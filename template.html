@@ -396,6 +396,8 @@
   .field label { display: block; font-size: 0.72rem; text-transform: uppercase;
                  letter-spacing: 0.05em; color: var(--text-3); font-weight: 600; margin-bottom: 5px; }
   .hint { font-size: 0.75rem; color: var(--text-3); margin: 0 0 12px; }
+  /* what a section claims, above the smaller print explaining how to read it */
+  .lead { font-size: 0.85rem; color: var(--text-2); margin: 0 0 10px; }
   .actions { display: flex; gap: 10px; flex-wrap: wrap; margin-top: 16px; align-items: center; }
   button.primary {
     background: var(--series-1); color: #fff; border: none; border-radius: 7px;
@@ -903,6 +905,18 @@ window.POLITI_PROFILES = [];
           </table>
         </div>
       </div>
+
+      <div class="card" id="strips-card">
+        <div class="tip-strip" id="strip-tip" hidden></div>
+        <h2 data-i18n="stripsTitle"></h2>
+        <p class="lead" data-i18n="stripsLead"></p>
+        <p class="hint" id="strips-hint"></p>
+        <div class="strip-head">
+          <span data-i18n="poleNegative"></span><span class="c">−100 &nbsp;·&nbsp; 0 &nbsp;·&nbsp; +100</span>
+          <span class="r" data-i18n="polePositive"></span><span class="r">σ</span>
+        </div>
+        <div id="axes-strips" class="strips"></div>
+      </div>
     </div>
 
     <div>
@@ -917,7 +931,7 @@ window.POLITI_PROFILES = [];
                 <th style="text-align:right" data-i18n-title="titleY" data-i18n="colY"></th>
                 <th style="text-align:right" data-i18n-title="titleSov" data-i18n="colSov"></th>
                 <th style="text-align:right" data-i18n-title="titleEcol" data-i18n="colEcol"></th>
-                <th data-i18n="colFamily"></th>
+                <th data-i18n-title="titleFamily" data-i18n="colFamily"></th>
                 <th><span class="sr-only" aria-label="Supprimer"></span></th>
               </tr>
             </thead>
@@ -966,17 +980,6 @@ window.POLITI_PROFILES = [];
       </div>
     </div>
 
-  </div>
-
-  <div class="card" id="strips-card" style="margin-top: 20px;">
-    <div class="tip-strip" id="strip-tip" hidden></div>
-    <h2 data-i18n="stripsTitle"></h2>
-    <p class="hint" id="strips-hint"></p>
-    <div class="strip-head">
-      <span data-i18n="poleNegative"></span><span class="c">−100 &nbsp;·&nbsp; 0 &nbsp;·&nbsp; +100</span>
-      <span class="r" data-i18n="polePositive"></span><span class="r">σ</span>
-    </div>
-    <div id="axes-strips" class="strips"></div>
   </div>
 
   <footer class="site">
@@ -1154,14 +1157,24 @@ const LOCALES = {
       + " points) : un profil qui tombe dans cet intervalle a mécaniquement un rattachement "
       + "plus lâche qu'un profil marqué.",
     tableTitle: "Profils enregistrés", addTitle: "Ajouter un profil",
-    stripsTitle: "Les huit axes, un par un",
+    stripsTitle: "Seconde lecture : les huit axes",
+    stripsLead: "La boussole compresse huit axes en deux, et cette compression est un choix, "
+      + "pas une évidence : elle rapproche des profils que ces huit axes séparent. Ici rien "
+      + "n'est compressé — même profils, une ligne par axe. Les deux lectures ne disent pas "
+      + "la même chose, et l'écart entre elles est ce qu'il y a de plus instructif.",
     dropTitle: "Déposer une capture PolitiScales",
     dropHint: "Ou cliquez pour choisir un fichier PNG",
     submit: "Calculer et placer", clear: "Vider", reset: "Tout réafficher",
     aliasLabel: "Alias", aliasPlaceholder: "Ex. Luc",
     footPrivacy: "Vos données", footSources: "Sources", footCode: "Code",
     colAlias: "Alias", colX: "X éco", colY: "Y sociétal", colSov: "Souv.",
-    colEcol: "Écolo.", colFamily: "Famille proche",
+    colEcol: "Écolo.",
+    /* Not "famille politique": the measure is a distance between two points on
+       two axes, which is a proximity, not a belonging. The column used to
+       claim the second while computing the first. */
+    colFamily: "Repère le plus proche",
+    titleFamily: "Le repère le plus proche sur les deux axes, et la distance qui l'en sépare. "
+      + "Une proximité mesurée, pas une appartenance.",
     colDistance: "Distance", colDeltaEcon: "Δ éco", colDeltaSocial: "Δ soc.",
     titleY: "Positif = autoritaire (haut) · négatif = libertaire (bas)",
     titleSov: "Nationalisme − Internationalisme : positif = souverainiste",
@@ -1405,8 +1418,12 @@ function methodTag(p) {
 
 /* Nearest neighbour, replacing a cascade of thresholds that left gaps (the
    whole right-libertarian quadrant, and x = 0) and had unreachable branches
-   (the RN was always caught by "x > 0 && y < 0" before being tested). */
-function nearestFamily(x, y) {
+   (the RN was always caught by "x > 0 && y < 0" before being tested).
+
+   Named for what it returns: the closest reference point and how far away it
+   is. It was `nearestFamily`, which promised a political family the two
+   coordinates cannot establish. */
+function nearestReference(x, y) {
   const ranked = REFERENCES
     .map(r => ({ r, d: Math.hypot(r.x - x, r.y - y) }))
     .sort((a, b) => a.d - b.d);
@@ -1813,7 +1830,7 @@ function render() {
     ptsLayer.appendChild(g);
 
     /* textContent throughout: the alias is free input, never HTML. */
-    const fam = nearestFamily(c.x, c.y);
+    const nearest = nearestReference(c.x, c.y);
     const tr = document.createElement("tr");
     tr.dataset.idx = String(i);
     if (selection && selection.kind === "profile" && selection.i === i) tr.classList.add("sel");
@@ -1845,9 +1862,9 @@ function render() {
     tdFam.className = "fam";
     const tag = document.createElement("span");
     tag.className = "tag";
-    tag.textContent = " · " + fitPhrase(fam.d) + " (" + fam.d + ")";
-    if (fam.d > FAR_LIMIT) tag.classList.add("far-note");
-    tdFam.append(document.createTextNode(fam.name), tag);
+    tag.textContent = " · " + fitPhrase(nearest.d) + " (" + nearest.d + ")";
+    if (nearest.d > FAR_LIMIT) tag.classList.add("far-note");
+    tdFam.append(document.createTextNode(nearest.name), tag);
     tr.appendChild(tdFam);
 
     const tdDel = document.createElement("td");
@@ -2299,7 +2316,7 @@ function wireHover(computed) {
 
   const show = (idx, clientX, clientY) => {
     const { p, c } = computed[idx];
-    const fam = nearestFamily(c.x, c.y);
+    const nearest = nearestReference(c.x, c.y);
 
     tip.replaceChildren();
     const b = document.createElement("b");
@@ -2336,9 +2353,9 @@ function wireHover(computed) {
 
     const near = document.createElement("p");
     near.className = "near";
-    near.textContent = fam.d > FAR_LIMIT
-      ? L.nearestFar + fam.name + " (" + fam.d + ")"
-      : L.nearest + fam.name + " (" + L.proximity + fam.fit + ")";
+    near.textContent = nearest.d > FAR_LIMIT
+      ? L.nearestFar + nearest.name + " (" + nearest.d + ")"
+      : L.nearest + nearest.name + " (" + L.proximity + nearest.fit + ")";
     tip.appendChild(near);
 
     tip.hidden = false;
