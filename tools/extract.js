@@ -23,7 +23,14 @@ const CACHE = path.join(SRC, ".extract-cache.json");
 const OUT = path.join(ROOT, "profiles-data.js");
 const PAGE = path.join(ROOT, "index.html");       /* generated, not committed */
 const TEMPLATE = path.join(ROOT, "template.html"); /* committed source, no data */
-const LIB = path.join(__dirname, "politi-dissect.js");
+/* The two files shared with the browser, each inlined into its own marked
+   block: the screenshot reader, and the compass model. */
+const SHARED = [
+  { file: path.join(__dirname, "politi-dissect.js"),
+    start: "/* POLITI-EXTRACTOR:START */", end: "/* POLITI-EXTRACTOR:END */" },
+  { file: path.join(__dirname, "politi-model.js"),
+    start: "/* POLITI-MODEL:START */", end: "/* POLITI-MODEL:END */" }
+];
 
 /* Replaces the content between two markers, leaving the rest untouched. */
 function between(text, start, end, body) {
@@ -35,25 +42,25 @@ function between(text, start, end, body) {
 /* A literal "</script>" inside a string would close the surrounding tag. */
 const safe = s => s.replace(/<\/(script)/gi, "<\\/$1");
 
-/* The extractor is code, so it is inlined into the template itself and
-   committed: someone who clones the repository gets a page where dropping a
-   screenshot works straight away, with no build step and no Node. Only the
-   DATA is template-only-in-index.html, since that is what must never be
-   committed.
+/* The shared files are code, so they are inlined into the template itself and
+   committed: someone who clones the repository gets a page that works straight
+   away, with no build step and no Node. Only the DATA is
+   template-only-in-index.html, since that is what must never be committed.
 
    index.html is then REBUILT from the template on every run, so it never holds
    anything beyond the template plus the current data. */
 function inject(count, dataJs) {
-  if (!fs.existsSync(TEMPLATE) || !fs.existsSync(LIB)) return false;
-  const extractor = safe(fs.readFileSync(LIB, "utf8").trimEnd());
+  if (!fs.existsSync(TEMPLATE) || SHARED.some(s => !fs.existsSync(s.file))) return false;
 
   let page = fs.readFileSync(TEMPLATE, "utf8");
-  const withExtractor = between(page, "/* POLITI-EXTRACTOR:START */",
-                                "/* POLITI-EXTRACTOR:END */", extractor);
-  if (!withExtractor) return false;
-  if (withExtractor !== page) {          /* only touch it when it changed */
-    fs.writeFileSync(TEMPLATE, withExtractor);
-    page = withExtractor;
+  for (const { file, start, end } of SHARED) {
+    const code = safe(fs.readFileSync(file, "utf8").trimEnd());
+    const next = between(page, start, end, code);
+    if (!next) return false;
+    if (next !== page) {                 /* only touch it when it changed */
+      fs.writeFileSync(TEMPLATE, next);
+      page = next;
+    }
   }
 
   const out = between(page, "/* POLITI-DATA:START */", "/* POLITI-DATA:END */",

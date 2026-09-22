@@ -741,6 +741,277 @@
 /* POLITI-EXTRACTOR:END */
   </script>
   <script>
+/* POLITI-MODEL:START */
+"use strict";
+/* The compass model: the axes and their weights, the party references, and
+   every computation that turns a PolitiScales profile into a position.
+
+   Shared file: loaded as-is by the browser (inlined into index.html) and by
+   Node (require), exactly like politi-dissect.js beside it. It touches no DOM
+   and holds no state — the page keeps the current country, the module only
+   computes.
+
+   It returns KEYS, never sentences: `fitOf` gives "near", not "proche", and
+   `methodTag` gives "revolutionary". Wording belongs to the locale table in
+   the page, so a second language changes nothing here.
+
+   Being requirable is the point: the weighting, the thresholds and the
+   proximity claims have all been measured, and a measurement nobody else can
+   re-run is just an assertion. */
+(function (global) {
+
+  /* The 8 PolitiScales axes. `neg` pulls left (X) or down (Y), `pos` pulls
+     right or up. `axis: null` means descriptive only. */
+  const AXES = [
+    { neg: ["com"], pos: ["cap"],  axis: "x", w: 0.45 },
+    { neg: ["reg"], pos: ["laf"],  axis: "x", w: 0.35 },
+    /* Ecology <-> Productivism does NOT feed axis X. It used to, at 20%, which
+       mixed two different things: the party references come from CHES, whose
+       `lrecon` scale (taxes, spending, deregulation) excludes the environment —
+       CHES keeps it as a separate variable. So we were comparing an
+       economy+ecology axis against a purely economic one. The worst-affected
+       profile came out 12 points too far left: ecological AND pro-market, their
+       ecology dragged them leftwards even though it says nothing about their
+       relationship to the market. Ecology is now a separate readout, like
+       sovereignism. */
+    { neg: ["eco"], pos: ["prod"], axis: null },
+    { neg: ["cst"], pos: ["ess"],  axis: "y", w: 0.30 },
+    { neg: ["rehab"], pos: ["pun"], axis: "y", w: 0.25 },
+    { neg: ["prg"], pos: ["csv"],  axis: "y", w: 0.25 },
+    { neg: ["int"], pos: ["nat"],  axis: "y", w: 0.20 },
+    { neg: ["rev"], pos: ["ref"],  axis: null }
+  ];
+
+  /* Reference parties, on the same [-100, 100] scales as the profiles, grouped
+     by country. A profile means nothing in the absolute: it only reads against
+     the forces it could actually vote for, and those change at every border.
+
+     `src` carries where a pair of coordinates comes from, so the page can count
+     its own sources instead of a hardcoded sentence going stale:
+       "ches" — read off the Chapel Hill Expert Survey 2024 (609 political
+                scientists, 279 European parties), converted from its 0-10
+                `lrecon` (economic left-right) and `galtan` (libertarian-
+                authoritarian) scales: value = (score − 5) × 20. Those are
+                exactly the two dimensions of this compass, which is why the
+                conversion is a rescaling and nothing more.
+       "est"  — hand estimate, calibrated against the CHES entries around it.
+
+     What does NOT transpose is the meaning of "a party". CHES rates parties, so
+     in a multi-party system each reference is one. The United States are not in
+     CHES — no expert survey on these scales covers them — and two parties that
+     each span half the board would place nobody: the American table therefore
+     rates the main tendencies as well, and says so. Comparing a profile to
+     "the Democratic Party" and to "its progressive wing" are two different
+     questions, and only the second one is informative there. */
+  const COUNTRIES = [
+    {
+      code: "fr", name: "France", parties: [
+        { name: "Lutte ouvrière",     x: -92, y: -30, src: "est",  note: "Trotskisme, anticapitalisme de classe" },
+        { name: "NPA / Rév. perm.",   x: -88, y: -70, src: "est",  note: "Anticapitalisme, forte ouverture sociétale" },
+        { name: "La France insoumise",x: -82, y: -64, src: "ches", note: "Rupture écosocialiste, populisme de gauche" },
+        { name: "PCF",                x: -75, y: -29, src: "ches", note: "Étatisme économique, sensibilité souverainiste" },
+        { name: "Les Écologistes",    x: -54, y: -66, src: "ches", note: "Écologie politique, libéralisme culturel" },
+        { name: "Parti socialiste",   x: -33, y: -45, src: "ches", note: "Social-démocratie réformiste" },
+        { name: "La France humaniste",x: -15, y: -22, src: "est",  note: "Villepin, 2025 — gaullisme social : patrimoine et successions taxés, mais déficit sous 3 %, simplification par ordonnances. Postérieur au CHES, placement incertain" },
+        { name: "MoDem",              x:  14, y: -10, src: "ches", note: "Centrisme social, europhilie" },
+        { name: "Rassemblement national", x: 20, y: 67, src: "ches", note: "Étatisme social ciblé, nationalisme" },
+        { name: "Renaissance",        x:  24, y: -18, src: "ches", note: "Libéralisme économique, centre-droit" },
+        { name: "Horizons",           x:  36, y:   6, src: "ches", note: "Droite libérale gestionnaire" },
+        { name: "Debout la France",   x:  38, y:  62, src: "est",  note: "Souverainisme gaulliste" },
+        { name: "Les Républicains",   x:  56, y:  44, src: "ches", note: "Droite conservatrice, ordre et marché" },
+        { name: "Nouvelle Énergie",   x:  62, y:  32, src: "est",  note: "Lisnard — droite libérale et décentralisatrice : choc de dérégulation, retraite par capitalisation, migration hors contrôle des cours européennes" },
+        { name: "Reconquête",         x:  67, y:  82, src: "ches", note: "Libéralisme économique, national-conservatisme" }
+      ]
+    },
+    {
+      code: "de", name: "Allemagne", parties: [
+        { name: "Die Linke",          x: -73, y: -54, src: "ches", note: "Gauche radicale, redistribution et ouverture sociétale" },
+        { name: "BSW",                x: -44, y:  41, src: "ches", note: "Scission de Die Linke — étatisme économique et conservatisme culturel, le quadrant que l'échiquier français laisse vide" },
+        { name: "Grüne",              x: -33, y: -68, src: "ches", note: "Écologie politique, libéralisme culturel" },
+        { name: "SPD",                x: -31, y: -28, src: "ches", note: "Social-démocratie de gouvernement" },
+        { name: "Freie Wähler",       x:  29, y:  34, src: "ches", note: "Centre-droit localiste, ancré en Bavière" },
+        { name: "CDU",                x:  32, y:  31, src: "ches", note: "Démocratie chrétienne, centre-droit de gouvernement" },
+        { name: "CSU",                x:  35, y:  51, src: "ches", note: "Aile bavaroise de la CDU, nettement plus conservatrice" },
+        { name: "FDP",                x:  52, y: -36, src: "ches", note: "Libéralisme de marché ET libéralisme culturel — sans équivalent français de ce poids" },
+        { name: "AfD",                x:  53, y:  88, src: "ches", note: "Droite radicale nationaliste" }
+      ]
+    },
+    {
+      code: "it", name: "Italie", parties: [
+        { name: "Sinistra Italiana",  x: -72, y: -66, src: "ches", note: "Gauche radicale, composante de l'alliance AVS" },
+        { name: "Europa Verde",       x: -56, y: -66, src: "ches", note: "Écologistes, composante de l'alliance AVS" },
+        { name: "M5S",                x: -43, y: -35, src: "ches", note: "Mouvement 5 étoiles — populisme devenu social, longtemps hors du clivage" },
+        { name: "Partito Democratico",x: -41, y: -53, src: "ches", note: "Centre-gauche social-démocrate" },
+        { name: "SVP",                x:   0, y:   2, src: "ches", note: "Parti régionaliste sud-tyrolien, au centre des deux axes" },
+        { name: "Azione",             x:   4, y: -31, src: "ches", note: "Centre libéral réformateur" },
+        { name: "Più Europa",         x:   5, y: -73, src: "ches", note: "Centre libéral, fortement europhile" },
+        { name: "Fratelli d'Italia",  x:  28, y:  83, src: "ches", note: "Droite nationale-conservatrice, au gouvernement depuis 2022" },
+        { name: "Lega",               x:  36, y:  77, src: "ches", note: "Droite radicale, régionaliste à l'origine" },
+        { name: "Forza Italia",       x:  48, y:  21, src: "ches", note: "Droite libérale-conservatrice" }
+      ]
+    },
+    {
+      code: "uk", name: "Royaume-Uni", parties: [
+        { name: "Green Party",        x: -58, y: -71, src: "ches", note: "Écologistes d'Angleterre et du pays de Galles" },
+        { name: "Plaid Cymru",        x: -42, y: -31, src: "ches", note: "Nationalisme gallois de gauche" },
+        { name: "SNP",                x: -38, y: -44, src: "ches", note: "Indépendantisme écossais, social-démocrate" },
+        { name: "Labour",             x: -28, y: -33, src: "ches", note: "Travaillisme de gouvernement, recentré" },
+        { name: "Liberal Democrats",  x: -14, y: -65, src: "ches", note: "Centre libéral, très libéral culturellement" },
+        { name: "Conservative Party", x:  49, y:  43, src: "ches", note: "Conservatisme de marché" },
+        { name: "Reform UK",          x:  68, y:  82, src: "ches", note: "Droite radicale issue du Brexit" }
+      ]
+    },
+    {
+      /* No CHES survey covers the United States: CHES-USA is announced but
+         unreleased. Every position here is an estimate, and the table is the
+         one that mixes parties and tendencies — see the note above. */
+      code: "us", name: "États-Unis",
+      why: "aucune enquête CHES ne couvre les États-Unis (CHES-USA est annoncée, pas publiée). "
+         + "Le bipartisme y rend d'ailleurs le parti seul peu parlant : les deux grands partis "
+         + "agrègent des positions très écartées, donc leurs principaux courants sont placés à "
+         + "part. À lire comme un ordre de grandeur, pas comme une mesure.",
+      parties: [
+        { name: "Green Party",              x: -65, y: -62, src: "est", note: "Écosocialisme, hors des deux grands partis" },
+        { name: "Démocrates progressistes", x: -52, y: -52, src: "est", note: "Sanders, Ocasio-Cortez — assurance maladie publique, Green New Deal" },
+        { name: "Parti démocrate",          x: -16, y: -30, src: "est", note: "Centre-gauche à l'échelle européenne : le marché y est peu contesté, le libéralisme culturel assumé" },
+        { name: "Républicains modérés",     x:  55, y:  30, src: "est", note: "Républicanisme d'avant 2016 : marché, défense, conservatisme social tempéré" },
+        { name: "Parti républicain",        x:  62, y:  72, src: "est", note: "Marché, conservatisme social et national" },
+        { name: "Parti libertarien",        x:  88, y: -32, src: "est", note: "Marché sans entrave et libertés individuelles — quadrant que personne n'occupe en Europe à ce niveau" }
+      ]
+    }
+  ];
+
+  const clamp = (v, lo, hi) => Math.min(hi, Math.max(lo, v));
+
+  /* A component only counts if at least one of its two poles is filled in.
+     Weights are renormalised over the components present, so an incomplete
+     profile stays on the same [-100, 100] scale as the others. */
+  function axisScore(p, which) {
+    let sum = 0, weight = 0;
+    for (const a of AXES) {
+      if (a.axis !== which) continue;
+      const lo = p[a.neg[0]], hi = p[a.pos[0]];
+      const hasLo = Number.isFinite(lo), hasHi = Number.isFinite(hi);
+      if (!hasLo && !hasHi) continue;
+      sum += a.w * ((hasHi ? hi : 0) - (hasLo ? lo : 0));
+      weight += a.w;
+    }
+    if (!weight) return 0;
+    return clamp(sum / weight, -100, 100);
+  }
+
+  /* "revolutionary" | "reformist" | "neither" | null */
+  function methodTag(p) {
+    const rev = Number(p.rev), ref = Number(p.ref);
+    if (!Number.isFinite(rev) && !Number.isFinite(ref)) return null;
+    const d = (rev || 0) - (ref || 0);
+    if (d > 20) return "revolutionary";
+    if (d < -20) return "reformist";
+    return "neither";
+  }
+
+  function coords(p) {
+    return {
+      x: Math.round(axisScore(p, "x")),
+      y: Math.round(axisScore(p, "y")),
+      sov: Math.round((Number(p.nat) || 0) - (Number(p.int) || 0)),
+      ecol: Math.round((Number(p.eco) || 0) - (Number(p.prod) || 0)),
+      method: methodTag(p)
+    };
+  }
+
+  /* Median distance from a reference to its nearest neighbour. */
+  function spacingOf(refs) {
+    if (refs.length < 2) return 0;
+    const nn = refs.map((r, i) => Math.min(...refs
+      .filter((_, j) => j !== i).map(o => Math.hypot(o.x - r.x, o.y - r.y))));
+    nn.sort((a, b) => a - b);
+    return nn[nn.length >> 1];
+  }
+
+  /* Proximity thresholds, DERIVED from the references rather than hardcoded.
+     "Close" means no further from a reference than that reference is from its
+     own neighbour; beyond one and a half times, none is genuinely close.
+     Deriving them keeps them from going stale: pinned at 20 and 32 against the
+     old positions, they were wrong the moment the CHES data was adopted.
+
+     `tie` is the third: below that gap between the first and second reference,
+     the attachment is a toss-up. Measured on 4000 synthetic profiles over the
+     French board — under a third of the spacing, a third to a half of profiles
+     get a different nearest reference under equally defensible axis weights,
+     against 6% past ten points. The scaling to other countries follows their
+     own spacing, which is an inference and not a measurement.
+
+     Every country gets its own: one whose parties crowd together earns tighter
+     thresholds than one spread over the whole board. */
+  function limitsFor(refs) {
+    const s = spacingOf(refs);
+    return { near: Math.round(s), far: Math.round(s * 1.5), tie: Math.round(s * 0.3) };
+  }
+
+  /* "near" | "moderate" | "far" */
+  const fitOf = (d, limits) =>
+    (d <= limits.near ? "near" : d <= limits.far ? "moderate" : "far");
+
+  /* Nearest neighbour, replacing a cascade of thresholds that left gaps (the
+     whole right-libertarian quadrant, and x = 0) and had unreachable branches
+     (the RN was always caught by "x > 0 && y < 0" before being tested).
+
+     Named for what it returns: the closest reference point and how far away it
+     is. It was `nearestFamily`, which promised a political family the two
+     coordinates cannot establish — and the runner-up comes back with it,
+     because the margin between the two is what decides whether the answer
+     survives a different weighting. */
+  function nearestReference(x, y, refs, limits) {
+    if (!refs.length) return null;
+    const ranked = refs
+      .map(r => ({ r, d: Math.hypot(r.x - x, r.y - y) }))
+      .sort((a, b) => a.d - b.d);
+    const best = ranked[0];
+    const d = Math.round(best.d);
+    const runnerUp = ranked[1];
+    const second = runnerUp
+      ? { name: runnerUp.r.name, d: Math.round(runnerUp.d) } : null;
+    return { name: best.r.name, ref: best.r, d, fit: fitOf(best.d, limits), second,
+             margin: second ? second.d - d : Infinity };
+  }
+
+  /* Distances from a point to every reference, nearest first. dx/dy are
+     signed: "this party sits 34 points to your right". */
+  function rankParties(c, refs) {
+    return refs
+      .map(r => ({ name: r.name, ref: r,
+                   d: Math.round(Math.hypot(r.x - c.x, r.y - c.y)),
+                   dx: r.x - c.x, dy: r.y - c.y }))
+      .sort((a, b) => a.d - b.d);
+  }
+
+  /* The widest hole on the economic axis, which is where a profile gets
+     attached to a reference it is not really close to. Measured rather than
+     asserted: the copy used to name the French centre gap, which said nothing
+     about Germany. */
+  function widestEconGap(refs) {
+    const sorted = refs.slice().sort((a, b) => a.x - b.x);
+    let best = null;
+    for (let i = 1; i < sorted.length; i++) {
+      const d = sorted[i].x - sorted[i - 1].x;
+      if (!best || d > best.d) best = { d, lo: sorted[i - 1], hi: sorted[i] };
+    }
+    return best;
+  }
+
+  const countryByCode = code => COUNTRIES.find(c => c.code === code) || null;
+
+  const api = { AXES, COUNTRIES, clamp, axisScore, methodTag, coords, spacingOf,
+                limitsFor, fitOf, nearestReference, rankParties, widestEconGap,
+                countryByCode };
+  if (typeof module !== "undefined" && module.exports) module.exports = api;
+  else global.PolitiModel = api;
+
+})(typeof globalThis !== "undefined" ? globalThis : this);
+/* POLITI-MODEL:END */
+  </script>
+  <script>
 /* POLITI-DATA:START */
 /* Filled by tools/extract.js from politi-results/.
    This template holds NO personal data: it is the file that is committed,
@@ -1218,128 +1489,16 @@ const L = LOCALES[LANG] || LOCALES.fr;
 
 /* ---------------------------------------------------------------- model --- */
 
-/* The 8 PolitiScales axes. `neg` pulls left (X) or down (Y), `pos` pulls
-   right or up. `axis: null` means descriptive only. */
-const AXES = [
-  { neg: ["com"], pos: ["cap"],  axis: "x", w: 0.45 },
-  { neg: ["reg"], pos: ["laf"],  axis: "x", w: 0.35 },
-  /* Ecology <-> Productivism does NOT feed axis X. It used to, at 20%, which
-     mixed two different things: the party references come from CHES, whose
-     `lrecon` scale (taxes, spending, deregulation) excludes the environment —
-     CHES keeps it as a separate variable. So we were comparing an
-     economy+ecology axis against a purely economic one. The worst-affected
-     profile came out 12 points too far left: ecological AND pro-market, their
-     ecology dragged them leftwards even though it says nothing about their
-     relationship to the market. Ecology is now a separate readout, like
-     sovereignism. */
-  { neg: ["eco"], pos: ["prod"], axis: null },
-  { neg: ["cst"], pos: ["ess"],  axis: "y", w: 0.30 },
-  { neg: ["rehab"], pos: ["pun"], axis: "y", w: 0.25 },
-  { neg: ["prg"], pos: ["csv"],  axis: "y", w: 0.25 },
-  { neg: ["int"], pos: ["nat"],  axis: "y", w: 0.20 },
-  { neg: ["rev"], pos: ["ref"],  axis: null }
-];
+/* The axes and their weights live in tools/politi-model.js, inlined above:
+   the same table has to be readable from Node, or the measurements that set
+   those weights cannot be re-run by anyone else. */
+const AXES = PolitiModel.AXES;
+
 /* Axis wording comes from the locale, so AXES itself stays language-neutral. */
 AXES.forEach(a => { a.neg[1] = L.axis[a.neg[0]]; a.pos[1] = L.axis[a.pos[0]]; });
 
-/* Reference parties, on the same [-100, 100] scales as the profiles, grouped
-   by country. A profile means nothing in the absolute: it only reads against
-   the forces it could actually vote for, and those change at every border.
-
-   `src` carries where a pair of coordinates comes from, so the page can count
-   its own sources instead of a hardcoded sentence going stale:
-     "ches" — read off the Chapel Hill Expert Survey 2024 (609 political
-              scientists, 279 European parties), converted from its 0-10
-              `lrecon` (economic left-right) and `galtan` (libertarian-
-              authoritarian) scales: value = (score − 5) × 20. Those are
-              exactly the two dimensions of this compass, which is why the
-              conversion is a rescaling and nothing more.
-     "est"  — hand estimate, calibrated against the CHES entries around it.
-
-   What does NOT transpose is the meaning of "a party". CHES rates parties, so
-   in a multi-party system each reference is one. The United States are not in
-   CHES — no expert survey on these scales covers them — and two parties that
-   each span half the board would place nobody: the American table therefore
-   rates the main tendencies as well, and says so. Comparing a profile to
-   "the Democratic Party" and to "its progressive wing" are two different
-   questions, and only the second one is informative there. */
-const COUNTRIES = [
-  {
-    code: "fr", name: "France", parties: [
-      { name: "Lutte ouvrière",     x: -92, y: -30, src: "est",  note: "Trotskisme, anticapitalisme de classe" },
-      { name: "NPA / Rév. perm.",   x: -88, y: -70, src: "est",  note: "Anticapitalisme, forte ouverture sociétale" },
-      { name: "La France insoumise",x: -82, y: -64, src: "ches", note: "Rupture écosocialiste, populisme de gauche" },
-      { name: "PCF",                x: -75, y: -29, src: "ches", note: "Étatisme économique, sensibilité souverainiste" },
-      { name: "Les Écologistes",    x: -54, y: -66, src: "ches", note: "Écologie politique, libéralisme culturel" },
-      { name: "Parti socialiste",   x: -33, y: -45, src: "ches", note: "Social-démocratie réformiste" },
-      { name: "La France humaniste",x: -15, y: -22, src: "est",  note: "Villepin, 2025 — gaullisme social : patrimoine et successions taxés, mais déficit sous 3 %, simplification par ordonnances. Postérieur au CHES, placement incertain" },
-      { name: "MoDem",              x:  14, y: -10, src: "ches", note: "Centrisme social, europhilie" },
-      { name: "Rassemblement national", x: 20, y: 67, src: "ches", note: "Étatisme social ciblé, nationalisme" },
-      { name: "Renaissance",        x:  24, y: -18, src: "ches", note: "Libéralisme économique, centre-droit" },
-      { name: "Horizons",           x:  36, y:   6, src: "ches", note: "Droite libérale gestionnaire" },
-      { name: "Debout la France",   x:  38, y:  62, src: "est",  note: "Souverainisme gaulliste" },
-      { name: "Les Républicains",   x:  56, y:  44, src: "ches", note: "Droite conservatrice, ordre et marché" },
-      { name: "Nouvelle Énergie",   x:  62, y:  32, src: "est",  note: "Lisnard — droite libérale et décentralisatrice : choc de dérégulation, retraite par capitalisation, migration hors contrôle des cours européennes" },
-      { name: "Reconquête",         x:  67, y:  82, src: "ches", note: "Libéralisme économique, national-conservatisme" }
-    ]
-  },
-  {
-    code: "de", name: "Allemagne", parties: [
-      { name: "Die Linke",          x: -73, y: -54, src: "ches", note: "Gauche radicale, redistribution et ouverture sociétale" },
-      { name: "BSW",                x: -44, y:  41, src: "ches", note: "Scission de Die Linke — étatisme économique et conservatisme culturel, le quadrant que l'échiquier français laisse vide" },
-      { name: "Grüne",              x: -33, y: -68, src: "ches", note: "Écologie politique, libéralisme culturel" },
-      { name: "SPD",                x: -31, y: -28, src: "ches", note: "Social-démocratie de gouvernement" },
-      { name: "Freie Wähler",       x:  29, y:  34, src: "ches", note: "Centre-droit localiste, ancré en Bavière" },
-      { name: "CDU",                x:  32, y:  31, src: "ches", note: "Démocratie chrétienne, centre-droit de gouvernement" },
-      { name: "CSU",                x:  35, y:  51, src: "ches", note: "Aile bavaroise de la CDU, nettement plus conservatrice" },
-      { name: "FDP",                x:  52, y: -36, src: "ches", note: "Libéralisme de marché ET libéralisme culturel — sans équivalent français de ce poids" },
-      { name: "AfD",                x:  53, y:  88, src: "ches", note: "Droite radicale nationaliste" }
-    ]
-  },
-  {
-    code: "it", name: "Italie", parties: [
-      { name: "Sinistra Italiana",  x: -72, y: -66, src: "ches", note: "Gauche radicale, composante de l'alliance AVS" },
-      { name: "Europa Verde",       x: -56, y: -66, src: "ches", note: "Écologistes, composante de l'alliance AVS" },
-      { name: "M5S",                x: -43, y: -35, src: "ches", note: "Mouvement 5 étoiles — populisme devenu social, longtemps hors du clivage" },
-      { name: "Partito Democratico",x: -41, y: -53, src: "ches", note: "Centre-gauche social-démocrate" },
-      { name: "SVP",                x:   0, y:   2, src: "ches", note: "Parti régionaliste sud-tyrolien, au centre des deux axes" },
-      { name: "Azione",             x:   4, y: -31, src: "ches", note: "Centre libéral réformateur" },
-      { name: "Più Europa",         x:   5, y: -73, src: "ches", note: "Centre libéral, fortement europhile" },
-      { name: "Fratelli d'Italia",  x:  28, y:  83, src: "ches", note: "Droite nationale-conservatrice, au gouvernement depuis 2022" },
-      { name: "Lega",               x:  36, y:  77, src: "ches", note: "Droite radicale, régionaliste à l'origine" },
-      { name: "Forza Italia",       x:  48, y:  21, src: "ches", note: "Droite libérale-conservatrice" }
-    ]
-  },
-  {
-    code: "uk", name: "Royaume-Uni", parties: [
-      { name: "Green Party",        x: -58, y: -71, src: "ches", note: "Écologistes d'Angleterre et du pays de Galles" },
-      { name: "Plaid Cymru",        x: -42, y: -31, src: "ches", note: "Nationalisme gallois de gauche" },
-      { name: "SNP",                x: -38, y: -44, src: "ches", note: "Indépendantisme écossais, social-démocrate" },
-      { name: "Labour",             x: -28, y: -33, src: "ches", note: "Travaillisme de gouvernement, recentré" },
-      { name: "Liberal Democrats",  x: -14, y: -65, src: "ches", note: "Centre libéral, très libéral culturellement" },
-      { name: "Conservative Party", x:  49, y:  43, src: "ches", note: "Conservatisme de marché" },
-      { name: "Reform UK",          x:  68, y:  82, src: "ches", note: "Droite radicale issue du Brexit" }
-    ]
-  },
-  {
-    /* No CHES survey covers the United States: CHES-USA is announced but
-       unreleased. Every position here is an estimate, and the table is the
-       one that mixes parties and tendencies — see the note above. */
-    code: "us", name: "États-Unis",
-    why: "aucune enquête CHES ne couvre les États-Unis (CHES-USA est annoncée, pas publiée). "
-       + "Le bipartisme y rend d'ailleurs le parti seul peu parlant : les deux grands partis "
-       + "agrègent des positions très écartées, donc leurs principaux courants sont placés à "
-       + "part. À lire comme un ordre de grandeur, pas comme une mesure.",
-    parties: [
-      { name: "Green Party",              x: -65, y: -62, src: "est", note: "Écosocialisme, hors des deux grands partis" },
-      { name: "Démocrates progressistes", x: -52, y: -52, src: "est", note: "Sanders, Ocasio-Cortez — assurance maladie publique, Green New Deal" },
-      { name: "Parti démocrate",          x: -16, y: -30, src: "est", note: "Centre-gauche à l'échelle européenne : le marché y est peu contesté, le libéralisme culturel assumé" },
-      { name: "Républicains modérés",     x:  55, y:  30, src: "est", note: "Républicanisme d'avant 2016 : marché, défense, conservatisme social tempéré" },
-      { name: "Parti républicain",        x:  62, y:  72, src: "est", note: "Marché, conservatisme social et national" },
-      { name: "Parti libertarien",        x:  88, y: -32, src: "est", note: "Marché sans entrave et libertés individuelles — quadrant que personne n'occupe en Europe à ce niveau" }
-    ]
-  }
-];
+/* The reference tables, likewise, live in the shared model. */
+const COUNTRIES = PolitiModel.COUNTRIES;
 
 /* The active country. Everything downstream keeps reading REFERENCES, which is
    rebound rather than rebuilt, so the rendering code never learns that
@@ -1406,40 +1565,12 @@ function rebuild() {
 let profiles = [];
 rebuild();
 
-/* A component only counts if at least one of its two poles is filled in.
-   Weights are renormalised over the components present, so an incomplete
-   profile stays on the same [-100, 100] scale as the others. */
-function axisScore(p, which) {
-  let sum = 0, weight = 0;
-  for (const a of AXES) {
-    if (a.axis !== which) continue;
-    const lo = p[a.neg[0]], hi = p[a.pos[0]];
-    const hasLo = Number.isFinite(lo), hasHi = Number.isFinite(hi);
-    if (!hasLo && !hasHi) continue;
-    sum += a.w * ((hasHi ? hi : 0) - (hasLo ? lo : 0));
-    weight += a.w;
-  }
-  if (!weight) return 0;
-  return clamp(sum / weight, -100, 100);
-}
-
+/* The model returns keys, not sentences, so the wrappers below are the whole
+   of the presentation layer: they look the wording up and change nothing else. */
 function coords(p) {
-  return {
-    x: Math.round(axisScore(p, "x")),
-    y: Math.round(axisScore(p, "y")),
-    sov: Math.round((Number(p.nat) || 0) - (Number(p.int) || 0)),
-    ecol: Math.round((Number(p.eco) || 0) - (Number(p.prod) || 0)),
-    method: methodTag(p)
-  };
-}
-
-function methodTag(p) {
-  const rev = Number(p.rev), ref = Number(p.ref);
-  if (!Number.isFinite(rev) && !Number.isFinite(ref)) return null;
-  const d = (rev || 0) - (ref || 0);
-  if (d > 20) return L.method.revolutionary;
-  if (d < -20) return L.method.reformist;
-  return L.method.neither;
+  const c = PolitiModel.coords(p);
+  if (c.method) c.method = L.method[c.method];
+  return c;
 }
 
 /* Nearest neighbour, replacing a cascade of thresholds that left gaps (the
@@ -1450,57 +1581,22 @@ function methodTag(p) {
    is. It was `nearestFamily`, which promised a political family the two
    coordinates cannot establish. */
 function nearestReference(x, y) {
-  const ranked = REFERENCES
-    .map(r => ({ r, d: Math.hypot(r.x - x, r.y - y) }))
-    .sort((a, b) => a.d - b.d);
-  const best = ranked[0];
-  const fit = fitOf(best.d);
-  const d = Math.round(best.d);
-  /* The runner-up and how far behind it sits. Measured on 4000 synthetic
-     profiles: when that margin is under a third of the reference spacing, a
-     third to a half of profiles get a DIFFERENT nearest reference under
-     equally defensible axis weights; past ten points, 94% keep theirs. The
-     margin, not the weighting, is what decides whether the answer holds, so
-     the page shows it instead of presenting a coin toss as a result. */
-  const runnerUp = ranked[1];
-  const second = runnerUp
-    ? { name: runnerUp.r.name, d: Math.round(runnerUp.d) } : null;
-  return { name: best.r.name, note: noteOf(best.r), d, fit, second,
-           margin: second ? second.d - d : Infinity };
+  const n = PolitiModel.nearestReference(x, y, REFERENCES, LIMITS);
+  if (!n) return null;
+  n.fit = L.fit[n.fit];
+  n.note = noteOf(n.ref);
+  return n;
 }
 
 /* { kind: "profile" | "party", i } — whatever is currently being compared. */
 let selection = null;
 
-/* Proximity thresholds, DERIVED from the references rather than hardcoded:
-   we measure the median spacing between a party and its nearest neighbour and
-   work from that. "Close" means no further from the party than that party is
-   from its own neighbour; beyond one and a half times, no party is genuinely
-   close (the name is still shown, but presenting it as a family would be a
-   stretch).
-
-   Deriving them keeps them from going stale: pinned at 20 and 32 against the
-   old positions, they were wrong the moment the CHES data was adopted, which
-   tightens the set.
-
-   They are recomputed on every country change for the same reason: a country
-   whose parties crowd together earns tighter thresholds than one spread over
-   the whole board, and the French spacing would describe neither. */
-function spacingOf(refs) {
-  if (refs.length < 2) return 0;
-  const nn = refs.map((r, i) => Math.min(...refs
-    .filter((_, j) => j !== i).map(o => Math.hypot(o.x - r.x, o.y - r.y))));
-  nn.sort((a, b) => a - b);
-  return nn[nn.length >> 1];
-}
-let NEAR_LIMIT = 0, FAR_LIMIT = 0;
-/* Below this gap between the nearest reference and the runner-up, the
-   attachment is a toss-up (see nearestReference). Derived from the spacing
-   like the other two, so a sparse board — where every distance is larger —
-   gets a proportionally wider band rather than France's five points. */
-let TIE_LIMIT = 0;
-const fitOf = d => (d <= NEAR_LIMIT ? L.fit.near : d <= FAR_LIMIT ? L.fit.moderate : L.fit.far);
-const fitPhrase = d => (d <= FAR_LIMIT ? L.proximity + fitOf(d) : L.noCloseParty);
+/* Thresholds are derived from the references by the model, and recomputed on
+   every country change: a board whose parties crowd together earns tighter
+   ones than a board spread over the whole square. */
+let LIMITS = { near: 0, far: 0, tie: 0 };
+const fitOf = d => L.fit[PolitiModel.fitOf(d, LIMITS)];
+const fitPhrase = d => (d <= LIMITS.far ? L.proximity + fitOf(d) : L.noCloseParty);
 
 /* The chosen country is a preference, not data: it is kept apart from the
    profile overlay so that clearing one never clears the other. */
@@ -1510,27 +1606,12 @@ function setCountry(code) {
   const found = COUNTRIES.find(c => c.code === code);
   if (found) country = found;
   REFERENCES = country.parties;
-  const s = spacingOf(REFERENCES);
-  NEAR_LIMIT = Math.round(s);
-  FAR_LIMIT = Math.round(s * 1.5);
-  TIE_LIMIT = Math.round(s * 0.3);
+  LIMITS = PolitiModel.limitsFor(REFERENCES);
   /* `selection` holds an index into the previous table, which now points at
      another party or at nothing at all. */
   if (selection && selection.kind === "party") selection = null;
 }
 
-/* The widest hole on the economic axis, which is where a profile gets attached
-   to a party it is not really close to. Measured rather than asserted: the
-   copy used to name the French centre gap, which said nothing about Germany. */
-function widestEconGap() {
-  const sorted = REFERENCES.slice().sort((a, b) => a.x - b.x);
-  let best = null;
-  for (let i = 1; i < sorted.length; i++) {
-    const d = sorted[i].x - sorted[i - 1].x;
-    if (!best || d > best.d) best = { d, lo: sorted[i - 1], hi: sorted[i] };
-  }
-  return best;
-}
 
 /* Every piece of copy that names the country or counts its references. */
 function applyCountry() {
@@ -1545,19 +1626,15 @@ function applyCountry() {
     : L.methodRefsMixed(country.name, ches.length, est.length,
                         est.map(r => r.name).join(", "));
 
-  const gap = widestEconGap();
+  const gap = PolitiModel.widestEconGap(REFERENCES);
   $("method-gap").textContent = gap ? L.methodGap(gap.lo.name, gap.hi.name, gap.d) : "";
-  $("method-tie").textContent = L.methodTie(TIE_LIMIT);
+  $("method-tie").textContent = L.methodTie(LIMITS.tie);
 }
 
-/* Distances from a point to every party, nearest first. dx/dy are signed:
-   "this party sits 34 points to your right". */
+/* Distances to every reference, nearest first, with the wording added. */
 function rankParties(c) {
-  return REFERENCES
-    .map(r => ({ name: r.name, note: noteOf(r),
-                 d: Math.round(Math.hypot(r.x - c.x, r.y - c.y)),
-                 dx: r.x - c.x, dy: r.y - c.y }))
-    .sort((a, b) => a.d - b.d);
+  return PolitiModel.rankParties(c, REFERENCES)
+    .map(r => Object.assign(r, { note: noteOf(r.ref) }));
 }
 
 /* The mirror image: which profiles come closest to a given party. */
@@ -1907,12 +1984,12 @@ function render() {
     const tag = document.createElement("span");
     tag.className = "tag";
     tag.textContent = " · " + fitPhrase(nearest.d) + " (" + nearest.d + ")";
-    if (nearest.d > FAR_LIMIT) tag.classList.add("far-note");
+    if (nearest.d > LIMITS.far) tag.classList.add("far-note");
     tdFam.append(document.createTextNode(nearest.name), tag);
 
     /* A near-tie is shown rather than hidden behind the winner: the runner-up
        was already computed, and which of the two comes first is not robust. */
-    if (nearest.margin <= TIE_LIMIT) {
+    if (nearest.margin <= LIMITS.tie) {
       const tie = document.createElement("span");
       tie.className = "tie";
       tie.textContent = L.tieWith(nearest.second.name, nearest.margin);
@@ -2236,7 +2313,7 @@ function renderAnnotations(computed, annot) {
 
   const ox = toSvgX(origin.x), oy = toSvgY(origin.y);
   annot.appendChild(el("circle", { class: "sel-disc", cx: ox, cy: oy, r: 50 }));
-  for (const [d, r] of [[NEAR_LIMIT, NEAR_LIMIT * 2.5], [FAR_LIMIT, FAR_LIMIT * 2.5]]) {
+  for (const [d, r] of [[LIMITS.near, LIMITS.near * 2.5], [LIMITS.far, LIMITS.far * 2.5]]) {
     annot.appendChild(el("circle", { class: "sel-ring", cx: ox, cy: oy, r }));
     const t = el("text", { class: "sel-ring-cap", x: ox, y: oy - r - 3, "text-anchor": "middle" });
     t.textContent = d;
@@ -2332,7 +2409,7 @@ function renderDetail(computed) {
     tdName.append(document.createTextNode(r.name));
     if (n === 0) {
       const pill = document.createElement("span");
-      pill.className = "fit-pill" + (r.d > FAR_LIMIT ? " far-note" : "");
+      pill.className = "fit-pill" + (r.d > LIMITS.far ? " far-note" : "");
       pill.textContent = " · " + fitPhrase(r.d);
       tdName.appendChild(pill);
     }
@@ -2342,7 +2419,7 @@ function renderDetail(computed) {
     const tdBar = document.createElement("td");
     tdBar.className = "bar-cell";
     const bar = document.createElement("div");
-    bar.className = "bar" + (r.d > FAR_LIMIT ? " far" : "");
+    bar.className = "bar" + (r.d > LIMITS.far ? " far" : "");
     bar.style.width = Math.max(2, Math.round((r.d / max) * 100)) + "%";
     tdBar.appendChild(bar);
     tr.appendChild(tdBar);
@@ -2407,10 +2484,10 @@ function wireHover(computed) {
 
     const near = document.createElement("p");
     near.className = "near";
-    near.textContent = (nearest.d > FAR_LIMIT
+    near.textContent = (nearest.d > LIMITS.far
       ? L.nearestFar + nearest.name + " (" + nearest.d + ")"
       : L.nearest + nearest.name + " (" + L.proximity + nearest.fit + ")")
-      + (nearest.margin <= TIE_LIMIT ? L.tieWith(nearest.second.name, nearest.margin) : "");
+      + (nearest.margin <= LIMITS.tie ? L.tieWith(nearest.second.name, nearest.margin) : "");
     tip.appendChild(near);
 
     tip.hidden = false;
