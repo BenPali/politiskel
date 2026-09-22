@@ -21,7 +21,8 @@ starting point, not the destination.
 - **Other questionnaires are plausible.** Not implemented.
 
 Only two things are genuinely tied to PolitiScales: `tools/politi-dissect.js`,
-which reads its screenshot layout, and the `AXES` table in `template.html`.
+which reads its screenshot layout, and the `AXES` table in
+`tools/politi-model.js`.
 Adding another questionnaire is mostly declaring its axes and writing an
 importer.
 
@@ -52,6 +53,26 @@ drop a capture onto it or type a profile in by hand.
 You can also drop a screenshot onto the page itself, or type a profile in by
 hand. `node tools/verify.js` checks extraction against values read by eye,
 stored in `politi-results/fixture.json` (not committed).
+
+## Layout
+
+Two files are shared between Node and the browser, inlined into `index.html`
+by the build so the page needs no module loading and no build step of its own:
+
+- `tools/politi-dissect.js` — reads a PolitiScales result out of a screenshot.
+- `tools/politi-model.js` — the axes and their weights, the party references,
+  and every computation that turns a profile into a position. It touches no
+  DOM, holds no state, and returns keys rather than sentences, so the wording
+  stays in the locale table in `template.html`.
+
+Being requirable from Node is the point of the second one: the weights, the
+proximity thresholds and the claims made about them have all been measured,
+and a measurement nobody else can re-run is only an assertion.
+`node tools/weight-sensitivity.js` re-runs one of them — it reports how often
+a profile's nearest reference changes under other axis weightings, and shows
+that what makes an attachment fragile is a tight margin to the runner-up, not
+the weighting. It reads no profile; it exercises the model over its own input
+space. `--country de` and `--profiles N` change what it runs on.
 
 ## How it reads a screenshot
 
