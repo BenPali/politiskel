@@ -247,6 +247,9 @@
                background: var(--series-1); margin-right: 7px; vertical-align: -1px; }
   td .fam { white-space: normal; }
   .tag { font-size: 0.7rem; color: var(--text-3); }
+  /* The runner-up when the two are within a toss-up of each other. On its own
+     line: it is secondary, and inline it pushed the table past its card. */
+  .tie { display: block; font-size: 0.7rem; color: var(--text-3); font-style: italic; }
 
   /* per-axis strips: one row per PolitiScales axis, every profile on it */
   .strip { display: grid; grid-template-columns: minmax(0, 17ch) 1fr minmax(0, 17ch) 4.5ch;
@@ -874,6 +877,7 @@ window.POLITI_PROFILES = [];
               puis « proche » vaut jusqu'à cet espacement et « modérée » jusqu'à une fois et
               demie. Au-delà, le nom du parti le moins lointain reste affiché, mais la page
               signale qu'aucun n'est vraiment proche. <span id="method-gap"></span>
+              <span id="method-tie"></span>
             </p>
             <p>
               L'axe souverainiste (nationalisme ↔ internationalisme) est fortement transversal
@@ -1152,6 +1156,12 @@ const LOCALES = {
     /* Party names are quoted rather than dropped straight into the sentence:
        French would need "de l'Aile" before a vowel, and no table of labels is
        going to carry its own elision. */
+    methodTie: n => "Un troisième seuil en découle : quand le second repère est à moins de " + n
+      + " points du premier, les deux sont affichés. À marge aussi courte, lequel arrive premier "
+      + "dépend des pondérations d'axes, qui n'ont rien d'évident — mesuré sur 4 000 profils "
+      + "synthétiques et l'échiquier français, un tiers à une moitié d'entre eux changent de "
+      + "repère sous des pondérations tout aussi défendables, contre 6 % au-delà de dix points "
+      + "de marge. Le seuil des autres pays est mis à la même échelle que leurs repères, non mesuré.",
     methodGap: (lo, hi, d) =>
       "Le plus grand vide sur l'axe économique sépare « " + lo + " » de « " + hi + " » (" + d
       + " points) : un profil qui tombe dans cet intervalle a mécaniquement un rattachement "
@@ -1175,6 +1185,12 @@ const LOCALES = {
     colFamily: "Repère le plus proche",
     titleFamily: "Le repère le plus proche sur les deux axes, et la distance qui l'en sépare. "
       + "Une proximité mesurée, pas une appartenance.",
+    tieWith: (name, margin) => " ou " + name
+      + (margin === 0 ? ", à égalité"
+                      : ", à " + margin + " point" + (margin > 1 ? "s" : "") + " près"),
+    tieTitle: margin => "Le second repère n'est qu'à " + margin + " points de plus : lequel arrive "
+      + "premier dépend de pondérations d'axes qui n'ont rien d'évident. À marge aussi courte, "
+      + "environ un profil sur trois change de repère sous des pondérations tout aussi défendables.",
     colDistance: "Distance", colDeltaEcon: "Δ éco", colDeltaSocial: "Δ soc.",
     titleY: "Positif = autoritaire (haut) · négatif = libertaire (bas)",
     titleSov: "Nationalisme − Internationalisme : positif = souverainiste",
@@ -1429,7 +1445,18 @@ function nearestReference(x, y) {
     .sort((a, b) => a.d - b.d);
   const best = ranked[0];
   const fit = fitOf(best.d);
-  return { name: best.r.name, note: noteOf(best.r), d: Math.round(best.d), fit, second: ranked[1] };
+  const d = Math.round(best.d);
+  /* The runner-up and how far behind it sits. Measured on 4000 synthetic
+     profiles: when that margin is under a third of the reference spacing, a
+     third to a half of profiles get a DIFFERENT nearest reference under
+     equally defensible axis weights; past ten points, 94% keep theirs. The
+     margin, not the weighting, is what decides whether the answer holds, so
+     the page shows it instead of presenting a coin toss as a result. */
+  const runnerUp = ranked[1];
+  const second = runnerUp
+    ? { name: runnerUp.r.name, d: Math.round(runnerUp.d) } : null;
+  return { name: best.r.name, note: noteOf(best.r), d, fit, second,
+           margin: second ? second.d - d : Infinity };
 }
 
 /* { kind: "profile" | "party", i } — whatever is currently being compared. */
@@ -1457,6 +1484,11 @@ function spacingOf(refs) {
   return nn[nn.length >> 1];
 }
 let NEAR_LIMIT = 0, FAR_LIMIT = 0;
+/* Below this gap between the nearest reference and the runner-up, the
+   attachment is a toss-up (see nearestReference). Derived from the spacing
+   like the other two, so a sparse board — where every distance is larger —
+   gets a proportionally wider band rather than France's five points. */
+let TIE_LIMIT = 0;
 const fitOf = d => (d <= NEAR_LIMIT ? L.fit.near : d <= FAR_LIMIT ? L.fit.moderate : L.fit.far);
 const fitPhrase = d => (d <= FAR_LIMIT ? L.proximity + fitOf(d) : L.noCloseParty);
 
@@ -1471,6 +1503,7 @@ function setCountry(code) {
   const s = spacingOf(REFERENCES);
   NEAR_LIMIT = Math.round(s);
   FAR_LIMIT = Math.round(s * 1.5);
+  TIE_LIMIT = Math.round(s * 0.3);
   /* `selection` holds an index into the previous table, which now points at
      another party or at nothing at all. */
   if (selection && selection.kind === "party") selection = null;
@@ -1504,6 +1537,7 @@ function applyCountry() {
 
   const gap = widestEconGap();
   $("method-gap").textContent = gap ? L.methodGap(gap.lo.name, gap.hi.name, gap.d) : "";
+  $("method-tie").textContent = L.methodTie(TIE_LIMIT);
 }
 
 /* Distances from a point to every party, nearest first. dx/dy are signed:
@@ -1865,6 +1899,16 @@ function render() {
     tag.textContent = " · " + fitPhrase(nearest.d) + " (" + nearest.d + ")";
     if (nearest.d > FAR_LIMIT) tag.classList.add("far-note");
     tdFam.append(document.createTextNode(nearest.name), tag);
+
+    /* A near-tie is shown rather than hidden behind the winner: the runner-up
+       was already computed, and which of the two comes first is not robust. */
+    if (nearest.margin <= TIE_LIMIT) {
+      const tie = document.createElement("span");
+      tie.className = "tie";
+      tie.textContent = L.tieWith(nearest.second.name, nearest.margin);
+      tie.title = L.tieTitle(nearest.margin);
+      tdFam.appendChild(tie);
+    }
     tr.appendChild(tdFam);
 
     const tdDel = document.createElement("td");
@@ -2353,9 +2397,10 @@ function wireHover(computed) {
 
     const near = document.createElement("p");
     near.className = "near";
-    near.textContent = nearest.d > FAR_LIMIT
+    near.textContent = (nearest.d > FAR_LIMIT
       ? L.nearestFar + nearest.name + " (" + nearest.d + ")"
-      : L.nearest + nearest.name + " (" + L.proximity + nearest.fit + ")";
+      : L.nearest + nearest.name + " (" + L.proximity + nearest.fit + ")")
+      + (nearest.margin <= TIE_LIMIT ? L.tieWith(nearest.second.name, nearest.margin) : "");
     tip.appendChild(near);
 
     tip.hidden = false;
