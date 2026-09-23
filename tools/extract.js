@@ -23,13 +23,15 @@ const CACHE = path.join(SRC, ".extract-cache.json");
 const OUT = path.join(ROOT, "profiles-data.js");
 const PAGE = path.join(ROOT, "index.html");       /* generated, not committed */
 const TEMPLATE = path.join(ROOT, "template.html"); /* committed source, no data */
-/* The two files shared with the browser, each inlined into its own marked
-   block: the screenshot reader, and the compass model. */
+/* The files shared with the browser, each inlined into its own marked block:
+   the screenshot reader, the compass model, and the questionnaire. */
 const SHARED = [
   { file: path.join(__dirname, "politi-dissect.js"),
     start: "/* POLITI-EXTRACTOR:START */", end: "/* POLITI-EXTRACTOR:END */" },
   { file: path.join(__dirname, "politi-model.js"),
-    start: "/* POLITI-MODEL:START */", end: "/* POLITI-MODEL:END */" }
+    start: "/* POLITI-MODEL:START */", end: "/* POLITI-MODEL:END */" },
+  { file: path.join(__dirname, "politi-quiz.js"),
+    start: "/* POLITI-QUIZ:START */", end: "/* POLITI-QUIZ:END */" }
 ];
 
 /* Replaces the content between two markers, leaving the rest untouched. */
