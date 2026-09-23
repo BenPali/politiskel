@@ -9,24 +9,33 @@ use serde_json::{json, Value};
 use sqlx::sqlite::SqlitePoolOptions;
 use tower::ServiceExt;
 
-async fn server() -> axum::Router {
+async fn server() -> axum::Router { server_with(false).await }
+
+async fn server_with(trust_proxy: bool) -> axum::Router {
     // One connection: an in-memory SQLite database lives per connection.
     let db = SqlitePoolOptions::new().max_connections(1)
         .connect("sqlite::memory:").await.unwrap();
     sqlx::query("PRAGMA foreign_keys = ON").execute(&db).await.unwrap();
     migrate(&db).await.unwrap();
-    app(AppState::new(db, "<!doctype html><title>Politiskel</title>".into(), true))
+    app(AppState::new(db, "<!doctype html><title>Politiskel</title>".into(), true).trusting_proxy(trust_proxy))
 }
 
 /// A client that keeps its session cookie between requests.
-struct Client { app: axum::Router, cookie: Option<String> }
+struct Client { app: axum::Router, cookie: Option<String>, headers: Vec<(&'static str, String)> }
 
 impl Client {
-    fn new(app: &axum::Router) -> Self { Self { app: app.clone(), cookie: None } }
+    fn new(app: &axum::Router) -> Self { Self { app: app.clone(), cookie: None, headers: vec![] } }
+
+    fn from_ip(app: &axum::Router, ip: &str) -> Self {
+        let mut c = Self::new(app);
+        c.headers.push(("x-forwarded-for", format!("10.9.9.9, {ip}")));
+        c
+    }
 
     async fn call(&mut self, method: &str, uri: &str, body: Option<Value>) -> (StatusCode, Value) {
         let mut req = Request::builder().method(method).uri(uri);
         if let Some(c) = &self.cookie { req = req.header(header::COOKIE, c); }
+        for (k, v) in &self.headers { req = req.header(*k, v); }
         let req = match body {
             Some(b) => req.header(header::CONTENT_TYPE, "application/json").body(Body::from(b.to_string())),
             None => req.body(Body::empty()),
@@ -212,4 +221,94 @@ async fn session_cookie_is_locked_down() {
     for part in ["HttpOnly", "Secure", "SameSite=Strict", "Path=/"] {
         assert!(set.contains(part), "{part} missing from {set}");
     }
+}
+
+
+#[tokio::test]
+async fn a_burst_of_parallel_guesses_is_still_capped() {
+    let app = server().await;
+    Client::new(&app).register("Jc").await;
+    let tries = (0..20).map(|_| {
+        let app = app.clone();
+        tokio::spawn(async move {
+            let mut c = Client::new(&app);
+            c.call("POST", "/api/login", Some(json!({ "username": "Jc", "password": "guess guess guess" }))).await.0
+        })
+    });
+    let codes: Vec<StatusCode> = futures_join(tries).await;
+    let wrong = codes.iter().filter(|s| **s == StatusCode::UNAUTHORIZED).count();
+    assert!(wrong <= 5, "{wrong} passwords were checked, the cap is 5");
+    assert!(codes.iter().all(|s| *s == StatusCode::UNAUTHORIZED || *s == StatusCode::TOO_MANY_REQUESTS));
+}
+
+async fn futures_join<T>(handles: impl Iterator<Item = tokio::task::JoinHandle<T>>) -> Vec<T> {
+    let mut out = vec![];
+    for h in handles.collect::<Vec<_>>() { out.push(h.await.unwrap()); }
+    out
+}
+
+#[tokio::test]
+async fn guessing_from_one_address_does_not_lock_the_owner_out() {
+    let app = server_with(true).await;
+    Client::from_ip(&app, "192.0.2.1").register("Theo").await;
+    let mut attacker = Client::from_ip(&app, "203.0.113.66");
+    for _ in 0..6 {
+        attacker.call("POST", "/api/login", Some(json!({ "username": "Theo", "password": "not his password" }))).await;
+    }
+    let (s, _) = attacker.call("POST", "/api/login",
+        Some(json!({ "username": "Theo", "password": "correct horse battery" }))).await;
+    assert_eq!(s, StatusCode::TOO_MANY_REQUESTS);
+    let (s, _) = Client::from_ip(&app, "192.0.2.1").call("POST", "/api/login",
+        Some(json!({ "username": "Theo", "password": "correct horse battery" }))).await;
+    assert_eq!(s, StatusCode::OK);
+}
+
+#[tokio::test]
+async fn look_alike_names_cannot_both_exist() {
+    let app = server().await;
+    assert_eq!(Client::new(&app).register("Zoé").await, StatusCode::CREATED);
+    for twin in ["ZOÉ", "Zoe", "zoe\u{0301}"] {
+        assert_eq!(Client::new(&app).register(twin).await, StatusCode::CONFLICT, "{twin}");
+    }
+    let (s, b) = Client::new(&app).call("POST", "/api/register",
+        Some(json!({ "username": "\u{0417}oé", "password": "correct horse battery", "consent": true }))).await;
+    assert_eq!((s, b["error"].as_str()), (StatusCode::BAD_REQUEST, Some("username_chars")));
+    let (s, b) = Client::new(&app).call("POST", "/api/login",
+        Some(json!({ "username": "ZOE", "password": "correct horse battery" }))).await;
+    assert_eq!((s, b["username"].as_str()), (StatusCode::OK, Some("Zoé")));
+}
+
+#[tokio::test]
+async fn writes_from_another_origin_are_refused() {
+    let app = server().await;
+    let mut c = Client::new(&app);
+    c.register("Hippo").await;
+    let (_, g) = c.call("POST", "/api/groups", Some(json!({ "name": "G" }))).await;
+    let gid = g["id"].as_i64().unwrap();
+    let mut evil = Client { app: app.clone(), cookie: c.cookie.clone(),
+        headers: vec![("host", "politiskel.example.org".into()), ("origin", "https://evil.example.org".into())] };
+    let (s, b) = evil.call("POST", &format!("/api/groups/{gid}/leave"), None).await;
+    assert_eq!((s, b["error"].as_str()), (StatusCode::FORBIDDEN, Some("cross_origin")));
+    let mut sibling = Client { app: app.clone(), cookie: c.cookie.clone(),
+        headers: vec![("sec-fetch-site", "same-site".into())] };
+    assert_eq!(sibling.call("POST", "/api/logout", None).await.0, StatusCode::FORBIDDEN);
+    let mut same = Client { app: app.clone(), cookie: c.cookie.clone(),
+        headers: vec![("host", "politiskel.example.org".into()), ("origin", "https://politiskel.example.org".into())] };
+    assert_eq!(same.call("POST", &format!("/api/groups/{gid}/leave"), None).await.0, StatusCode::NO_CONTENT);
+}
+
+#[tokio::test]
+async fn an_invitation_can_be_read_before_it_is_accepted() {
+    let app = server().await;
+    let (mut a, mut b) = (Client::new(&app), Client::new(&app));
+    a.register("Krmn").await;
+    let (_, g) = a.call("POST", "/api/groups", Some(json!({ "name": "Atelier" }))).await;
+    let code = g["invite"].as_str().unwrap();
+    assert_eq!(b.call("GET", &format!("/api/invites/{code}"), None).await.0, StatusCode::UNAUTHORIZED);
+    b.register("Line").await;
+    let (s, p) = b.call("GET", &format!("/api/invites/{code}"), None).await;
+    assert_eq!((s, p["name"].as_str(), p["members"].as_i64(), p["member"].as_bool()),
+               (StatusCode::OK, Some("Atelier"), Some(1), Some(false)));
+    // reading it joined nothing
+    assert_eq!(b.call("GET", "/api/me", None).await.1["groups"], json!([]));
 }

@@ -1001,6 +1001,7 @@ dependencies = [
  "time",
  "tokio",
  "tower",
+ "unicode-normalization",
 ]
 
 [[package]]

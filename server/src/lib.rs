@@ -35,8 +35,12 @@ use sqlx::SqlitePool;
 
 const SESSION_COOKIE: &str = "politiskel_session";
 const SESSION_DAYS: i64 = 30;
-/// Failed logins allowed per username within the window, before a pause.
+/// Login attempts that may fail within the window: per name and address,
+/// before that address is paused on that name; and per name from every
+/// address together, which only a distributed guess would reach. Keyed on the
+/// name alone, the limit let anyone who knew a pseudonym lock its owner out.
 const MAX_FAILURES: u32 = 5;
+const MAX_FAILURES_PER_NAME: u32 = 100;
 const FAILURE_WINDOW: i64 = 15 * 60;
 
 #[derive(Clone)]
@@ -47,12 +51,43 @@ pub struct AppState {
     pub page: Arc<String>,
     /// Off only for local development over plain http.
     pub secure_cookies: bool,
+    /// Whether to read the client's address from X-Forwarded-For, as set by
+    /// the reverse proxy in front; otherwise the socket's address is used.
+    pub trust_proxy: bool,
     failures: Arc<Mutex<HashMap<String, (u32, i64)>>>,
 }
 
 impl AppState {
     pub fn new(db: SqlitePool, page: String, secure_cookies: bool) -> Self {
-        Self { db, page: Arc::new(page), secure_cookies, failures: Arc::default() }
+        Self { db, page: Arc::new(page), secure_cookies, trust_proxy: false, failures: Arc::default() }
+    }
+
+    pub fn trusting_proxy(mut self, yes: bool) -> Self {
+        self.trust_proxy = yes;
+        self
+    }
+}
+
+/// The client's address: the socket's, or behind a trusted proxy the last
+/// X-Forwarded-For entry — the one the proxy itself appended, which a client
+/// cannot forge.
+pub struct ClientIp(pub String);
+
+impl axum::extract::FromRequestParts<AppState> for ClientIp {
+    type Rejection = std::convert::Infallible;
+    async fn from_request_parts(parts: &mut axum::http::request::Parts, state: &AppState)
+        -> Result<Self, Self::Rejection>
+    {
+        if state.trust_proxy {
+            if let Some(ip) = parts.headers.get("x-forwarded-for").and_then(|v| v.to_str().ok())
+                .and_then(|v| v.rsplit(',').next()).map(|v| v.trim().to_string()).filter(|v| !v.is_empty())
+            {
+                return Ok(ClientIp(ip));
+            }
+        }
+        let ip = parts.extensions.get::<axum::extract::ConnectInfo<std::net::SocketAddr>>()
+            .map(|c| c.0.ip().to_string()).unwrap_or_else(|| "unknown".into());
+        Ok(ClientIp(ip))
     }
 }
 
@@ -71,9 +106,11 @@ pub fn app(state: AppState) -> Router {
         .route("/api/me/export", get(export))
         .route("/api/groups", post(create_group))
         .route("/api/groups/join", post(join_group))
+        .route("/api/invites/{code}", get(invite_preview))
         .route("/api/groups/{id}/leave", post(leave_group))
         .route("/api/groups/{id}/profiles", get(group_profiles))
         .layer(DefaultBodyLimit::max(64 * 1024))
+        .layer(middleware::from_fn(same_origin_writes))
         .layer(middleware::from_fn(security_headers))
         .with_state(state)
 }
@@ -193,6 +230,28 @@ fn parse_json(text: Option<String>) -> Value {
 
 /* ------------------------------------------------------------------ routes */
 
+/// Refuses a state-changing request that another site sent. SameSite=Strict
+/// keeps the session cookie from other sites, but a sibling subdomain counts
+/// as the same site, and two endpoints (leave, logout) take no JSON body that
+/// a form could not forge. Browsers send Origin on every such request; when
+/// they do not, Sec-Fetch-Site says where it came from.
+async fn same_origin_writes(req: Request<axum::body::Body>, next: Next) -> Response {
+    use axum::http::Method;
+    if matches!(*req.method(), Method::POST | Method::PUT | Method::DELETE | Method::PATCH) {
+        let h = req.headers();
+        let host = h.get(header::HOST).and_then(|v| v.to_str().ok()).unwrap_or("");
+        let origin_ok = match h.get(header::ORIGIN).and_then(|v| v.to_str().ok()) {
+            Some(o) => o.split_once("://").map(|(_, rest)| rest) == Some(host),
+            None => !matches!(h.get("sec-fetch-site").and_then(|v| v.to_str().ok()),
+                              Some("cross-site") | Some("same-site")),
+        };
+        if !origin_ok {
+            return ApiError(StatusCode::FORBIDDEN, "cross_origin").into_response();
+        }
+    }
+    next.run(req).await
+}
+
 async fn security_headers(req: Request<axum::body::Body>, next: Next) -> Response {
     let mut res = next.run(req).await;
     let api = req_is_api(&res);
@@ -235,9 +294,13 @@ async fn register(State(state): State<AppState>, jar: CookieJar, Json(body): Jso
     validate::password(&body.password).map_err(bad)?;
     let hash = hash_password(body.password).await?;
     let t = now();
-    let res = sqlx::query("INSERT INTO users (username, pw_hash, consent_at, created_at) VALUES (?, ?, ?, ?)")
-        .bind(&name).bind(&hash).bind(t).bind(t)
-        .execute(&state.db).await;
+    // One transaction: an account without its profile row would answer 500
+    // on every call and keep its name taken.
+    let mut tx = state.db.begin().await?;
+    let res = sqlx::query(
+        "INSERT INTO users (username, username_key, pw_hash, consent_at, created_at) VALUES (?, ?, ?, ?, ?)")
+        .bind(&name).bind(validate::username_key(&name)).bind(&hash).bind(t).bind(t)
+        .execute(&mut *tx).await;
     let id = match res {
         Ok(r) => r.last_insert_rowid(),
         Err(sqlx::Error::Database(e)) if e.is_unique_violation() =>
@@ -245,7 +308,8 @@ async fn register(State(state): State<AppState>, jar: CookieJar, Json(body): Jso
         Err(e) => return Err(e.into()),
     };
     sqlx::query("INSERT INTO profiles (user_id, updated_at) VALUES (?, ?)")
-        .bind(id).bind(t).execute(&state.db).await?;
+        .bind(id).bind(t).execute(&mut *tx).await?;
+    tx.commit().await?;
     let jar = start_session(&state, jar, id).await?;
     Ok((StatusCode::CREATED, jar, Json(json!({ "username": name }))))
 }
@@ -253,30 +317,37 @@ async fn register(State(state): State<AppState>, jar: CookieJar, Json(body): Jso
 #[derive(Deserialize)]
 struct Login { username: String, password: String }
 
-async fn login(State(state): State<AppState>, jar: CookieJar, Json(body): Json<Login>)
-    -> ApiResult<(CookieJar, Json<Value>)>
+async fn login(State(state): State<AppState>, ClientIp(ip): ClientIp, jar: CookieJar,
+               Json(body): Json<Login>) -> ApiResult<(CookieJar, Json<Value>)>
 {
-    let key = body.username.trim().to_lowercase();
+    let name_key = validate::username_key(&body.username);
+    let (pair, whole) = (format!("{name_key}\u{0}{ip}"), format!("{name_key}\u{0}*"));
     let t = now();
+    // The attempt is counted BEFORE the password is checked, and handed back
+    // if it succeeds: counted after, a burst of parallel requests would all
+    // pass the check while argon2 was still running on the first.
     {
         let mut f = state.failures.lock().unwrap();
         f.retain(|_, (_, since)| t - *since < FAILURE_WINDOW);
-        if f.get(&key).is_some_and(|(n, _)| *n >= MAX_FAILURES) {
+        let over = |k: &str, max: u32| f.get(k).is_some_and(|(n, _)| *n >= max);
+        if over(&pair, MAX_FAILURES) || over(&whole, MAX_FAILURES_PER_NAME) {
             return Err(ApiError(StatusCode::TOO_MANY_REQUESTS, "too_many_attempts"));
         }
+        for k in [&pair, &whole] { f.entry(k.clone()).or_insert((0, t)).0 += 1; }
     }
     let row: Option<(i64, String, String)> =
-        sqlx::query_as("SELECT id, username, pw_hash FROM users WHERE username = ?")
-            .bind(body.username.trim()).fetch_optional(&state.db).await?;
+        sqlx::query_as("SELECT id, username, pw_hash FROM users WHERE username_key = ?")
+            .bind(&name_key).fetch_optional(&state.db).await?;
     let hash = row.as_ref().map(|r| r.2.clone()).unwrap_or_else(|| dummy_hash().to_string());
     let ok = verify_password(body.password, hash).await && row.is_some();
     if !ok {
-        let mut f = state.failures.lock().unwrap();
-        let e = f.entry(key).or_insert((0, t));
-        e.0 += 1;
         return Err(ApiError(StatusCode::UNAUTHORIZED, "bad_credentials"));
     }
-    state.failures.lock().unwrap().remove(&key);
+    {
+        let mut f = state.failures.lock().unwrap();
+        f.remove(&pair);
+        if let Some(e) = f.get_mut(&whole) { e.0 = e.0.saturating_sub(1); }
+    }
     sqlx::query("DELETE FROM sessions WHERE expires_at <= ?").bind(t).execute(&state.db).await?;
     let (id, name, _) = row.unwrap();
     let jar = start_session(&state, jar, id).await?;
@@ -404,6 +475,22 @@ async fn create_group(State(state): State<AppState>, jar: CookieJar, Json(body):
         .bind(gid).bind(user).bind(t).execute(&mut *tx).await?;
     tx.commit().await?;
     Ok((StatusCode::CREATED, Json(json!({ "id": gid, "name": name, "invite": invite, "members": 1 }))))
+}
+
+/// What an invitation leads to, so the page can ask before joining: joining
+/// shows one's profile to every member, which is not something a link should
+/// do on its own. Signed-in only, and the code is 128 random bits.
+async fn invite_preview(State(state): State<AppState>, jar: CookieJar, Path(code): Path<String>)
+    -> ApiResult<Json<Value>>
+{
+    let (user, _) = current_user(&state, &jar).await?;
+    let row: Option<(i64, String, i64)> = sqlx::query_as(
+        "SELECT g.id, g.name, (SELECT COUNT(*) FROM members m WHERE m.group_id = g.id)
+         FROM groups g WHERE g.invite_code = ?")
+        .bind(code.trim()).fetch_optional(&state.db).await?;
+    let (gid, name, n) = row.ok_or(ApiError(StatusCode::NOT_FOUND, "no_such_invite"))?;
+    Ok(Json(json!({ "id": gid, "name": name, "members": n,
+                    "member": is_member(&state, gid, user).await? })))
 }
 
 #[derive(Deserialize)]

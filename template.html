@@ -533,10 +533,13 @@
   .account details { margin-top: 10px; }
   .account summary { cursor: pointer; color: var(--text-2); }
   .account .error { margin: 8px 0 0; }
+  .account .invite { background: var(--series-1-soft); border-radius: 8px; padding: 10px 12px;
+                     margin-bottom: 10px; }
   .account .status { color: var(--text-3); font-size: 0.78rem; }
   .account .note { color: var(--text-3); font-size: 0.75rem; margin: 8px 0 0; max-width: 90ch; }
   body.server-mode #native-form, body.server-mode #p-alias, body.server-mode label[for=p-alias],
-  body.server-mode .drop-note code, body.server-mode #reset-btn { display: none; }
+  body.server-mode .drop-note code, body.server-mode #reset-btn,
+  body.server-mode button.del { display: none; }
   .start-native { display: flex; flex-wrap: wrap; gap: 8px 10px; align-items: center;
                   margin: -6px 0 20px; font-size: 0.85rem; color: var(--text-2); }
   .start-native input { font: inherit; padding: 7px 10px; border: 1px solid var(--border);
@@ -2540,7 +2543,12 @@ const LOCALES = {
     leave: "Quitter ce groupe", leaveConfirm: g => "Quitter « " + g + " » ? Vous n'y verrez plus "
       + "les profils, et ses membres ne verront plus le vôtre.",
     joined: g => "Vous avez rejoint « " + g + " ».",
-    joinPending: "Connectez-vous ou créez un compte pour rejoindre le groupe qui vous a invité.",
+    joinPending: "Connectez-vous ou créez un compte : vous verrez ensuite quel groupe vous "
+      + "invite, avant de décider de le rejoindre.",
+    inviteAsk: (g, n) => "Le groupe « " + g + " » (" + n + " membre" + (n > 1 ? "s" : "") + ") vous "
+      + "invite. En le rejoignant, vos réponses et vos pourcentages PolitiScales seront visibles "
+      + "de ses membres.",
+    inviteAccept: "Rejoindre", inviteDecline: "Refuser",
     accountMore: "Nouveau groupe, mes données",
     exportAccount: "Exporter toutes mes données",
     deleteWarn: "Supprimer mon compte et tout ce qu'il contient :",
@@ -2822,7 +2830,8 @@ let overlay = loadOverlay();
    /api/me and turns on accounts: the profiles shown are the chosen group's,
    and the signed-in member's answers are saved to the server rather than to
    this browser. Opened as a local file it never asks, and nothing changes. */
-const SERVER = { on: false, me: null, group: null, saving: null, status: "" };
+const SERVER = { on: false, me: null, group: null, saving: null, pending: null, status: "",
+                 invite: null };
 
 function rebuild() {
   const hidden = new Set(overlay.hidden);
@@ -2831,9 +2840,11 @@ function rebuild() {
      in politi-results/answers/ and rebuilt. They are the same person, so it
      is listed once, as imported; its local answers still take precedence. */
   const seeded = new Set(SEED.map(idOf));
-  /* in server mode the list is the group's, and profiles added in this
-     browser are not part of it */
-  profiles = SEED.filter(p => !hidden.has(idOf(p))).map(p => ({ ...p }))
+  /* In server mode the list is the group's, and profiles added in this
+     browser are not part of it. Nor is hiding: a hidden row would still be
+     on the server and visible to the whole group while its owner thought it
+     gone — there, a profile leaves a group by leaving the group. */
+  profiles = SEED.filter(p => SERVER.on || !hidden.has(idOf(p))).map(p => ({ ...p }))
     .concat(SERVER.on ? [] : overlay.added.filter(p => !seeded.has(idOf(p))).map(p => ({ ...p })));
 }
 
@@ -5050,15 +5061,14 @@ async function afterAuth() {
     let code = null;
     try { code = sessionStorage.getItem("politiskel.join"); sessionStorage.removeItem("politiskel.join"); }
     catch (_) { /* private browsing */ }
+    /* An invitation is read, not followed: joining shows one's answers to
+       every member, so the page names the group and asks first. */
     if (code) {
-      const j = await api("POST", "/api/groups/join", { code });
-      if (j.ok) {
-        try { localStorage.setItem(GROUP_KEY, String(j.data.id)); } catch (_) { /* quota */ }
-        await refreshMe();
-        SERVER.status = L.joined(j.data.name);
-      } else {
-        SERVER.status = apiError(j);
-      }
+      const r = await api("GET", "/api/invites/" + encodeURIComponent(code));
+      if (!r.ok) SERVER.status = apiError(r);
+      else if (r.data.member) {
+        try { localStorage.setItem(GROUP_KEY, String(r.data.id)); } catch (_) { /* quota */ }
+      } else SERVER.invite = Object.assign({ code }, r.data);
     }
     let saved = null;
     try { saved = Number(localStorage.getItem(GROUP_KEY)); } catch (_) { /* private browsing */ }
@@ -5078,6 +5088,7 @@ async function refreshMe() {
 
 /* The profiles on show: the chosen group's, or one's own alone. */
 async function loadGroup() {
+  await flushAnswers();   /* an answer still waiting must reach the server first */
   let list = [];
   if (SERVER.me && SERVER.group) {
     const r = await api("GET", "/api/groups/" + SERVER.group.id + "/profiles");
@@ -5104,14 +5115,24 @@ const myId = () => SERVER.me ? "user:" + SERVER.me.username : null;
 
 /* Saved half a second after the last answer, so a run of answers is one
    request; the account bar says whether it went through. */
+/* What is sent is the answers as they stand when the save is scheduled, not
+   when it fires: in between, loadGroup() may have reloaded them from the
+   server, and the older copy would overwrite the answer just given. */
 function saveAnswersSoon() {
   clearTimeout(SERVER.saving);
-  SERVER.saving = setTimeout(async () => {
-    const r = await api("PUT", "/api/me/profile", { answers: SEED_ANSWERS[myId()] || {} });
-    SERVER.status = r.ok ? L.saved : apiError(r);
-    if (r.ok) SERVER.me.profile = r.data;
-    renderAccount();
-  }, 500);
+  SERVER.pending = Object.assign({}, SEED_ANSWERS[myId()] || {});
+  SERVER.saving = setTimeout(flushAnswers, 500);
+}
+
+async function flushAnswers() {
+  clearTimeout(SERVER.saving);
+  const answers = SERVER.pending;
+  if (!answers || !SERVER.me) return;
+  SERVER.pending = null;
+  const r = await api("PUT", "/api/me/profile", { answers });
+  SERVER.status = r.ok ? L.saved : apiError(r);
+  if (r.ok) SERVER.me.profile = r.data;
+  renderAccount();
 }
 
 async function savePolitiscales(p) {
@@ -5180,6 +5201,23 @@ function renderAccount() {
   }
 
   const me = SERVER.me;
+  if (SERVER.invite) {
+    const inv = SERVER.invite;
+    const yes = el2("button", { type: "button", className: "primary", textContent: L.inviteAccept });
+    const no = el2("button", { type: "button", className: "ghost", textContent: L.inviteDecline });
+    yes.addEventListener("click", async () => {
+      const j = await api("POST", "/api/groups/join", { code: inv.code });
+      SERVER.invite = null;
+      if (!j.ok) { SERVER.status = apiError(j); return renderAccount(); }
+      try { localStorage.setItem(GROUP_KEY, String(j.data.id)); } catch (_) { /* quota */ }
+      await refreshMe();
+      SERVER.status = L.joined(j.data.name);
+      await afterAuth();
+    });
+    no.addEventListener("click", () => { SERVER.invite = null; renderAccount(); });
+    box.append(el2("div", { className: "row invite" },
+      el2("span", { textContent: L.inviteAsk(inv.name, inv.members) }), yes, no));
+  }
   const select = el2("select", { ariaLabel: L.groupLabel });
   select.append(el2("option", { value: "", textContent: L.groupNone }));
   for (const g of me.groups) select.append(el2("option", { value: String(g.id), textContent: g.name + " (" + g.members + ")" }));
@@ -5252,6 +5290,7 @@ function renderAccount() {
   });
   const logout = el2("button", { type: "button", className: "ghost", textContent: L.signOut });
   logout.addEventListener("click", async () => {
+    await flushAnswers();
     await api("POST", "/api/logout");
     SERVER.me = null;
     await afterAuth();

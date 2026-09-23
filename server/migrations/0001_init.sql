@@ -5,7 +5,10 @@
 
 CREATE TABLE users (
     id          INTEGER PRIMARY KEY,
-    username    TEXT NOT NULL UNIQUE COLLATE NOCASE,   -- a pseudonym, shown to the groups
+    username    TEXT NOT NULL,                          -- a pseudonym, shown to the groups
+    -- Its look-alike key (case and accents folded), unique: "Zoé", "ZOÉ" and
+    -- "Zoe" are one name, so nobody can join a group as someone else.
+    username_key TEXT NOT NULL UNIQUE,
     pw_hash     TEXT NOT NULL,                          -- argon2id, PHC string
     consent_at  INTEGER NOT NULL,                       -- when art. 9 consent was given
     created_at  INTEGER NOT NULL

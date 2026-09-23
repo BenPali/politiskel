@@ -17,16 +17,31 @@ pub const MAX_ANSWERS: usize = 300;
 
 /// A pseudonym: shown to every group its owner joins, so no e-mail, and a
 /// short list of characters that cannot smuggle markup anywhere.
+///
+/// Latin letters only, with their accents. Accepting any Unicode letter let a
+/// Cyrillic "а" pass for a Latin "a", and a decomposed "é" for a composed one:
+/// a newcomer could appear in a group as an existing member. The name is
+/// stored composed (NFC), and compared through `username_key`.
 pub fn username(raw: &str) -> Result<String, &'static str> {
-    let name = raw.trim();
+    use unicode_normalization::UnicodeNormalization;
+    let name: String = raw.trim().nfc().collect();
     let len = name.chars().count();
     if !(2..=24).contains(&len) {
         return Err("username_length");
     }
-    if !name.chars().all(|c| c.is_alphanumeric() || " -_.'".contains(c)) {
+    let latin = |c: char| c.is_ascii_alphanumeric()
+        || (('\u{00C0}'..='\u{017F}').contains(&c) && c != '\u{00D7}' && c != '\u{00F7}');
+    if !name.chars().all(|c| latin(c) || " -_.'".contains(c)) {
         return Err("username_chars");
     }
-    Ok(name.to_string())
+    Ok(name)
+}
+
+/// The key two names collide on: accents stripped, case folded. "Zoé",
+/// "ZOÉ" and "Zoe" share it, so only one of them can exist.
+pub fn username_key(name: &str) -> String {
+    use unicode_normalization::{char::is_combining_mark, UnicodeNormalization};
+    name.trim().nfkd().filter(|c| !is_combining_mark(*c)).collect::<String>().to_lowercase()
 }
 
 pub fn password(raw: &str) -> Result<(), &'static str> {
@@ -102,9 +117,20 @@ mod tests {
     #[test]
     fn usernames() {
         assert_eq!(username("  Zoé "), Ok("Zoé".into()));
+        assert_eq!(username("Zoe\u{0301}"), Ok("Zoé".into()));      // decomposed é, stored composed
         assert!(username("a").is_err());
         assert!(username("<script>").is_err());
         assert!(username(&"x".repeat(25)).is_err());
+        assert!(username("\u{0430}drien").is_err());                // Cyrillic а
+        assert!(username("Zoé×2").is_err());
+    }
+
+    #[test]
+    fn look_alikes_share_a_key() {
+        assert_eq!(username_key("Zoé"), username_key("ZOÉ"));
+        assert_eq!(username_key("Zoé"), username_key("zoe"));
+        assert_eq!(username_key("Zoe\u{0301}"), username_key("Zoé"));
+        assert_ne!(username_key("Zoé"), username_key("Zoa"));
     }
 
     #[test]

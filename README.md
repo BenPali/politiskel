@@ -187,8 +187,11 @@ POLITISKEL_PAGE=../template.html \
 
 It listens on localhost only: put a reverse proxy that terminates HTTPS in
 front of it (Caddy: `politiskel.example.org { reverse_proxy 127.0.0.1:8080 }`).
-Session cookies are marked Secure, so plain http only works for local
-development, with `POLITISKEL_INSECURE_COOKIES=1`. The database is one SQLite
+Behind it, set `POLITISKEL_TRUST_PROXY=1`, so that login limits count per
+client address (the last `X-Forwarded-For` entry, the one the proxy adds)
+rather than treating every visitor as the proxy. Session cookies are marked
+Secure, so plain http only works for local development, with
+`POLITISKEL_INSECURE_COOKIES=1`. The database is one SQLite
 file: back it up like any other.
 
 What the server holds, and why it is careful about it: political opinions are
@@ -196,7 +199,8 @@ special-category data under GDPR art. 9. It stores a pseudonym, an argon2id
 password hash, the date consent was given, group memberships, PolitiScales
 percentages already read in the browser — never the screenshot — and
 questionnaire answers. Sign-up requires explicit consent; a group is visible
-to its members only; each member can export everything held about them and
+to its members only, and an invitation link shows the group before anyone
+joins it; each member can export everything held about them and
 delete their account, which deletes it all. Whoever runs an instance is the
 data controller for it.
 

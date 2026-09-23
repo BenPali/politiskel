@@ -5,6 +5,8 @@
 //!   POLITISKEL_DB     SQLite database file        (default politiskel.db)
 //!   POLITISKEL_PAGE   the page to serve           (default ../template.html)
 //!   POLITISKEL_INSECURE_COOKIES=1   plain-http development only
+//!   POLITISKEL_TRUST_PROXY=1        take the client address from the
+//!                                   X-Forwarded-For the reverse proxy sets
 //!
 //! It listens on localhost by default: put it behind a reverse proxy that
 //! terminates HTTPS. Session cookies are marked Secure, so over plain http a
@@ -22,6 +24,7 @@ async fn main() {
     let db_path = env("POLITISKEL_DB", "politiskel.db");
     let page_path = env("POLITISKEL_PAGE", "../template.html");
     let insecure = std::env::var("POLITISKEL_INSECURE_COOKIES").is_ok_and(|v| v == "1");
+    let trust_proxy = std::env::var("POLITISKEL_TRUST_PROXY").is_ok_and(|v| v == "1");
 
     let page = std::fs::read_to_string(&page_path)
         .unwrap_or_else(|e| panic!("cannot read the page at {page_path}: {e}"));
@@ -41,7 +44,8 @@ async fn main() {
         eprintln!("warning: POLITISKEL_INSECURE_COOKIES=1 — for local development only");
     }
     eprintln!("politiskel-server listening on http://{addr}  (database {db_path})");
-    axum::serve(listener, app(AppState::new(db, page, !insecure)))
+    let state = AppState::new(db, page, !insecure).trusting_proxy(trust_proxy);
+    axum::serve(listener, app(state).into_make_service_with_connect_info::<std::net::SocketAddr>())
         .with_graceful_shutdown(async { let _ = tokio::signal::ctrl_c().await; })
         .await
         .expect("server error");
