@@ -515,6 +515,12 @@
   .theme-card .go { grid-column: 2; grid-row: 1 / span 3; }
   .theme-card.planned { background: none; border-style: dashed; }
   .theme-card.all { border-color: var(--series-1); background: var(--surface); }
+  /* the Politiskel flag's figure in the distance panel */
+  .flag-figure { border-top: 1px solid var(--border); margin: 0 0 14px; padding-top: 12px; }
+  .flag-figure .hint { margin-bottom: 8px; }
+  .flag-legend { margin: 8px 0 0; padding-left: 18px; font-size: 0.78rem; color: var(--text-2); }
+  .flag-legend li { margin-bottom: 3px; }
+
   /* server mode: the site's tabs and pages */
   .tabs { display: flex; gap: 4px; align-items: center; flex-wrap: wrap; margin: -8px 0 22px;
           border-bottom: 1px solid var(--border); }

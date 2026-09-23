@@ -299,11 +299,26 @@ const signed  = n => (n > 0 ? "+" : "") + n;
 
 /* Flag thumbnail, or a plain series dot when the profile has none (typed in
    by hand). */
-function flagEl(p, cls) {
+function flagEl(p, cls, captureOnly) {
+  /* Politiskel's flag when chosen, or when PolitiScales drew none — drawn here
+     from numbers, never from the profile's own strings. A screenshot being
+     read (captureOnly) shows what it holds and nothing else. */
+  const ps = p.flag && /^data:image\/(png|jpeg|webp);base64,/.test(p.flag);
+  if (!captureOnly && (flagMode === "politiskel" || !ps)) {
+    const f = politiskelFlag(coords(p));
+    if (f) {
+      const img = document.createElement("img");
+      img.className = "flag " + (cls || "");
+      img.src = f.url;
+      img.alt = L.flagGeneratedAlt(p.alias);
+      img.title = f.legend.join("\n");
+      return img;
+    }
+  }
   /* The flag comes from profiles-data.js or from a local canvas; we still only
      accept an image data URI, so a profile tampered with in localStorage
      cannot slip another URL into a src. */
-  if (p.flag && /^data:image\/(png|jpeg|webp);base64,/.test(p.flag)) {
+  if (ps) {
     const img = document.createElement("img");
     img.className = "flag " + (cls || "");
     img.src = p.flag;
@@ -1210,12 +1225,14 @@ function renderReadings(p, c) {
   const box = $("detail-readings");
   box.replaceChildren();
   box.hidden = false;
+  const fig = flagFigure(p);
   box.className = c.quiz ? "readings" : "";
   if (c.quiz) {
     const h = document.createElement("h3");
     h.textContent = L.readingsTitle;
     box.append(h, readingsEl(c));
   }
+  if (fig) box.appendChild(fig);
   /* on a server, another member's profile is theirs to answer, not ours */
   if (SERVER.on && !p.me) return;
   const btn = document.createElement("a");

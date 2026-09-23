@@ -255,7 +255,7 @@ function captureFeedback(kind, text, flag) {
   const box = $("capture-ok");
   box.replaceChildren();
   if (!text) { box.hidden = true; return; }
-  if (flag) box.appendChild(flagEl({ flag, alias: "capture" }, "lg"));
+  if (flag) box.appendChild(flagEl({ flag, alias: "capture" }, "lg", true));
   const span = document.createElement("span");
   span.className = kind === "ok" ? "who" : "";
   if (kind !== "ok") span.style.color = "var(--warn)";
@@ -447,6 +447,22 @@ function applyView() {
     setCountry(country.code);
     applyCountry();
     renderChrome();
+    render();
+  });
+})();
+
+/* Flag picker: PolitiScales's flag where there is one, or Politiskel's for all. */
+(function () {
+  const sel = $("flags");
+  for (const [v, t] of [["politiscales", L.flagsPolitiscales], ["politiskel", L.flagsPolitiskel]]) {
+    const o = document.createElement("option");
+    o.value = v; o.textContent = t;
+    sel.appendChild(o);
+  }
+  sel.value = flagMode;
+  sel.addEventListener("change", () => {
+    flagMode = sel.value;
+    try { localStorage.setItem(FLAG_KEY, flagMode); } catch (_) { /* quota, or private browsing */ }
     render();
   });
 })();

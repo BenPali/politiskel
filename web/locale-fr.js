@@ -178,6 +178,25 @@ const LOCALES = {
     /* the native questionnaire */
     optTrail: "Trajet depuis PolitiScales",
     optView: "Lecture",
+    optFlags: "Drapeaux",
+    flagsPolitiscales: "PolitiScales quand il existe", flagsPolitiskel: "Politiskel pour tous",
+    flagGeneratedAlt: a => "Drapeau Politiskel de " + a,
+    flagFigureTitle: "Drapeau Politiskel — calculé à partir des lectures ci-dessus, sans symbole ni "
+      + "couleur de parti :",
+    flagBand: (x, dim, v) => "Bande de hampe : l'économie, du côté " + (x < 0 ? "gauche" : "droit")
+      + " (X " + signed(x) + "), d'autant plus large que la position est marquée"
+      + (dim ? " — teinte de « " + dim + " » (" + signed(v) + "), sa sous-dimension la plus marquée."
+             : " — teinte neutre, faute de réponses au thème Économie."),
+    flagField: (dim, v, y, shape) => "Fond : la société"
+      + (dim ? ", teinte de « " + dim + " » (" + signed(v) + "), sa sous-dimension la plus marquée"
+             : ", teinte neutre faute de réponses au thème Société")
+      + (y === null ? "." : " ; " + (shape === "stripe" ? "bande centrale : Y " + signed(y) + ", vers l'autoritaire (symétrie)"
+        : shape === "diagonal" ? "diagonale : Y " + signed(y) + ", vers le libertaire (asymétrie)"
+        : "uni : Y " + signed(y) + ", près du centre") + "."),
+    flagSymbol: v => (v >= 20 ? "Disque plein : lecture de classe anticapitaliste"
+      : v <= -20 ? "Anneau : lecture de classe procapitaliste" : "Point : lecture de classe près du centre")
+      + " (" + signed(v) + "), d'autant plus grand qu'elle est marquée.",
+    flagBorder: v => "Bordure : protectionnisme marqué (" + signed(v) + ").",
     tabCompass: "Boussole", tabQuiz: "Questionnaire", tabGroups: "Groupes", tabAccount: "Mon compte",
     welcomeTitle: "Politiskel, en groupe",
     welcomeLead: "Chaque membre a son compte et son profil, et voit ceux des groupes qu'il a "
