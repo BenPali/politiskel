@@ -516,6 +516,14 @@
   .theme-card .status { font-size: 0.75rem; color: var(--text-3); grid-column: 1; }
   .theme-card .go { grid-column: 2; grid-row: 1 / span 3; }
   .theme-card.planned { background: none; border-style: dashed; }
+  .theme-card.all { border-color: var(--series-1); background: var(--surface); }
+  .start-native { display: flex; flex-wrap: wrap; gap: 8px 10px; align-items: center;
+                  margin: -6px 0 20px; font-size: 0.85rem; color: var(--text-2); }
+  .start-native input { font: inherit; padding: 7px 10px; border: 1px solid var(--border);
+                        border-radius: 7px; background: var(--surface); color: var(--text);
+                        width: 11em; }
+  .start-native button.primary { padding: 7px 14px; }
+  .start-native .error { margin: 0; flex-basis: 100%; }
   .theme-card.planned h3, .theme-card.planned p { color: var(--text-3); }
   @media (max-width: 640px) {
     .theme-card { grid-template-columns: 1fr; }
@@ -1582,6 +1590,13 @@ window.POLITI_PROFILES = [];
 
   <main id="view-main">
   <p class="subtitle" data-i18n="subtitle"></p>
+  <form class="start-native" id="native-form" novalidate>
+    <span data-i18n="nativeLead"></span>
+    <input type="text" id="native-alias" maxlength="24" data-i18n-placeholder="aliasPlaceholder"
+           aria-label="Alias">
+    <button type="submit" class="primary" data-i18n="nativeStart"></button>
+    <p class="error" id="native-error" hidden></p>
+  </form>
 
   <div class="controls">
     <label class="country"><span data-i18n="optCountry"></span>
@@ -2050,7 +2065,7 @@ const LOCALES = {
     hubPlanned: "À venir",
     hubProgress: (n, m) => n + " / " + m + " réponses",
     themes: {
-      economy: { name: "Économie",
+      economy: { name: "Économie", about: "l'économie",
         desc: "Redistribution, impôts et services publics, régulation des marchés — qui remplacent "
           + "l'axe X de PolitiScales — et, à part, le protectionnisme et trois lectures de classe." },
       society: { name: "Société",
@@ -2068,8 +2083,9 @@ const LOCALES = {
     quizCount: (i, n) => i + " / " + n,
     quizIntroEyebrow: "Questionnaire Politiskel · Économie",
     quizIntroTitle: a => "Compléter le profil de " + a,
-    quizIntroMeta: n => n + " questions, et deux fois la même sur l'importance du thème · "
-      + "environ dix minutes",
+    quizIntroMeta: (n, t) => n + " questions, et deux fois la même sur l'importance "
+      + (t > 1 ? "de chaque thème" : "du thème") + " · environ " + Math.max(5, Math.round(n / 3.5))
+      + " minutes",
     quizLead: "Ces questions remplacent l'axe économique de PolitiScales, qui ne repose que sur "
       + "deux de ses axes et ne pose rien sur la redistribution. Y reste celui de PolitiScales "
       + "tant que le thème société n'existe pas.",
@@ -2082,14 +2098,14 @@ const LOCALES = {
     quizErase: "Effacer mes réponses",
     quizKeys: "Touches 1 à 9 pour répondre · ← → pour naviguer",
     quizPoleFull: n => "Tout à fait d'accord : " + n,
-    resultEyebrow: "Résultat · Économie",
+    resultEyebrow: t => "Résultat · " + t,
     resultTitle: "D'où vous partiez, où vous arrivez",
     resultNoX: "Aucune réponse sur l'axe économique : X reste celui de PolitiScales.",
     resultWas: "PolitiScales", resultNow: "Politiskel",
     resultLeft: "gauche", resultRight: "droite",
     backToCompass: "Voir sur la boussole", quizReview: "Revoir mes réponses",
     quizTranslated: { item: "traduction Politiskel", anchors: "bornes traduites par Politiskel" },
-    quizSalience: "Quelle place l'économie tient-elle dans vos choix politiques ?",
+    quizSalience: about => "Quelle place " + about + " tient-elle dans vos choix politiques ?",
     quizSalienceSrc: "Question Politiskel — aucune enquête publique ne mesure l'importance "
       + "d'un thème sur une échelle.",
     fromQuiz: from => "X tiré du questionnaire (PolitiScales : " + from + ")",
@@ -2118,8 +2134,29 @@ const LOCALES = {
     salienceOf: s => "Importance déclarée : " + s,
     salienceMoved: (a, b, d) => "Importance déclarée : " + a + " au début, " + b + " à la fin"
       + (d === 0 ? " — inchangée" : d > 0 ? " — en hausse" : " — en baisse"),
-    quizSalienceAfter: "Maintenant que vous avez répondu : quelle place l'économie tient-elle "
-      + "dans vos choix politiques ?"
+    quizSalienceAfter: about => "Maintenant que vous avez répondu : quelle place " + about
+      + " tient-elle dans vos choix politiques ?",
+    nativeLead: "Pas de résultat PolitiScales ? Partez d'ici :",
+    nativeStart: "Commencer le questionnaire",
+    nativeTitle: a => "Le profil de " + a,
+    nativeMotto: "Profil Politiskel, sans résultat PolitiScales",
+    quizLeadNative: "Ces questions placent votre profil sur l'axe économique, sur l'échelle "
+      + "qu'utilisent les experts du CHES pour les partis, et en tirent plusieurs autres lectures.",
+    nativeEmpty: "questionnaire pas encore commencé",
+    nativeNoY: "pas encore de Y — le thème Société est à venir",
+    nativeOffDetail: "Ce profil n'a pas encore de Y : l'axe sociétal viendra du thème Société. "
+      + "En attendant, il n'est pas placé sur cette boussole, mais la lecture « Économie × "
+      + "protectionnisme » le place.",
+    fromQuizNative: "X tiré du questionnaire",
+    journeyNative: x => "Politiskel " + x + " sur l'axe économique",
+    resultTitleNative: "Où vous placent vos réponses",
+    resultNoXNative: "Aucune réponse sur l'axe économique pour l'instant.",
+    allName: "Questionnaire complet",
+    allDesc: names => "Toutes les questions de tous les thèmes disponibles, à la suite, dans "
+      + "l'ordre des thèmes. Pour l'instant : " + names.join(", ") + ".",
+    allLead: (n, m) => "Toutes les questions des thèmes disponibles, à la suite — " + n
+      + " sur " + m + " pour l'instant. Les réponses sont les mêmes que thème par thème : ce qui "
+      + "est déjà répondu d'un côté l'est de l'autre."
   }
 };
 const LANG = (document.documentElement.lang || "fr").slice(0, 2);
@@ -2209,7 +2246,16 @@ rebuild();
 
 /* The model returns keys, not sentences, so the wrappers below are the whole
    of the presentation layer: they look the wording up and change nothing else. */
+/* A profile started on this site has no PolitiScales result at all: nothing
+   to project, so its coordinates start empty rather than at a centre it never
+   answered. Whatever it gets comes from the questionnaire. */
+const hasPolitiscales = p => AXES.some(a => Number.isFinite(p[a.neg[0]])
+                                         || Number.isFinite(p[a.pos[0]]));
+
 function coords(p) {
+  if (!hasPolitiscales(p)) {
+    return withQuiz(p, { x: null, y: null, ecol: null, sov: null, method: null, native: true });
+  }
   const c = PolitiModel.coords(p);
   if (c.method) c.method = L.method[c.method];
   return withQuiz(p, c);
@@ -2224,8 +2270,10 @@ function withQuiz(p, c) {
   if (!answers) return c;
   c.quiz = PolitiQuiz.score(answers, "economy");
   if (c.quiz.x !== null) {
-    c.from = { x: c.x, y: c.y };
-    c.psX = c.x;
+    if (!c.native) {
+      c.from = { x: c.x, y: c.y };
+      c.psX = c.x;
+    }
     c.x = c.quiz.x;
     c.xSrc = "quiz";
   }
@@ -2261,15 +2309,16 @@ const V = () => Object.assign({}, L, L.views[view.key] || {});
 
 function project(p) {
   const c = coords(p);
-  if (view.key === "politiskel") return c;
-  const v = Object.assign({}, c, { base: c, from: null });
+  const v = view.key === "politiskel" ? c : Object.assign({}, c, { base: c, from: null });
   if (view.key === "politiscales") {
-    if (c.psX !== undefined) v.x = c.psX;
+    v.x = c.native ? null : c.psX !== undefined ? c.psX : c.x;
     v.xSrc = null;
   } else if (view.key === "protectionism") {
     const y = c.quiz ? c.quiz.protectionism : null;
-    if (y === null || y === undefined) v.off = true; else v.y = y;
+    v.y = y === undefined ? null : y;
   }
+  /* no value on one axis, no place on the chart */
+  if (v.x === null || v.y === null) v.off = true;
   return v;
 }
 
@@ -2698,7 +2747,7 @@ function render() {
       td.textContent = v === null ? "—" : signed(v);
       if (k === 0 && c.xSrc === "quiz") {
         td.classList.add("quiz");
-        td.title = L.fromQuiz(signed(c.psX));
+        td.title = c.native ? L.fromQuizNative : L.fromQuiz(signed(c.psX));
       }
       tr.appendChild(td);
     });
@@ -2708,7 +2757,10 @@ function render() {
     if (!nearest) {
       const tag = document.createElement("span");
       tag.className = "tag";
-      tag.textContent = c.off ? L.viewOff : L.viewNoRefs;
+      tag.textContent = !c.off ? L.viewNoRefs
+        : c.native && !c.quiz ? L.nativeEmpty
+        : c.native && view.key === "politiskel" && c.x !== null ? L.nativeNoY
+        : L.viewOff;
       tdFam.appendChild(tag);
     } else {
     const tag = document.createElement("span");
@@ -3111,9 +3163,12 @@ function renderDetail(computed) {
     meta.className = "meta";
     const d = document.createElement("p");
     d.className = "d";
-    d.textContent = p.slogan ? p.slogan.join(" · ") : L.noMotto;
+    const native = !hasPolitiscales(p);
+    d.textContent = p.slogan ? p.slogan.join(" · ") : native ? L.nativeMotto : L.noMotto;
     if (!p.slogan) d.style.color = "var(--text-3)";
-    meta.append(d, conceptsEl(p));
+    meta.appendChild(d);
+    /* no PolitiScales answers, no PolitiScales concepts to compute */
+    if (!native) meta.appendChild(conceptsEl(p));
     card.appendChild(meta);
     card.hidden = false;
     renderReadings(p, origin.c.base || origin.c);
@@ -3126,7 +3181,8 @@ function renderDetail(computed) {
     const tr = document.createElement("tr");
     const td = document.createElement("td");
     td.colSpan = 6; td.className = "empty";
-    td.textContent = isProfile && origin.c.off ? L.viewOffDetail : L.nothingToCompare;
+    td.textContent = !(isProfile && origin.c.off) ? L.nothingToCompare
+      : origin.c.native && view.key === "politiskel" ? L.nativeOffDetail : L.viewOffDetail;
     tr.appendChild(td); tbody.appendChild(tr);
     return;
   }
@@ -3183,6 +3239,12 @@ function readingsEl(c) {
   const box = document.createElement("div");
   const q = c.quiz;
 
+  if (c.native && c.x !== null) {
+    const j = document.createElement("p");
+    j.className = "journey";
+    j.textContent = L.journeyNative(signed(c.x));
+    box.appendChild(j);
+  }
   if (c.from) {
     const was = nearestBase(c.from.x, c.from.y);
     const now = nearestBase(c.x, c.y);
@@ -3275,6 +3337,26 @@ function renderReadings(p, c) {
    the moment it is given, so leaving halfway loses nothing. */
 const QUIZ_ROUTE = "#questionnaire/";
 const quizItems = () => PolitiQuiz.ITEMS.filter(i => i.theme === "economy");
+const ALL = "all";      /* the complete questionnaire: every theme, in order */
+const openThemes = () => PolitiQuiz.THEMES.filter(t => !t.planned);
+
+/* A flow is a list of screens. A theme's: how much it matters, its items,
+   how much it matters now. The complete questionnaire is every available
+   theme's flow end to end, in the themes' order — so it asks exactly the same
+   questions, stores them under the same keys, and a theme answered on its own
+   shows up as answered in it. */
+function screensFor(key) {
+  const keys = key === ALL ? openThemes().map(t => t.key) : [key];
+  const out = [];
+  for (const k of keys) {
+    out.push({ kind: "salience", theme: k, after: false });
+    for (const item of PolitiQuiz.ITEMS.filter(i => i.theme === k)) out.push({ kind: "item", item });
+    out.push({ kind: "salience", theme: k, after: true });
+  }
+  return out;
+}
+const screenKey = sc => sc.kind === "item" ? sc.item.id
+  : "salience." + sc.theme + (sc.after ? ".after" : "");
 /* { p, id, theme, step } while the questionnaire is shown; theme null = the
    list of themes */
 let quiz = null;
@@ -3288,7 +3370,8 @@ function route() {
     const [rawId, themeKey] = h.slice(QUIZ_ROUTE.length).split("/");
     const id = decodeURIComponent(rawId);
     const p = profiles.find(q => idOf(q) === id);
-    const theme = PolitiQuiz.THEMES.find(t => t.key === themeKey && !t.planned);
+    const theme = themeKey === ALL ? { key: ALL }
+      : PolitiQuiz.THEMES.find(t => t.key === themeKey && !t.planned);
     if (p) {
       const key = theme ? theme.key : null;
       if (!quiz || quiz.id !== id || quiz.theme !== key) quiz = { p, id, theme: key, step: 0 };
@@ -3343,7 +3426,7 @@ function renderHub() {
   eb.className = "eyebrow";
   eb.textContent = L.hubEyebrow;
   const h = document.createElement("h2");
-  h.textContent = L.quizIntroTitle(quiz.p.alias);
+  h.textContent = hasPolitiscales(quiz.p) ? L.quizIntroTitle(quiz.p.alias) : L.nativeTitle(quiz.p.alias);
   const lead = document.createElement("p");
   lead.className = "lead";
   lead.textContent = L.hubLead;
@@ -3351,10 +3434,12 @@ function renderHub() {
 
   const list = document.createElement("div");
   list.className = "theme-list";
-  for (const t of PolitiQuiz.THEMES) {
-    const copy = L.themes[t.key];
+  for (const t of [{ key: ALL }].concat(PolitiQuiz.THEMES)) {
+    const copy = t.key === ALL
+      ? { name: L.allName, desc: L.allDesc(openThemes().map(o => L.themes[o.key].name)) }
+      : L.themes[t.key];
     const item = document.createElement("div");
-    item.className = "theme-card" + (t.planned ? " planned" : "");
+    item.className = "theme-card" + (t.planned ? " planned" : "") + (t.key === ALL ? " all" : "");
     const name = document.createElement("h3");
     name.textContent = copy.name;
     const desc = document.createElement("p");
@@ -3365,7 +3450,7 @@ function renderHub() {
     if (t.planned) {
       status.textContent = L.hubPlanned;
     } else {
-      const items = PolitiQuiz.ITEMS.filter(i => i.theme === t.key);
+      const items = screensFor(t.key).filter(sc => sc.kind === "item").map(sc => sc.item);
       const done = items.filter(i => saved[i.id] !== undefined).length;
       status.textContent = L.hubProgress(done, items.length);
       const go = document.createElement("a");
@@ -3388,7 +3473,7 @@ function setAnswer(key, value) {
 
 function goStep(step) {
   clearTimeout(quizAdvance);
-  const last = quizItems().length + 3;
+  const last = screensFor(quiz.theme).length + 1;
   quiz.step = Math.max(0, Math.min(last, step));
   renderQuiz();
   window.scrollTo(0, 0);
@@ -3397,8 +3482,8 @@ function goStep(step) {
 function renderQuiz() {
   const root = $("view-quiz");
   root.replaceChildren();
-  const items = quizItems();
-  const nQ = items.length + 2;               /* salience, the items, salience again */
+  const screens = screensFor(quiz.theme);
+  const nQ = screens.length;
   const step = quiz.step;
   const saved = answersOf(quiz.id);
 
@@ -3440,33 +3525,36 @@ function renderQuiz() {
   const spacer = () => document.createElement("span");
 
   if (step === 0) {
-    introScreen(card, items.length);
-    const started = Object.keys(saved).length > 0;
+    introScreen(card, screens);
+    const started = screens.some(sc => saved[screenKey(sc)] !== undefined);
     nav.append(spacer(), button(started ? L.quizResume : L.quizStart, "primary", () => goStep(1)));
     return;
   }
   if (step === nQ + 1) {
-    resultScreen(card, nav, button);
+    resultScreen(card, nav, button, screens);
     return;
   }
 
-  if (step === 1) {
+  const sc = screens[step - 1];
+  if (sc.kind === "salience") {
+    /* The closing one is not pre-filled, and the first answer is not
+       recalled: shown it, most people repeat it to stay consistent, and
+       nothing would be measured. */
     const src = document.createElement("p");
     src.className = "q-src";
     src.textContent = L.quizSalienceSrc;
-    questionScreen(card, { key: "salience.economy", scale: PolitiQuiz.SCALES.salience,
-                           text: L.quizSalience, source: src }, saved["salience.economy"]);
-  } else if (step === nQ) {
-    /* Not pre-filled, and the first answer is not recalled: shown it, most
-       people repeat it to stay consistent, and nothing would be measured. */
-    const src = document.createElement("p");
-    src.className = "q-src";
-    src.textContent = L.quizSalienceSrc;
-    questionScreen(card, { key: "salience.economy.after", scale: PolitiQuiz.SCALES.salience,
-                           text: L.quizSalienceAfter, source: src },
-                   saved["salience.economy.after"]);
+    const about = L.themes[sc.theme].about;
+    if (quiz.theme === ALL && !sc.after) {
+      const eb = document.createElement("p");
+      eb.className = "eyebrow";
+      eb.textContent = L.themes[sc.theme].name;
+      card.appendChild(eb);
+    }
+    questionScreen(card, { key: screenKey(sc), scale: PolitiQuiz.SCALES.salience,
+                           text: sc.after ? L.quizSalienceAfter(about) : L.quizSalience(about),
+                           source: src }, saved[screenKey(sc)]);
   } else {
-    const item = items[step - 2];
+    const item = sc.item;
     questionScreen(card, {
       key: item.id, scale: PolitiQuiz.SCALES[item.scale], text: item.fr, stem: item.stem,
       left: item.left, right: item.right, note: item.note,
@@ -3484,21 +3572,25 @@ function renderQuiz() {
   root.appendChild(keys);
 }
 
-function introScreen(card, n) {
+function introScreen(card, screens) {
+  const native = !hasPolitiscales(quiz.p);
+  const all = quiz.theme === ALL;
   const eb = document.createElement("p");
   eb.className = "eyebrow";
-  eb.textContent = L.quizIntroEyebrow;
+  eb.textContent = L.hubEyebrow + " · " + (all ? L.allName : L.themes[quiz.theme].name);
   const h = document.createElement("h2");
-  h.textContent = L.quizIntroTitle(quiz.p.alias);
+  h.textContent = native ? L.nativeTitle(quiz.p.alias) : L.quizIntroTitle(quiz.p.alias);
   const lead = document.createElement("p");
   lead.className = "lead";
-  lead.textContent = L.quizLead;
+  lead.textContent = all ? L.allLead(openThemes().length, PolitiQuiz.THEMES.length)
+                   : native ? L.quizLeadNative : L.quizLead;
   const hint = document.createElement("p");
   hint.className = "hint";
   hint.textContent = L.quizHint;
   const meta = document.createElement("p");
   meta.className = "q-src";
-  meta.textContent = L.quizIntroMeta(n);
+  meta.textContent = L.quizIntroMeta(screens.filter(sc => sc.kind === "item").length,
+                                     screens.filter(sc => sc.kind === "salience").length / 2);
   card.append(eb, h, lead, hint, meta);
 }
 
@@ -3591,19 +3683,19 @@ function questionScreen(card, q, was) {
   card.appendChild(q.source);
 }
 
-function resultScreen(card, nav, button) {
+function resultScreen(card, nav, button, screens) {
   const c = coords(quiz.p);
   const eb = document.createElement("p");
   eb.className = "eyebrow";
-  eb.textContent = L.resultEyebrow;
+  eb.textContent = L.resultEyebrow(quiz.theme === ALL ? L.allName : L.themes[quiz.theme].name);
   const h = document.createElement("h2");
-  h.textContent = L.resultTitle;
+  h.textContent = c.native ? L.resultTitleNative : L.resultTitle;
   card.append(eb, h);
 
   if (!c.quiz || c.quiz.x === null) {
     const p = document.createElement("p");
     p.className = "lead";
-    p.textContent = L.resultNoX;
+    p.textContent = c.native ? L.resultNoXNative : L.resultNoX;
     card.appendChild(p);
   } else {
     const cs = getComputedStyle(card);
@@ -3617,8 +3709,13 @@ function resultScreen(card, nav, button) {
     card.appendChild(r);
   }
 
+  /* erases what this flow asked, not the answers to other themes */
   const erase = button(L.quizErase, "skip", () => {
-    delete overlay.answers[quiz.id];
+    const a = overlay.answers[quiz.id];
+    if (a) {
+      for (const sc of screens) delete a[screenKey(sc)];
+      if (!Object.keys(a).length) delete overlay.answers[quiz.id];
+    }
     saveOverlay();
     goStep(0);
   });
@@ -3643,7 +3740,7 @@ function journeyStrip(c, width) {
   const sx = v => pad + (v + 100) / 200 * (W - 2 * pad);
   const anchorAt = x => (x < pad + 60 ? "start" : x > W - pad - 60 ? "end" : "middle");
   const svg = el("svg", { class: "journey-strip", viewBox: "0 0 " + W + " " + H, role: "img",
-                          "aria-label": L.resultWas + " " + signed(c.from.x) + " → "
+                          "aria-label": (c.from ? L.resultWas + " " + signed(c.from.x) + " → " : "")
                                         + L.resultNow + " " + signed(c.x) });
   svg.appendChild(el("line", { class: "axis", x1: pad, y1: axisY, x2: W - pad, y2: axisY }));
   for (const [v, t, anchor] of [[-100, L.resultLeft, "start"], [100, L.resultRight, "end"]]) {
@@ -3652,8 +3749,12 @@ function journeyStrip(c, width) {
     svg.appendChild(e);
   }
 
-  const was = nearestBase(c.from.x, c.from.y);
-  const now = nearestBase(c.x, c.y);
+  /* Without a PolitiScales start there is no journey, only where the answers
+     land; y is unknown, so the nearest reference is read on x alone. */
+  const start = c.from;
+  const byX = x => country.parties.reduce((b, r) => (!b || Math.abs(r.x - x) < Math.abs(b.x - x) ? r : b), null);
+  const was = start ? nearestBase(start.x, start.y) : { ref: byX(c.x) };
+  const now = start ? nearestBase(c.x, c.y) : { ref: byX(c.x) };
   for (const r of country.parties) {
     const x = sx(r.x);
     const g = el("g", {});
@@ -3677,8 +3778,8 @@ function journeyStrip(c, width) {
     svg.appendChild(t);
   });
 
-  const fx = sx(c.from.x), tx = sx(c.x);
-  if (Math.abs(tx - fx) > 12) {
+  const tx = sx(c.x), fx = start ? sx(start.x) : tx;
+  if (start && Math.abs(tx - fx) > 12) {
     const dir = Math.sign(tx - fx);
     svg.appendChild(el("path", { class: "arrow",
       d: "M " + fx + " " + (axisY - 10) + " Q " + (fx + tx) / 2 + " " + (axisY - 40) + " "
@@ -3686,15 +3787,15 @@ function journeyStrip(c, width) {
     svg.appendChild(el("path", { class: "head",
       d: "M " + tx + " " + (axisY - 8) + " l " + (-dir * 9) + " -7 l " + (dir * 1) + " 10 Z" }));
   }
-  svg.appendChild(el("circle", { class: "trail-ghost", cx: fx, cy: axisY, r: 6 }));
+  if (start) svg.appendChild(el("circle", { class: "trail-ghost", cx: fx, cy: axisY, r: 6 }));
   svg.appendChild(el("circle", { class: "dot", cx: tx, cy: axisY, r: 7 }));
 
   /* captions above the axis: the new one lifted when the two are close */
   const capW = el("text", { class: "cap was", x: fx, y: axisY - 16, "text-anchor": anchorAt(fx) });
-  capW.textContent = L.resultWas + " " + signed(c.from.x);
+  capW.textContent = start ? L.resultWas + " " + signed(start.x) : "";
   const capN = el("text", { class: "cap", x: tx, y: axisY - 16, "text-anchor": anchorAt(tx) });
   capN.textContent = L.resultNow + " " + signed(c.x);
-  if (Math.abs(tx - fx) < 150) capN.setAttribute("y", axisY - 48);
+  if (start && Math.abs(tx - fx) < 150) capN.setAttribute("y", axisY - 48);
   if (W < 460) svg.style.maxWidth = W + "px";
   svg.append(capW, capN);
   return svg;
@@ -3750,7 +3851,7 @@ function wireHover(computed) {
       [L.tipEcon, signed(c.x)],
       [Vc.tipSocial, signed(c.y)
         + (c.y > 0 ? Vc.suffixAuthor : c.y < 0 ? Vc.suffixLibert : "")],
-      [L.tipEcol, signed(c.ecol)]
+      [L.tipEcol, c.ecol === null ? "—" : signed(c.ecol)]
     ];
     if (c.method) rows.push([L.tipMethod, c.method]);
     for (const [k, v] of rows) {
@@ -4073,6 +4174,27 @@ function applyLocale() {
   });
 }
 applyLocale();
+
+/* A profile that starts here, with no PolitiScales result: an alias, then
+   straight to the list of themes. It lives in the overlay like a hand-typed
+   profile, so deleting it deletes its answers. */
+$("native-form").addEventListener("submit", e => {
+  e.preventDefault();
+  const alias = $("native-alias").value.trim();
+  const err = $("native-error");
+  err.hidden = true;
+  const fail = msg => { err.textContent = msg; err.hidden = false; };
+  if (!alias) return fail(L.errNoAlias);
+  if (profiles.some(p => p.alias.toLowerCase() === alias.toLowerCase()))
+    return fail(L.errDuplicate(alias));
+  const p = { alias, native: true };
+  overlay.added.push(p);
+  saveOverlay();
+  rebuild();
+  render();
+  $("native-alias").value = "";
+  location.hash = hubHref(idOf(p));
+});
 
 /* Reading picker. Changing reading changes both axes, the party table (only
    the parties measured on the new axis), and so the thresholds, which are
