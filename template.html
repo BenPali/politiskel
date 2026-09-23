@@ -1444,8 +1444,10 @@
       scale: "powerIssp", pole: -1,
       fr: "Selon vous, les syndicats ont-ils trop ou pas assez de pouvoir ?",
       src: { survey: "ISSP", wave: "Rôle de l'État 1996", variable: "Q11a", url: GESIS(6806) } },
+    /* "Et les dirigeants…" answers the unions question: it cannot be read
+       alone, so it always follows it, whatever the order. */
     { id: "issp.power.business", theme: "economy", reading: "labour",
-      scale: "powerIssp", pole: 1,
+      scale: "powerIssp", pole: 1, follows: "issp.power.unions",
       fr: "Et les dirigeants du commerce et de l'industrie, ont-ils trop ou pas assez de pouvoir ?",
       src: { survey: "ISSP", wave: "Rôle de l'État 1996", variable: "Q11b", url: GESIS(6806) } }
   ];
@@ -1466,15 +1468,19 @@
 
   const itemById = id => ITEMS.find(i => i.id === id) || null;
 
-  /* The complete questionnaire mixes every theme's items, in one fixed order
-     that everyone gets. Mixed, so that a run of items on one subject does not
-     tell the respondent what is being measured; fixed, so that order effects,
-     if any, are the same for every profile and answers stay comparable.
+  /* Items are asked mixed, in one fixed order that everyone gets — within a
+     theme and in the complete questionnaire alike. Mixed, so that a run of
+     items on one subject does not tell the respondent what is being measured;
+     fixed, so that order effects, if any, are the same for every profile and
+     answers stay comparable.
 
      The order is a sort on a hash of each item's id (FNV-1a, 32 bits) rather
      than a seeded shuffle: adding an item slots it in somewhere without
      moving any of the others, where a shuffle would deal the whole deck
-     again. */
+     again. Items of a shared grid need no special care, since every screen
+     repeats the grid's stem; an item whose wording leans on the one before
+     it says so with `follows`, and the two travel as one block, placed by the
+     first one's hash. */
   function hashId(id) {
     let h = 0x811c9dc5;
     for (let k = 0; k < id.length; k++) {
@@ -1483,8 +1489,18 @@
     }
     return h;
   }
-  const mixedOrder = items => items.slice().sort((a, b) => hashId(a.id) - hashId(b.id)
-                                                          || (a.id < b.id ? -1 : 1));
+  function mixedOrder(items) {
+    const present = new Set(items.map(i => i.id));
+    const heads = items.filter(i => !i.follows || !present.has(i.follows));
+    const next = new Map(items.filter(i => i.follows && present.has(i.follows))
+                              .map(i => [i.follows, i]));
+    heads.sort((a, b) => hashId(a.id) - hashId(b.id) || (a.id < b.id ? -1 : 1));
+    const out = [];
+    for (const h of heads) {
+      for (let i = h; i; i = next.get(i.id)) out.push(i);
+    }
+    return out;
+  }
   const mean = xs => xs.reduce((s, v) => s + v, 0) / xs.length;
 
   /* One answer, oriented: a number in [-1, 1], or null when the item was
@@ -3348,29 +3364,30 @@ function renderReadings(p, c) {
    browsers do not all share that storage between two file:// pages.
 
    Screens: an introduction, the salience question, one per item, salience
-   again, the result.
-   Salience comes first: asked after eighteen questions on the economy, it
+   again, the result. Items come mixed, in a fixed order (see screensFor).
+   Salience comes first: asked after thirty questions on the economy, it
    would measure how much the respondent had just been made to think about
    it, not how much it weighs in their politics. It is asked once more at the
    end, so the page can show whether answering moved it.
-   Items keep the bank order and carry no section heading — a heading such as
-   "class" would tell the respondent what an item is for. Every answer is saved
+   Items are mixed and carry no section heading, for the same reason: a
+   heading such as "class", or a run of items on one subject, would tell the
+   respondent what an item is for. Every answer is saved
    the moment it is given, so leaving halfway loses nothing. */
 const QUIZ_ROUTE = "#questionnaire/";
 const quizItems = () => PolitiQuiz.ITEMS.filter(i => i.theme === "economy");
-const ALL = "all";      /* the complete questionnaire: every theme, in order */
+const ALL = "all";      /* the complete questionnaire: every theme at once */
 const openThemes = () => PolitiQuiz.THEMES.filter(t => !t.planned);
 
-/* A flow is a list of screens. A theme's: how much it matters, its items in
-   bank order, how much it matters now. The complete questionnaire asks every
-   theme's salience first, then every available item mixed in the one fixed
-   order politi-quiz.js defines, then every salience again. Same questions,
-   same keys, so a theme answered on its own shows up as answered in it. */
+/* A flow is a list of screens: how much each of its themes matters, its items
+   mixed in the one fixed order politi-quiz.js defines, how much each theme
+   matters now. A theme's flow has one theme; the complete questionnaire has
+   them all, its items mixed across themes. Same questions, same keys, so a
+   theme answered on its own shows up as answered in it. */
 function screensFor(key) {
   const keys = key === ALL ? openThemes().map(t => t.key) : [key];
   const items = PolitiQuiz.ITEMS.filter(i => keys.includes(i.theme));
   return keys.map(k => ({ kind: "salience", theme: k, after: false }))
-    .concat((key === ALL ? PolitiQuiz.mixedOrder(items) : items).map(item => ({ kind: "item", item })))
+    .concat(PolitiQuiz.mixedOrder(items).map(item => ({ kind: "item", item })))
     .concat(keys.map(k => ({ kind: "salience", theme: k, after: true })));
 }
 const screenKey = sc => sc.kind === "item" ? sc.item.id

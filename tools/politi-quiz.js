@@ -289,8 +289,10 @@
       scale: "powerIssp", pole: -1,
       fr: "Selon vous, les syndicats ont-ils trop ou pas assez de pouvoir ?",
       src: { survey: "ISSP", wave: "Rôle de l'État 1996", variable: "Q11a", url: GESIS(6806) } },
+    /* "Et les dirigeants…" answers the unions question: it cannot be read
+       alone, so it always follows it, whatever the order. */
     { id: "issp.power.business", theme: "economy", reading: "labour",
-      scale: "powerIssp", pole: 1,
+      scale: "powerIssp", pole: 1, follows: "issp.power.unions",
       fr: "Et les dirigeants du commerce et de l'industrie, ont-ils trop ou pas assez de pouvoir ?",
       src: { survey: "ISSP", wave: "Rôle de l'État 1996", variable: "Q11b", url: GESIS(6806) } }
   ];
@@ -311,15 +313,19 @@
 
   const itemById = id => ITEMS.find(i => i.id === id) || null;
 
-  /* The complete questionnaire mixes every theme's items, in one fixed order
-     that everyone gets. Mixed, so that a run of items on one subject does not
-     tell the respondent what is being measured; fixed, so that order effects,
-     if any, are the same for every profile and answers stay comparable.
+  /* Items are asked mixed, in one fixed order that everyone gets — within a
+     theme and in the complete questionnaire alike. Mixed, so that a run of
+     items on one subject does not tell the respondent what is being measured;
+     fixed, so that order effects, if any, are the same for every profile and
+     answers stay comparable.
 
      The order is a sort on a hash of each item's id (FNV-1a, 32 bits) rather
      than a seeded shuffle: adding an item slots it in somewhere without
      moving any of the others, where a shuffle would deal the whole deck
-     again. */
+     again. Items of a shared grid need no special care, since every screen
+     repeats the grid's stem; an item whose wording leans on the one before
+     it says so with `follows`, and the two travel as one block, placed by the
+     first one's hash. */
   function hashId(id) {
     let h = 0x811c9dc5;
     for (let k = 0; k < id.length; k++) {
@@ -328,8 +334,18 @@
     }
     return h;
   }
-  const mixedOrder = items => items.slice().sort((a, b) => hashId(a.id) - hashId(b.id)
-                                                          || (a.id < b.id ? -1 : 1));
+  function mixedOrder(items) {
+    const present = new Set(items.map(i => i.id));
+    const heads = items.filter(i => !i.follows || !present.has(i.follows));
+    const next = new Map(items.filter(i => i.follows && present.has(i.follows))
+                              .map(i => [i.follows, i]));
+    heads.sort((a, b) => hashId(a.id) - hashId(b.id) || (a.id < b.id ? -1 : 1));
+    const out = [];
+    for (const h of heads) {
+      for (let i = h; i; i = next.get(i.id)) out.push(i);
+    }
+    return out;
+  }
   const mean = xs => xs.reduce((s, v) => s + v, 0) / xs.length;
 
   /* One answer, oriented: a number in [-1, 1], or null when the item was
