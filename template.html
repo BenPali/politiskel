@@ -2140,6 +2140,11 @@ const LOCALES = {
     viewNoteOff: n => n + " profil" + (n > 1 ? "s" : "") + " sans réponse au questionnaire "
       + "économie " + (n > 1 ? "ne sont" : "n'est") + " pas placé" + (n > 1 ? "s" : "")
       + " : c'est lui qui mesure le protectionnisme.",
+    viewNoteSkippedProt: n => n + " profil" + (n > 1 ? "s ont" : " a") + " passé les deux "
+      + "questions sur le protectionnisme, et " + (n > 1 ? "ne sont" : "n'est") + " donc pas "
+      + "placé" + (n > 1 ? "s" : "") + ".",
+    viewNoteNoX: n => n + " profil" + (n > 1 ? "s" : "") + " sans réponse sur l'axe économique "
+      + (n > 1 ? "ne sont" : "n'est") + " pas placé" + (n > 1 ? "s" : "") + ".",
     views: {
       politiskel: { name: "Politiskel — économie × société" },
       politiscales: { name: "PolitiScales d'origine" },
@@ -2478,10 +2483,13 @@ function applyCountry() {
   $("legend-parties").textContent = L.legendParties(country.name);
   $("detail-hint").textContent = L.detailHint(REFERENCES.length);
 
-  const ches = REFERENCES.filter(r => r.src === "ches");
-  const est = REFERENCES.filter(r => r.src !== "ches");
+  /* The whole table, whatever the reading keeps: a reading that drops every
+     party (Italy on protectionism) must not make them read as estimates. */
+  const all = country.parties;
+  const ches = all.filter(r => r.src === "ches");
+  const est = all.filter(r => r.src !== "ches");
   $("method-refs").textContent =
-      !ches.length ? L.methodRefsEstimated(country.name, REFERENCES.length, country.why || "")
+      !ches.length ? L.methodRefsEstimated(country.name, all.length, country.why || "")
     : !est.length  ? L.methodRefsAll(country.name, ches.length)
     : L.methodRefsMixed(country.name, ches.length, est.length,
                         est.map(r => r.name).join(", "));
@@ -3461,6 +3469,7 @@ let quiz = null;
 let quizAdvance = null;   /* pending auto-advance after an answer */
 
 function route() {
+  clearTimeout(quizAdvance);   /* an answer's auto-advance belongs to the page it was given on */
   const h = location.hash;
   if (h.startsWith(QUIZ_ROUTE)) {
     /* #questionnaire/<id> lists the themes, #questionnaire/<id>/<theme> runs
@@ -3720,7 +3729,8 @@ function questionScreen(card, q, was) {
     r.addEventListener("change", () => {
       setAnswer(q.key, value);
       clearTimeout(quizAdvance);
-      quizAdvance = setTimeout(() => goStep(quiz.step + 1), 260);
+      /* route() cancels it on any navigation; the check covers the rest */
+      quizAdvance = setTimeout(() => { if (quiz && quiz.theme) goStep(quiz.step + 1); }, 260);
     });
     lab.appendChild(r);
     if (key !== null) {
@@ -3917,7 +3927,8 @@ function sourceLine(src, translated) {
 
 /* Keyboard, on the questionnaire only: digits answer, arrows move. */
 document.addEventListener("keydown", e => {
-  if (!quiz || e.altKey || e.ctrlKey || e.metaKey) return;
+  /* inside a flow only: the list of themes has no steps to move through */
+  if (!quiz || !quiz.theme || e.altKey || e.ctrlKey || e.metaKey) return;
   if (e.key === "ArrowRight" || (e.key === "Enter" && !e.target.closest("button, a"))) {
     e.preventDefault(); goStep(quiz.step + 1);
   } else if (e.key === "ArrowLeft") {
@@ -4129,8 +4140,14 @@ $("clear-btn").addEventListener("click", () => {
 
 $("reset-btn").addEventListener("click", () => {
   /* "Show everything again" brings hidden profiles back; it is not an erase
-     button, so questionnaire answers survive it. */
-  overlay = { hidden: [], added: [], answers: overlay.answers };
+     button, so the answers of the profiles it keeps survive it. The profiles
+     it removes — every added one — take their answers with them, as a
+     deletion does: left behind, they would come back on a new profile that
+     happened to reuse the alias. */
+  const kept = new Set(SEED.map(idOf));
+  const answers = {};
+  for (const [id, a] of Object.entries(overlay.answers)) if (kept.has(id)) answers[id] = a;
+  overlay = { hidden: [], added: [], answers };
   saveOverlay();
   rebuild();
   render();
@@ -4309,8 +4326,15 @@ function applyView() {
     if (country.protWhy) parts.push(L.viewNoteNoProt(country.protWhy));
     else if (!REFERENCES.length) parts.push(L.viewNoteAllEstimated);
     else if (dropped) parts.push(L.viewNoteDropped(dropped));
-    const off = profiles.filter(p => project(p).off).length;
-    if (off) parts.push(L.viewNoteOff(off));
+    /* why each profile is off: never answered, skipped protectionism, or
+       answered protectionism but nothing that places it on x */
+    const offs = profiles.map(project).filter(c => c.off);
+    const none = offs.filter(c => !c.quiz).length;
+    const noProt = offs.filter(c => c.quiz && c.y === null).length;
+    const noX = offs.filter(c => c.quiz && c.y !== null && c.x === null).length;
+    if (none) parts.push(L.viewNoteOff(none));
+    if (noProt) parts.push(L.viewNoteSkippedProt(noProt));
+    if (noX) parts.push(L.viewNoteNoX(noX));
   }
   note.textContent = parts.join(" ");
   note.hidden = !parts.length;
