@@ -82,6 +82,7 @@ function flagTraits(c, p) {
   const ord = first(d.laworder, ps.pun);
   const rev = Math.max(has(cls) ? cls : -100, has(ps.rev) ? ps.rev : -100);
   const monarchy = futureReading(c, "monarchism");
+  const stands = (v, axis) => v >= 80 || !has(axis) || v >= axis + 15;
 
   const T = [
     { k: "left",        s: neg(x),                      min: 34, colour: "red" },
@@ -90,8 +91,13 @@ function flagTraits(c, p) {
     { k: "class",       s: first(cls, ps.com),          min: 50, colour: "red", symbol: "fist" },
     { k: "redistribution", s: neg(d.redistribution),    min: 60, colour: "red", symbol: "scales" },
     { k: "deregulation", s: first(d.deregulation, ps.laf), min: 60, colour: "gold", symbol: "swallow" },
-    { k: "liberties",   s: first(neg(d.laworder), ps.rehab), min: 60, symbol: "liberty" },
-    { k: "laworder",    s: ord,                         min: 60, colour: "blue", symbol: "sword" },
+    /* Law and order is part of y, and so is liberty against it: their
+       symbols show only when they say more than the axis's colour already
+       does — standing clear of y, or very strong. */
+    { k: "liberties",   s: first(neg(d.laworder), ps.rehab), min: 60, symbol: "liberty",
+      when: () => stands(first(neg(d.laworder), ps.rehab), neg(y)) },
+    { k: "laworder",    s: ord,                         min: 60, colour: "blue", symbol: "shield",
+      when: () => stands(ord, y) },
     { k: "cosmopolitan", s: intl,                       min: 60, colour: "sky", symbol: "globe" },
     { k: "nation",      s: nat,                         min: 60, symbol: "oak" },
     { k: "protectionism", s: prot,                      min: 60, symbol: "tower" },
