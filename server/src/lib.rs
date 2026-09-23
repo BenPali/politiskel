@@ -135,6 +135,9 @@ pub fn app(state: AppState) -> Router {
         .route("/api/invites/{code}", get(invite_preview))
         .route("/api/groups/{id}/leave", post(leave_group))
         .route("/api/groups/{id}/profiles", get(group_profiles))
+        // The site's pages — /connexion, /groupes, /rejoindre/<code>… — are
+        // one page that routes itself; an unknown /api/ path stays a 404.
+        .fallback(site_page)
         .layer(DefaultBodyLimit::max(64 * 1024))
         .layer(middleware::from_fn_with_state(state.clone(), same_origin_writes))
         .layer(middleware::from_fn(security_headers))
@@ -314,6 +317,14 @@ fn req_is_api(res: &Response) -> bool {
 
 async fn page(State(state): State<AppState>) -> Html<String> {
     Html(state.page.as_ref().clone())
+}
+
+async fn site_page(State(state): State<AppState>, req: Request<axum::body::Body>) -> Response {
+    let path = req.uri().path();
+    if req.method() != axum::http::Method::GET || path.starts_with("/api/") {
+        return ApiError(StatusCode::NOT_FOUND, "not_found").into_response();
+    }
+    Html(state.page.as_ref().clone()).into_response()
 }
 
 #[derive(Deserialize)]

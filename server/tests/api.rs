@@ -372,3 +372,16 @@ async fn an_invitation_can_be_read_before_it_is_accepted() {
     // reading it joined nothing
     assert_eq!(b.call("GET", "/api/me", None).await.1["groups"], json!([]));
 }
+
+#[tokio::test]
+async fn site_paths_serve_the_page_and_unknown_api_paths_do_not() {
+    let app = server().await;
+    for path in ["/connexion", "/groupes", "/compte", "/rejoindre/abc", "/questionnaire/economy"] {
+        let res = app.clone().oneshot(Request::get(path).body(Body::empty()).unwrap()).await.unwrap();
+        assert_eq!(res.status(), StatusCode::OK, "{path}");
+    }
+    let res = app.clone().oneshot(Request::get("/api/nope").body(Body::empty()).unwrap()).await.unwrap();
+    assert_eq!(res.status(), StatusCode::NOT_FOUND);
+    let res = app.oneshot(Request::post("/groupes").body(Body::empty()).unwrap()).await.unwrap();
+    assert_eq!(res.status(), StatusCode::NOT_FOUND);
+}
