@@ -1465,6 +1465,26 @@
   ];
 
   const itemById = id => ITEMS.find(i => i.id === id) || null;
+
+  /* The complete questionnaire mixes every theme's items, in one fixed order
+     that everyone gets. Mixed, so that a run of items on one subject does not
+     tell the respondent what is being measured; fixed, so that order effects,
+     if any, are the same for every profile and answers stay comparable.
+
+     The order is a sort on a hash of each item's id (FNV-1a, 32 bits) rather
+     than a seeded shuffle: adding an item slots it in somewhere without
+     moving any of the others, where a shuffle would deal the whole deck
+     again. */
+  function hashId(id) {
+    let h = 0x811c9dc5;
+    for (let k = 0; k < id.length; k++) {
+      h ^= id.charCodeAt(k);
+      h = Math.imul(h, 0x01000193) >>> 0;
+    }
+    return h;
+  }
+  const mixedOrder = items => items.slice().sort((a, b) => hashId(a.id) - hashId(b.id)
+                                                          || (a.id < b.id ? -1 : 1));
   const mean = xs => xs.reduce((s, v) => s + v, 0) / xs.length;
 
   /* One answer, oriented: a number in [-1, 1], or null when the item was
@@ -1531,7 +1551,7 @@
     return out;
   }
 
-  const api = { SCALES, ITEMS, THEMES, itemById, itemValue, score };
+  const api = { SCALES, ITEMS, THEMES, itemById, itemValue, score, mixedOrder };
   if (typeof module !== "undefined" && module.exports) module.exports = api;
   else global.PolitiQuiz = api;
 
@@ -2152,11 +2172,12 @@ const LOCALES = {
     resultTitleNative: "Où vous placent vos réponses",
     resultNoXNative: "Aucune réponse sur l'axe économique pour l'instant.",
     allName: "Questionnaire complet",
-    allDesc: names => "Toutes les questions de tous les thèmes disponibles, à la suite, dans "
-      + "l'ordre des thèmes. Pour l'instant : " + names.join(", ") + ".",
-    allLead: (n, m) => "Toutes les questions des thèmes disponibles, à la suite — " + n
-      + " sur " + m + " pour l'instant. Les réponses sont les mêmes que thème par thème : ce qui "
-      + "est déjà répondu d'un côté l'est de l'autre."
+    allDesc: names => "Toutes les questions de tous les thèmes disponibles, mélangées dans un "
+      + "ordre fixe, le même pour tout le monde. Pour l'instant : " + names.join(", ") + ".",
+    allLead: (n, m) => "Toutes les questions des thèmes disponibles — " + n + " sur " + m
+      + " pour l'instant — mélangées dans un ordre fixe, le même pour tout le monde : une suite "
+      + "de questions sur un même sujet laisse deviner ce qu'elle mesure. Les réponses sont les "
+      + "mêmes que thème par thème : ce qui est déjà répondu d'un côté l'est de l'autre."
   }
 };
 const LANG = (document.documentElement.lang || "fr").slice(0, 2);
@@ -3340,20 +3361,17 @@ const quizItems = () => PolitiQuiz.ITEMS.filter(i => i.theme === "economy");
 const ALL = "all";      /* the complete questionnaire: every theme, in order */
 const openThemes = () => PolitiQuiz.THEMES.filter(t => !t.planned);
 
-/* A flow is a list of screens. A theme's: how much it matters, its items,
-   how much it matters now. The complete questionnaire is every available
-   theme's flow end to end, in the themes' order — so it asks exactly the same
-   questions, stores them under the same keys, and a theme answered on its own
-   shows up as answered in it. */
+/* A flow is a list of screens. A theme's: how much it matters, its items in
+   bank order, how much it matters now. The complete questionnaire asks every
+   theme's salience first, then every available item mixed in the one fixed
+   order politi-quiz.js defines, then every salience again. Same questions,
+   same keys, so a theme answered on its own shows up as answered in it. */
 function screensFor(key) {
   const keys = key === ALL ? openThemes().map(t => t.key) : [key];
-  const out = [];
-  for (const k of keys) {
-    out.push({ kind: "salience", theme: k, after: false });
-    for (const item of PolitiQuiz.ITEMS.filter(i => i.theme === k)) out.push({ kind: "item", item });
-    out.push({ kind: "salience", theme: k, after: true });
-  }
-  return out;
+  const items = PolitiQuiz.ITEMS.filter(i => keys.includes(i.theme));
+  return keys.map(k => ({ kind: "salience", theme: k, after: false }))
+    .concat((key === ALL ? PolitiQuiz.mixedOrder(items) : items).map(item => ({ kind: "item", item })))
+    .concat(keys.map(k => ({ kind: "salience", theme: k, after: true })));
 }
 const screenKey = sc => sc.kind === "item" ? sc.item.id
   : "salience." + sc.theme + (sc.after ? ".after" : "");
@@ -3544,7 +3562,7 @@ function renderQuiz() {
     src.className = "q-src";
     src.textContent = L.quizSalienceSrc;
     const about = L.themes[sc.theme].about;
-    if (quiz.theme === ALL && !sc.after) {
+    if (quiz.theme === ALL) {
       const eb = document.createElement("p");
       eb.className = "eyebrow";
       eb.textContent = L.themes[sc.theme].name;

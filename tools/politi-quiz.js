@@ -310,6 +310,26 @@
   ];
 
   const itemById = id => ITEMS.find(i => i.id === id) || null;
+
+  /* The complete questionnaire mixes every theme's items, in one fixed order
+     that everyone gets. Mixed, so that a run of items on one subject does not
+     tell the respondent what is being measured; fixed, so that order effects,
+     if any, are the same for every profile and answers stay comparable.
+
+     The order is a sort on a hash of each item's id (FNV-1a, 32 bits) rather
+     than a seeded shuffle: adding an item slots it in somewhere without
+     moving any of the others, where a shuffle would deal the whole deck
+     again. */
+  function hashId(id) {
+    let h = 0x811c9dc5;
+    for (let k = 0; k < id.length; k++) {
+      h ^= id.charCodeAt(k);
+      h = Math.imul(h, 0x01000193) >>> 0;
+    }
+    return h;
+  }
+  const mixedOrder = items => items.slice().sort((a, b) => hashId(a.id) - hashId(b.id)
+                                                          || (a.id < b.id ? -1 : 1));
   const mean = xs => xs.reduce((s, v) => s + v, 0) / xs.length;
 
   /* One answer, oriented: a number in [-1, 1], or null when the item was
@@ -376,7 +396,7 @@
     return out;
   }
 
-  const api = { SCALES, ITEMS, THEMES, itemById, itemValue, score };
+  const api = { SCALES, ITEMS, THEMES, itemById, itemValue, score, mixedOrder };
   if (typeof module !== "undefined" && module.exports) module.exports = api;
   else global.PolitiQuiz = api;
 
