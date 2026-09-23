@@ -3006,7 +3006,10 @@ function renderReadings(p, c) {
    HTML file, because the answers live in this page's localStorage, and
    browsers do not all share that storage between two file:// pages.
 
-   Screens: an introduction, one per item, the salience question, the result.
+   Screens: an introduction, the salience question, one per item, the result.
+   Salience comes first: asked after eighteen questions on the economy, it
+   would measure how much the respondent had just been made to think about
+   it, not how much it weighs in their politics.
    Items keep the bank order and carry no section heading — a heading such as
    "class" would tell the respondent what an item is for. Every answer is saved
    the moment it is given, so leaving halfway loses nothing. */
@@ -3115,19 +3118,19 @@ function renderQuiz() {
     return;
   }
 
-  if (step <= items.length) {
-    const item = items[step - 1];
-    questionScreen(card, {
-      key: item.id, scale: PolitiQuiz.SCALES[item.scale], text: item.fr, stem: item.stem,
-      left: item.left, right: item.right, note: item.note,
-      source: sourceLine(item.src, item.translated)
-    }, saved[item.id]);
-  } else {
+  if (step === 1) {
     const src = document.createElement("p");
     src.className = "q-src";
     src.textContent = L.quizSalienceSrc;
     questionScreen(card, { key: "salience.economy", scale: PolitiQuiz.SCALES.salience,
                            text: L.quizSalience, source: src }, saved["salience.economy"]);
+  } else {
+    const item = items[step - 2];
+    questionScreen(card, {
+      key: item.id, scale: PolitiQuiz.SCALES[item.scale], text: item.fr, stem: item.stem,
+      left: item.left, right: item.right, note: item.note,
+      source: sourceLine(item.src, item.translated)
+    }, saved[item.id]);
   }
 
   nav.append(
