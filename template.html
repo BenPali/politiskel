@@ -2592,6 +2592,10 @@ const LOCALES = {
     quizStart: "Commencer", quizResume: "Reprendre", quizPrev: "← Précédent",
     quizNext: "Suivant →", quizSkip: "Passer", quizSeeResult: "Voir le résultat →",
     quizErase: "Effacer mes réponses",
+    exportAnswers: "Exporter mes réponses",
+    exportHint: "Le fichier téléchargé contient vos réponses, rien d'autre. Déposé dans "
+      + "politi-results/answers/ par la personne qui assemble la page du groupe, il y ajoute "
+      + "votre profil, et permet de tester le questionnaire sur de vraies réponses.",
     quizKeys: "Touches 1 à 9 pour répondre · ← → pour naviguer",
     quizPoleFull: n => "Tout à fait d'accord : " + n,
     resultEyebrow: t => "Résultat · " + t,
@@ -2714,6 +2718,21 @@ const STORE_KEY = "politicompass.overlay.v4";
    have none, so we fall back to the alias. */
 const idOf = p => p.source || ("alias:" + p.alias);
 
+/* Answers exported by the group's members and dropped in
+   politi-results/answers/: the build folds them in as POLITI_ANSWERS. A file
+   naming a screenshot completes that profile; one that names none is a
+   profile started on the site, and joins the list as such. Answers given in
+   this browser afterwards take precedence (see answersOf). */
+const SEED_ANSWERS = {};
+for (const a of window.POLITI_ANSWERS || []) {
+  const match = a.source && SEED.find(p => p.source === a.source);
+  if (match) { SEED_ANSWERS[idOf(match)] = a.answers; continue; }
+  if (SEED.some(p => p.alias.toLowerCase() === a.alias.toLowerCase())) continue;
+  const p = { alias: a.alias, native: true, source: null };
+  SEED.push(p);
+  SEED_ANSWERS[idOf(p)] = a.answers;
+}
+
 function loadOverlay() {
   try {
     const raw = localStorage.getItem(STORE_KEY);
@@ -2769,7 +2788,8 @@ function coords(p) {
    `from` keeps where PolitiScales had put the profile, so the journey from
    one instrument to the other can be drawn. */
 function withQuiz(p, c) {
-  const answers = overlay.answers[idOf(p)];
+  const id = idOf(p);
+  const answers = overlay.answers[id] || SEED_ANSWERS[id];
   if (!answers) return c;
   c.quiz = PolitiQuiz.score(answers, "economy");
   c.soc = PolitiQuiz.score(answers, "society");
@@ -3849,7 +3869,37 @@ function renderReadings(p, c) {
   actions.className = "actions";
   actions.style.margin = "0 0 14px";
   actions.appendChild(btn);
+  if (Object.keys(answersOf(idOf(p))).length) actions.appendChild(exportButton(p, "ghost"));
   box.appendChild(actions);
+}
+
+/* Downloads a profile's answers as the file tools/extract.js reads back from
+   politi-results/answers/. The format is versioned so that a later bank can
+   still tell an old file apart. */
+const slugOf = a => a.normalize("NFD").replace(/[\u0300-\u036f]/g, "").toLowerCase()
+  .replace(/[^a-z0-9]+/g, "-").replace(/^-|-$/g, "") || "profil";
+
+function exportAnswers(p) {
+  const data = { format: "politiskel-answers", version: 1, alias: p.alias,
+                 source: p.source || null, answers: answersOf(idOf(p)) };
+  const blob = new Blob([JSON.stringify(data, null, 1) + "\n"], { type: "application/json" });
+  const a = document.createElement("a");
+  a.href = URL.createObjectURL(blob);
+  a.download = slugOf(p.alias) + "-reponses.json";
+  document.body.appendChild(a);
+  a.click();
+  a.remove();
+  setTimeout(() => URL.revokeObjectURL(a.href), 1000);
+}
+
+function exportButton(p, cls) {
+  const b = document.createElement("button");
+  b.type = "button";
+  b.className = cls;
+  b.textContent = L.exportAnswers;
+  b.title = L.exportHint;
+  b.addEventListener("click", () => exportAnswers(p));
+  return b;
 }
 
 /* ----------------------------------------------------------- questionnaire --- */
@@ -3932,7 +3982,8 @@ function route() {
 }
 window.addEventListener("hashchange", route);
 
-function answersOf(id) { return overlay.answers[id] || {}; }
+/* This browser's answers first, then those imported with the page. */
+function answersOf(id) { return overlay.answers[id] || SEED_ANSWERS[id] || {}; }
 
 const hubHref = id => QUIZ_ROUTE + encodeURIComponent(id);
 const themeHref = (id, key) => hubHref(id) + "/" + key;
@@ -4002,7 +4053,9 @@ function renderHub() {
 }
 
 function setAnswer(key, value) {
-  const a = overlay.answers[quiz.id] || (overlay.answers[quiz.id] = {});
+  /* a first local edit starts from the imported answers, not from nothing */
+  const a = overlay.answers[quiz.id]
+    || (overlay.answers[quiz.id] = Object.assign({}, SEED_ANSWERS[quiz.id] || {}));
   a[key] = value;
   saveOverlay();
 }
@@ -4259,18 +4312,27 @@ function resultScreen(card, nav, button, screens) {
 
   /* erases what this flow asked, not the answers to other themes */
   const erase = button(L.quizErase, "skip", () => {
-    const a = overlay.answers[quiz.id];
-    if (a) {
-      for (const sc of screens) delete a[screenKey(sc)];
-      if (!Object.keys(a).length) delete overlay.answers[quiz.id];
-    }
+    const a = Object.assign({}, answersOf(quiz.id));
+    for (const sc of screens) delete a[screenKey(sc)];
+    /* An empty local entry is kept when answers were imported: removing it
+       would bring the imported ones straight back. */
+    if (Object.keys(a).length || SEED_ANSWERS[quiz.id]) overlay.answers[quiz.id] = a;
+    else delete overlay.answers[quiz.id];
     saveOverlay();
     goStep(0);
   });
   const right = document.createElement("span");
   right.style.display = "flex";
+  right.style.flexWrap = "wrap";
+  right.style.justifyContent = "flex-end";
   right.style.gap = "10px";
-  right.append(button(L.quizReview, "ghost", () => goStep(1)),
+  const hint = document.createElement("p");
+  hint.className = "hint";
+  hint.style.marginTop = "14px";
+  hint.textContent = L.exportHint;
+  card.appendChild(hint);
+  right.append(exportButton(quiz.p, "ghost"),
+               button(L.quizReview, "ghost", () => goStep(1)),
                button(L.otherThemes, "ghost", () => { location.hash = hubHref(quiz.id); }),
                button(L.backToCompass, "primary", () => { location.hash = ""; }));
   nav.append(erase, right);

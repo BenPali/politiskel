@@ -51,6 +51,15 @@ are skipped.
    `index.html`. Only changed screenshots are re-read.
 3. Open `index.html`.
 
+To gather a group's questionnaire answers, each member answers on their own
+copy of the page and clicks **Exporter mes réponses**, which downloads one
+small JSON file. Drop those files in `politi-results/answers/` and run
+`node tools/extract.js` again: every answer is checked against the item bank
+(a wrong key or an out-of-range answer is skipped, and said so), a file that
+names a screenshot completes that profile, and one that names none adds a
+questionnaire-only profile. Answers given afterwards in a browser take
+precedence over the imported ones.
+
 Step 1 is optional: with no screenshot, and with no `politi-results/` at all,
 the build still writes a working page with an empty profile list — you can then
 drop a capture onto it or type a profile in by hand.
@@ -89,6 +98,14 @@ and how many attachments are toss-ups in each country. Every correlation comes
 with its 95% interval and the verdict is read off the interval, so a small group
 gets "too few profiles to conclude" rather than a number that looks like a
 finding. It reads `profiles-data.js` and writes nothing.
+
+With exported answers it also checks the questionnaire: whether
+protectionism and the three class readings repeat x, how far the
+questionnaire moves each axis from PolitiScales for the same people, whether
+each sub-dimension goes with the rest of its axis — does religion part from
+y? — and which items, if any, run against their own axis. Synthetic answers
+cannot stand in for these: whoever generates them picks how coherent they
+are, and with it the answer.
 
 ## The questionnaire
 
@@ -132,8 +149,9 @@ each item's id, so adding an item moves no other. An item whose wording leans
 on the one before it travels with it. How much the theme matters is asked
 before the items and again after, on four labelled points.
 
-Answers stay in the browser, so `tools/model-check.js`, which reads
-`profiles-data.js`, cannot test the questionnaire's readings yet.
+Answers live in the browser until exported; once exported answer files are
+in `politi-results/answers/`, `tools/model-check.js` tests the questionnaire
+on them (see below).
 
 ## Readings of the compass
 
