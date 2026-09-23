@@ -214,8 +214,11 @@ const LOCALES = {
       sky: v => "Bleu ciel, celui des Nations unies : le cosmopolitisme (" + v + ").",
       orange: () => "Orange, la couleur des centristes : aucun axe ne penche nettement.",
       white: () => "Blanc : aucune lecture assez marquée pour une couleur.",
-      black: v => "Noir : le libertarisme, dans la tradition anarchiste (" + v + ")."
+      black: v => "Noir : le libertarisme, dans la tradition anarchiste (" + v + ").",
+      steel: v => "Acier : le productivisme, d'après PolitiScales (" + v + ")."
     },
+    flagSecond: "Et, plus petit — ",
+    flagBorder: v => "Bordure sombre : un protectionnisme très marqué (" + v + ").",
     flagRevolutionStar: v => "Étoile : la révolution (" + v + ").",
     flagRainbow: v => "Barre arc-en-ciel : un soutien marqué aux droits des personnes LGBT (" + v + ").",
     flagSymbolLines: {

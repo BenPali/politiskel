@@ -2628,8 +2628,11 @@ const LOCALES = {
       sky: v => "Bleu ciel, celui des Nations unies : le cosmopolitisme (" + v + ").",
       orange: () => "Orange, la couleur des centristes : aucun axe ne penche nettement.",
       white: () => "Blanc : aucune lecture assez marquée pour une couleur.",
-      black: v => "Noir : le libertarisme, dans la tradition anarchiste (" + v + ")."
+      black: v => "Noir : le libertarisme, dans la tradition anarchiste (" + v + ").",
+      steel: v => "Acier : le productivisme, d'après PolitiScales (" + v + ")."
     },
+    flagSecond: "Et, plus petit — ",
+    flagBorder: v => "Bordure sombre : un protectionnisme très marqué (" + v + ").",
     flagRevolutionStar: v => "Étoile : la révolution (" + v + ").",
     flagRainbow: v => "Barre arc-en-ciel : un soutien marqué aux droits des personnes LGBT (" + v + ").",
     flagSymbolLines: {
@@ -4792,10 +4795,19 @@ const FLAG_ICONS = {
    shapes, no lettering). Every element stands for a reading, and the legend
    says which.
 
+   Nothing is picked from a fixed list of flags: every trait carries its own
+   colour and symbol, and a flag is the combination of its profile's
+   strongest traits — colours filling the layout's fields in order, a main
+   symbol and a second one elsewhere, and modifiers for intensity (the number
+   of stripes, a border for marked protectionism, the rainbow bar). An
+   ecologist anarchist and a productivist one share the diagonal and differ
+   in everything else.
+
      colours   red: economic left · gold: economic liberalism · blue: order ·
                purple: feminism · pink: LGBT rights · green: ecology ·
-               sky blue (the UN's): cosmopolitanism · orange: the centre ·
-               black, as structure: marked libertarianism
+               steel: productivism · sky blue (the UN's): cosmopolitanism ·
+               orange: the centre · black, as structure: marked
+               libertarianism
      layouts   the anarchist per-bend diagonal (black at the lower fly), the
                revolutionary hoist triangle and star, a white field with a
                gold border for order and tradition — or for monarchism, once a
@@ -4820,7 +4832,8 @@ const FLAG_ICONS = {
 
 const FLAG_COLOURS = {
   red: "#d52b1e", gold: "#f5c518", blue: "#1c4fa0", black: "#151515", purple: "#6b2c91",
-  green: "#1a8a4a", pink: "#e0529c", orange: "#f28c28", sky: "#4a90d9", white: "#ffffff"
+  green: "#1a8a4a", pink: "#e0529c", orange: "#f28c28", sky: "#4a90d9", steel: "#5f6f7e",
+  white: "#ffffff"
 };
 const FLAG_LIGHT = new Set(["gold", "white", "pink", "orange", "sky"]);
 const FLAG_RAINBOW = ["#e40303", "#ff8c00", "#ffed00", "#008026", "#004dff", "#750787"];
@@ -4831,74 +4844,87 @@ const FLAG_KEY = "politicompass.flags.v1";
    shows; a reading is looked up by name on the computed profile. */
 const futureReading = (c, key) => (c.readings && Number.isFinite(c.readings[key]) ? c.readings[key] : null);
 
-/* What a profile's readings say, as strengths (0-100): colours, symbols, and
-   the few values the layout is chosen from. `ps` are PolitiScales's own
-   percentages, used where the questionnaire has not been answered, so a
-   PolitiScales-only profile still gets a flag of its own. */
+/* Every trait a flag can speak of, each with the strength it has in a profile
+   (0-100, or null), and what it contributes: a colour, a symbol, or both. A
+   flag is the combination of its profile's strongest traits — two anarchists
+   differ by what else they are, ecology or productivism, feminism or the
+   market — so every trait worth reading has a way to show.
+
+   `min` is where a trait starts to count; `bonus` lifts a composite above
+   the traits it is made of. `v` is what the legend reports. PolitiScales's
+   own percentages stand in where the questionnaire has not been answered. */
 function flagTraits(c, p) {
   const x = c.x, y = c.y;
-  const ed = (c.quiz && c.quiz.dims) || {}, sd = (c.soc && c.soc.dims) || {};
-  const d = Object.assign({}, ed, sd);
+  const d = Object.assign({}, (c.quiz && c.quiz.dims) || {}, (c.soc && c.soc.dims) || {});
   const ps = {};
   for (const k of ["com", "laf", "eco", "prod", "rehab", "pun", "prg", "csv", "int", "nat", "rev", "ref"])
     if (p && Number.isFinite(p[k])) ps[k] = p[k];
   const has = v => v !== null && v !== undefined && Number.isFinite(v);
   const neg = v => (has(v) ? -v : null);
-
-  const colours = [], symbols = [];
-  const colour = (k, s) => { if (has(s)) colours.push({ k, s }); };
-  if (has(x) && x <= -34) colour("red", -x);
-  if (has(x) && x >= 34) colour("gold", x);
-  if (has(y) && y >= 34) colour("blue", y);
-  if (has(d.women) && d.women <= -60) colour("purple", -d.women);
-  if (has(d.lgbt) && d.lgbt <= -60) colour("pink", -d.lgbt);
-  if ((ps.eco || 0) >= 60) colour("green", ps.eco);
-  const intl = has(d.nationalism) ? -d.nationalism : (ps.int || 0) - (ps.nat || 0);
-  if (intl >= 60) colour("sky", intl);
-  if (has(x) && has(y) && Math.abs(x) < 25 && Math.abs(y) < 25)
-    colour("orange", 60 - Math.max(Math.abs(x), Math.abs(y)));
-
-  /* s orders the symbols; v is the reading the legend reports */
-  const symbol = (k, s, min) => { if (has(s) && s >= min) symbols.push({ k, s, v: s }); };
+  const first = (...vs) => { for (const v of vs) if (has(v)) return v; return null; };
   const cls = c.quiz ? c.quiz.class : null;
   const prot = c.quiz ? c.quiz.protectionism : null;
-  symbol("fist", cls, 50);               symbol("fist", ps.com, 65);
-  symbol("swallow", d.deregulation, 60); symbol("swallow", ps.laf, 65);
-  symbol("liberty", neg(d.laworder), 60); symbol("liberty", ps.rehab, 65);
-  symbol("sword", d.laworder, 60);       symbol("sword", ps.pun, 65);
-  symbol("globe", intl, 60);
-  symbol("oak", d.nationalism, 60);      symbol("oak", ps.nat, 65);
-  symbol("tower", prot, 60);
-  symbol("book", neg(d.religion), 60);
-  symbol("column", d.religion, 60);      symbol("column", ps.csv, 70);
-  symbol("scales", neg(d.redistribution), 60);
-  symbol("rings", neg(d.multiculturalism), 60);
-  symbol("star", ps.rev, 65);
-  symbol("sprout", ps.eco, 65);
-  symbol("torch", ps.prg, 70);
-  symbol("venus", neg(d.women), 75);
-  symbol("handshake", ps.ref, 65);
-  symbol("factory", ps.prod, 65);
-  /* composites outrank their parts */
-  const rev = Math.max(has(cls) ? cls : 0, ps.rev || 0);
-  if (has(y) && y <= -80) symbols.push({ k: "anarchy", s: -y + 12, v: -y });
-  if (rev >= 70 && has(y) && y <= -30) symbols.push({ k: "phrygian", s: rev + 12, v: rev });
-  const nat = has(d.nationalism) ? d.nationalism : ps.nat || 0;
-  const ord = has(d.laworder) ? d.laworder : ps.pun || 0;
-  if (nat >= 70 && ord >= 60) symbols.push({ k: "croix", s: Math.max(nat, ord) + 12, v: Math.min(nat, ord) });
+  const intl = has(d.nationalism) ? -d.nationalism : has(ps.int) || has(ps.nat) ? (ps.int || 0) - (ps.nat || 0) : null;
+  const nat = first(d.nationalism, ps.nat);
+  const ord = first(d.laworder, ps.pun);
+  const rev = Math.max(has(cls) ? cls : -100, has(ps.rev) ? ps.rev : -100);
   const monarchy = futureReading(c, "monarchism");
-  if (has(monarchy) && monarchy >= 60) symbols.push({ k: monarchy >= 85 ? "fleur" : "crown", s: monarchy + 20, v: monarchy });
 
-  colours.sort((a, b) => b.s - a.s);
-  symbols.sort((a, b) => b.s - a.s);
+  const T = [
+    { k: "left",        s: neg(x),                      min: 34, colour: "red" },
+    { k: "market",      s: x,                           min: 34, colour: "gold" },
+    { k: "order",       s: y,                           min: 34, colour: "blue" },
+    { k: "class",       s: first(cls, ps.com),          min: 50, colour: "red", symbol: "fist" },
+    { k: "redistribution", s: neg(d.redistribution),    min: 60, colour: "red", symbol: "scales" },
+    { k: "deregulation", s: first(d.deregulation, ps.laf), min: 60, colour: "gold", symbol: "swallow" },
+    { k: "liberties",   s: first(neg(d.laworder), ps.rehab), min: 60, symbol: "liberty" },
+    { k: "laworder",    s: ord,                         min: 60, colour: "blue", symbol: "sword" },
+    { k: "cosmopolitan", s: intl,                       min: 60, colour: "sky", symbol: "globe" },
+    { k: "nation",      s: nat,                         min: 60, symbol: "oak" },
+    { k: "protectionism", s: prot,                      min: 60, symbol: "tower" },
+    { k: "secular",     s: neg(d.religion),             min: 60, symbol: "book" },
+    { k: "tradition",   s: first(d.religion, has(ps.csv) ? ps.csv - 10 : null), min: 60, symbol: "column" },
+    { k: "multicultural", s: neg(d.multiculturalism),   min: 60, symbol: "rings" },
+    { k: "feminism",    s: neg(d.women),                min: 60, colour: "purple", symbol: "venus" },
+    { k: "lgbt",        s: neg(d.lgbt),                 min: 60, colour: "pink" },
+    { k: "ecology",     s: ps.eco,                      min: 60, colour: "green", symbol: "sprout" },
+    { k: "productivism", s: ps.prod,                    min: 60, colour: "steel", symbol: "factory" },
+    { k: "revolution",  s: ps.rev,                      min: 65, symbol: "star" },
+    { k: "reform",      s: ps.ref,                      min: 65, symbol: "handshake" },
+    { k: "progress",    s: ps.prg,                      min: 70, symbol: "torch" },
+    { k: "centre",      s: has(x) && has(y) && Math.abs(x) < 25 && Math.abs(y) < 25
+                             ? 60 - Math.max(Math.abs(x), Math.abs(y)) : null, min: 1, colour: "orange" },
+    /* composites, which outrank the traits they combine */
+    { k: "anarchy",     s: neg(y),                      min: 80, symbol: "anarchy", bonus: 12 },
+    { k: "phrygian",    s: has(y) && y <= -30 ? rev : null, min: 70, symbol: "phrygian", bonus: 12 },
+    { k: "croix",       s: has(nat) && has(ord) ? Math.min(nat, ord) : null,
+                             min: 60, symbol: "croix", bonus: 20, when: () => nat >= 70 },
+    { k: "monarchy",    s: monarchy,                    min: 60, symbol: "crown", bonus: 20 },
+    { k: "legitimism",  s: monarchy,                    min: 85, symbol: "fleur", bonus: 30 }
+  ].filter(t => has(t.s) && t.s >= t.min && (!t.when || t.when()))
+   .map(t => Object.assign(t, { v: Math.round(t.s), rank: t.s + (t.bonus || 0) }))
+   .sort((a, b) => b.rank - a.rank);
+
+  /* colours: each trait's, strongest first, each colour once */
   const cols = [];
-  for (const t of colours) if (!cols.includes(t.k)) cols.push(t.k);
-  const tradition = Math.max(has(d.religion) ? d.religion : -100, (ps.csv || 0) - 10);
-  return {
-    x, y, cols: cols.slice(0, 3), strengths: colours, symbol: symbols[0] || null,
-    intl, rev, tradition, nat, monarchy,
-    multi: neg(d.multiculturalism) || 0, lgbt: neg(d.lgbt) || 0
-  };
+  for (const t of T) if (t.colour && !cols.includes(t.colour)) cols.push(t.colour);
+  /* symbols: the two strongest, from two different traits; a composite
+     replaces the symbols of the traits it is made of */
+  const covers = { anarchy: [], phrygian: ["revolution", "class"], croix: ["nation", "laworder"],
+                   monarchy: [], legitimism: ["monarchy"] };
+  const syms = [];
+  const hidden = new Set();
+  for (const t of T) {
+    if (!t.symbol || hidden.has(t.k) || syms.length === 2) continue;
+    syms.push(t);
+    for (const k of covers[t.k] || []) hidden.add(k);
+  }
+  const trait = k => T.find(t => t.k === k) || null;
+  return { x, y, traits: T, cols: cols.slice(0, 3), syms, trait,
+           intl: has(intl) ? intl : 0, rev, nat: has(nat) ? nat : 0, monarchy,
+           tradition: (trait("tradition") || {}).s || 0,
+           multi: (trait("multicultural") || {}).s || 0, lgbt: (trait("lgbt") || {}).s || 0,
+           prot: has(prot) ? prot : 0 };
 }
 
 function flagLayout(t) {
@@ -4919,96 +4945,131 @@ function flagIcon(k, cx, cy, size, fill) {
   return FLAG_ICONS[k].map(d => '<path transform="translate(' + (cx - size / 2) + "," + (cy - size / 2)
     + ") scale(" + s + ')" fill="' + fill + '" d="' + d + '"/>').join("");
 }
+const inkOn = bg => (FLAG_LIGHT.has(bg) ? "#151515" : "#ffffff");
 
 /* The flag of a computed profile: { url, legend, layout } — or null when there
-   is nothing to draw from. */
+   is nothing to draw from.
+
+   Each layout has its zones, filled in order of strength: its colour fields
+   take the strongest traits' colours, its first place takes the strongest
+   symbol and its second place, smaller and elsewhere, the next one. So the
+   same layout reads differently for every combination of traits. */
 function politiskelFlag(c, p) {
   const t = flagTraits(c, p);
-  if (t.x === null && t.y === null && !t.symbol && !t.cols.length) return null;
+  if (t.x === null && t.y === null && !t.traits.length) return null;
   const cols = t.cols.length ? t.cols : ["white"];
   const layout = flagLayout(t);
   const C = k => FLAG_COLOURS[k];
-  const [a, b] = cols;
+  const [a, b, c3] = cols;
   const P = [];
-  let sx = 75, sy = 50, size = 46, bg = a, symbol = t.symbol;
-  let drawn = [];   /* the meaningful colours this layout shows, for the legend */
+  let places = [];   /* [{ x, y, size, bg }] — where the symbols go, first the main one */
+  let drawn = [];    /* the meaningful colours shown, for the legend */
+  let syms = t.syms.slice();
 
   if (layout === "diagonal") {
     const other = a === "white" ? "black" : a;
     P.push('<rect width="150" height="100" fill="' + C("black") + '"/>');
     if (other !== "black") P.push('<polygon points="0,0 150,0 0,100" fill="' + C(other) + '"/>');
-    sx = 42; sy = 32; size = 40; bg = other;
+    places = [{ x: 42, y: 32, size: 40, bg: other }, { x: 112, y: 70, size: 28, bg: "black" }];
     drawn = other !== "black" ? [other] : [];
   } else if (layout === "revolution") {
-    const tri = a === "white" ? "red" : a;
-    P.push('<rect width="150" height="100" fill="' + C(b || "black") + '"/>',
+    const tri = a === "white" ? "red" : a, band = b && b !== tri ? b : "black";
+    P.push('<rect width="150" height="100" fill="' + C(band) + '"/>',
            '<rect y="33.3" width="150" height="33.4" fill="' + C("white") + '"/>',
-           '<polygon points="0,0 70,50 0,100" fill="' + C(tri) + '"/>',
-           flagIcon("star", 24, 50, 26, "#ffffff"));
-    sx = 108; sy = 50; size = 30; bg = "white";
-    if (symbol && symbol.k === "star") symbol = null;
-    drawn = [tri, b].filter(k => k && k !== "white");
+           '<polygon points="0,0 70,50 0,100" fill="' + C(tri) + '"/>');
+    /* the triangle keeps the revolution's star unless a symbol claims it */
+    const star = !syms.some(s => s.symbol === "star");
+    if (star) P.push(flagIcon("star", 24, 50, 26, "#ffffff"));
+    else syms = [syms.find(s => s.symbol === "star")].concat(syms.filter(s => s.symbol !== "star"));
+    places = star ? [{ x: 108, y: 50, size: 30, bg: "white" }, { x: 132, y: 84, size: 18, bg: band }]
+                  : [{ x: 24, y: 50, size: 26, bg: tri }, { x: 108, y: 50, size: 30, bg: "white" }];
+    /* a black band chosen for want of a second colour is filler, not a reading */
+    drawn = [tri, b && b !== tri ? band : null].filter(k => k && k !== "white");
   } else if (layout === "royal") {
     const field = a === "blue" || a === "white" ? "white" : a;
     P.push('<rect width="150" height="100" fill="' + C(field) + '"/>',
            '<rect x="5" y="5" width="140" height="90" fill="none" stroke="' + C("gold") + '" stroke-width="10"/>');
-    size = 52; bg = field;
+    places = [{ x: 75, y: 48, size: 50, bg: field }, { x: 128, y: 80, size: 16, bg: field }];
     drawn = field !== "white" ? [field] : [];
   } else if (layout === "nordic") {
     const cross = b || "white";
     P.push('<rect width="150" height="100" fill="' + C(a) + '"/>');
     if (cross !== "white") P.push('<rect x="38" width="26" height="100" fill="#fff"/><rect y="37" width="150" height="26" fill="#fff"/>');
     P.push('<rect x="43" width="16" height="100" fill="' + C(cross) + '"/><rect y="42" width="150" height="16" fill="' + C(cross) + '"/>');
-    sx = 19; sy = 19; size = 28;
-    drawn = [a, cross].filter(k => k !== "white");
+    if (c3) P.push('<rect x="64" y="63" width="86" height="37" fill="' + C(c3) + '"/>');
+    places = [{ x: 19, y: 19, size: 28, bg: a }, { x: 107, y: 81, size: 24, bg: c3 || a }];
+    drawn = [a, cross, c3].filter(k => k && k !== "white");
   } else if (layout === "pall") {
+    const field2 = b || "white";
     P.push('<rect width="150" height="100" fill="' + C(a) + '"/>',
-           '<polygon points="0,62 0,100 66,100" fill="' + C(b || "white") + '"/><polygon points="0,0 0,38 66,0" fill="' + C(b || "white") + '"/>',
+           '<rect y="50" width="150" height="50" fill="' + C(c3 || a) + '"/>',
+           '<polygon points="0,62 0,100 66,100" fill="' + C(field2) + '"/><polygon points="0,0 0,38 66,0" fill="' + C(field2) + '"/>',
            '<path d="M0,20 L60,50 L150,50 M0,80 L60,50" stroke="#fff" stroke-width="22" fill="none"/>',
            '<path d="M0,20 L60,50 L150,50 M0,80 L60,50" stroke="' + C("black") + '" stroke-width="12" fill="none"/>');
-    sx = 110; sy = 26; size = 30;
-    drawn = [a, b].filter(k => k && k !== "white");
+    places = [{ x: 110, y: 25, size: 28, bg: a }, { x: 110, y: 77, size: 24, bg: c3 || a }];
+    drawn = [a, b, c3].filter(k => k && k !== "white");
   } else if (layout === "stripes") {
     const second = b && b !== "sky" ? b : (a === "sky" ? "white" : "sky");
-    for (let i = 0; i < 5; i++)
-      P.push('<rect y="' + (i * 20) + '" width="150" height="20" fill="' + (i % 2 ? C("white") : C(second === "white" ? a : second)) + '"/>');
-    P.push('<rect width="66" height="60" fill="' + C(a) + '"/>');
-    sx = 33; sy = 30; size = 36;
+    const n = t.intl >= 80 ? 7 : 5, h = 100 / n, canton = h * (n === 7 ? 4 : 3);
+    for (let i = 0; i < n; i++)
+      P.push('<rect y="' + (i * h) + '" width="150" height="' + (h + 0.2) + '" fill="' + (i % 2 ? C("white") : C(second === "white" ? a : second)) + '"/>');
+    P.push('<rect width="66" height="' + canton + '" fill="' + C(a) + '"/>');
+    places = [{ x: 33, y: canton / 2, size: 34, bg: a }];
     drawn = [a, second].filter(k => k !== "white");
   } else if (layout === "triband") {
-    P.push('<rect width="150" height="100" fill="' + C(a) + '"/><rect y="33.3" width="150" height="33.4" fill="' + C(b || "white") + '"/>');
-    size = 30; bg = b || "white";
-    drawn = [a, b].filter(k => k && k !== "white");
+    const mid = b || "white";
+    P.push('<rect width="150" height="100" fill="' + C(a) + '"/>',
+           '<rect y="66.6" width="150" height="33.4" fill="' + C(c3 || a) + '"/>',
+           '<rect y="33.3" width="150" height="33.4" fill="' + C(mid) + '"/>');
+    places = [{ x: 75, y: 50, size: 30, bg: mid }, { x: 18, y: 16, size: 20, bg: a }];
+    drawn = [a, b, c3].filter(k => k && k !== "white");
   } else {
     const cs = cols.map(C);
-    if (cs.length === 1) P.push('<rect width="150" height="100" fill="' + cs[0] + '"/>');
-    else if (cs.length === 2) { P.push('<rect width="75" height="100" fill="' + cs[0] + '"/><rect x="75" width="75" height="100" fill="' + cs[1] + '"/>'); sx = 37; }
-    else { P.push('<rect width="50" height="100" fill="' + cs[0] + '"/><rect x="50" width="50" height="100" fill="' + cs[1] + '"/><rect x="100" width="50" height="100" fill="' + cs[2] + '"/>'); bg = cols[1]; }
+    if (cs.length === 1) {
+      P.push('<rect width="150" height="100" fill="' + cs[0] + '"/>');
+      places = [{ x: 75, y: 50, size: 46, bg: cols[0] }, { x: 128, y: 18, size: 20, bg: cols[0] }];
+    } else if (cs.length === 2) {
+      P.push('<rect width="75" height="100" fill="' + cs[0] + '"/><rect x="75" width="75" height="100" fill="' + cs[1] + '"/>');
+      places = [{ x: 37, y: 50, size: 40, bg: cols[0] }, { x: 112, y: 50, size: 30, bg: cols[1] }];
+    } else {
+      P.push('<rect width="50" height="100" fill="' + cs[0] + '"/><rect x="50" width="50" height="100" fill="' + cs[1] + '"/><rect x="100" width="50" height="100" fill="' + cs[2] + '"/>');
+      places = [{ x: 75, y: 50, size: 38, bg: cols[1] }, { x: 25, y: 18, size: 18, bg: cols[0] }];
+    }
     drawn = cols.slice();
   }
-  if (t.lgbt >= 80 && layout !== "revolution" && layout !== "diagonal")
+
+  /* modifiers */
+  const rainbow = t.lgbt >= 80 && layout !== "revolution";
+  if (rainbow)
     FLAG_RAINBOW.forEach((col, i) => P.push('<rect x="138" y="' + (i * 100 / 6) + '" width="12" height="' + (100 / 6 + 0.2) + '" fill="' + col + '"/>'));
-  if (symbol) {
-    const fg = symbol.k === "phrygian" && bg === "white" ? C("red") : FLAG_LIGHT.has(bg) ? "#151515" : "#ffffff";
-    P.push(flagIcon(symbol.k, sx, sy, size, fg));
-  }
-  if (bg === "white" && layout === "pale") P.push('<rect x=".5" y=".5" width="149" height="99" fill="none" stroke="#c8c8c8"/>');
+  const border = t.prot >= 75 && layout !== "royal";
+  if (border) P.push('<rect x="3" y="3" width="144" height="94" fill="none" stroke="' + C("black") + '" stroke-width="6"/>');
+
+  const shown = syms.slice(0, places.length);
+  shown.forEach((s, i) => {
+    const pl = places[i];
+    const fg = s.symbol === "phrygian" && pl.bg === "white" ? C("red") : inkOn(pl.bg);
+    P.push(flagIcon(s.symbol, pl.x, pl.y, pl.size, fg));
+  });
+  if (cols[0] === "white" && layout === "pale") P.push('<rect x=".5" y=".5" width="149" height="99" fill="none" stroke="#c8c8c8"/>');
 
   const svg = '<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 150 100" width="150" height="100">'
     + P.join("") + "</svg>";
   return { url: "data:image/svg+xml;charset=utf-8," + encodeURIComponent(svg), layout,
-           legend: flagLegend(t, drawn, layout, symbol) };
+           legend: flagLegend(t, drawn, layout, shown, border, rainbow,
+                              !t.syms.some(s => s.symbol === "star")) };
 }
 
 /* One line per element, in the order the eye reads a flag. */
-function flagLegend(t, drawn, layout, symbol) {
+function flagLegend(t, drawn, layout, shown, border, rainbow, starOfLayout) {
   const lines = [L.flagLayouts[layout](t)];
-  const strength = k => (t.strengths.find(s => s.k === k) || {}).s;
-  for (const k of drawn) lines.push(L.flagColourLines[k](Math.round(strength(k) || 0), t));
+  const strength = colour => Math.round(Math.max(...t.traits.filter(x => x.colour === colour).map(x => x.s), 0));
+  for (const k of drawn) lines.push(L.flagColourLines[k](strength(k), t));
   if (layout === "diagonal") lines.push(L.flagColourLines.black(Math.round(-t.y)));
-  if (layout === "revolution") lines.push(L.flagRevolutionStar(Math.round(t.rev)));
-  if (symbol) lines.push(L.flagSymbolLines[symbol.k](Math.round(symbol.v)));
-  if (t.lgbt >= 80 && layout !== "revolution" && layout !== "diagonal") lines.push(L.flagRainbow(Math.round(t.lgbt)));
+  if (layout === "revolution" && starOfLayout) lines.push(L.flagRevolutionStar(Math.round(t.rev)));
+  shown.forEach((s, i) => lines.push((i ? L.flagSecond : "") + L.flagSymbolLines[s.symbol](s.v)));
+  if (rainbow) lines.push(L.flagRainbow(Math.round(t.lgbt)));
+  if (border) lines.push(L.flagBorder(Math.round(t.prot)));
   return lines;
 }
 
