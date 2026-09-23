@@ -1146,6 +1146,9 @@
      conflict       perceived conflict between classes (ISSP), reported beside
                     Wright's scale rather than mixed into it: adding items to a
                     validated scale makes it a different, unvalidated one
+     labour         the balance of power between capital and labour — unions,
+                    business — which is an attitude to that balance, not a
+                    perception of conflict, so it gets its own reading
    Salience is asked per theme, twice: before the items and after them. The
    first records the weight the theme had coming in, the second whether
    answering moved it; both are returned as is, never folded into a score. */
@@ -1163,6 +1166,13 @@
       values: [1, 0.5, 0, -0.5, -1],
       fr: ["Tout à fait d'accord", "D'accord", "Ni d'accord, ni pas d'accord",
            "Pas d'accord", "Pas du tout d'accord"]
+    },
+    /* ESS rounds 1 and 8, France: the card said "Plutôt", unlike rounds 9-11.
+       "Ne sait pas" was an interviewer code, never read out. */
+    agreePlutot: {
+      values: [1, 0.5, 0, -0.5, -1],
+      fr: ["Tout à fait d'accord", "Plutôt d'accord", "Ni d'accord, ni pas d'accord",
+           "Plutôt pas d'accord", "Pas du tout d'accord"]
     },
     /* ISSP, France, 2013-2023. */
     agreeIssp: {
@@ -1190,6 +1200,25 @@
       values: [1, 1 / 3, -1 / 3, -1],
       fr: ["Des conflits très importants", "Des conflits importants",
            "Des conflits, mais pas très importants", "Pas de conflits du tout"],
+      dk: "Ne peut choisir"
+    },
+    /* ISSP Role of Government, France, 2016, Q6. */
+    spendIssp: {
+      values: [-1, -0.5, 0, 0.5, 1],
+      fr: ["Dépenser beaucoup plus", "Dépenser plus", "Maintenir les dépenses actuelles",
+           "Dépenser moins", "Dépenser beaucoup moins"],
+      dk: "Ne peut choisir"
+    },
+    /* ISSP Role of Government, France, 1996, Q11. */
+    powerIssp: {
+      values: [1, 0.5, 0, -0.5, -1],
+      fr: ["Beaucoup trop", "Trop", "À peu près comme il faut", "Trop peu", "Beaucoup trop peu"],
+      dk: "Ne peut choisir"
+    },
+    /* ISSP Role of Government, France, 1996, Q18: two options only. */
+    ownerIssp: {
+      values: [1, -1],
+      fr: ["Le secteur privé", "L'État"],
       dk: "Ne peut choisir"
     },
     /* EVS 2017: a 1-10 card between two opposed statements, carried by the
@@ -1224,7 +1253,21 @@
   /* The item bank. `reading` is what the item feeds, `dim` the CHES
      sub-dimension for x. `pole: 1` keeps the scale's orientation, `-1` flips
      it, so that after orientation +1 always means: right on x, protectionist,
-     anticapitalist on class, conflict perceived. */
+     anticapitalist on class, conflict perceived, on the side of labour. */
+  const SPEND_STEM = "Pour chacun des secteurs suivants, pouvez-vous dire si vous souhaiteriez que le gouvernement dépense plus ou moins ? N'oubliez pas que dépenser « beaucoup plus » peut entraîner une augmentation des impôts, taxes ou cotisations sociales.";
+  const OWNER_STEM = "Qui, d'après vous, devrait principalement gérer les services suivants, l'État ou le secteur privé ?";
+  const ACTIONS_STEM = "Voici un certain nombre d'actions économiques que les gouvernements peuvent faire. Pouvez-vous indiquer si vous y êtes favorable ou défavorable ?";
+  const CONFLICT_STEM = "Dans tous les pays, il y a des différences, ou même des conflits entre les différents groupes. À votre avis, en France, est-ce qu'il y a beaucoup de conflits…";
+
+  const spending = (id, fr) => ({
+    id: "issp.spend." + id, theme: "economy", reading: "x", dim: "spendvtax",
+    scale: "spendIssp", pole: 1, stem: SPEND_STEM, fr,
+    src: { survey: "ISSP", wave: "Rôle de l'État 2016", variable: "Q6", url: GESIS(63847) } });
+  const ownership = (id, fr) => ({
+    id: "issp.owner." + id, theme: "economy", reading: "x", dim: "deregulation",
+    scale: "ownerIssp", pole: 1, stem: OWNER_STEM, fr,
+    src: { survey: "ISSP", wave: "Rôle de l'État 1996", variable: "Q18", url: GESIS(6806) } });
+
   const ITEMS = [
     /* --- x: redistribution (CHES `redistribution`, r = 0.96 with lrecon) --- */
     { id: "ess.gincdif", theme: "economy", reading: "x", dim: "redistribution",
@@ -1241,6 +1284,16 @@
       scale: "taxShareIssp", pole: 1,
       fr: "Pensez-vous que les personnes ayant des revenus élevés devraient payer en impôts une part plus importante, égale ou plus faible que celle des personnes à faibles revenus ?",
       src: { survey: "ISSP", wave: "Inégalités sociales 2019", variable: "v28", url: GESIS(73310) } },
+    { id: "ess.smdfslv", theme: "economy", reading: "x", dim: "redistribution",
+      scale: "agreePlutot", pole: -1,
+      fr: "Pour qu'une société soit juste, les différences de niveau de vie entre les gens devraient être faibles.",
+      src: { survey: "ESS", wave: "rounds 4 and 8", variable: "smdfslv",
+             url: ESS_FR + "round8/fieldwork/france/ESS8_questionnaires_FR.pdf" } },
+    { id: "ess.dfincac", theme: "economy", reading: "x", dim: "redistribution",
+      scale: "agreePlutot", pole: 1,
+      fr: "De grandes différences de revenus entre les gens sont acceptables pour récompenser convenablement les différences de talents et d'efforts de chacun.",
+      src: { survey: "ESS", wave: "rounds 4 and 8", variable: "dfincac",
+             url: ESS_FR + "round8/fieldwork/france/ESS8_questionnaires_FR.pdf" } },
 
     /* --- x: public services vs taxes (CHES `spendvtax`, r = 0.92) --- */
     { id: "ess.ditxssp", theme: "economy", reading: "x", dim: "spendvtax",
@@ -1258,11 +1311,15 @@
       left: "Les individus devraient avoir davantage la responsabilité de subvenir à leurs propres besoins",
       right: "L'État devrait avoir davantage la responsabilité d'assurer à chacun ses besoins",
       src: { survey: "EVS", wave: "2017", variable: "v103", url: GESIS(66251) } },
+    spending("health", "La santé"),
+    spending("education", "L'éducation"),
+    spending("pensions", "Les retraites"),
+    spending("unemployment", "Les allocations de chômage"),
 
     /* --- x: deregulation (CHES `deregulation`, r = 0.90) --- */
     { id: "issp.dereg", theme: "economy", reading: "x", dim: "deregulation",
       scale: "favourIssp", pole: 1,
-      stem: "Voici un certain nombre d'actions économiques que les gouvernements peuvent faire. Pouvez-vous indiquer si vous y êtes favorable ou défavorable ?",
+      stem: ACTIONS_STEM,
       fr: "Assouplir la réglementation du commerce et des affaires",
       src: { survey: "ISSP", wave: "Rôle de l'État 2016", variable: "Q5", url: GESIS(63847) } },
     { id: "evs.v107", theme: "economy", reading: "x", dim: "deregulation",
@@ -1275,6 +1332,14 @@
       left: "La concurrence est une bonne chose",
       right: "La concurrence est dangereuse",
       src: { survey: "EVS", wave: "2017", variable: "v105", url: GESIS(66251) } },
+    { id: "issp.declining", theme: "economy", reading: "x", dim: "deregulation",
+      scale: "favourIssp", pole: -1, stem: ACTIONS_STEM,
+      fr: "Soutenir les industries en difficulté pour protéger les emplois",
+      src: { survey: "ISSP", wave: "Rôle de l'État 2016", variable: "Q5", url: GESIS(63847) } },
+    ownership("electricity", "L'électricité"),
+    ownership("hospitals", "Les hôpitaux"),
+    /* "Le banques" in the 1996 French questionnaire: its typo, corrected. */
+    ownership("banks", "Les banques"),
 
     /* --- protectionism (CHES `protectionism`): not part of x --- */
     { id: "issp.imports", theme: "economy", reading: "protectionism",
@@ -1317,22 +1382,41 @@
     /* --- conflict: ISSP, official French, reported beside Wright's scale --- */
     { id: "issp.conflict.workers", theme: "economy", reading: "conflict",
       scale: "conflictIssp", pole: 1,
-      stem: "Dans tous les pays, il y a des différences, ou même des conflits entre les différents groupes. À votre avis, en France, est-ce qu'il y a beaucoup de conflits…",
+      stem: CONFLICT_STEM,
       fr: "Entre les dirigeants et les travailleurs",
       src: { survey: "ISSP", wave: "Inégalités sociales 2019", variable: "Q12_c", url: GESIS(73310) } },
     { id: "issp.conflict.rich", theme: "economy", reading: "conflict",
       scale: "conflictIssp", pole: 1,
-      stem: "Dans tous les pays, il y a des différences, ou même des conflits entre les différents groupes. À votre avis, en France, est-ce qu'il y a beaucoup de conflits…",
+      stem: CONFLICT_STEM,
       fr: "Entre les riches et les pauvres",
       src: { survey: "ISSP", wave: "Inégalités sociales 2019", variable: "Q12_a", url: GESIS(73310) } },
+    { id: "issp.conflict.classes", theme: "economy", reading: "conflict",
+      scale: "conflictIssp", pole: 1, stem: CONFLICT_STEM,
+      fr: "Entre la classe ouvrière et la classe moyenne",
+      src: { survey: "ISSP", wave: "Inégalités sociales 2019", variable: "Q12_b", url: GESIS(73310) } },
     { id: "issp.cause1", theme: "economy", reading: "conflict",
       scale: "agreeIssp", pole: 1,
       fr: "Les inégalités continuent d'exister car elles bénéficient aux riches et aux puissants.",
-      src: { survey: "ISSP", wave: "Inégalités sociales 1999", variable: "V9", url: GESIS(10483) } }
+      src: { survey: "ISSP", wave: "Inégalités sociales 1999", variable: "V9", url: GESIS(10483) } },
+
+    /* --- labour: the balance of power, +1 = on the side of labour --- */
+    { id: "ess.needtru", theme: "economy", reading: "labour",
+      scale: "agreePlutot", pole: 1,
+      fr: "Les salariés ont besoin de syndicats forts pour défendre leurs conditions de travail et leurs salaires.",
+      src: { survey: "ESS", wave: "round 1", variable: "needtru",
+             url: ESS_FR + "round1/fieldwork/france/ESS1_main_questionnaire_FR.pdf" } },
+    { id: "issp.power.unions", theme: "economy", reading: "labour",
+      scale: "powerIssp", pole: -1,
+      fr: "Selon vous, les syndicats ont-ils trop ou pas assez de pouvoir ?",
+      src: { survey: "ISSP", wave: "Rôle de l'État 1996", variable: "Q11a", url: GESIS(6806) } },
+    { id: "issp.power.business", theme: "economy", reading: "labour",
+      scale: "powerIssp", pole: 1,
+      fr: "Et les dirigeants du commerce et de l'industrie, ont-ils trop ou pas assez de pouvoir ?",
+      src: { survey: "ISSP", wave: "Rôle de l'État 1996", variable: "Q11b", url: GESIS(6806) } }
   ];
 
   const THEMES = [
-    { key: "economy", readings: ["x", "protectionism", "class", "conflict"],
+    { key: "economy", readings: ["x", "protectionism", "class", "conflict", "labour"],
       dims: ["redistribution", "spendvtax", "deregulation"] }
   ];
 
@@ -1381,7 +1465,7 @@
     out.dims = dims;
     out.n.x = answered.filter(a => a.i.reading === "x").length;
 
-    for (const r of ["protectionism", "conflict"]) {
+    for (const r of ["protectionism", "conflict", "labour"]) {
       const vs = answered.filter(a => a.i.reading === r).map(a => a.v);
       out[r] = vs.length ? Math.round(100 * mean(vs)) : null;
       out.n[r] = vs.length;
@@ -1894,7 +1978,7 @@ const LOCALES = {
     quizIntroEyebrow: "Questionnaire Politiskel · Économie",
     quizIntroTitle: a => "Compléter le profil de " + a,
     quizIntroMeta: n => n + " questions, et deux fois la même sur l'importance du thème · "
-      + "environ cinq minutes",
+      + "environ dix minutes",
     quizLead: "Ces questions remplacent l'axe économique de PolitiScales, qui ne repose que sur "
       + "deux de ses axes et ne pose rien sur la redistribution. Y reste celui de PolitiScales "
       + "tant que le thème société n'existe pas.",
@@ -1929,6 +2013,7 @@ const LOCALES = {
     readingProtectionism: "Protectionnisme",
     readingClass: "Classe (Wright)",
     readingConflict: "Conflit de classe perçu",
+    readingLabour: "Rapport capital / travail",
     readingNone: "—",
     readingClassIncomplete: n => "incomplète (" + n + "/5) — l'échelle ne vaut que complète",
     answeredOf: (n, m) => n + "/" + m + " réponses",
@@ -1936,7 +2021,8 @@ const LOCALES = {
       x: "négatif = gauche, positif = droite, sur l'échelle lrecon du CHES",
       protectionism: "hors de l'axe X : dans le CHES, il va contre la gauche-droite économique",
       class: "anticapitaliste si positif — une lecture rivale de X, pas une composante",
-      conflict: "à côté de l'échelle de Wright, pas dedans"
+      conflict: "à côté de l'échelle de Wright, pas dedans",
+      labour: "du côté du travail si positif — syndicats, pouvoir des patrons"
     },
     salienceOf: s => "Importance déclarée : " + s,
     salienceMoved: (a, b, d) => "Importance déclarée : " + a + " au début, " + b + " à la fin"
@@ -2977,6 +3063,8 @@ function readingsEl(c) {
       q.class === null ? null : L.readingNotes.class);
   row(L.readingConflict, show(q.conflict),
       L.answeredOf(q.n.conflict, count("conflict")) + " · " + L.readingNotes.conflict);
+  row(L.readingLabour, show(q.labour),
+      L.answeredOf(q.n.labour, count("labour")) + " · " + L.readingNotes.labour);
   box.appendChild(dl);
 
   const lvl = PolitiQuiz.SCALES.salience.fr;
