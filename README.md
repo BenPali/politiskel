@@ -32,6 +32,8 @@ importer.
 ## Privacy
 
 Politiskel runs entirely on your machine — no server, no account, no tracker.
+The optional group server (below) is the one exception, and only when you run
+one and open the page from it.
 
 The repository holds code, never profiles. `template.html` is the application
 with an empty data slot; the build fills it and writes the page you open. Since
@@ -165,6 +167,40 @@ it adopts.
 CHES protectionism is used for France, Germany and the UK. Italy's nine party
 means are all whole numbers, where the others rest on five to eleven experts —
 consistent with a single rater — so it is left out, and the page says so.
+
+## Running it for a group (optional)
+
+Without a server, each member answers in their own browser and the answers
+travel as exported files. `server/` is a small Rust service (axum, SQLite)
+that serves the same page with accounts: each member signs up under a
+pseudonym, gets one profile, and sees the profiles of the groups they have
+joined through an invitation link. The page detects it on its own; opened as a
+local file, it never contacts anything.
+
+```
+cd server
+cargo build --release
+POLITISKEL_DB=/var/lib/politiskel/politiskel.db \
+POLITISKEL_PAGE=../template.html \
+./target/release/politiskel-server          # listens on 127.0.0.1:8080
+```
+
+It listens on localhost only: put a reverse proxy that terminates HTTPS in
+front of it (Caddy: `politiskel.example.org { reverse_proxy 127.0.0.1:8080 }`).
+Session cookies are marked Secure, so plain http only works for local
+development, with `POLITISKEL_INSECURE_COOKIES=1`. The database is one SQLite
+file: back it up like any other.
+
+What the server holds, and why it is careful about it: political opinions are
+special-category data under GDPR art. 9. It stores a pseudonym, an argon2id
+password hash, the date consent was given, group memberships, PolitiScales
+percentages already read in the browser — never the screenshot — and
+questionnaire answers. Sign-up requires explicit consent; a group is visible
+to its members only; each member can export everything held about them and
+delete their account, which deletes it all. Whoever runs an instance is the
+data controller for it.
+
+`cargo test` runs the API end to end against an in-memory database.
 
 ## How it reads a screenshot
 

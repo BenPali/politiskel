@@ -518,6 +518,25 @@
   .theme-card .go { grid-column: 2; grid-row: 1 / span 3; }
   .theme-card.planned { background: none; border-style: dashed; }
   .theme-card.all { border-color: var(--series-1); background: var(--surface); }
+  /* server mode: the account bar, and what a local page has that a group's does not */
+  .account { background: var(--surface); border: 1px solid var(--border); border-radius: 12px;
+             padding: 14px 18px; margin: 0 0 18px; font-size: 0.85rem; }
+  .account .row { display: flex; flex-wrap: wrap; gap: 8px 12px; align-items: center; }
+  .account input[type=text], .account input[type=password] {
+    font: inherit; padding: 7px 10px; border: 1px solid var(--border); border-radius: 7px;
+    background: var(--bg); color: var(--text); width: 12em; }
+  .account select { font: inherit; padding: 6px 8px; border-radius: 7px; border: 1px solid var(--border);
+                    background: var(--bg); color: var(--text); }
+  .account button.primary, .account button.ghost { padding: 7px 12px; }
+  .account .consent { display: flex; gap: 8px; align-items: flex-start; max-width: 70ch;
+                      color: var(--text-2); margin: 8px 0; }
+  .account details { margin-top: 10px; }
+  .account summary { cursor: pointer; color: var(--text-2); }
+  .account .error { margin: 8px 0 0; }
+  .account .status { color: var(--text-3); font-size: 0.78rem; }
+  .account .note { color: var(--text-3); font-size: 0.75rem; margin: 8px 0 0; max-width: 90ch; }
+  body.server-mode #native-form, body.server-mode #p-alias, body.server-mode label[for=p-alias],
+  body.server-mode .drop-note code, body.server-mode #reset-btn { display: none; }
   .start-native { display: flex; flex-wrap: wrap; gap: 8px 10px; align-items: center;
                   margin: -6px 0 20px; font-size: 0.85rem; color: var(--text-2); }
   .start-native input { font: inherit; padding: 7px 10px; border: 1px solid var(--border);
@@ -1994,6 +2013,7 @@ window.POLITI_PROFILES = [];
   </header>
 
   <main id="view-main">
+  <section class="account" id="account" hidden></section>
   <p class="subtitle" data-i18n="subtitle"></p>
   <form class="start-native" id="native-form" novalidate>
     <span data-i18n="nativeLead"></span>
@@ -2234,7 +2254,7 @@ window.POLITI_PROFILES = [];
   </div>
 
   <div class="card add-card">
-    <h2 data-i18n="addTitle"></h2>
+    <h2 id="add-card-title" data-i18n="addTitle"></h2>
 
     <label class="drop" id="drop">
       <strong data-i18n="dropTitle"></strong>
@@ -2503,6 +2523,45 @@ const LOCALES = {
     /* the native questionnaire */
     optTrail: "Trajet depuis PolitiScales",
     optView: "Lecture",
+    username: "Pseudonyme", password: "Mot de passe", passwordNew: "Mot de passe (10 caractères ou plus)",
+    signInTitle: "Se connecter", signIn: "Connexion", registerTitle: "Créer un compte",
+    register: "Créer mon compte", signOut: "Se déconnecter", signedInAs: "Connecté : ",
+    consent: "J'accepte que mes réponses — des opinions politiques — soient enregistrées sur "
+      + "ce serveur et montrées aux membres des groupes que je rejoins, et à eux seuls. Je peux "
+      + "exporter mes données ou supprimer mon compte à tout moment, ce qui efface tout.",
+    serverNote: "Choisissez un pseudonyme plutôt que votre nom : c'est lui que verront les "
+      + "membres de vos groupes. Aucun e-mail n'est demandé.",
+    serverNoteIn: "Vos réponses et vos pourcentages PolitiScales sont enregistrés sur ce serveur, "
+      + "visibles des membres de vos groupes seulement. Les captures, elles, ne quittent jamais "
+      + "votre navigateur.",
+    groupLabel: "Groupe", groupNone: "Mon profil seul", groupName: "Nom du nouveau groupe",
+    groupCreate: "Créer le groupe", invite: "Copier le lien d'invitation",
+    inviteCopied: "Lien d'invitation copié : quiconque l'a peut rejoindre le groupe.",
+    leave: "Quitter ce groupe", leaveConfirm: g => "Quitter « " + g + " » ? Vous n'y verrez plus "
+      + "les profils, et ses membres ne verront plus le vôtre.",
+    joined: g => "Vous avez rejoint « " + g + " ».",
+    joinPending: "Connectez-vous ou créez un compte pour rejoindre le groupe qui vous a invité.",
+    accountMore: "Nouveau groupe, mes données",
+    exportAccount: "Exporter toutes mes données",
+    deleteWarn: "Supprimer mon compte et tout ce qu'il contient :",
+    deleteAccount: "Supprimer définitivement",
+    deleteConfirm: "Supprimer votre compte, votre profil et vos réponses ? C'est définitif.",
+    saved: "Enregistré.", addTitleServer: "Mon résultat PolitiScales",
+    apiErrors: {
+      default: "Le serveur n'a pas pu traiter la demande.",
+      consent_required: "Cochez la case de consentement pour créer un compte.",
+      username_length: "Le pseudonyme doit faire de 2 à 24 caractères.",
+      username_chars: "Le pseudonyme ne peut contenir que des lettres, des chiffres, des espaces et - _ . '",
+      username_taken: "Ce pseudonyme est déjà pris.",
+      password_short: "Le mot de passe doit faire au moins 10 caractères.",
+      password_long: "Ce mot de passe est trop long.",
+      bad_credentials: "Pseudonyme ou mot de passe incorrect.",
+      too_many_attempts: "Trop de tentatives : réessayez dans un quart d'heure.",
+      not_signed_in: "Votre session a expiré : reconnectez-vous.",
+      no_such_invite: "Ce lien d'invitation ne mène à aucun groupe.",
+      no_such_group: "Ce groupe n'existe plus, ou vous n'en êtes plus membre.",
+      group_name_length: "Donnez au groupe un nom de 1 à 60 caractères."
+    },
     viewOff: "pas de position dans cette lecture",
     viewOffDetail: "Ce profil n'a pas de position dans cette lecture : il lui manque les réponses "
       + "au questionnaire qui la mesurent.",
@@ -2759,6 +2818,12 @@ function saveOverlay() {
 
 let overlay = loadOverlay();
 
+/* Server mode. Served by server/ (the optional Rust backend), the page finds
+   /api/me and turns on accounts: the profiles shown are the chosen group's,
+   and the signed-in member's answers are saved to the server rather than to
+   this browser. Opened as a local file it never asks, and nothing changes. */
+const SERVER = { on: false, me: null, group: null, saving: null, status: "" };
+
 function rebuild() {
   const hidden = new Set(overlay.hidden);
   /* A profile added in this browser and one imported with the page can share
@@ -2766,8 +2831,10 @@ function rebuild() {
      in politi-results/answers/ and rebuilt. They are the same person, so it
      is listed once, as imported; its local answers still take precedence. */
   const seeded = new Set(SEED.map(idOf));
+  /* in server mode the list is the group's, and profiles added in this
+     browser are not part of it */
   profiles = SEED.filter(p => !hidden.has(idOf(p))).map(p => ({ ...p }))
-    .concat(overlay.added.filter(p => !seeded.has(idOf(p))).map(p => ({ ...p })));
+    .concat(SERVER.on ? [] : overlay.added.filter(p => !seeded.has(idOf(p))).map(p => ({ ...p })));
 }
 
 let profiles = [];
@@ -2796,7 +2863,7 @@ function coords(p) {
    one instrument to the other can be drawn. */
 function withQuiz(p, c) {
   const id = idOf(p);
-  const answers = overlay.answers[id] || SEED_ANSWERS[id];
+  const answers = localAnswers(id) || SEED_ANSWERS[id];
   /* an erased profile keeps an empty entry (see the erase button): no answers */
   if (!answers || !Object.keys(answers).length) return c;
   c.quiz = PolitiQuiz.score(answers, "economy");
@@ -3869,6 +3936,8 @@ function renderReadings(p, c) {
     h.textContent = L.readingsTitle;
     box.append(h, readingsEl(c));
   }
+  /* on a server, another member's profile is theirs to answer, not ours */
+  if (SERVER.on && !p.me) return;
   const btn = document.createElement("a");
   btn.href = hubHref(idOf(p));
   btn.className = "button " + (c.quiz ? "ghost" : "primary");
@@ -3877,7 +3946,7 @@ function renderReadings(p, c) {
   actions.className = "actions";
   actions.style.margin = "0 0 14px";
   actions.appendChild(btn);
-  if (Object.keys(answersOf(idOf(p))).length) actions.appendChild(exportButton(p, "ghost"));
+  if (!SERVER.on && Object.keys(answersOf(idOf(p))).length) actions.appendChild(exportButton(p, "ghost"));
   box.appendChild(actions);
 }
 
@@ -3967,7 +4036,7 @@ function route() {
     const p = profiles.find(q => idOf(q) === id);
     const theme = themeKey === ALL ? { key: ALL }
       : PolitiQuiz.THEMES.find(t => t.key === themeKey && !t.planned);
-    if (p) {
+    if (p && !(SERVER.on && !p.me)) {
       const key = theme ? theme.key : null;
       if (!quiz || quiz.id !== id || quiz.theme !== key) quiz = { p, id, theme: key, step: 0 };
       $("view-main").hidden = true;
@@ -3991,8 +4060,10 @@ function route() {
 }
 window.addEventListener("hashchange", route);
 
-/* This browser's answers first, then those imported with the page. */
-function answersOf(id) { return overlay.answers[id] || SEED_ANSWERS[id] || {}; }
+/* This browser's answers first, then those imported with the page. On a
+   server there is one copy, the server's: a local one could only go stale. */
+function localAnswers(id) { return SERVER.on ? undefined : overlay.answers[id]; }
+function answersOf(id) { return localAnswers(id) || SEED_ANSWERS[id] || {}; }
 
 const hubHref = id => QUIZ_ROUTE + encodeURIComponent(id);
 const themeHref = (id, key) => hubHref(id) + "/" + key;
@@ -4062,6 +4133,12 @@ function renderHub() {
 }
 
 function setAnswer(key, value) {
+  if (SERVER.on) {
+    const a = SEED_ANSWERS[quiz.id] || (SEED_ANSWERS[quiz.id] = {});
+    a[key] = value;
+    saveAnswersSoon();
+    return;
+  }
   /* a first local edit starts from the imported answers, not from nothing */
   const a = overlay.answers[quiz.id]
     || (overlay.answers[quiz.id] = Object.assign({}, SEED_ANSWERS[quiz.id] || {}));
@@ -4323,6 +4400,12 @@ function resultScreen(card, nav, button, screens) {
   const erase = button(L.quizErase, "skip", () => {
     const a = Object.assign({}, answersOf(quiz.id));
     for (const sc of screens) delete a[screenKey(sc)];
+    if (SERVER.on) {
+      SEED_ANSWERS[quiz.id] = a;
+      saveAnswersSoon();
+      goStep(0);
+      return;
+    }
     /* An empty local entry is kept when answers were imported: removing it
        would bring the imported ones straight back. */
     if (Object.keys(a).length || SEED_ANSWERS[quiz.id]) overlay.answers[quiz.id] = a;
@@ -4340,7 +4423,8 @@ function resultScreen(card, nav, button, screens) {
   hint.style.marginTop = "14px";
   hint.textContent = L.exportHint;
   card.appendChild(hint);
-  right.append(exportButton(quiz.p, "ghost"),
+  if (!SERVER.on) right.appendChild(exportButton(quiz.p, "ghost"));
+  right.append(
                button(L.quizReview, "ghost", () => goStep(1)),
                button(L.otherThemes, "ghost", () => { location.hash = hubHref(quiz.id); }),
                button(L.backToCompass, "primary", () => { location.hash = ""; }));
@@ -4596,9 +4680,12 @@ function readForm() {
   const fail = msg => { err.textContent = msg; err.hidden = false; return null; };
   err.hidden = true;
 
-  if (!alias) return fail(L.errNoAlias);
-  if (profiles.some(p => p.alias.toLowerCase() === alias.toLowerCase()))
-    return fail(L.errDuplicate(alias));
+  /* on a server the alias is the account's pseudonym, not typed here */
+  if (!SERVER.on) {
+    if (!alias) return fail(L.errNoAlias);
+    if (profiles.some(p => p.alias.toLowerCase() === alias.toLowerCase()))
+      return fail(L.errDuplicate(alias));
+  }
 
   const over = AXES.filter(a => val(a.neg[0]) + val(a.pos[0]) > 100);
   if (over.length)
@@ -4633,6 +4720,7 @@ document.getElementById("add-form").addEventListener("submit", e => {
   e.preventDefault();
   const p = readForm();
   if (!p) return;
+  if (SERVER.on) { savePolitiscales(p); return; }
   overlay.added.push(p);
   saveOverlay();
   rebuild();
@@ -4918,6 +5006,267 @@ buildForm();
 renderChrome();
 render();
 route();   /* a reload on #questionnaire/... lands back on the questionnaire */
+
+/* ---------------------------------------------------------------- server --- */
+
+const GROUP_KEY = "politicompass.group.v1";
+const JOIN_ROUTE = "#rejoindre/";
+
+async function api(method, path, body) {
+  const res = await fetch(path, {
+    method, credentials: "same-origin",
+    headers: body ? { "Content-Type": "application/json" } : {},
+    body: body ? JSON.stringify(body) : undefined
+  });
+  let data = null;
+  try { data = await res.json(); } catch (_) { /* 204, or not JSON */ }
+  return { ok: res.ok, status: res.status, data };
+}
+const apiError = r => L.apiErrors[r.data && r.data.error] || L.apiErrors.default;
+
+/* Asks once, over http(s) only. Anything but our backend's answer — a 404
+   from a plain static host, a network error — leaves the page local. */
+async function detectServer() {
+  if (!/^https?:$/.test(location.protocol)) return;
+  let r;
+  try { r = await api("GET", "/api/me"); } catch (_) { return; }
+  const ours = r.status === 200 ? r.data && typeof r.data.username === "string"
+             : r.status === 401 && r.data && r.data.error === "not_signed_in";
+  if (!ours) return;
+  SERVER.on = true;
+  SERVER.me = r.status === 200 ? r.data : null;
+  document.body.classList.add("server-mode");
+  $("add-card-title").textContent = L.addTitleServer;
+  const code = location.hash.startsWith(JOIN_ROUTE) ? location.hash.slice(JOIN_ROUTE.length) : null;
+  if (code) {
+    try { sessionStorage.setItem("politiskel.join", code); } catch (_) { /* private browsing */ }
+    history.replaceState(null, "", location.pathname);
+  }
+  await afterAuth();
+}
+
+async function afterAuth() {
+  if (SERVER.me) {
+    let code = null;
+    try { code = sessionStorage.getItem("politiskel.join"); sessionStorage.removeItem("politiskel.join"); }
+    catch (_) { /* private browsing */ }
+    if (code) {
+      const j = await api("POST", "/api/groups/join", { code });
+      if (j.ok) {
+        try { localStorage.setItem(GROUP_KEY, String(j.data.id)); } catch (_) { /* quota */ }
+        await refreshMe();
+        SERVER.status = L.joined(j.data.name);
+      } else {
+        SERVER.status = apiError(j);
+      }
+    }
+    let saved = null;
+    try { saved = Number(localStorage.getItem(GROUP_KEY)); } catch (_) { /* private browsing */ }
+    const groups = SERVER.me.groups;
+    SERVER.group = groups.find(g => g.id === saved) || groups[0] || null;
+  } else {
+    SERVER.group = null;
+  }
+  await loadGroup();
+  renderAccount();
+}
+
+async function refreshMe() {
+  const r = await api("GET", "/api/me");
+  SERVER.me = r.ok ? r.data : null;
+}
+
+/* The profiles on show: the chosen group's, or one's own alone. */
+async function loadGroup() {
+  let list = [];
+  if (SERVER.me && SERVER.group) {
+    const r = await api("GET", "/api/groups/" + SERVER.group.id + "/profiles");
+    list = r.ok ? r.data : [];
+  } else if (SERVER.me) {
+    list = [{ username: SERVER.me.username, me: true,
+              politiscales: SERVER.me.profile.politiscales, answers: SERVER.me.profile.answers }];
+  }
+  SEED.length = 0;
+  for (const k of Object.keys(SEED_ANSWERS)) delete SEED_ANSWERS[k];
+  for (const m of list) {
+    const p = Object.assign({ alias: m.username, source: "user:" + m.username, me: !!m.me,
+                              flag: null, slogan: null }, m.politiscales || {});
+    SEED.push(p);
+    if (m.answers && Object.keys(m.answers).length) SEED_ANSWERS[idOf(p)] = m.answers;
+  }
+  selection = null;
+  rebuild();
+  render();
+  route();
+}
+
+const myId = () => SERVER.me ? "user:" + SERVER.me.username : null;
+
+/* Saved half a second after the last answer, so a run of answers is one
+   request; the account bar says whether it went through. */
+function saveAnswersSoon() {
+  clearTimeout(SERVER.saving);
+  SERVER.saving = setTimeout(async () => {
+    const r = await api("PUT", "/api/me/profile", { answers: SEED_ANSWERS[myId()] || {} });
+    SERVER.status = r.ok ? L.saved : apiError(r);
+    if (r.ok) SERVER.me.profile = r.data;
+    renderAccount();
+  }, 500);
+}
+
+async function savePolitiscales(p) {
+  const values = {};
+  for (const a of AXES) for (const k of [a.neg[0], a.pos[0]]) if (Number.isFinite(p[k])) values[k] = p[k];
+  const r = await api("PUT", "/api/me/profile", { politiscales: values });
+  if (!r.ok) { $("form-error").textContent = apiError(r); $("form-error").hidden = false; return; }
+  SERVER.me.profile = r.data;
+  SERVER.status = L.saved;
+  $("add-form").reset();
+  pendingCapture = null;
+  captureFeedback(null, null);
+  await loadGroup();
+  renderAccount();
+}
+
+function renderAccount() {
+  const box = $("account");
+  box.replaceChildren();
+  box.hidden = !SERVER.on;
+  if (!SERVER.on) return;
+  const el2 = (tag, props, ...kids) => {
+    const n = document.createElement(tag);
+    Object.assign(n, props || {});
+    for (const k of kids) n.append(k);
+    return n;
+  };
+  const err = el2("p", { className: "error", hidden: true });
+  const fail = r => { err.textContent = typeof r === "string" ? r : apiError(r); err.hidden = false; };
+
+  if (!SERVER.me) {
+    const user = el2("input", { type: "text", placeholder: L.username, autocomplete: "username",
+                                maxLength: 24 });
+    const pass = el2("input", { type: "password", placeholder: L.password, autocomplete: "current-password" });
+    const login = el2("form", { className: "row" }, el2("strong", { textContent: L.signInTitle }), user, pass,
+                      el2("button", { type: "submit", className: "primary", textContent: L.signIn }));
+    login.addEventListener("submit", async e => {
+      e.preventDefault();
+      const r = await api("POST", "/api/login", { username: user.value, password: pass.value });
+      if (!r.ok) return fail(r);
+      await refreshMe();
+      await afterAuth();
+    });
+
+    const nu = el2("input", { type: "text", placeholder: L.username, autocomplete: "username", maxLength: 24 });
+    const np = el2("input", { type: "password", placeholder: L.passwordNew, autocomplete: "new-password" });
+    const consent = el2("input", { type: "checkbox" });
+    const reg = el2("form", {},
+      el2("div", { className: "row" }, nu, np),
+      el2("label", { className: "consent" }, consent, el2("span", { textContent: L.consent })),
+      el2("button", { type: "submit", className: "primary", textContent: L.register }));
+    reg.addEventListener("submit", async e => {
+      e.preventDefault();
+      if (!consent.checked) return fail(L.apiErrors.consent_required);
+      const r = await api("POST", "/api/register", { username: nu.value, password: np.value, consent: true });
+      if (!r.ok) return fail(r);
+      await refreshMe();
+      await afterAuth();
+    });
+    let pending = null;
+    try { pending = sessionStorage.getItem("politiskel.join"); } catch (_) { /* private browsing */ }
+    box.append(login, el2("details", {}, el2("summary", { textContent: L.registerTitle }), reg),
+               pending ? el2("p", { className: "note", textContent: L.joinPending }) : "",
+               el2("p", { className: "note", textContent: L.serverNote }), err);
+    return;
+  }
+
+  const me = SERVER.me;
+  const select = el2("select", { ariaLabel: L.groupLabel });
+  select.append(el2("option", { value: "", textContent: L.groupNone }));
+  for (const g of me.groups) select.append(el2("option", { value: String(g.id), textContent: g.name + " (" + g.members + ")" }));
+  select.value = SERVER.group ? String(SERVER.group.id) : "";
+  select.addEventListener("change", async () => {
+    SERVER.group = me.groups.find(g => String(g.id) === select.value) || null;
+    try { localStorage.setItem(GROUP_KEY, SERVER.group ? String(SERVER.group.id) : ""); } catch (_) { /* quota */ }
+    await loadGroup();
+    renderAccount();
+  });
+
+  const bar = el2("div", { className: "row" },
+    el2("span", {}, L.signedInAs, el2("strong", { textContent: me.username })),
+    el2("label", { className: "row" }, L.groupLabel + " ", select));
+
+  if (SERVER.group) {
+    const invite = el2("button", { type: "button", className: "ghost", textContent: L.invite });
+    invite.addEventListener("click", async () => {
+      const link = location.origin + location.pathname + JOIN_ROUTE + SERVER.group.invite;
+      try { await navigator.clipboard.writeText(link); SERVER.status = L.inviteCopied; }
+      catch (_) { SERVER.status = link; }
+      renderAccount();
+    });
+    const leave = el2("button", { type: "button", className: "ghost", textContent: L.leave });
+    leave.addEventListener("click", async () => {
+      if (!confirm(L.leaveConfirm(SERVER.group.name))) return;
+      const r = await api("POST", "/api/groups/" + SERVER.group.id + "/leave");
+      if (!r.ok) return fail(r);
+      await refreshMe();
+      SERVER.group = SERVER.me.groups[0] || null;
+      await loadGroup();
+      renderAccount();
+    });
+    bar.append(invite, leave);
+  }
+
+  const gname = el2("input", { type: "text", placeholder: L.groupName, maxLength: 60 });
+  const newGroup = el2("form", { className: "row" }, gname,
+    el2("button", { type: "submit", className: "ghost", textContent: L.groupCreate }));
+  newGroup.addEventListener("submit", async e => {
+    e.preventDefault();
+    const r = await api("POST", "/api/groups", { name: gname.value });
+    if (!r.ok) return fail(r);
+    await refreshMe();
+    SERVER.group = SERVER.me.groups.find(g => g.id === r.data.id) || null;
+    try { localStorage.setItem(GROUP_KEY, String(r.data.id)); } catch (_) { /* quota */ }
+    await loadGroup();
+    renderAccount();
+  });
+
+  const exportBtn = el2("button", { type: "button", className: "ghost", textContent: L.exportAccount });
+  exportBtn.addEventListener("click", async () => {
+    const r = await api("GET", "/api/me/export");
+    if (!r.ok) return fail(r);
+    const blob = new Blob([JSON.stringify(r.data, null, 1) + "\n"], { type: "application/json" });
+    const a = el2("a", { href: URL.createObjectURL(blob), download: slugOf(me.username) + "-compte.json" });
+    document.body.appendChild(a); a.click(); a.remove();
+    setTimeout(() => URL.revokeObjectURL(a.href), 1000);
+  });
+  const delPass = el2("input", { type: "password", placeholder: L.password, autocomplete: "current-password" });
+  const delForm = el2("form", { className: "row" }, el2("span", { textContent: L.deleteWarn }), delPass,
+    el2("button", { type: "submit", className: "ghost", textContent: L.deleteAccount }));
+  delForm.addEventListener("submit", async e => {
+    e.preventDefault();
+    if (!confirm(L.deleteConfirm)) return;
+    const r = await api("DELETE", "/api/me", { password: delPass.value });
+    if (!r.ok) return fail(r);
+    SERVER.me = null;
+    await afterAuth();
+  });
+  const logout = el2("button", { type: "button", className: "ghost", textContent: L.signOut });
+  logout.addEventListener("click", async () => {
+    await api("POST", "/api/logout");
+    SERVER.me = null;
+    await afterAuth();
+  });
+
+  box.append(bar,
+    el2("details", {}, el2("summary", { textContent: L.accountMore }),
+      el2("div", { className: "row" }, newGroup),
+      el2("div", { className: "row" }, exportBtn, logout),
+      delForm),
+    SERVER.status ? el2("p", { className: "status", textContent: SERVER.status }) : "",
+    el2("p", { className: "note", textContent: L.serverNoteIn }), err);
+}
+
+detectServer();
 </script>
 </body>
 </html>
