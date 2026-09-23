@@ -2,27 +2,30 @@
 
 Discover your political skeleton.
 
-Politiskel places political profiles on a two-axis compass — economic left/right
-and libertarian/authoritarian — compares them against the parties of a chosen
-country, and breaks each profile down axis by axis, so a group can see where it
-actually diverges rather than only where its average sits.
+Politiskel places political profiles on several readings of the political
+space — economic left/right against libertarian/authoritarian by default —
+compares them against the parties of a chosen country, and breaks each profile
+down axis by axis, so a group can see where it actually diverges rather than
+only where its average sits.
 
-It currently reads [PolitiScales](https://politiscales.fr) results. That is the
-starting point, not the destination.
+A profile comes from a [PolitiScales](https://politiscales.fr) result, from
+Politiskel's own questionnaire, or from both: the questionnaire can complete a
+PolitiScales profile, or start one from nothing.
 
 ## Direction
 
 - **A native test is the goal.** Answering inside Politiskel, no detour and no
-  import. The compass, group comparison and party references already work
-  independently of where the numbers come from; the questionnaire is what is
-  missing.
+  import. The first theme, the economy, exists; society, Europe and the world,
+  ecology and institutions are planned, each with its counterpart in CHES so
+  its readings stay comparable to the parties.
 - **PolitiScales import stays.** It is the fastest way to a real profile today,
   and nobody who already took that test should have to retake anything.
 - **Other questionnaires are plausible.** Not implemented.
 
 Only two things are genuinely tied to PolitiScales: `tools/politi-dissect.js`,
 which reads its screenshot layout, and the `AXES` table in
-`tools/politi-model.js`.
+`tools/politi-model.js`. The questionnaire lives beside them in
+`tools/politi-quiz.js`.
 Adding another questionnaire is mostly declaring its axes and writing an
 importer.
 
@@ -34,6 +37,8 @@ The repository holds code, never profiles. `template.html` is the application
 with an empty data slot; the build fills it and writes the page you open. Since
 that page is rebuilt on every run, it cannot accumulate data across versions.
 Everything derived from your answers is ignored by git — see `.gitignore`.
+Questionnaire answers never reach a file at all: they stay in the browser's
+storage for this page.
 
 ## Usage
 
@@ -56,7 +61,7 @@ stored in `politi-results/fixture.json` (not committed).
 
 ## Layout
 
-Two files are shared between Node and the browser, inlined into `index.html`
+Three files are shared between Node and the browser, inlined into `index.html`
 by the build so the page needs no module loading and no build step of its own:
 
 - `tools/politi-dissect.js` — reads a PolitiScales result out of a screenshot.
@@ -64,6 +69,9 @@ by the build so the page needs no module loading and no build step of its own:
   and every computation that turns a profile into a position. It touches no
   DOM, holds no state, and returns keys rather than sentences, so the wording
   stays in the locale table in `template.html`.
+- `tools/politi-quiz.js` — the questionnaire: its items with their sources, the
+  answer scales they were fielded with, the fixed order they are asked in, and
+  the scoring from answers to readings.
 
 Being requirable from Node is the point of the second one: the weights, the
 proximity thresholds and the claims made about them have all been measured,
@@ -81,6 +89,56 @@ and how many attachments are toss-ups in each country. Every correlation comes
 with its 95% interval and the verdict is read off the interval, so a small group
 gets "too few profiles to conclude" rather than a number that looks like a
 finding. It reads `profiles-data.js` and writes nothing.
+
+## The questionnaire
+
+No item is written for Politiskel. Each is quoted from a field-tested survey —
+the European Social Survey, the International Social Survey Programme, the
+European Values Study — in its official French questionnaire, and carries its
+source down to the variable. The one set that has no French version, Erik Olin
+Wright's class scale, is translated and flagged as such on every item.
+
+The economy theme asks 32 items and feeds five readings:
+
+| Reading | Items | Compared to parties |
+| --- | --- | --- |
+| x — economic left/right | 18, over CHES's three economic sub-scales | yes, `lrecon` |
+| protectionism | 2 | yes, `protectionism` |
+| class (Wright's anticapitalism scale) | 5 | no |
+| perceived class conflict | 4 | no |
+| capital / labour balance | 3 | no |
+
+x is the plain mean of redistribution, public services vs taxes and
+deregulation: across the 279 parties of CHES 2024 their mean reproduces
+`lrecon` at r = 0.96, so a weighting would have nothing to recover.
+Protectionism runs against `lrecon` there (r = −0.37) and is kept out of x.
+Wright's scale is reported only complete, since a partial sum of an additive
+scale is not the scale.
+
+A questionnaire axis replaces the PolitiScales one wholesale — never averaged
+with it — and the page names each coordinate's source. When it replaces one,
+the compass draws the journey from the PolitiScales position.
+
+Items are asked mixed, in one fixed order for everyone: a sort on a hash of
+each item's id, so adding an item moves no other. An item whose wording leans
+on the one before it travels with it. How much the theme matters is asked
+before the items and again after, on four labelled points.
+
+Answers stay in the browser, so `tools/model-check.js`, which reads
+`profiles-data.js`, cannot test the questionnaire's readings yet.
+
+## Readings of the compass
+
+A picker redraws the compass along other axes, placing profiles and parties on
+the same variables: the default (questionnaire x where answered, PolitiScales
+y), PolitiScales alone, and economy × protectionism. A profile with no value on
+an axis keeps its table row and is left off the chart. A populist reading
+(people vs elites) will come with the institutions theme, named for the theory
+it adopts.
+
+CHES protectionism is used for France, Germany and the UK. Italy's nine party
+means are all whole numbers, where the others rest on five to eleven experts —
+consistent with a single rater — so it is left out, and the page says so.
 
 ## How it reads a screenshot
 

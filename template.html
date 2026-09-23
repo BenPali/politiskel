@@ -1684,7 +1684,15 @@ window.POLITI_PROFILES = [];
         <details class="method">
           <summary>Méthode de calcul et limites</summary>
           <div class="body">
-            <p><strong>Axe X — économique (gauche ◄ ► droite)</strong>, moyenne pondérée de :</p>
+            <p>
+              Un profil a deux sources possibles : un résultat PolitiScales, lu sur une capture,
+              et le questionnaire Politiskel, rempli sur cette page. Quand un thème du
+              questionnaire est répondu, l'axe qu'il mesure <strong>remplace entièrement</strong>
+              celui de PolitiScales — les deux ne sont jamais moyennés. Chaque coordonnée a donc
+              une seule source, et le tableau la signale (« Q »).
+            </p>
+            <p><strong>Axe X depuis PolitiScales — économique (gauche ◄ ► droite)</strong>,
+              moyenne pondérée de :</p>
             <ul>
               <li><code>0,45</code> × (Capitalisme − Communisme)</li>
               <li><code>0,35</code> × (Laissez-faire − Régulation)</li>
@@ -1693,9 +1701,10 @@ window.POLITI_PROFILES = [];
               Écologie ↔ Productivisme n'entre pas dans l'axe X : les repères partisans
               viennent du CHES, dont l'échelle économique exclut l'environnement (variable
               séparée). L'y inclure revenait à comparer deux axes différents. Cette dimension
-              est affichée à part, comme le souverainisme.
+              est affichée à part, dans la colonne « Écolo. ».
             </p>
-            <p><strong>Axe Y — sociétal (libertaire ▼ ▲ autoritaire)</strong>, moyenne pondérée de :</p>
+            <p><strong>Axe Y depuis PolitiScales — sociétal (libertaire ▼ ▲ autoritaire)</strong>,
+              moyenne pondérée de :</p>
             <ul>
               <li><code>0,30</code> × (Essentialisme − Constructivisme)</li>
               <li><code>0,25</code> × (Justice punitive − réhabilitative)</li>
@@ -1736,8 +1745,51 @@ window.POLITI_PROFILES = [];
               cet écart un doublon, et le présenter comme une information distincte en
               exagérait la portée. Une vraie mesure de la souveraineté — la position sur
               l'intégration européenne, dont les deux axes n'expliquent pas même la moitié
-              dans le CHES — demanderait des questions que PolitiScales ne pose pas.
+              dans le CHES — demanderait des questions que PolitiScales ne pose pas. C'est ce que
+              fera le thème « Europe et monde » du questionnaire.
             </p>
+
+            <p><strong>Le questionnaire Politiskel.</strong> Aucune question n'est écrite ici :
+              chacune est reprise d'une grande enquête publique — European Social Survey,
+              International Social Survey Programme, European Values Study — dans sa version
+              française officielle, avec sa source jusqu'à la variable. Les exceptions sont
+              signalées sur la question même : l'échelle de classe d'Erik Olin Wright, qui n'existe
+              pas en français, et les deux bornes d'une échelle de l'ESS dont la carte n'a pas été
+              retrouvée. Chaque réponse est ramenée entre −1 et +1 ; « ne peut choisir » compte
+              comme une absence de réponse.</p>
+            <p><strong>Axe X depuis le questionnaire.</strong> Moyenne simple de trois
+              sous-dimensions, chacune moyenne de ses questions : redistribution, services publics
+              contre impôts, régulation des marchés. Ce sont les trois sous-échelles économiques du
+              CHES, et leur moyenne reproduit son axe <code>lrecon</code> à <code>r = 0,96</code>
+              sur les 279 partis de 2024 : une pondération n'aurait rien à rattraper. Une limite :
+              être « plutôt d'accord » ne place pas une personne à un point précis de l'échelle
+              0-10 des experts. Les deux échelles sont alignées sur les mêmes dimensions, pas
+              calibrées l'une sur l'autre.</p>
+            <p><strong>Protectionnisme.</strong> Lu à part, jamais dans X : dans le CHES, il va
+              contre la gauche-droite économique (<code>r = −0,37</code>) et avec l'axe sociétal
+              (+0,43) — LFI et le RN sont tous deux protectionnistes. L'intégrer à X répéterait
+              l'erreur de l'écologie.</p>
+            <p><strong>Trois lectures de classe</strong>, sans équivalent chez les partis :
+              l'échelle anticapitaliste de Wright (<em>Class Counts</em>, chap. 11 : cinq questions,
+              de −2 à +2, sommées ; donnée seulement complète, car une somme partielle n'est pas
+              l'échelle), le conflit de classe perçu (ISSP), et le rapport de force capital /
+              travail (syndicats, pouvoir des patrons). Elles ne sont pas des composantes de X :
+              une analyse de classe est une lecture rivale du même conflit, pas un axe de plus.</p>
+            <p><strong>Importance du thème.</strong> Demandée avant les questions et après, sur
+              quatre réponses nommées plutôt qu'une échelle de 0 à 10 : on ne distingue pas un 9 d'un
+              10 à propos de soi. Posée seulement à la fin, elle mesurerait surtout qu'on vient d'y
+              réfléchir ; la seconde n'est pas pré-remplie, pour ne pas inviter à répéter la
+              première.</p>
+            <p><strong>Ordre des questions.</strong> Mélangé, pour qu'une suite de questions sur un
+              même sujet ne laisse pas deviner ce qu'elle mesure, mais fixe et identique pour tout
+              le monde, pour que les réponses restent comparables. Deux questions dont la seconde
+              répond à la première restent ensemble.</p>
+            <p><strong>Lectures de la boussole.</strong> Chaque lecture place les profils et les
+              partis sur les mêmes variables, pour ne comparer un profil qu'à des partis mesurés sur
+              la même chose. Un profil sans valeur sur un axe garde sa ligne dans le tableau mais
+              n'est pas placé. La lecture « populiste » — peuple contre élites — viendra avec le
+              thème Institutions, sous ce nom : l'adopter comme axe revient à adopter la théorie
+              populiste du conflit.</p>
           </div>
         </details>
       </div>
@@ -1849,9 +1901,10 @@ window.POLITI_PROFILES = [];
       <div>
         <h2 data-i18n="footPrivacy"></h2>
         <p>
-          Tout reste sur votre machine. Les captures, les profils et cette page
-          assemblée ne sont envoyés nulle part — il n'y a ni serveur, ni compte,
-          ni traceur. Le dépôt de code ne contient aucun profil.
+          Tout reste sur votre machine. Les captures, les profils, les réponses au
+          questionnaire et cette page assemblée ne sont envoyés nulle part — il n'y
+          a ni serveur, ni compte, ni traceur. Les réponses restent dans ce
+          navigateur. Le dépôt de code ne contient aucun profil.
         </p>
       </div>
       <div>
@@ -1863,7 +1916,16 @@ window.POLITI_PROFILES = [];
           </li>
           <li>
             <a href="https://www.chesdata.eu/ches-europe/" target="_blank" rel="noopener noreferrer">Chapel Hill Expert Survey 2024</a>
-            — position de dix des quinze partis
+            — position des partis, pays par pays
+          </li>
+          <li>
+            <a href="https://www.europeansocialsurvey.org/" target="_blank" rel="noopener noreferrer">ESS</a>,
+            <a href="https://issp.org/" target="_blank" rel="noopener noreferrer">ISSP</a>,
+            <a href="https://europeanvaluesstudy.eu/" target="_blank" rel="noopener noreferrer">EVS</a>
+            — les questions du questionnaire
+          </li>
+          <li>
+            Erik Olin Wright, <em>Class Counts</em> — l'échelle de classe
           </li>
         </ul>
       </div>
@@ -1878,10 +1940,11 @@ window.POLITI_PROFILES = [];
       </div>
     </div>
     <p class="fine">
-      Les repères partisans situent un ordre de grandeur, pas une mesure : dix viennent
-      d'une enquête d'experts, cinq sont des estimations attribuées à la main et signalées
-      comme telles au survol. Les pourcentages des profils, eux, sont lus directement sur
-      les captures.
+      Les repères partisans situent un ordre de grandeur, pas une mesure : la plupart
+      viennent d'une enquête d'experts, les autres sont des estimations à la main,
+      signalées comme telles au survol et comptées dans la méthode, pays par pays. Les
+      pourcentages PolitiScales sont lus directement sur les captures ; les réponses au
+      questionnaire, sur cette page.
     </p>
   </footer>
 </div>
@@ -1989,9 +2052,9 @@ const LOCALES = {
     /* static markup, applied through data-i18n */
     brandTag: "Votre squelette politique",
     navTest: "Passer le test", navSource: "Code source",
-    subtitle: "Projection des profils PolitiScales sur deux axes — gauche-droite économique "
-      + "et libertaire-autoritaire — et comparaison avec la position des principales forces "
-      + "politiques du pays choisi.",
+    subtitle: "Placez un profil — depuis un résultat PolitiScales, ou avec le questionnaire "
+      + "Politiskel — sur plusieurs lectures de l'espace politique, et comparez-le aux principales "
+      + "forces du pays choisi, placées d'après les experts du CHES.",
     optCountry: "Pays de référence",
     optRefs: "Repères partis", optRefLabels: "Étiquettes des repères",
     optLabels: "Étiquettes des profils",
@@ -2051,7 +2114,7 @@ const LOCALES = {
       + "environ un profil sur trois change de repère sous des pondérations tout aussi défendables.",
     colDistance: "Distance", colDeltaEcon: "Δ éco", colDeltaSocial: "Δ soc.",
     titleY: "Positif = autoritaire (haut) · négatif = libertaire (bas)",
-    titleEcol: "Écologie − Productivisme : positif = écologiste. Hors axes, comme le souverainisme.",
+    titleEcol: "Écologie − Productivisme : positif = écologiste. Hors des deux axes, comme dans le CHES.",
     titleDeltaEcon: "Écart sur l'axe économique",
     titleDeltaSocial: "Écart sur l'axe sociétal : positif = le parti est plus autoritaire que vous",
 
