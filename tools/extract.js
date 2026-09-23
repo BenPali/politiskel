@@ -21,9 +21,16 @@ const ROOT = path.join(__dirname, "..");
 const SRC = path.join(ROOT, "politi-results");
 const CACHE = path.join(SRC, ".extract-cache.json");
 const OUT = path.join(ROOT, "profiles-data.js");
-const PAGE = path.join(ROOT, "index.html");       /* généré, non versionné */
-const TEMPLATE = path.join(ROOT, "template.html"); /* source versionnée, sans données */
-const LIB = path.join(__dirname, "politi-dissect.js");
+const PAGE = path.join(ROOT, "index.html");       /* generated, not committed */
+const TEMPLATE = path.join(ROOT, "template.html"); /* committed source, no data */
+/* The two files shared with the browser, each inlined into its own marked
+   block: the screenshot reader, and the compass model. */
+const SHARED = [
+  { file: path.join(__dirname, "politi-dissect.js"),
+    start: "/* POLITI-EXTRACTOR:START */", end: "/* POLITI-EXTRACTOR:END */" },
+  { file: path.join(__dirname, "politi-model.js"),
+    start: "/* POLITI-MODEL:START */", end: "/* POLITI-MODEL:END */" }
+];
 
 /* Replaces the content between two markers, leaving the rest untouched. */
 function between(text, start, end, body) {
@@ -35,25 +42,25 @@ function between(text, start, end, body) {
 /* A literal "</script>" inside a string would close the surrounding tag. */
 const safe = s => s.replace(/<\/(script)/gi, "<\\/$1");
 
-/* The extractor is code, so it is inlined into the template itself and
-   committed: someone who clones the repository gets a page where dropping a
-   screenshot works straight away, with no build step and no Node. Only the
-   DATA is template-only-in-index.html, since that is what must never be
-   committed.
+/* The shared files are code, so they are inlined into the template itself and
+   committed: someone who clones the repository gets a page that works straight
+   away, with no build step and no Node. Only the DATA is
+   template-only-in-index.html, since that is what must never be committed.
 
    index.html is then REBUILT from the template on every run, so it never holds
    anything beyond the template plus the current data. */
 function inject(count, dataJs) {
-  if (!fs.existsSync(TEMPLATE) || !fs.existsSync(LIB)) return false;
-  const extractor = safe(fs.readFileSync(LIB, "utf8").trimEnd());
+  if (!fs.existsSync(TEMPLATE) || SHARED.some(s => !fs.existsSync(s.file))) return false;
 
   let page = fs.readFileSync(TEMPLATE, "utf8");
-  const withExtractor = between(page, "/* POLITI-EXTRACTOR:START */",
-                                "/* POLITI-EXTRACTOR:END */", extractor);
-  if (!withExtractor) return false;
-  if (withExtractor !== page) {          /* only touch it when it changed */
-    fs.writeFileSync(TEMPLATE, withExtractor);
-    page = withExtractor;
+  for (const { file, start, end } of SHARED) {
+    const code = safe(fs.readFileSync(file, "utf8").trimEnd());
+    const next = between(page, start, end, code);
+    if (!next) return false;
+    if (next !== page) {                 /* only touch it when it changed */
+      fs.writeFileSync(TEMPLATE, next);
+      page = next;
+    }
   }
 
   const out = between(page, "/* POLITI-DATA:START */", "/* POLITI-DATA:END */",
@@ -106,7 +113,7 @@ function snapWord(raw) {
     if (d < bestD) { bestD = d; best = orig; }
   }
   if (best && bestD <= Math.max(1, Math.floor(plain.length * 0.34))) return best;
-  return w.charAt(0).toUpperCase() + w.slice(1);   /* inconnu : on garde l'OCR */
+  return w.charAt(0).toUpperCase() + w.slice(1);   /* unknown: keep what OCR read */
 }
 
 /* Surrounds a binarised image with white margin: tesseract will not read a
@@ -201,10 +208,43 @@ function loadCache() {
   try { return JSON.parse(fs.readFileSync(CACHE, "utf8")); } catch (_) { return {}; }
 }
 
+/* How many profiles the current profiles-data.js holds: 0 when there is no
+   file or an empty list. A file that cannot be read back counts as non-empty,
+   so that it is never overwritten on a guess. */
+function existingProfileCount() {
+  if (!fs.existsSync(OUT)) return 0;
+  const sandbox = { window: {} };
+  try { require("vm").runInNewContext(fs.readFileSync(OUT, "utf8"), sandbox); }
+  catch (_) { return Infinity; }
+  const list = sandbox.window.POLITI_PROFILES;
+  return Array.isArray(list) ? list.length : Infinity;
+}
+
 function main() {
-  if (!fs.existsSync(SRC)) { console.error("folder not found: " + SRC); process.exit(1); }
-  const files = fs.readdirSync(SRC).filter(f => /\.png$/i.test(f)).sort();
-  if (!files.length) { console.error("no .png screenshots in " + SRC); process.exit(1); }
+  /* No screenshots is not an error: the page works without them — a profile
+     can be dropped onto it or typed in by hand. Failing here left whoever
+     just cloned the repository with no index.html at all, and no way to get
+     one short of producing a PolitiScales capture first. */
+  const hasFolder = fs.existsSync(SRC);
+  const files = hasFolder
+    ? fs.readdirSync(SRC).filter(f => /\.png$/i.test(f)).sort() : [];
+  if (!files.length) {
+    /* ...but only when there is nothing to lose: a moved or emptied folder
+       must not silently wipe the profiles already extracted. */
+    const kept = existingProfileCount();
+    if (kept) {
+      console.error((hasFolder
+        ? "no .png screenshot in " + path.relative(ROOT, SRC)
+        : path.relative(ROOT, SRC) + " not found")
+        + ", but " + path.relative(ROOT, OUT)
+        + (kept === Infinity ? " is not empty" : " still holds " + kept + " profile(s)")
+        + " — aborting. Delete it first to build an empty page.");
+      process.exit(1);
+    }
+    console.log(hasFolder
+      ? "no .png screenshot in " + path.relative(ROOT, SRC) + " — building an empty page"
+      : path.relative(ROOT, SRC) + " not found — building an empty page");
+  }
 
   const cache = loadCache();
   const next = {}, profiles = [];
@@ -255,7 +295,7 @@ function main() {
       + (res.warnings.length ? "   [" + res.warnings.join(" ; ") + "]" : ""));
   }
 
-  fs.writeFileSync(CACHE, JSON.stringify(next, null, 1));
+  if (hasFolder) fs.writeFileSync(CACHE, JSON.stringify(next, null, 1));
   const banner = "/* Generated by tools/extract.js — do not edit by hand.\n"
     + "   Source: politi-results/  ·  " + profiles.length + " profile(s)\n"
     + "   Regenerate: node tools/extract.js */\n";
