@@ -5,6 +5,10 @@
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
 <title>Politiskel</title>
 <style>
+  /* The page's stylesheet: colour tokens for light and dark on :root, then
+     each part of the page in turn — header, compass, tables, strips, forms,
+     the questionnaire, and the site's pages in server mode. */
+
   :root {
     color-scheme: light;
     --bg:            #f4f4f2;
@@ -938,7 +942,7 @@
 
    It returns KEYS, never sentences: `fitOf` gives "near", not "proche", and
    `methodTag` gives "revolutionary". Wording belongs to the locale table in
-   the page, so a second language changes nothing here.
+   web/locale-fr.js, so a second language changes nothing here.
 
    Being requirable is the point: the weighting, the thresholds and the
    proximity claims have all been measured, and a measurement nobody else can
@@ -2395,6 +2399,11 @@ window.POLITI_PROFILES = [];
 </div>
 
 <script>
+/* Every sentence the page shows, in French. Code elsewhere looks wording up
+   here and never writes it, so a second language is a second table.
+   The page has one script: the web/*.js files are concatenated in the order
+   web/shell.html includes them, and share its top-level scope. */
+
 "use strict";
 
 /* ----------------------------------------------------------------- i18n ---
@@ -2805,6 +2814,13 @@ const LOCALES = {
 };
 const LANG = (document.documentElement.lang || "fr").slice(0, 2);
 const L = LOCALES[LANG] || LOCALES.fr;
+
+/* The compass: the model wrappers (coordinates, readings of the compass,
+   the questionnaire's axes replacing PolitiScales's), the axis labels, and
+   the rendering of the chart, the profiles table, the strips and the
+   distance panel.
+   The page has one script: the web/*.js files are concatenated in the order
+   web/shell.html includes them, and share its top-level scope. */
 
 /* ---------------------------------------------------------------- model --- */
 
@@ -4061,6 +4077,12 @@ function exportButton(p, cls) {
   return b;
 }
 
+/* The questionnaire: its pages — the list of themes, one question per
+   screen, the result — its fixed order, and the readings it adds to a
+   profile.
+   The page has one script: the web/*.js files are concatenated in the order
+   web/shell.html includes them, and share its top-level scope. */
+
 /* ----------------------------------------------------------- questionnaire --- */
 
 /* The questionnaire is a page of its own inside this file, reached through
@@ -4628,6 +4650,12 @@ document.addEventListener("keydown", e => {
   }
 });
 
+/* What connects the page to its user: the chart's hover cards, the
+   PolitiScales form and screenshot reader, the controls, and the start-up
+   sequence.
+   The page has one script: the web/*.js files are concatenated in the order
+   web/shell.html includes them, and share its top-level scope. */
+
 /* ---------------------------------------------------------------- survol --- */
 
 function wireHover(computed) {
@@ -5097,6 +5125,11 @@ buildForm();
 renderChrome();
 render();
 route();   /* a reload on #questionnaire/... lands back on the questionnaire */
+
+/* Server mode: when the page is served by server/, accounts, groups and the
+   site's own pages and router. None of it runs from a local file.
+   The page has one script: the web/*.js files are concatenated in the order
+   web/shell.html includes them, and share its top-level scope. */
 
 /* ---------------------------------------------------------------- server --- */
 

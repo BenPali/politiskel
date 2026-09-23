@@ -36,7 +36,8 @@ The optional group server (below) is the one exception, and only when you run
 one and open the page from it.
 
 The repository holds code, never profiles. `template.html` is the application
-with an empty data slot; the build fills it and writes the page you open. Since
+with an empty data slot, assembled from `web/`; the build fills it and writes
+the page you open. Since
 that page is rebuilt on every run, it cannot accumulate data across versions.
 Everything derived from your answers is ignored by git — see `.gitignore`.
 Questionnaire answers never reach a file at all: they stay in the browser's
@@ -72,6 +73,25 @@ stored in `politi-results/fixture.json` (not committed).
 
 ## Layout
 
+The page's sources are in `web/`, one file per part:
+
+| File | What it holds |
+| --- | --- |
+| `web/shell.html` | the markup, and where each part below goes |
+| `web/style.css` | the stylesheet, light and dark |
+| `web/locale-fr.js` | every sentence the page shows |
+| `web/compass.js` | the compass, the profiles table, the strips, the distance panel |
+| `web/quiz.js` | the questionnaire's pages and readings |
+| `web/wiring.js` | hover cards, the PolitiScales form and reader, controls, start-up |
+| `web/site.js` | server mode: accounts, groups, the site's pages and router |
+
+`node tools/extract.js` assembles them, with the shared files below, into
+`template.html` — one file, because a page opened as `file://` cannot reliably
+load its neighbours, and one file can be shared as is. `template.html` is
+committed, so a clone works without Node and the group server can serve it;
+it is generated, so edit `web/`, then rebuild. The scripts are concatenated
+into one, in the order `web/shell.html` includes them, and share one scope.
+
 Three files are shared between Node and the browser, inlined into `index.html`
 by the build so the page needs no module loading and no build step of its own:
 
@@ -79,7 +99,7 @@ by the build so the page needs no module loading and no build step of its own:
 - `tools/politi-model.js` — the axes and their weights, the party references,
   and every computation that turns a profile into a position. It touches no
   DOM, holds no state, and returns keys rather than sentences, so the wording
-  stays in the locale table in `template.html`.
+  stays in the locale table in `web/locale-fr.js`.
 - `tools/politi-quiz.js` — the questionnaire: its items with their sources, the
   answer scales they were fielded with, the fixed order they are asked in, and
   the scoring from answers to readings.

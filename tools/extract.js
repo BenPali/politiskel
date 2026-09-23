@@ -26,7 +26,14 @@ const CACHE = path.join(SRC, ".extract-cache.json");
 const ANSWERS = path.join(SRC, "answers");
 const OUT = path.join(ROOT, "profiles-data.js");
 const PAGE = path.join(ROOT, "index.html");       /* generated, not committed */
-const TEMPLATE = path.join(ROOT, "template.html"); /* committed source, no data */
+/* The page's sources live in web/: a shell with the markup, the stylesheet,
+   and the app's scripts, each a file of its own. The build assembles them —
+   with the shared tools below — into template.html, which is committed so
+   that a clone works with no build step and no Node, and which the group
+   server serves. template.html is generated: edit web/, not it. */
+const WEB = path.join(ROOT, "web");
+const SHELL = path.join(WEB, "shell.html");
+const TEMPLATE = path.join(ROOT, "template.html"); /* assembled, committed, no data */
 /* The files shared with the browser, each inlined into its own marked block:
    the screenshot reader, the compass model, and the questionnaire. */
 const SHARED = [
@@ -48,26 +55,31 @@ function between(text, start, end, body) {
 /* A literal "</script>" inside a string would close the surrounding tag. */
 const safe = s => s.replace(/<\/(script)/gi, "<\\/$1");
 
-/* The shared files are code, so they are inlined into the template itself and
-   committed: someone who clones the repository gets a page that works straight
-   away, with no build step and no Node. Only the DATA is
-   template-only-in-index.html, since that is what must never be committed.
-
-   index.html is then REBUILT from the template on every run, so it never holds
-   anything beyond the template plus the current data. */
-function inject(count, dataJs) {
-  if (!fs.existsSync(TEMPLATE) || SHARED.some(s => !fs.existsSync(s.file))) return false;
-
-  let page = fs.readFileSync(TEMPLATE, "utf8");
+/* The shell's "/* @include web/<file> *\/" lines are replaced by those files,
+   verbatim; its marked blocks by the shared tools. The page stays one file:
+   opened as file://, a page cannot reliably load its neighbours, and a single
+   file can be shared as is. */
+function assemble() {
+  if (!fs.existsSync(SHELL) || SHARED.some(s => !fs.existsSync(s.file))) return null;
+  let page = fs.readFileSync(SHELL, "utf8").replace(
+    /^\/\* @include (web\/[\w.-]+) \*\/\n/gm,
+    (_, f) => safe(fs.readFileSync(path.join(ROOT, f), "utf8")));
   for (const { file, start, end } of SHARED) {
-    const code = safe(fs.readFileSync(file, "utf8").trimEnd());
-    const next = between(page, start, end, code);
-    if (!next) return false;
-    if (next !== page) {                 /* only touch it when it changed */
-      fs.writeFileSync(TEMPLATE, next);
-      page = next;
-    }
+    page = between(page, start, end, safe(fs.readFileSync(file, "utf8").trimEnd()));
+    if (page === null) return null;
   }
+  return page;
+}
+
+/* Rewrites template.html only when its sources changed, then fills in the
+   data. Only the DATA is left out of the template, since that is what must
+   never be committed; index.html is REBUILT from the template on every run,
+   so it never holds anything beyond the template plus the current data. */
+function inject(count, dataJs) {
+  const page = assemble();
+  if (!page) return false;
+  if (!fs.existsSync(TEMPLATE) || fs.readFileSync(TEMPLATE, "utf8") !== page)
+    fs.writeFileSync(TEMPLATE, page);
 
   const out = between(page, "/* POLITI-DATA:START */", "/* POLITI-DATA:END */",
                       "/* " + count + " profile(s) extracted from politi-results/ */\n"
