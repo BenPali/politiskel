@@ -248,6 +248,66 @@ async fn futures_join<T>(handles: impl Iterator<Item = tokio::task::JoinHandle<T
 }
 
 #[tokio::test]
+async fn a_forged_forwarded_for_line_is_not_trusted() {
+    let app = server_with(true).await;
+    Client::new(&app).register("Victor").await;
+    // the client sends its own line first; the proxy adds the real address last
+    for n in 0..6 {
+        let mut c = Client::new(&app);
+        c.headers.push(("x-forwarded-for", format!("198.51.100.{n}")));
+        c.headers.push(("x-forwarded-for", "203.0.113.9".into()));
+        c.call("POST", "/api/login", Some(json!({ "username": "Victor", "password": "wrong wrong wrong" }))).await;
+    }
+    let mut c = Client::new(&app);
+    c.headers.push(("x-forwarded-for", "198.51.100.200".into()));
+    c.headers.push(("x-forwarded-for", "203.0.113.9".into()));
+    let (s, _) = c.call("POST", "/api/login",
+        Some(json!({ "username": "Victor", "password": "correct horse battery" }))).await;
+    assert_eq!(s, StatusCode::TOO_MANY_REQUESTS, "a fresh first line must not buy fresh attempts");
+}
+
+#[tokio::test]
+async fn many_addresses_cannot_lock_the_owner_out() {
+    let app = server_with(true).await;
+    Client::from_ip(&app, "192.0.2.1").register("Baptiste").await;
+    for n in 0..30 {
+        Client::from_ip(&app, &format!("203.0.113.{n}")).call("POST", "/api/login",
+            Some(json!({ "username": "Baptiste", "password": "wrong wrong wrong" }))).await;
+    }
+    let (s, _) = Client::from_ip(&app, "192.0.2.1").call("POST", "/api/login",
+        Some(json!({ "username": "Baptiste", "password": "correct horse battery" }))).await;
+    assert_eq!(s, StatusCode::OK);
+}
+
+#[tokio::test]
+async fn ipv6_neighbours_share_a_limit() {
+    let app = server_with(true).await;
+    Client::new(&app).register("Ben").await;
+    for n in 0..5 {
+        Client::from_ip(&app, &format!("2001:db8:1:2::{n:x}")).call("POST", "/api/login",
+            Some(json!({ "username": "Ben", "password": "wrong wrong wrong" }))).await;
+    }
+    let (s, _) = Client::from_ip(&app, "2001:db8:1:2::ffff").call("POST", "/api/login",
+        Some(json!({ "username": "Ben", "password": "correct horse battery" }))).await;
+    assert_eq!(s, StatusCode::TOO_MANY_REQUESTS);
+}
+
+#[tokio::test]
+async fn a_configured_origin_replaces_the_host_check() {
+    let db = SqlitePoolOptions::new().max_connections(1).connect("sqlite::memory:").await.unwrap();
+    migrate(&db).await.unwrap();
+    let app = app(AppState::new(db, String::new(), true)
+        .with_origin(Some("https://politiskel.example.org/".into())));
+    // behind nginx, Host arrives as the upstream address
+    let mut c = Client { app: app.clone(), cookie: None, headers: vec![
+        ("host", "127.0.0.1:8080".into()), ("origin", "https://politiskel.example.org".into())] };
+    assert_eq!(c.register("Line").await, StatusCode::CREATED);
+    let mut evil = Client { app: app.clone(), cookie: None, headers: vec![
+        ("host", "127.0.0.1:8080".into()), ("origin", "http://127.0.0.1:8080".into())] };
+    assert_eq!(evil.register("Theo").await, StatusCode::FORBIDDEN);
+}
+
+#[tokio::test]
 async fn guessing_from_one_address_does_not_lock_the_owner_out() {
     let app = server_with(true).await;
     Client::from_ip(&app, "192.0.2.1").register("Theo").await;

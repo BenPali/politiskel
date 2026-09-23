@@ -35,12 +35,13 @@ use sqlx::SqlitePool;
 
 const SESSION_COOKIE: &str = "politiskel_session";
 const SESSION_DAYS: i64 = 30;
-/// Login attempts that may fail within the window: per name and address,
-/// before that address is paused on that name; and per name from every
-/// address together, which only a distributed guess would reach. Keyed on the
-/// name alone, the limit let anyone who knew a pseudonym lock its owner out.
+/// Login attempts that may fail within the window, per name and address,
+/// before that address is paused on that name. There is deliberately no cap
+/// per name across addresses: any such cap is a way to lock the owner out,
+/// and every member of a group knows the others' pseudonyms. What guards
+/// against guessing from many addresses is argon2's cost and the ten-character
+/// minimum; IPv6 addresses count per /64, since one host holds a whole block.
 const MAX_FAILURES: u32 = 5;
-const MAX_FAILURES_PER_NAME: u32 = 100;
 const FAILURE_WINDOW: i64 = 15 * 60;
 
 #[derive(Clone)]
@@ -54,24 +55,46 @@ pub struct AppState {
     /// Whether to read the client's address from X-Forwarded-For, as set by
     /// the reverse proxy in front; otherwise the socket's address is used.
     pub trust_proxy: bool,
+    /// The public origin browsers load the page from ("https://host"), when
+    /// the proxy does not pass the Host header through (nginx by default).
+    pub origin: Option<String>,
     failures: Arc<Mutex<HashMap<String, (u32, i64)>>>,
 }
 
 impl AppState {
     pub fn new(db: SqlitePool, page: String, secure_cookies: bool) -> Self {
-        Self { db, page: Arc::new(page), secure_cookies, trust_proxy: false, failures: Arc::default() }
+        Self { db, page: Arc::new(page), secure_cookies, trust_proxy: false, origin: None,
+               failures: Arc::default() }
     }
 
     pub fn trusting_proxy(mut self, yes: bool) -> Self {
         self.trust_proxy = yes;
         self
     }
+
+    pub fn with_origin(mut self, origin: Option<String>) -> Self {
+        self.origin = origin.map(|o| o.trim_end_matches('/').to_string());
+        self
+    }
 }
 
 /// The client's address: the socket's, or behind a trusted proxy the last
-/// X-Forwarded-For entry — the one the proxy itself appended, which a client
-/// cannot forge.
+/// X-Forwarded-For entry across every such header line — the one the proxy
+/// itself added, which a client cannot forge. Some proxies add a line of their
+/// own rather than appending to the client's, so the first line alone could be
+/// the client's invention. IPv6 addresses are cut to their /64.
 pub struct ClientIp(pub String);
+
+fn address_key(ip: &str) -> String {
+    match ip.parse::<std::net::IpAddr>() {
+        Ok(std::net::IpAddr::V6(v6)) => {
+            let s = v6.segments();
+            format!("{:x}:{:x}:{:x}:{:x}::/64", s[0], s[1], s[2], s[3])
+        }
+        Ok(v4) => v4.to_string(),
+        Err(_) => ip.to_string(),
+    }
+}
 
 impl axum::extract::FromRequestParts<AppState> for ClientIp {
     type Rejection = std::convert::Infallible;
@@ -79,15 +102,18 @@ impl axum::extract::FromRequestParts<AppState> for ClientIp {
         -> Result<Self, Self::Rejection>
     {
         if state.trust_proxy {
-            if let Some(ip) = parts.headers.get("x-forwarded-for").and_then(|v| v.to_str().ok())
-                .and_then(|v| v.rsplit(',').next()).map(|v| v.trim().to_string()).filter(|v| !v.is_empty())
-            {
-                return Ok(ClientIp(ip));
+            let last = parts.headers.get_all("x-forwarded-for").iter()
+                .filter_map(|v| v.to_str().ok())
+                .flat_map(|v| v.split(','))
+                .map(str::trim).filter(|v| !v.is_empty())
+                .last().map(str::to_string);
+            if let Some(ip) = last {
+                return Ok(ClientIp(address_key(&ip)));
             }
         }
         let ip = parts.extensions.get::<axum::extract::ConnectInfo<std::net::SocketAddr>>()
             .map(|c| c.0.ip().to_string()).unwrap_or_else(|| "unknown".into());
-        Ok(ClientIp(ip))
+        Ok(ClientIp(address_key(&ip)))
     }
 }
 
@@ -110,7 +136,7 @@ pub fn app(state: AppState) -> Router {
         .route("/api/groups/{id}/leave", post(leave_group))
         .route("/api/groups/{id}/profiles", get(group_profiles))
         .layer(DefaultBodyLimit::max(64 * 1024))
-        .layer(middleware::from_fn(same_origin_writes))
+        .layer(middleware::from_fn_with_state(state.clone(), same_origin_writes))
         .layer(middleware::from_fn(security_headers))
         .with_state(state)
 }
@@ -235,13 +261,24 @@ fn parse_json(text: Option<String>) -> Value {
 /// as the same site, and two endpoints (leave, logout) take no JSON body that
 /// a form could not forge. Browsers send Origin on every such request; when
 /// they do not, Sec-Fetch-Site says where it came from.
-async fn same_origin_writes(req: Request<axum::body::Body>, next: Next) -> Response {
+///
+/// The expected origin is POLITISKEL_ORIGIN when set; otherwise the host the
+/// browser asked for — X-Forwarded-Host behind a trusted proxy, else Host. A
+/// proxy that rewrites Host (nginx does by default) needs one of the two.
+async fn same_origin_writes(State(state): State<AppState>, req: Request<axum::body::Body>, next: Next)
+    -> Response
+{
     use axum::http::Method;
     if matches!(*req.method(), Method::POST | Method::PUT | Method::DELETE | Method::PATCH) {
         let h = req.headers();
-        let host = h.get(header::HOST).and_then(|v| v.to_str().ok()).unwrap_or("");
+        let header_str = |k: &str| h.get(k).and_then(|v| v.to_str().ok()).map(str::to_string);
+        let host = if state.trust_proxy { header_str("x-forwarded-host") } else { None }
+            .or_else(|| header_str("host")).unwrap_or_default();
         let origin_ok = match h.get(header::ORIGIN).and_then(|v| v.to_str().ok()) {
-            Some(o) => o.split_once("://").map(|(_, rest)| rest) == Some(host),
+            Some(o) => match &state.origin {
+                Some(expected) => o == expected,
+                None => o.split_once("://").map(|(_, rest)| rest) == Some(host.as_str()),
+            },
             None => !matches!(h.get("sec-fetch-site").and_then(|v| v.to_str().ok()),
                               Some("cross-site") | Some("same-site")),
         };
@@ -321,7 +358,7 @@ async fn login(State(state): State<AppState>, ClientIp(ip): ClientIp, jar: Cooki
                Json(body): Json<Login>) -> ApiResult<(CookieJar, Json<Value>)>
 {
     let name_key = validate::username_key(&body.username);
-    let (pair, whole) = (format!("{name_key}\u{0}{ip}"), format!("{name_key}\u{0}*"));
+    let pair = format!("{name_key}\u{0}{ip}");
     let t = now();
     // The attempt is counted BEFORE the password is checked, and handed back
     // if it succeeds: counted after, a burst of parallel requests would all
@@ -329,11 +366,10 @@ async fn login(State(state): State<AppState>, ClientIp(ip): ClientIp, jar: Cooki
     {
         let mut f = state.failures.lock().unwrap();
         f.retain(|_, (_, since)| t - *since < FAILURE_WINDOW);
-        let over = |k: &str, max: u32| f.get(k).is_some_and(|(n, _)| *n >= max);
-        if over(&pair, MAX_FAILURES) || over(&whole, MAX_FAILURES_PER_NAME) {
+        if f.get(&pair).is_some_and(|(n, _)| *n >= MAX_FAILURES) {
             return Err(ApiError(StatusCode::TOO_MANY_REQUESTS, "too_many_attempts"));
         }
-        for k in [&pair, &whole] { f.entry(k.clone()).or_insert((0, t)).0 += 1; }
+        f.entry(pair.clone()).or_insert((0, t)).0 += 1;
     }
     let row: Option<(i64, String, String)> =
         sqlx::query_as("SELECT id, username, pw_hash FROM users WHERE username_key = ?")
@@ -343,11 +379,7 @@ async fn login(State(state): State<AppState>, ClientIp(ip): ClientIp, jar: Cooki
     if !ok {
         return Err(ApiError(StatusCode::UNAUTHORIZED, "bad_credentials"));
     }
-    {
-        let mut f = state.failures.lock().unwrap();
-        f.remove(&pair);
-        if let Some(e) = f.get_mut(&whole) { e.0 = e.0.saturating_sub(1); }
-    }
+    state.failures.lock().unwrap().remove(&pair);
     sqlx::query("DELETE FROM sessions WHERE expires_at <= ?").bind(t).execute(&state.db).await?;
     let (id, name, _) = row.unwrap();
     let jar = start_session(&state, jar, id).await?;

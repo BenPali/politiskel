@@ -189,7 +189,10 @@ It listens on localhost only: put a reverse proxy that terminates HTTPS in
 front of it (Caddy: `politiskel.example.org { reverse_proxy 127.0.0.1:8080 }`).
 Behind it, set `POLITISKEL_TRUST_PROXY=1`, so that login limits count per
 client address (the last `X-Forwarded-For` entry, the one the proxy adds)
-rather than treating every visitor as the proxy. Session cookies are marked
+rather than treating every visitor as the proxy. If the proxy rewrites the
+Host header — nginx does unless told `proxy_set_header Host $host;` — also
+set `POLITISKEL_ORIGIN=https://your.host`, or every sign-in and save will be
+refused as coming from another site. Session cookies are marked
 Secure, so plain http only works for local development, with
 `POLITISKEL_INSECURE_COOKIES=1`. The database is one SQLite
 file: back it up like any other.

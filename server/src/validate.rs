@@ -19,12 +19,14 @@ pub const MAX_ANSWERS: usize = 300;
 /// short list of characters that cannot smuggle markup anywhere.
 ///
 /// Latin letters only, with their accents. Accepting any Unicode letter let a
-/// Cyrillic "а" pass for a Latin "a", and a decomposed "é" for a composed one:
-/// a newcomer could appear in a group as an existing member. The name is
-/// stored composed (NFC), and compared through `username_key`.
+/// Cyrillic "а" pass for a Latin "a", and a decomposed "é" for a composed one.
+/// The name is stored composed (NFC) with single spaces — HTML collapses runs
+/// of them anyway — and compared through `username_key`, which folds the
+/// common look-alikes. That narrows impersonation; it cannot rule out every
+/// resemblance a typeface allows.
 pub fn username(raw: &str) -> Result<String, &'static str> {
     use unicode_normalization::UnicodeNormalization;
-    let name: String = raw.trim().nfc().collect();
+    let name: String = raw.split_whitespace().collect::<Vec<_>>().join(" ").nfc().collect();
     let len = name.chars().count();
     if !(2..=24).contains(&len) {
         return Err("username_length");
@@ -37,11 +39,33 @@ pub fn username(raw: &str) -> Result<String, &'static str> {
     Ok(name)
 }
 
-/// The key two names collide on: accents stripped, case folded. "Zoé",
-/// "ZOÉ" and "Zoe" share it, so only one of them can exist.
+/// The key two names collide on: accents stripped, case folded, letters that
+/// do not decompose (ı, ł, ø, đ…) mapped to their base, the glyphs a
+/// sans-serif face draws alike (l, I and 1; O and 0) merged, and spaces and
+/// punctuation dropped. "Zoé", "ZOÉ", "Zoe", "Adrıen" / "Adrien", "AIice" /
+/// "Alice" and "Jean-Paul" / "Jean Paul" each share one, so only one of each
+/// pair can exist.
 pub fn username_key(name: &str) -> String {
     use unicode_normalization::{char::is_combining_mark, UnicodeNormalization};
-    name.trim().nfkd().filter(|c| !is_combining_mark(*c)).collect::<String>().to_lowercase()
+    let mut out = String::new();
+    for c in name.nfkd().filter(|c| !is_combining_mark(*c)).flat_map(char::to_lowercase) {
+        let folded: &str = match c {
+            'ı' | 'l' | '1' | 'ŀ' | 'ł' => "i",
+            '0' | 'ø' => "o",
+            'đ' | 'ð' => "d",
+            'ħ' => "h",
+            'ŧ' => "t",
+            'ĸ' => "k",
+            'ß' => "ss",
+            'æ' => "ae",
+            'œ' => "oe",
+            'þ' => "th",
+            c if c.is_alphanumeric() => { out.push(c); continue; }
+            _ => continue,                       // spaces, - _ . '
+        };
+        out.push_str(folded);
+    }
+    out
 }
 
 pub fn password(raw: &str) -> Result<(), &'static str> {
@@ -123,6 +147,15 @@ mod tests {
         assert!(username(&"x".repeat(25)).is_err());
         assert!(username("\u{0430}drien").is_err());                // Cyrillic а
         assert!(username("Zoé×2").is_err());
+    }
+
+    #[test]
+    fn look_alikes_the_review_found_share_a_key() {
+        assert_eq!(username_key("Adrıen"), username_key("Adrien"));
+        assert_eq!(username_key("AIice"), username_key("Alice"));
+        assert_eq!(username_key("Jean  Paul"), username_key("Jean-Paul"));
+        assert_eq!(username_key("Bjørn"), username_key("Bjorn"));
+        assert_eq!(username("Jean   Paul"), Ok("Jean Paul".into()));
     }
 
     #[test]

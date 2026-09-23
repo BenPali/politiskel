@@ -7,6 +7,8 @@
 //!   POLITISKEL_INSECURE_COOKIES=1   plain-http development only
 //!   POLITISKEL_TRUST_PROXY=1        take the client address from the
 //!                                   X-Forwarded-For the reverse proxy sets
+//!   POLITISKEL_ORIGIN               the public origin, e.g. https://host —
+//!                                   needed when the proxy rewrites Host
 //!
 //! It listens on localhost by default: put it behind a reverse proxy that
 //! terminates HTTPS. Session cookies are marked Secure, so over plain http a
@@ -44,7 +46,8 @@ async fn main() {
         eprintln!("warning: POLITISKEL_INSECURE_COOKIES=1 — for local development only");
     }
     eprintln!("politiskel-server listening on http://{addr}  (database {db_path})");
-    let state = AppState::new(db, page, !insecure).trusting_proxy(trust_proxy);
+    let origin = std::env::var("POLITISKEL_ORIGIN").ok().filter(|v| !v.is_empty());
+    let state = AppState::new(db, page, !insecure).trusting_proxy(trust_proxy).with_origin(origin);
     axum::serve(listener, app(state).into_make_service_with_connect_info::<std::net::SocketAddr>())
         .with_graceful_shutdown(async { let _ = tokio::signal::ctrl_c().await; })
         .await

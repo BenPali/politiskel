@@ -2830,8 +2830,8 @@ let overlay = loadOverlay();
    /api/me and turns on accounts: the profiles shown are the chosen group's,
    and the signed-in member's answers are saved to the server rather than to
    this browser. Opened as a local file it never asks, and nothing changes. */
-const SERVER = { on: false, me: null, group: null, saving: null, pending: null, status: "",
-                 invite: null };
+const SERVER = { on: false, me: null, group: null, saving: null, pending: null, inflight: null,
+                 status: "", invite: null };
 
 function rebuild() {
   const hidden = new Set(overlay.hidden);
@@ -5124,15 +5124,22 @@ function saveAnswersSoon() {
   SERVER.saving = setTimeout(flushAnswers, 500);
 }
 
+/* Sends what is pending, and in every case returns only once no save is in
+   flight: a caller about to reload the list from the server must not read it
+   while an answer is still on its way there. Saves go one after another. */
 async function flushAnswers() {
   clearTimeout(SERVER.saving);
+  while (SERVER.inflight) await SERVER.inflight;
   const answers = SERVER.pending;
   if (!answers || !SERVER.me) return;
   SERVER.pending = null;
-  const r = await api("PUT", "/api/me/profile", { answers });
-  SERVER.status = r.ok ? L.saved : apiError(r);
-  if (r.ok) SERVER.me.profile = r.data;
-  renderAccount();
+  SERVER.inflight = (async () => {
+    const r = await api("PUT", "/api/me/profile", { answers });
+    SERVER.status = r.ok ? L.saved : apiError(r);
+    if (r.ok && SERVER.me) SERVER.me.profile = r.data;
+    renderAccount();
+  })();
+  try { await SERVER.inflight; } finally { SERVER.inflight = null; }
 }
 
 async function savePolitiscales(p) {
