@@ -259,7 +259,9 @@
   .strip .pole.r { text-align: right; }
   .strip .sd { font-size: 0.72rem; color: var(--text-3); text-align: right;
                font-variant-numeric: tabular-nums; }
-  .track { position: relative; height: 26px; }
+  /* Tall enough to separate ten dots on one axis: at 26px a group of that size
+     read as a single smear. */
+  .track { position: relative; height: 34px; }
   .track::before { content: ""; position: absolute; left: 0; right: 0; top: 50%;
                    height: 1px; background: var(--border); }
   .track .zero { position: absolute; left: 50%; top: 3px; bottom: 3px;
@@ -279,12 +281,20 @@
                  pointer-events: none; transition: opacity .1s ease; }
   .track .band.on, .track .band.hi { opacity: 0.40; }
   .strips.hov .pt:not(:hover) { opacity: 0.4; }
-  .track .pt { position: absolute; top: 50%; width: 11px; height: 11px;
-               margin: -5.5px 0 0 -5.5px; border-radius: 50%; background: var(--series-1);
+  .track .pt { position: absolute; top: 50%; width: 13px; height: 13px;
+               margin: -6.5px 0 0 -6.5px; border-radius: 50%; background: var(--series-1);
                box-shadow: 0 0 0 2px var(--surface); cursor: pointer; }
-  .track .pt.on { z-index: 3; width: 15px; height: 15px; margin: -7.5px 0 0 -7.5px; }
+  .track .pt.on { z-index: 3; width: 17px; height: 17px; margin: -8.5px 0 0 -8.5px; }
   .strips.dim .pt:not(.on) { opacity: 0.2; }
-  #strips-card { position: relative; }
+  /* The second reading spans the page under the compass and the tables: it is
+     a reading in its own right, and squeezed into the chart column its tracks
+     were too short to tell ten profiles apart. */
+  #strips-card { position: relative; margin-top: 20px; }
+  #strips-card .strip { padding: 11px 0; }
+  #strips-card .strip .pole { font-size: 0.84rem; }
+  /* the form is input, not a reading: it closes the page and keeps a readable
+     line length instead of stretching across it */
+  .add-card { max-width: 760px; }
   .tip-strip {
     position: absolute; z-index: 8;
     background: var(--surface); border: 1px solid var(--border); border-radius: 8px;
@@ -914,6 +924,9 @@
     return {
       x: Math.round(axisScore(p, "x")),
       y: Math.round(axisScore(p, "y")),
+      /* No longer shown: tools/model-check.js, run on a real group, found it
+         repeating y while looking like a separate reading. Kept so the check
+         can be re-run on other groups. */
       sov: Math.round((Number(p.nat) || 0) - (Number(p.int) || 0)),
       ecol: Math.round((Number(p.eco) || 0) - (Number(p.prod) || 0)),
       method: methodTag(p)
@@ -1151,23 +1164,44 @@ window.POLITI_PROFILES = [];
               <span id="method-tie"></span>
             </p>
             <p>
-              L'axe nationalisme ↔ internationalisme est repris comme composante de l'axe Y
-              <em>et</em> affiché à part dans le tableau. La première place se justifie : dans
-              le CHES, le nationalisme culturel est presque indistinguable de l'axe sociétal
-              (<code>r = 0,90</code>) et de ses voisins immédiats, immigration et
-              multiculturalisme (0,89 et 0,91). La seconde est un pari. Sur des profils
-              synthétiques, la colonne « Souv. » corrèle à l'axe Y entre <code>0,39</code>, quand
-              les réponses sont indépendantes d'un axe à l'autre, et <code>0,96</code>, quand
-              elles sont aussi solidaires que celles d'un parti ; le plancher est mécanique,
-              puisque cet axe pèse déjà 0,20 dans Y. Où tombent de vraies réponses, personne ne
-              le sait sans profils réels — et si c'est près du haut de cette plage, la colonne
-              répète l'axe Y plutôt que de le compléter. Une version antérieure de cette page
-              justifiait la colonne par le fait qu'elle séparait le RN de LFI, que les deux axes
-              rapprocheraient : aux positions du CHES, cette paire est la 13<sup>e</sup> plus
-              éloignée sur 105.
+              L'axe nationalisme ↔ internationalisme compte dans l'axe Y, et nulle part
+              ailleurs. Il y a sa place : dans le CHES, le nationalisme culturel est presque
+              indistinguable de l'axe sociétal (<code>r = 0,90</code>) et de ses voisins
+              immédiats, immigration et multiculturalisme (0,89 et 0,91). Une colonne
+              « souverainisme » l'affichait aussi à part, comme une lecture de plus. Elle a été
+              retirée : testée sur un vrai groupe avec <code>tools/model-check.js</code>, elle
+              répétait l'axe Y. Des réponses aussi solidaires d'un axe social à l'autre font de
+              cet écart un doublon, et le présenter comme une information distincte en
+              exagérait la portée. Une vraie mesure de la souveraineté — la position sur
+              l'intégration européenne, dont les deux axes n'expliquent pas même la moitié
+              dans le CHES — demanderait des questions que PolitiScales ne pose pas.
             </p>
           </div>
         </details>
+      </div>
+    </div>
+
+    <div>
+      <div class="card">
+        <h2 data-i18n="tableTitle"></h2>
+        <div class="table-scroll">
+          <table id="profiles-table">
+            <thead>
+              <tr>
+                <th data-i18n="colAlias"></th>
+                <th style="text-align:right" data-i18n="colX"></th>
+                <th style="text-align:right" data-i18n-title="titleY" data-i18n="colY"></th>
+                <th style="text-align:right" data-i18n-title="titleEcol" data-i18n="colEcol"></th>
+                <th data-i18n-title="titleFamily" data-i18n="colFamily"></th>
+                <th><span class="sr-only" aria-label="Supprimer"></span></th>
+              </tr>
+            </thead>
+            <tbody></tbody>
+          </table>
+        </div>
+        <div class="actions">
+          <button type="button" class="ghost" id="reset-btn" data-i18n="reset"></button>
+        </div>
       </div>
 
       <div class="card" id="detail-card">
@@ -1190,81 +1224,56 @@ window.POLITI_PROFILES = [];
           </table>
         </div>
       </div>
-
-      <div class="card" id="strips-card">
-        <div class="tip-strip" id="strip-tip" hidden></div>
-        <h2 data-i18n="stripsTitle"></h2>
-        <p class="lead" data-i18n="stripsLead"></p>
-        <p class="hint" id="strips-hint"></p>
-        <div class="strip-head">
-          <span data-i18n="poleNegative"></span><span class="c">−100 &nbsp;·&nbsp; 0 &nbsp;·&nbsp; +100</span>
-          <span class="r" data-i18n="polePositive"></span><span class="r">σ</span>
-        </div>
-        <div id="axes-strips" class="strips"></div>
-      </div>
     </div>
 
-    <div>
-      <div class="card">
-        <h2 data-i18n="tableTitle"></h2>
-        <div class="table-scroll">
-          <table id="profiles-table">
-            <thead>
-              <tr>
-                <th data-i18n="colAlias"></th>
-                <th style="text-align:right" data-i18n="colX"></th>
-                <th style="text-align:right" data-i18n-title="titleY" data-i18n="colY"></th>
-                <th style="text-align:right" data-i18n-title="titleSov" data-i18n="colSov"></th>
-                <th style="text-align:right" data-i18n-title="titleEcol" data-i18n="colEcol"></th>
-                <th data-i18n-title="titleFamily" data-i18n="colFamily"></th>
-                <th><span class="sr-only" aria-label="Supprimer"></span></th>
-              </tr>
-            </thead>
-            <tbody></tbody>
-          </table>
-        </div>
-        <div class="actions">
-          <button type="button" class="ghost" id="reset-btn" data-i18n="reset"></button>
-        </div>
-      </div>
+  </div>
 
-      <div class="card">
-        <h2 data-i18n="addTitle"></h2>
-
-        <label class="drop" id="drop">
-          <strong data-i18n="dropTitle"></strong>
-          <span data-i18n="dropHint"></span>
-          <input type="file" id="drop-input" accept="image/png,image/*">
-        </label>
-        <p class="drop-note">
-          Les 16 pourcentages sont lus sur la géométrie des barres, pas par OCR : un
-          segment de 5 % ne porte aucune étiquette et serait illisible autrement.
-          Le contrôle porte sur le neutre — la part déduite doit retomber sur le vide
-          réellement mesuré entre les deux segments. Pour traiter tout le dossier d'un
-          coup : <code>node tools/extract.js</code>.
-        </p>
-        <div class="capture-ok" id="capture-ok" hidden></div>
-
-        <p class="hint">
-          Saisissez les pourcentages PolitiScales (0-100). Les deux pôles d'un même axe ne
-          peuvent pas dépasser 100 % à eux deux — le reste est la part neutre.
-          Laissez à 0 un axe que vous ne connaissez pas : il sera ignoré, pas compté comme neutre.
-        </p>
-        <form id="add-form" novalidate>
-          <div class="field">
-            <label for="p-alias" data-i18n="aliasLabel"></label>
-            <input type="text" id="p-alias" maxlength="24" data-i18n-placeholder="aliasPlaceholder" required>
-          </div>
-          <fieldset id="axis-fields"></fieldset>
-          <p class="error" id="form-error" hidden></p>
-          <div class="actions">
-            <button type="submit" class="primary" data-i18n="submit"></button>
-            <button type="button" class="ghost" id="clear-btn" data-i18n="clear"></button>
-          </div>
-        </form>
-      </div>
+  <div class="card wide" id="strips-card">
+    <div class="tip-strip" id="strip-tip" hidden></div>
+    <h2 data-i18n="stripsTitle"></h2>
+    <p class="lead" data-i18n="stripsLead"></p>
+    <p class="hint" id="strips-hint"></p>
+    <div class="strip-head">
+      <span data-i18n="poleNegative"></span><span class="c">−100 &nbsp;·&nbsp; 0 &nbsp;·&nbsp; +100</span>
+      <span class="r" data-i18n="polePositive"></span><span class="r">σ</span>
     </div>
+    <div id="axes-strips" class="strips"></div>
+  </div>
 
+  <div class="card add-card">
+    <h2 data-i18n="addTitle"></h2>
+
+    <label class="drop" id="drop">
+      <strong data-i18n="dropTitle"></strong>
+      <span data-i18n="dropHint"></span>
+      <input type="file" id="drop-input" accept="image/png,image/*">
+    </label>
+    <p class="drop-note">
+      Les 16 pourcentages sont lus sur la géométrie des barres, pas par OCR : un
+      segment de 5 % ne porte aucune étiquette et serait illisible autrement.
+      Le contrôle porte sur le neutre — la part déduite doit retomber sur le vide
+      réellement mesuré entre les deux segments. Pour traiter tout le dossier d'un
+      coup : <code>node tools/extract.js</code>.
+    </p>
+    <div class="capture-ok" id="capture-ok" hidden></div>
+
+    <p class="hint">
+      Saisissez les pourcentages PolitiScales (0-100). Les deux pôles d'un même axe ne
+      peuvent pas dépasser 100 % à eux deux — le reste est la part neutre.
+      Laissez à 0 un axe que vous ne connaissez pas : il sera ignoré, pas compté comme neutre.
+    </p>
+    <form id="add-form" novalidate>
+      <div class="field">
+        <label for="p-alias" data-i18n="aliasLabel"></label>
+        <input type="text" id="p-alias" maxlength="24" data-i18n-placeholder="aliasPlaceholder" required>
+      </div>
+      <fieldset id="axis-fields"></fieldset>
+      <p class="error" id="form-error" hidden></p>
+      <div class="actions">
+        <button type="submit" class="primary" data-i18n="submit"></button>
+        <button type="button" class="ghost" id="clear-btn" data-i18n="clear"></button>
+      </div>
+    </form>
   </div>
 
   <footer class="site">
@@ -1364,7 +1373,7 @@ const LOCALES = {
     quadBottomLeft: "Gauche libertaire", quadBottomRight: "Droite libertaire",
 
     tipEcon: "Axe économique", tipSocial: "Axe sociétal",
-    tipSov: "Souverainisme", tipEcol: "Écologie", tipMethod: "Méthode",
+    tipEcol: "Écologie", tipMethod: "Méthode",
     suffixAuthor: " autor.", suffixLibert: " libert.",
 
     distances: "Distances",
@@ -1458,7 +1467,7 @@ const LOCALES = {
     submit: "Calculer et placer", clear: "Vider", reset: "Tout réafficher",
     aliasLabel: "Alias", aliasPlaceholder: "Ex. Luc",
     footPrivacy: "Vos données", footSources: "Sources", footCode: "Code",
-    colAlias: "Alias", colX: "X éco", colY: "Y sociétal", colSov: "Souv.",
+    colAlias: "Alias", colX: "X éco", colY: "Y sociétal",
     colEcol: "Écolo.",
     /* Not "famille politique": the measure is a distance between two points on
        two axes, which is a proximity, not a belonging. The column used to
@@ -1474,7 +1483,6 @@ const LOCALES = {
       + "environ un profil sur trois change de repère sous des pondérations tout aussi défendables.",
     colDistance: "Distance", colDeltaEcon: "Δ éco", colDeltaSocial: "Δ soc.",
     titleY: "Positif = autoritaire (haut) · négatif = libertaire (bas)",
-    titleSov: "Nationalisme − Internationalisme : positif = souverainiste",
     titleEcol: "Écologie − Productivisme : positif = écologiste. Hors axes, comme le souverainisme.",
     titleDeltaEcon: "Écart sur l'axe économique",
     titleDeltaSocial: "Écart sur l'axe sociétal : positif = le parti est plus autoritaire que vous",
@@ -1972,7 +1980,7 @@ function render() {
     }
     tr.appendChild(tdAlias);
 
-    for (const v of [c.x, c.y, c.sov, c.ecol]) {
+    for (const v of [c.x, c.y, c.ecol]) {
       const td = document.createElement("td");
       td.className = "num";
       td.textContent = signed(v);
@@ -2035,7 +2043,7 @@ function render() {
   if (!computed.length) {
     const tr = document.createElement("tr");
     const td = document.createElement("td");
-    td.colSpan = 7;
+    td.colSpan = 6;
     td.className = "empty";
     td.textContent = window.POLITI_PROFILES ? L.emptyDrop : L.emptyNoData;
     tr.appendChild(td);
@@ -2459,7 +2467,6 @@ function wireHover(computed) {
       [L.tipEcon, signed(c.x)],
       [L.tipSocial, signed(c.y)
         + (c.y > 0 ? L.suffixAuthor : c.y < 0 ? L.suffixLibert : "")],
-      [L.tipSov, signed(c.sov)],
       [L.tipEcol, signed(c.ecol)]
     ];
     if (c.method) rows.push([L.tipMethod, c.method]);
