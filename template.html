@@ -412,16 +412,18 @@
   /* what a section claims, above the smaller print explaining how to read it */
   .lead { font-size: 0.85rem; color: var(--text-2); margin: 0 0 10px; }
   .actions { display: flex; gap: 10px; flex-wrap: wrap; margin-top: 16px; align-items: center; }
-  button.primary {
+  /* a link that navigates, dressed as the button it stands for */
+  a.button { display: inline-block; text-decoration: none; }
+  button.primary, a.button.primary {
     background: var(--series-1); color: #fff; border: none; border-radius: 7px;
     padding: 9px 16px; font: inherit; font-weight: 600; font-size: 0.85rem; cursor: pointer;
   }
-  button.primary:hover { filter: brightness(1.08); }
-  button.ghost {
+  button.primary:hover, a.button.primary:hover { filter: brightness(1.08); }
+  button.ghost, a.button.ghost {
     background: none; color: var(--text-2); border: 1px solid var(--border);
     border-radius: 7px; padding: 9px 14px; font: inherit; font-size: 0.85rem; cursor: pointer;
   }
-  button.ghost:hover { background: var(--bg); color: var(--text); }
+  button.ghost:hover, a.button.ghost:hover { background: var(--bg); color: var(--text); }
   .error { color: var(--warn); font-size: 0.8rem; margin: 10px 0 0; }
   .error[hidden] { display: none !important; }
 
@@ -446,35 +448,74 @@
   .readings dd { margin: 0; font-variant-numeric: tabular-nums; }
   .readings dd small { color: var(--text-3); }
 
-  /* The questionnaire. */
-  dialog.quiz { border: 1px solid var(--border); border-radius: 12px; padding: 0;
-                background: var(--surface); color: var(--text);
-                width: min(760px, calc(100vw - 32px)); max-height: calc(100vh - 32px); }
-  dialog.quiz::backdrop { background: rgb(0 0 0 / 0.4); }
-  dialog.quiz form { padding: 20px 22px; }
-  dialog.quiz h2 { margin-top: 0; }
-  .q-item { border: none; border-top: 1px solid var(--border); margin: 0; padding: 14px 0; }
-  .q-item legend { font-size: 0.9rem; padding: 0; margin-bottom: 8px; float: left; width: 100%; }
-  .q-item legend + * { clear: both; }
-  .q-stem { font-size: 0.8rem; color: var(--text-2); margin: 14px 0 0; }
-  .q-options { display: flex; flex-wrap: wrap; gap: 6px 14px; font-size: 0.82rem; }
-  .q-options label { display: inline-flex; gap: 5px; align-items: center; cursor: pointer; }
-  .q-options label.dk { color: var(--text-3); }
-  .q-bipolar { display: grid; grid-template-columns: 1fr auto 1fr; gap: 10px;
-               align-items: center; font-size: 0.8rem; }
-  .q-bipolar .r { text-align: right; }
-  .q-bipolar .scale { display: flex; gap: 2px; }
-  .q-bipolar .scale label { display: flex; flex-direction: column; align-items: center;
-                            font-size: 0.65rem; color: var(--text-3); cursor: pointer; }
-  .q-bipolar + .q-options { margin-top: 6px; }
+  /* The questionnaire: a page of its own, one question per screen. */
+  main[hidden] { display: none; }
+  .quiz-view { max-width: 720px; margin: 8px auto 40px; }
+  .quiz-top { display: flex; align-items: center; gap: 16px; margin-bottom: 22px;
+              font-size: 0.85rem; flex-wrap: wrap; }
+  .quiz-top a { color: var(--text-2); text-decoration: none; }
+  .quiz-top a:hover { color: var(--text); }
+  .quiz-top .who { color: var(--text-3); margin-left: auto; }
+  .progress { flex: 1; min-width: 120px; max-width: 260px; height: 4px;
+              background: var(--grid); border-radius: 2px; overflow: hidden; }
+  .progress > div { height: 100%; background: var(--series-1); transition: width 0.25s; }
+  .quiz-count { font-variant-numeric: tabular-nums; color: var(--text-3); }
+  .quiz-card { background: var(--surface); border: 1px solid var(--border); border-radius: 14px;
+               padding: 36px 38px 26px; min-height: 380px; display: flex; flex-direction: column; }
+  @media (max-width: 640px) { .quiz-card { padding: 24px 18px 18px; min-height: 0; } }
+  .quiz-card h2 { font-size: 1.4rem; line-height: 1.38; font-weight: 600; margin: 0 0 26px;
+                  letter-spacing: -0.01em; }
+  .quiz-card .eyebrow { font-size: 0.72rem; text-transform: uppercase; letter-spacing: 0.06em;
+                        color: var(--text-3); font-weight: 600; margin: 0 0 12px; }
+  .quiz-card .stem { font-size: 0.92rem; color: var(--text-2); margin: 0 0 10px; }
+  .quiz-card .lead { font-size: 0.95rem; }
+  .choices { display: flex; flex-direction: column; gap: 8px; }
+  .choice { position: relative; display: flex; align-items: center; gap: 12px; padding: 11px 16px;
+            border: 1px solid var(--border); border-radius: 10px; cursor: pointer;
+            font-size: 0.95rem; background: var(--bg); transition: border-color 0.15s; }
+  .choice:hover { border-color: var(--text-3); }
+  .choice input { position: absolute; opacity: 0; pointer-events: none; }
+  .choice .key { flex: none; width: 22px; height: 22px; border-radius: 6px; display: grid;
+                 place-items: center; font-size: 0.72rem; color: var(--text-3);
+                 border: 1px solid var(--border); background: var(--surface); }
+  .choice:has(input:checked) { border-color: var(--series-1); background: var(--series-1-soft); }
+  .choice:has(input:checked) .key { background: var(--series-1); border-color: var(--series-1); color: #fff; }
+  .choice:has(input:focus-visible) { outline: 2px solid var(--focus); outline-offset: 2px; }
+  .choice.dk { background: none; border-style: dashed; color: var(--text-2); font-size: 0.85rem; }
+  .poles { display: grid; grid-template-columns: 1fr 1fr; gap: 24px; margin-bottom: 18px; }
+  .pole { font-size: 1.08rem; line-height: 1.42; font-weight: 600; }
+  .pole small { display: block; font-size: 0.7rem; font-weight: 600; color: var(--text-3);
+                text-transform: uppercase; letter-spacing: 0.06em; margin-bottom: 5px; }
+  .pole.r { text-align: right; }
+  .ladder { display: grid; grid-auto-flow: column; grid-auto-columns: 1fr; gap: 6px; }
+  .ladder .choice { justify-content: center; padding: 11px 0; font-variant-numeric: tabular-nums; }
+  .ladder + .choices { margin-top: 10px; }
   @media (max-width: 640px) {
-    .q-bipolar { grid-template-columns: 1fr 1fr; }
-    .q-bipolar .scale { grid-column: 1 / -1; grid-row: 2; justify-content: space-between; }
+    .poles { grid-template-columns: 1fr; gap: 12px; }
+    .pole.r { text-align: left; }
+    .ladder { gap: 3px; }
+    .ladder .choice { font-size: 0.78rem; padding: 9px 0; }
   }
-  .q-src { font-size: 0.7rem; color: var(--text-3); margin: 8px 0 0; }
+  .q-note { font-size: 0.8rem; color: var(--text-2); font-style: italic; margin: 14px 0 0; }
+  .q-src { font-size: 0.72rem; color: var(--text-3); margin: 0; padding-top: 24px; margin-top: auto; }
   .q-src a { color: inherit; }
   .q-src .tr { color: var(--warn); }
-  .q-note { font-size: 0.75rem; color: var(--text-2); font-style: italic; margin: 6px 0 0; }
+  .quiz-nav { display: flex; justify-content: space-between; align-items: center; gap: 10px;
+              margin-top: 18px; }
+  .quiz-nav .skip { background: none; border: none; color: var(--text-3); cursor: pointer;
+                    font: inherit; font-size: 0.85rem; }
+  .quiz-nav .skip:hover { color: var(--text); }
+  .quiz-keys { text-align: center; font-size: 0.72rem; color: var(--text-3); margin-top: 14px; }
+  .journey-strip { width: 100%; height: auto; margin: 4px 0 18px; overflow: visible; }
+  .journey-strip .axis { stroke: var(--axis); stroke-width: 1; }
+  .journey-strip .ref { fill: var(--surface); stroke: var(--ref-ink); stroke-width: 1; }
+  .journey-strip .ref-name { font-size: 10px; fill: var(--text-3); }
+  .journey-strip .end { font-size: 10px; fill: var(--text-3); }
+  .journey-strip .cap { font-size: 11px; font-weight: 600; fill: var(--text); }
+  .journey-strip .cap.was { fill: var(--text-2); font-weight: 400; }
+  .journey-strip .dot { fill: var(--series-1); }
+  .journey-strip .arrow { stroke: var(--series-1); stroke-width: 1.5; fill: none; }
+  .journey-strip .head { fill: var(--series-1); }
 
   details.method { margin-top: 20px; }
   details.method summary { cursor: pointer; font-size: 0.8rem; color: var(--text-2);
@@ -1414,6 +1455,7 @@ window.POLITI_PROFILES = [];
     </nav>
   </header>
 
+  <main id="view-main">
   <p class="subtitle" data-i18n="subtitle"></p>
 
   <div class="controls">
@@ -1570,20 +1612,6 @@ window.POLITI_PROFILES = [];
 
   </div>
 
-  <dialog class="quiz" id="quiz">
-    <form method="dialog" id="quiz-form" novalidate>
-      <h2 id="quiz-title"></h2>
-      <p class="lead" data-i18n="quizLead"></p>
-      <p class="hint" data-i18n="quizHint"></p>
-      <div id="quiz-items"></div>
-      <div class="actions">
-        <button type="submit" class="primary" value="save" data-i18n="quizSave"></button>
-        <button type="submit" class="ghost" value="cancel" formnovalidate data-i18n="quizCancel"></button>
-        <button type="button" class="ghost" id="quiz-erase" data-i18n="quizErase"></button>
-      </div>
-    </form>
-  </dialog>
-
   <div class="card wide" id="strips-card">
     <div class="tip-strip" id="strip-tip" hidden></div>
     <h2 data-i18n="stripsTitle"></h2>
@@ -1631,6 +1659,11 @@ window.POLITI_PROFILES = [];
       </div>
     </form>
   </div>
+
+  </main>
+
+  <!-- The questionnaire: its own page, built by renderQuiz() from the item bank. -->
+  <main id="view-quiz" class="quiz-view" hidden></main>
 
   <footer class="site">
     <div class="cols">
@@ -1850,7 +1883,12 @@ const LOCALES = {
     /* the native questionnaire */
     optTrail: "Trajet depuis PolitiScales",
     quizOpen: "Compléter mon profil", quizEdit: "Modifier mes réponses",
-    quizTitle: a => "Compléter le profil de " + a + " — économie",
+    quizBack: "← Retour à la boussole",
+    quizWho: a => "Profil de " + a,
+    quizCount: (i, n) => i + " / " + n,
+    quizIntroEyebrow: "Questionnaire Politiskel · Économie",
+    quizIntroTitle: a => "Compléter le profil de " + a,
+    quizIntroMeta: n => n + " questions · environ cinq minutes",
     quizLead: "Ces questions remplacent l'axe économique de PolitiScales, qui ne repose que sur "
       + "deux de ses axes et ne pose rien sur la redistribution. Y reste celui de PolitiScales "
       + "tant que le thème société n'existe pas.",
@@ -1858,7 +1896,17 @@ const LOCALES = {
       + "EVS), dans sa version française officielle, avec sa source. Les exceptions sont "
       + "signalées : l'échelle de classe d'Erik Olin Wright n'existe pas en français, elle est "
       + "traduite ici. Vous pouvez passer une question ; vos réponses restent dans ce navigateur.",
-    quizSave: "Enregistrer", quizCancel: "Annuler", quizErase: "Effacer mes réponses",
+    quizStart: "Commencer", quizResume: "Reprendre", quizPrev: "← Précédent",
+    quizNext: "Suivant →", quizSkip: "Passer", quizSeeResult: "Voir le résultat →",
+    quizErase: "Effacer mes réponses",
+    quizKeys: "Touches 1 à 9 pour répondre · ← → pour naviguer",
+    quizPoleFull: n => "Tout à fait d'accord : " + n,
+    resultEyebrow: "Résultat · Économie",
+    resultTitle: "D'où vous partiez, où vous arrivez",
+    resultNoX: "Aucune réponse sur l'axe économique : X reste celui de PolitiScales.",
+    resultWas: "PolitiScales", resultNow: "Politiskel",
+    resultLeft: "gauche", resultRight: "droite",
+    backToCompass: "Voir sur la boussole", quizReview: "Revoir mes réponses",
     quizTranslated: { item: "traduction Politiskel", anchors: "bornes traduites par Politiskel" },
     quizSalience: "Quelle place l'économie tient-elle dans vos choix politiques ?",
     quizSalienceSrc: "Question Politiskel — aucune enquête publique ne mesure l'importance "
@@ -2875,189 +2923,436 @@ function renderDetail(computed) {
   });
 }
 
-/* What the questionnaire adds to a selected profile: the journey from its
-   PolitiScales position, then every reading beside the compass. A profile
-   with no answers only gets the button to start. */
+/* What the questionnaire adds to a profile, as a block: the journey from its
+   PolitiScales position, then every reading beside the compass. Used by the
+   distance panel and by the questionnaire's result screen. */
+function readingsEl(c) {
+  const box = document.createElement("div");
+  const q = c.quiz;
+
+  if (c.from) {
+    const was = PolitiModel.nearestReference(c.from.x, c.from.y, REFERENCES, LIMITS);
+    const now = nearestReference(c.x, c.y);
+    const j = document.createElement("p");
+    j.className = "journey";
+    j.textContent = c.from.x === c.x
+      ? L.journeyFlat(signed(c.x), now.name)
+      : L.journey(signed(c.from.x), signed(c.x), was.name, now.name);
+    box.appendChild(j);
+  }
+
+  const items = quizItems();
+  const count = r => items.filter(i => i.reading === r).length;
+  const dl = document.createElement("dl");
+  const row = (label, value, note, sub) => {
+    const dt = document.createElement("dt");
+    dt.textContent = label;
+    if (sub) dt.style.paddingLeft = "12px";
+    const dd = document.createElement("dd");
+    dd.textContent = value;
+    if (note) {
+      const sm = document.createElement("small");
+      sm.textContent = " · " + note;
+      dd.appendChild(sm);
+    }
+    dl.append(dt, dd);
+  };
+  const show = v => (v === null ? L.readingNone : signed(v));
+
+  row(L.readingX, show(q.x), L.answeredOf(q.n.x, count("x")) + " · " + L.readingNotes.x);
+  for (const d of PolitiQuiz.THEMES[0].dims) row(L.dims[d], show(q.dims[d]), null, true);
+  row(L.readingProtectionism, show(q.protectionism),
+      L.answeredOf(q.n.protectionism, count("protectionism")) + " · " + L.readingNotes.protectionism);
+  row(L.readingClass, q.class === null && q.n.class ? L.readingClassIncomplete(q.n.class) : show(q.class),
+      q.class === null ? null : L.readingNotes.class);
+  row(L.readingConflict, show(q.conflict),
+      L.answeredOf(q.n.conflict, count("conflict")) + " · " + L.readingNotes.conflict);
+  box.appendChild(dl);
+
+  if (q.salience !== null) {
+    const sal = document.createElement("p");
+    sal.className = "hint";
+    sal.textContent = L.salienceOf(PolitiQuiz.SCALES.salience.fr[q.salience]);
+    box.appendChild(sal);
+  }
+  return box;
+}
+
 function renderReadings(p, c) {
   const box = $("detail-readings");
   box.replaceChildren();
   box.hidden = false;
-  const q = c.quiz;
-
-  if (q) {
-    box.className = "readings";
+  box.className = c.quiz ? "readings" : "";
+  if (c.quiz) {
     const h = document.createElement("h3");
     h.textContent = L.readingsTitle;
-    box.appendChild(h);
-
-    if (c.from) {
-      const was = PolitiModel.nearestReference(c.from.x, c.from.y, REFERENCES, LIMITS);
-      const now = nearestReference(c.x, c.y);
-      const j = document.createElement("p");
-      j.className = "journey";
-      j.textContent = c.from.x === c.x
-        ? L.journeyFlat(signed(c.x), now.name)
-        : L.journey(signed(c.from.x), signed(c.x), was.name, now.name);
-      box.appendChild(j);
-    }
-
-    const items = PolitiQuiz.ITEMS.filter(i => i.theme === "economy");
-    const count = r => items.filter(i => i.reading === r).length;
-    const dl = document.createElement("dl");
-    const row = (label, value, note, sub) => {
-      const dt = document.createElement("dt");
-      dt.textContent = label;
-      if (sub) dt.style.paddingLeft = "12px";
-      const dd = document.createElement("dd");
-      dd.textContent = value;
-      if (note) {
-        const sm = document.createElement("small");
-        sm.textContent = " · " + note;
-        dd.appendChild(sm);
-      }
-      dl.append(dt, dd);
-    };
-    const show = v => (v === null ? L.readingNone : signed(v));
-
-    row(L.readingX, show(q.x), L.answeredOf(q.n.x, count("x")) + " · " + L.readingNotes.x);
-    for (const d of PolitiQuiz.THEMES[0].dims) row(L.dims[d], show(q.dims[d]), null, true);
-    row(L.readingProtectionism, show(q.protectionism),
-        L.answeredOf(q.n.protectionism, count("protectionism")) + " · " + L.readingNotes.protectionism);
-    row(L.readingClass, q.class === null && q.n.class ? L.readingClassIncomplete(q.n.class) : show(q.class),
-        q.class === null ? null : L.readingNotes.class);
-    row(L.readingConflict, show(q.conflict),
-        L.answeredOf(q.n.conflict, count("conflict")) + " · " + L.readingNotes.conflict);
-    box.appendChild(dl);
-
-    if (q.salience !== null) {
-      const sal = document.createElement("p");
-      sal.className = "hint";
-      sal.textContent = L.salienceOf(PolitiQuiz.SCALES.salience.fr[q.salience]);
-      box.appendChild(sal);
-    }
-  } else {
-    box.className = "";
+    box.append(h, readingsEl(c));
   }
-
-  const btn = document.createElement("button");
-  btn.type = "button";
-  btn.className = q ? "ghost" : "primary";
-  btn.textContent = q ? L.quizEdit : L.quizOpen;
-  btn.addEventListener("click", () => openQuiz(p));
+  const btn = document.createElement("a");
+  btn.href = QUIZ_ROUTE + encodeURIComponent(idOf(p));
+  btn.className = "button " + (c.quiz ? "ghost" : "primary");
+  btn.textContent = c.quiz ? L.quizEdit : L.quizOpen;
   const actions = document.createElement("div");
   actions.className = "actions";
-  actions.style.marginTop = "0";
-  actions.style.marginBottom = "14px";
+  actions.style.margin = "0 0 14px";
   actions.appendChild(btn);
   box.appendChild(actions);
 }
 
 /* ----------------------------------------------------------- questionnaire --- */
 
-/* Built from the item bank each time it opens, pre-filled with the saved
-   answers. Items are shown in bank order without section headings: a heading
-   such as "class" would tell the respondent what an item is for. A stem shared
-   by consecutive items is printed once. */
-let quizProfile = null;
+/* The questionnaire is a page of its own inside this file, reached through
+   the address: #questionnaire/<profile id>. Same document rather than a second
+   HTML file, because the answers live in this page's localStorage, and
+   browsers do not all share that storage between two file:// pages.
 
-function openQuiz(p) {
-  quizProfile = p;
-  const saved = overlay.answers[idOf(p)] || {};
-  $("quiz-title").textContent = L.quizTitle(p.alias);
-  const box = $("quiz-items");
-  box.replaceChildren();
+   Screens: an introduction, one per item, the salience question, the result.
+   Items keep the bank order and carry no section heading — a heading such as
+   "class" would tell the respondent what an item is for. Every answer is saved
+   the moment it is given, so leaving halfway loses nothing. */
+const QUIZ_ROUTE = "#questionnaire/";
+const quizItems = () => PolitiQuiz.ITEMS.filter(i => i.theme === "economy");
+let quiz = null;          /* { p, id, step } while the questionnaire is shown */
+let quizAdvance = null;   /* pending auto-advance after an answer */
 
-  let lastStem = null;
-  const radio = (name, value, checked) => {
-    const r = document.createElement("input");
-    r.type = "radio"; r.name = name; r.value = String(value);
-    if (checked) r.checked = true;
-    return r;
+function route() {
+  const h = location.hash;
+  if (h.startsWith(QUIZ_ROUTE)) {
+    const id = decodeURIComponent(h.slice(QUIZ_ROUTE.length));
+    const p = profiles.find(q => idOf(q) === id);
+    if (p) {
+      if (!quiz || quiz.id !== id) quiz = { p, id, step: 0 };
+      $("view-main").hidden = true;
+      $("view-quiz").hidden = false;
+      renderQuiz();
+      window.scrollTo(0, 0);
+      return;
+    }
+  }
+  const wasQuiz = quiz;
+  quiz = null;
+  $("view-quiz").hidden = true;
+  $("view-main").hidden = false;
+  if (wasQuiz) {
+    /* back on the compass, on the profile just completed */
+    const i = profiles.findIndex(q => idOf(q) === wasQuiz.id);
+    selection = i >= 0 ? { kind: "profile", i } : selection;
+    render();
+    $("detail-card").scrollIntoView({ block: "start" });
+  }
+}
+window.addEventListener("hashchange", route);
+
+function answersOf(id) { return overlay.answers[id] || {}; }
+
+function setAnswer(key, value) {
+  const a = overlay.answers[quiz.id] || (overlay.answers[quiz.id] = {});
+  a[key] = value;
+  saveOverlay();
+}
+
+function goStep(step) {
+  clearTimeout(quizAdvance);
+  const last = quizItems().length + 2;
+  quiz.step = Math.max(0, Math.min(last, step));
+  renderQuiz();
+  window.scrollTo(0, 0);
+}
+
+function renderQuiz() {
+  const root = $("view-quiz");
+  root.replaceChildren();
+  const items = quizItems();
+  const nQ = items.length + 1;               /* items + salience */
+  const step = quiz.step;
+  const saved = answersOf(quiz.id);
+
+  const top = document.createElement("div");
+  top.className = "quiz-top";
+  const back = document.createElement("a");
+  back.href = "#";
+  back.textContent = L.quizBack;
+  top.appendChild(back);
+  if (step >= 1 && step <= nQ) {
+    const bar = document.createElement("div");
+    bar.className = "progress";
+    const fill = document.createElement("div");
+    fill.style.width = Math.round(100 * step / nQ) + "%";
+    bar.appendChild(fill);
+    const cnt = document.createElement("span");
+    cnt.className = "quiz-count";
+    cnt.textContent = L.quizCount(step, nQ);
+    top.append(bar, cnt);
+  }
+  const who = document.createElement("span");
+  who.className = "who";
+  who.textContent = L.quizWho(quiz.p.alias);
+  top.appendChild(who);
+  root.appendChild(top);
+
+  const card = document.createElement("section");
+  card.className = "quiz-card";
+  root.appendChild(card);
+  const nav = document.createElement("div");
+  nav.className = "quiz-nav";
+  root.appendChild(nav);
+  const button = (text, cls, onClick) => {
+    const b = document.createElement("button");
+    b.type = "button"; b.className = cls; b.textContent = text;
+    b.addEventListener("click", onClick);
+    return b;
   };
-  const optionLabel = (name, value, text, checked, cls) => {
+  const spacer = () => document.createElement("span");
+
+  if (step === 0) {
+    introScreen(card, items.length + 1);
+    const started = Object.keys(saved).length > 0;
+    nav.append(spacer(), button(started ? L.quizResume : L.quizStart, "primary", () => goStep(1)));
+    return;
+  }
+  if (step === nQ + 1) {
+    resultScreen(card, nav, button);
+    return;
+  }
+
+  if (step <= items.length) {
+    const item = items[step - 1];
+    questionScreen(card, {
+      key: item.id, scale: PolitiQuiz.SCALES[item.scale], text: item.fr, stem: item.stem,
+      left: item.left, right: item.right, note: item.note,
+      source: sourceLine(item.src, item.translated)
+    }, saved[item.id]);
+  } else {
+    const src = document.createElement("p");
+    src.className = "q-src";
+    src.textContent = L.quizSalienceSrc;
+    questionScreen(card, { key: "salience.economy", scale: PolitiQuiz.SCALES.salience,
+                           text: L.quizSalience, source: src }, saved["salience.economy"]);
+  }
+
+  nav.append(
+    button(L.quizPrev, "ghost", () => goStep(step - 1)),
+    button(L.quizSkip, "skip", () => goStep(step + 1)),
+    button(step === nQ ? L.quizSeeResult : L.quizNext, "primary", () => goStep(step + 1)));
+  const keys = document.createElement("p");
+  keys.className = "quiz-keys";
+  keys.textContent = L.quizKeys;
+  root.appendChild(keys);
+}
+
+function introScreen(card, n) {
+  const eb = document.createElement("p");
+  eb.className = "eyebrow";
+  eb.textContent = L.quizIntroEyebrow;
+  const h = document.createElement("h2");
+  h.textContent = L.quizIntroTitle(quiz.p.alias);
+  const lead = document.createElement("p");
+  lead.className = "lead";
+  lead.textContent = L.quizLead;
+  const hint = document.createElement("p");
+  hint.className = "hint";
+  hint.textContent = L.quizHint;
+  const meta = document.createElement("p");
+  meta.className = "q-src";
+  meta.textContent = L.quizIntroMeta(n);
+  card.append(eb, h, lead, hint, meta);
+}
+
+/* One question. A categorical scale is a column of full-width choices; a
+   bipolar one shows its two statements side by side over a numbered ladder,
+   numbered as the survey's card was (1-10, or 0-10). */
+function questionScreen(card, q, was) {
+  if (q.stem) {
+    const st = document.createElement("p");
+    st.className = "stem";
+    st.textContent = q.stem;
+    card.appendChild(st);
+  }
+  if (q.text) {
+    const h = document.createElement("h2");
+    h.textContent = q.text;
+    card.appendChild(h);
+  }
+  const group = document.createElement("div");
+  group.setAttribute("role", "radiogroup");
+  group.setAttribute("aria-label", q.text || (q.left + " / " + q.right));
+
+  const choice = (value, label, key, cls) => {
     const lab = document.createElement("label");
-    if (cls) lab.className = cls;
-    lab.append(radio(name, value, checked), document.createTextNode(text));
+    lab.className = "choice" + (cls ? " " + cls : "");
+    const r = document.createElement("input");
+    r.type = "radio"; r.name = "q"; r.value = String(value);
+    if (was === value) r.checked = true;
+    r.addEventListener("change", () => {
+      setAnswer(q.key, value);
+      clearTimeout(quizAdvance);
+      quizAdvance = setTimeout(() => goStep(quiz.step + 1), 260);
+    });
+    lab.appendChild(r);
+    if (key !== null) {
+      const k = document.createElement("span");
+      k.className = "key";
+      k.textContent = key;
+      lab.appendChild(k);
+    }
+    lab.appendChild(document.createTextNode(label));
+    lab.dataset.key = key === null ? "" : key;
     return lab;
   };
 
-  for (const item of PolitiQuiz.ITEMS.filter(i => i.theme === "economy")) {
-    if (item.stem && item.stem !== lastStem) {
-      const st = document.createElement("p");
-      st.className = "q-stem";
-      st.textContent = item.stem;
-      box.appendChild(st);
+  if (q.scale.bipolar) {
+    const first = q.scale.values.length === 11 ? 0 : 1;
+    const last = first + q.scale.values.length - 1;
+    const poles = document.createElement("div");
+    poles.className = "poles";
+    for (const [text, n, cls] of [[q.left, first, "pole"], [q.right, last, "pole r"]]) {
+      const d = document.createElement("div");
+      d.className = cls;
+      const sm = document.createElement("small");
+      sm.textContent = L.quizPoleFull(n);
+      d.append(sm, document.createTextNode(text));
+      poles.appendChild(d);
     }
-    lastStem = item.stem || null;
+    card.appendChild(poles);
+    const ladder = document.createElement("div");
+    ladder.className = "ladder";
+    q.scale.values.forEach((_, k) => {
+      const n = first + k;
+      const lab = choice(k, String(n), null);
+      lab.dataset.key = n === 10 ? "0" : String(n);   /* the 0 key stands for 10 on a 1-10 card */
+      if (first === 0 && n === 10) lab.dataset.key = "";
+      ladder.appendChild(lab);
+    });
+    group.appendChild(ladder);
+  } else {
+    const col = document.createElement("div");
+    col.className = "choices";
+    q.scale.fr.forEach((t, k) => col.appendChild(choice(k, t, String(k + 1))));
+    group.appendChild(col);
+  }
+  if (q.scale.dk) {
+    const col = document.createElement("div");
+    col.className = "choices";
+    col.appendChild(choice("dk", q.scale.dk, null, "dk"));
+    group.appendChild(col);
+  }
+  card.appendChild(group);
 
-    const scale = PolitiQuiz.SCALES[item.scale];
-    const name = "q:" + item.id;
-    const was = saved[item.id];
-    const fs = document.createElement("fieldset");
-    fs.className = "q-item";
+  if (q.note) {
+    const n = document.createElement("p");
+    n.className = "q-note";
+    n.textContent = q.note;
+    card.appendChild(n);
+  }
+  card.appendChild(q.source);
+}
 
-    if (scale.bipolar) {
-      const lg = document.createElement("legend");
-      lg.textContent = item.fr || "";
-      if (item.fr) fs.appendChild(lg);
-      const bp = document.createElement("div");
-      bp.className = "q-bipolar";
-      const l = document.createElement("span"); l.textContent = item.left;
-      const r = document.createElement("span"); r.className = "r"; r.textContent = item.right;
-      const sc = document.createElement("div");
-      sc.className = "scale";
-      /* the numbers the survey printed on its card: 1-10, or 0-10 */
-      const first = scale.values.length === 11 ? 0 : 1;
-      scale.values.forEach((_, k) => {
-        const lab = document.createElement("label");
-        lab.append(radio(name, k, was === k), document.createTextNode(String(first + k)));
-        lab.title = String(first + k);
-        sc.appendChild(lab);
-      });
-      bp.append(l, sc, r);
-      fs.appendChild(bp);
-      if (!item.fr) fs.setAttribute("aria-label", item.left + " / " + item.right);
-    } else {
-      const lg = document.createElement("legend");
-      lg.textContent = item.fr;
-      fs.appendChild(lg);
-      const opts = document.createElement("div");
-      opts.className = "q-options";
-      scale.fr.forEach((t, k) => opts.appendChild(optionLabel(name, k, t, was === k)));
-      if (scale.dk) opts.appendChild(optionLabel(name, "dk", scale.dk, was === "dk", "dk"));
-      fs.appendChild(opts);
-    }
+function resultScreen(card, nav, button) {
+  const c = coords(quiz.p);
+  const eb = document.createElement("p");
+  eb.className = "eyebrow";
+  eb.textContent = L.resultEyebrow;
+  const h = document.createElement("h2");
+  h.textContent = L.resultTitle;
+  card.append(eb, h);
 
-    if (item.note) {
-      const n = document.createElement("p");
-      n.className = "q-note";
-      n.textContent = item.note;
-      fs.appendChild(n);
-    }
-    fs.appendChild(sourceLine(item.src, item.translated));
-    box.appendChild(fs);
+  if (!c.quiz || c.quiz.x === null) {
+    const p = document.createElement("p");
+    p.className = "lead";
+    p.textContent = L.resultNoX;
+    card.appendChild(p);
+  } else {
+    const cs = getComputedStyle(card);
+    card.appendChild(journeyStrip(c, card.clientWidth - parseFloat(cs.paddingLeft)
+                                       - parseFloat(cs.paddingRight)));
+  }
+  if (c.quiz) {
+    const r = readingsEl(c);
+    r.className = "readings";
+    r.style.borderTop = "none";
+    card.appendChild(r);
   }
 
-  /* salience, last: a judgment on the theme as a whole, not on one item */
-  const fs = document.createElement("fieldset");
-  fs.className = "q-item";
-  const lg = document.createElement("legend");
-  lg.textContent = L.quizSalience;
-  fs.appendChild(lg);
-  const opts = document.createElement("div");
-  opts.className = "q-options";
-  PolitiQuiz.SCALES.salience.fr.forEach((t, k) =>
-    opts.appendChild(optionLabel("salience.economy", k, t, saved["salience.economy"] === k)));
-  fs.appendChild(opts);
-  const src = document.createElement("p");
-  src.className = "q-src";
-  src.textContent = L.quizSalienceSrc;
-  fs.appendChild(src);
-  box.appendChild(fs);
+  const erase = button(L.quizErase, "skip", () => {
+    delete overlay.answers[quiz.id];
+    saveOverlay();
+    goStep(0);
+  });
+  const right = document.createElement("span");
+  right.style.display = "flex";
+  right.style.gap = "10px";
+  right.append(button(L.quizReview, "ghost", () => goStep(1)),
+               button(L.backToCompass, "primary", () => { location.hash = ""; }));
+  nav.append(erase, right);
+}
 
-  /* Escape leaves returnValue untouched, so a stale "save" would be replayed */
-  $("quiz").returnValue = "";
-  $("quiz").showModal();
+/* The journey on the economic axis alone, against the reference parties: the
+   one axis the questionnaire has replaced, so the one worth drawing. Only the
+   two nearest references are named, below the axis; the rest keep their name
+   in a tooltip. Labels that would collide are moved to a second row. */
+function journeyStrip(c, width) {
+  /* drawn at the card's real width, so its text keeps its size on a phone
+     instead of shrinking with a fixed viewBox */
+  const W = Math.round(Math.max(300, Math.min(700, width || 640)));
+  const H = 128, pad = 28, axisY = 70;
+  const sx = v => pad + (v + 100) / 200 * (W - 2 * pad);
+  const anchorAt = x => (x < pad + 60 ? "start" : x > W - pad - 60 ? "end" : "middle");
+  const svg = el("svg", { class: "journey-strip", viewBox: "0 0 " + W + " " + H, role: "img",
+                          "aria-label": L.resultWas + " " + signed(c.from.x) + " → "
+                                        + L.resultNow + " " + signed(c.x) });
+  svg.appendChild(el("line", { class: "axis", x1: pad, y1: axisY, x2: W - pad, y2: axisY }));
+  for (const [v, t, anchor] of [[-100, L.resultLeft, "start"], [100, L.resultRight, "end"]]) {
+    const e = el("text", { class: "end", x: sx(v), y: H - 4, "text-anchor": anchor });
+    e.textContent = t;
+    svg.appendChild(e);
+  }
+
+  const was = PolitiModel.nearestReference(c.from.x, c.from.y, REFERENCES, LIMITS);
+  const now = nearestReference(c.x, c.y);
+  for (const r of REFERENCES) {
+    const x = sx(r.x);
+    const g = el("g", {});
+    g.appendChild(el("path", { class: "ref",
+      d: "M " + x + " " + (axisY - 4) + " L " + (x + 4) + " " + axisY + " L " + x + " "
+         + (axisY + 4) + " L " + (x - 4) + " " + axisY + " Z" }));
+    const title = el("title", {});
+    title.textContent = r.name + " (" + signed(r.x) + ")";
+    g.appendChild(title);
+    svg.appendChild(g);
+  }
+  /* the two named references: a second row when they would overlap */
+  const named = [was.ref, now.ref].filter((r, i, a) => a.indexOf(r) === i);
+  const nameW = named.map(r => r.name.length * 5.6);
+  named.forEach((r, i) => {
+    const x = sx(r.x);
+    const clash = i === 1 && Math.abs(x - sx(named[0].x)) < (nameW[0] + nameW[1]) / 2 + 10;
+    const t = el("text", { class: "ref-name", x, y: axisY + (clash ? 34 : 20),
+                           "text-anchor": anchorAt(x) });
+    t.textContent = r.name;
+    svg.appendChild(t);
+  });
+
+  const fx = sx(c.from.x), tx = sx(c.x);
+  if (Math.abs(tx - fx) > 12) {
+    const dir = Math.sign(tx - fx);
+    svg.appendChild(el("path", { class: "arrow",
+      d: "M " + fx + " " + (axisY - 10) + " Q " + (fx + tx) / 2 + " " + (axisY - 40) + " "
+         + (tx - dir * 6) + " " + (axisY - 12) }));
+    svg.appendChild(el("path", { class: "head",
+      d: "M " + tx + " " + (axisY - 8) + " l " + (-dir * 9) + " -7 l " + (dir * 1) + " 10 Z" }));
+  }
+  svg.appendChild(el("circle", { class: "trail-ghost", cx: fx, cy: axisY, r: 6 }));
+  svg.appendChild(el("circle", { class: "dot", cx: tx, cy: axisY, r: 7 }));
+
+  /* captions above the axis: the new one lifted when the two are close */
+  const capW = el("text", { class: "cap was", x: fx, y: axisY - 16, "text-anchor": anchorAt(fx) });
+  capW.textContent = L.resultWas + " " + signed(c.from.x);
+  const capN = el("text", { class: "cap", x: tx, y: axisY - 16, "text-anchor": anchorAt(tx) });
+  capN.textContent = L.resultNow + " " + signed(c.x);
+  if (Math.abs(tx - fx) < 150) capN.setAttribute("y", axisY - 48);
+  if (W < 460) svg.style.maxWidth = W + "px";
+  svg.append(capW, capN);
+  return svg;
 }
 
 function sourceLine(src, translated) {
@@ -3076,34 +3371,17 @@ function sourceLine(src, translated) {
   return p;
 }
 
-function readQuiz() {
-  const out = {};
-  for (const r of $("quiz-form").querySelectorAll("input[type=radio]:checked")) {
-    const key = r.name.startsWith("q:") ? r.name.slice(2) : r.name;
-    out[key] = r.value === "dk" ? "dk" : Number(r.value);
+/* Keyboard, on the questionnaire only: digits answer, arrows move. */
+document.addEventListener("keydown", e => {
+  if (!quiz || e.altKey || e.ctrlKey || e.metaKey) return;
+  if (e.key === "ArrowRight" || (e.key === "Enter" && !e.target.closest("button, a"))) {
+    e.preventDefault(); goStep(quiz.step + 1);
+  } else if (e.key === "ArrowLeft") {
+    e.preventDefault(); goStep(quiz.step - 1);
+  } else if (/^[0-9]$/.test(e.key)) {
+    const lab = document.querySelector('#view-quiz .choice[data-key="' + e.key + '"]');
+    if (lab) { const r = lab.querySelector("input"); r.checked = true; r.dispatchEvent(new Event("change")); }
   }
-  return out;
-}
-
-$("quiz").addEventListener("close", () => {
-  if ($("quiz").returnValue === "save" && quizProfile) {
-    const answers = readQuiz();
-    const id = idOf(quizProfile);
-    if (Object.keys(answers).length) overlay.answers[id] = answers;
-    else delete overlay.answers[id];
-    saveOverlay();
-    render();
-  }
-  quizProfile = null;
-});
-
-$("quiz-erase").addEventListener("click", () => {
-  if (quizProfile) {
-    delete overlay.answers[idOf(quizProfile)];
-    saveOverlay();
-  }
-  $("quiz").close("erased");
-  render();
 });
 
 /* ---------------------------------------------------------------- survol --- */
@@ -3486,6 +3764,7 @@ applyCountry();
 buildForm();
 renderChrome();
 render();
+route();   /* a reload on #questionnaire/... lands back on the questionnaire */
 </script>
 </body>
 </html>
