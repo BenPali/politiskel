@@ -208,6 +208,18 @@ function loadCache() {
   try { return JSON.parse(fs.readFileSync(CACHE, "utf8")); } catch (_) { return {}; }
 }
 
+/* How many profiles the current profiles-data.js holds: 0 when there is no
+   file or an empty list. A file that cannot be read back counts as non-empty,
+   so that it is never overwritten on a guess. */
+function existingProfileCount() {
+  if (!fs.existsSync(OUT)) return 0;
+  const sandbox = { window: {} };
+  try { require("vm").runInNewContext(fs.readFileSync(OUT, "utf8"), sandbox); }
+  catch (_) { return Infinity; }
+  const list = sandbox.window.POLITI_PROFILES;
+  return Array.isArray(list) ? list.length : Infinity;
+}
+
 function main() {
   /* No screenshots is not an error: the page works without them — a profile
      can be dropped onto it or typed in by hand. Failing here left whoever
@@ -217,6 +229,18 @@ function main() {
   const files = hasFolder
     ? fs.readdirSync(SRC).filter(f => /\.png$/i.test(f)).sort() : [];
   if (!files.length) {
+    /* ...but only when there is nothing to lose: a moved or emptied folder
+       must not silently wipe the profiles already extracted. */
+    const kept = existingProfileCount();
+    if (kept) {
+      console.error((hasFolder
+        ? "no .png screenshot in " + path.relative(ROOT, SRC)
+        : path.relative(ROOT, SRC) + " not found")
+        + ", but " + path.relative(ROOT, OUT)
+        + (kept === Infinity ? " is not empty" : " still holds " + kept + " profile(s)")
+        + " — aborting. Delete it first to build an empty page.");
+      process.exit(1);
+    }
     console.log(hasFolder
       ? "no .png screenshot in " + path.relative(ROOT, SRC) + " — building an empty page"
       : path.relative(ROOT, SRC) + " not found — building an empty page");
