@@ -517,7 +517,13 @@
   .theme-card.all { border-color: var(--series-1); background: var(--surface); }
   /* the Politiskel flag's figure in the distance panel */
   .flag-figure { border-top: 1px solid var(--border); margin: 0 0 14px; padding-top: 12px; }
-  .flag-figure .hint { margin-bottom: 8px; }
+  .flag-figure .hint { margin: 0; }
+  .flag-figure-head { display: flex; justify-content: space-between; align-items: center; gap: 12px;
+                      margin-bottom: 10px; }
+  .flag-figure .flag-size { padding: 5px 10px; font-size: 0.78rem; flex: none; }
+  .flag-drawn { display: block; width: 200px; max-width: 100%; height: auto; border-radius: 3px;
+                box-shadow: 0 0 0 1px var(--border); transition: width 0.2s; }
+  .flag-drawn.large { width: 100%; max-width: 560px; }
   .flag-legend { margin: 8px 0 0; padding-left: 18px; font-size: 0.78rem; color: var(--text-2); }
   .flag-legend li { margin-bottom: 3px; }
 

@@ -524,7 +524,13 @@
   .theme-card.all { border-color: var(--series-1); background: var(--surface); }
   /* the Politiskel flag's figure in the distance panel */
   .flag-figure { border-top: 1px solid var(--border); margin: 0 0 14px; padding-top: 12px; }
-  .flag-figure .hint { margin-bottom: 8px; }
+  .flag-figure .hint { margin: 0; }
+  .flag-figure-head { display: flex; justify-content: space-between; align-items: center; gap: 12px;
+                      margin-bottom: 10px; }
+  .flag-figure .flag-size { padding: 5px 10px; font-size: 0.78rem; flex: none; }
+  .flag-drawn { display: block; width: 200px; max-width: 100%; height: auto; border-radius: 3px;
+                box-shadow: 0 0 0 1px var(--border); transition: width 0.2s; }
+  .flag-drawn.large { width: 100%; max-width: 560px; }
   .flag-legend { margin: 8px 0 0; padding-left: 18px; font-size: 0.78rem; color: var(--text-2); }
   .flag-legend li { margin-bottom: 3px; }
 
@@ -2474,8 +2480,8 @@ const LOCALES = {
     tipEcol: "Écologie", tipMethod: "Méthode",
     suffixAuthor: " autor.", suffixLibert: " libert.",
 
-    distances: "Distances",
-    distancesOf: "Distances de ",
+    distances: "Fiche",
+    distancesOf: "Profil de ",
     profilesNear: "Profils proches de ",
     colParty: "Parti", colProfile: "Profil",
     nothingToCompare: "Aucun profil à comparer.",
@@ -2595,6 +2601,7 @@ const LOCALES = {
     optFlags: "Drapeaux",
     flagsPolitiscales: "PolitiScales quand il existe", flagsPolitiskel: "Politiskel pour tous",
     flagGeneratedAlt: a => "Drapeau Politiskel de " + a,
+    flagEnlarge: "Agrandir", flagShrink: "Taille par défaut",
     flagFigureTitle: "Drapeau Politiskel — tiré des lectures, selon les conventions des drapeaux "
       + "politiques :",
     flagCredit: "Symboles : game-icons.net (Lorc, Delapouite), licence CC BY 3.0.",
@@ -3961,7 +3968,9 @@ function renderDetail(computed) {
   card.replaceChildren();
   if (isProfile) {
     const p = origin.p;
-    card.appendChild(flagEl(p, "lg"));
+    /* The card's own flag is PolitiScales's, when there is one; Politiskel's
+       is drawn below with its legend, so the two never repeat each other. */
+    if (p.flag && /^data:image\/(png|jpeg|webp);base64,/.test(p.flag)) card.appendChild(flagEl(p, "lg", true));
     const meta = document.createElement("div");
     meta.className = "meta";
     const d = document.createElement("p");
@@ -5085,13 +5094,18 @@ let flagMode = "politiscales";
 try { flagMode = localStorage.getItem(FLAG_KEY) === "politiskel" ? "politiskel" : "politiscales"; }
 catch (_) { /* private browsing */ }
 
-/* The flag and its legend, for the distance panel: shown whatever the mode,
-   so both flags can be seen side by side there. */
+/* How large the flag is drawn in the profile card: a viewer's preference. */
+const FLAG_SIZE_KEY = "politicompass.flagsize.v1";
+let flagLarge = false;
+try { flagLarge = localStorage.getItem(FLAG_SIZE_KEY) === "large"; } catch (_) { /* private browsing */ }
+
+/* The flag and its legend, for the profile card: shown whatever the mode,
+   so both flags can be seen there — PolitiScales's above, this one here. */
 function flagFigure(p) {
   const f = politiskelFlag(coords(p), p);
   if (!f) return null;
   const img = document.createElement("img");
-  img.className = "flag lg";
+  img.className = "flag-drawn" + (flagLarge ? " large" : "");
   img.src = f.url;
   img.alt = L.flagGeneratedAlt(p.alias);
   const ul = document.createElement("ul");
@@ -5109,7 +5123,21 @@ function flagFigure(p) {
   const credit = document.createElement("p");
   credit.className = "note";
   credit.textContent = L.flagCredit;
-  box.append(cap, img, ul, credit);
+  const toggle = document.createElement("button");
+  toggle.type = "button";
+  toggle.className = "ghost flag-size";
+  const label = () => { toggle.textContent = flagLarge ? L.flagShrink : L.flagEnlarge; };
+  label();
+  toggle.addEventListener("click", () => {
+    flagLarge = !flagLarge;
+    img.classList.toggle("large", flagLarge);
+    label();
+    try { localStorage.setItem(FLAG_SIZE_KEY, flagLarge ? "large" : "default"); } catch (_) { /* quota */ }
+  });
+  const head = document.createElement("div");
+  head.className = "flag-figure-head";
+  head.append(cap, toggle);
+  box.append(head, img, ul, credit);
   return box;
 }
 /* What connects the page to its user: the chart's hover cards, the

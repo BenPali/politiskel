@@ -298,13 +298,18 @@ let flagMode = "politiscales";
 try { flagMode = localStorage.getItem(FLAG_KEY) === "politiskel" ? "politiskel" : "politiscales"; }
 catch (_) { /* private browsing */ }
 
-/* The flag and its legend, for the distance panel: shown whatever the mode,
-   so both flags can be seen side by side there. */
+/* How large the flag is drawn in the profile card: a viewer's preference. */
+const FLAG_SIZE_KEY = "politicompass.flagsize.v1";
+let flagLarge = false;
+try { flagLarge = localStorage.getItem(FLAG_SIZE_KEY) === "large"; } catch (_) { /* private browsing */ }
+
+/* The flag and its legend, for the profile card: shown whatever the mode,
+   so both flags can be seen there — PolitiScales's above, this one here. */
 function flagFigure(p) {
   const f = politiskelFlag(coords(p), p);
   if (!f) return null;
   const img = document.createElement("img");
-  img.className = "flag lg";
+  img.className = "flag-drawn" + (flagLarge ? " large" : "");
   img.src = f.url;
   img.alt = L.flagGeneratedAlt(p.alias);
   const ul = document.createElement("ul");
@@ -322,6 +327,20 @@ function flagFigure(p) {
   const credit = document.createElement("p");
   credit.className = "note";
   credit.textContent = L.flagCredit;
-  box.append(cap, img, ul, credit);
+  const toggle = document.createElement("button");
+  toggle.type = "button";
+  toggle.className = "ghost flag-size";
+  const label = () => { toggle.textContent = flagLarge ? L.flagShrink : L.flagEnlarge; };
+  label();
+  toggle.addEventListener("click", () => {
+    flagLarge = !flagLarge;
+    img.classList.toggle("large", flagLarge);
+    label();
+    try { localStorage.setItem(FLAG_SIZE_KEY, flagLarge ? "large" : "default"); } catch (_) { /* quota */ }
+  });
+  const head = document.createElement("div");
+  head.className = "flag-figure-head";
+  head.append(cap, toggle);
+  box.append(head, img, ul, credit);
   return box;
 }

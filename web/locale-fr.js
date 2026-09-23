@@ -60,8 +60,8 @@ const LOCALES = {
     tipEcol: "Écologie", tipMethod: "Méthode",
     suffixAuthor: " autor.", suffixLibert: " libert.",
 
-    distances: "Distances",
-    distancesOf: "Distances de ",
+    distances: "Fiche",
+    distancesOf: "Profil de ",
     profilesNear: "Profils proches de ",
     colParty: "Parti", colProfile: "Profil",
     nothingToCompare: "Aucun profil à comparer.",
@@ -181,6 +181,7 @@ const LOCALES = {
     optFlags: "Drapeaux",
     flagsPolitiscales: "PolitiScales quand il existe", flagsPolitiskel: "Politiskel pour tous",
     flagGeneratedAlt: a => "Drapeau Politiskel de " + a,
+    flagEnlarge: "Agrandir", flagShrink: "Taille par défaut",
     flagFigureTitle: "Drapeau Politiskel — tiré des lectures, selon les conventions des drapeaux "
       + "politiques :",
     flagCredit: "Symboles : game-icons.net (Lorc, Delapouite), licence CC BY 3.0.",

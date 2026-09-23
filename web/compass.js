@@ -1064,7 +1064,9 @@ function renderDetail(computed) {
   card.replaceChildren();
   if (isProfile) {
     const p = origin.p;
-    card.appendChild(flagEl(p, "lg"));
+    /* The card's own flag is PolitiScales's, when there is one; Politiskel's
+       is drawn below with its legend, so the two never repeat each other. */
+    if (p.flag && /^data:image\/(png|jpeg|webp);base64,/.test(p.flag)) card.appendChild(flagEl(p, "lg", true));
     const meta = document.createElement("div");
     meta.className = "meta";
     const d = document.createElement("p");
