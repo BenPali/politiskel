@@ -913,6 +913,14 @@
                 conversion is a rescaling and nothing more.
        "est"  — hand estimate, calibrated against the CHES entries around it.
 
+     `prot` is CHES `protectionism` (0 = trade liberalisation, 10 = protection
+     of domestic producers), converted the same way. It is carried for France,
+     Germany and the UK only. For Italy all nine party means are whole
+     numbers, where the other countries' rest on five to eleven experts —
+     consistent with a single rater, so the variable is left out rather than
+     drawn as if it were a measure; `protWhy` says so on the page. Hand
+     estimates carry no `prot`: there is nothing to estimate it from.
+
      What does NOT transpose is the meaning of "a party". CHES rates parties, so
      in a multi-party system each reference is one. The United States are not in
      CHES — no expert survey on these scales covers them — and two parties that
@@ -925,36 +933,40 @@
       code: "fr", name: "France", parties: [
         { name: "Lutte ouvrière",     x: -92, y: -30, src: "est",  note: "Trotskisme, anticapitalisme de classe" },
         { name: "NPA / Rév. perm.",   x: -88, y: -70, src: "est",  note: "Anticapitalisme, forte ouverture sociétale" },
-        { name: "La France insoumise",x: -82, y: -64, src: "ches", note: "Rupture écosocialiste, populisme de gauche" },
-        { name: "PCF",                x: -75, y: -29, src: "ches", note: "Étatisme économique, sensibilité souverainiste" },
-        { name: "Les Écologistes",    x: -54, y: -66, src: "ches", note: "Écologie politique, libéralisme culturel" },
-        { name: "Parti socialiste",   x: -33, y: -45, src: "ches", note: "Social-démocratie réformiste" },
+        { name: "La France insoumise",x: -82, y: -64, src: "ches", prot: 48, note: "Rupture écosocialiste, populisme de gauche" },
+        { name: "PCF",                x: -75, y: -29, src: "ches", prot: 56, note: "Étatisme économique, sensibilité souverainiste" },
+        { name: "Les Écologistes",    x: -54, y: -66, src: "ches", prot: 15, note: "Écologie politique, libéralisme culturel" },
+        { name: "Parti socialiste",   x: -33, y: -45, src: "ches", prot: 8, note: "Social-démocratie réformiste" },
         { name: "La France humaniste",x: -15, y: -22, src: "est",  note: "Villepin, 2025 — gaullisme social : patrimoine et successions taxés, mais déficit sous 3 %, simplification par ordonnances. Postérieur au CHES, placement incertain" },
-        { name: "MoDem",              x:  14, y: -10, src: "ches", note: "Centrisme social, europhilie" },
-        { name: "Rassemblement national", x: 20, y: 67, src: "ches", note: "Étatisme social ciblé, nationalisme" },
-        { name: "Renaissance",        x:  24, y: -18, src: "ches", note: "Libéralisme économique, centre-droit" },
-        { name: "Horizons",           x:  36, y:   6, src: "ches", note: "Droite libérale gestionnaire" },
+        { name: "MoDem",              x:  14, y: -10, src: "ches", prot: -24, note: "Centrisme social, europhilie" },
+        { name: "Rassemblement national", x: 20, y: 67, src: "ches", prot: 70, note: "Étatisme social ciblé, nationalisme" },
+        { name: "Renaissance",        x:  24, y: -18, src: "ches", prot: -24, note: "Libéralisme économique, centre-droit" },
+        { name: "Horizons",           x:  36, y:   6, src: "ches", prot: -28, note: "Droite libérale gestionnaire" },
         { name: "Debout la France",   x:  38, y:  62, src: "est",  note: "Souverainisme gaulliste" },
-        { name: "Les Républicains",   x:  56, y:  44, src: "ches", note: "Droite conservatrice, ordre et marché" },
+        { name: "Les Républicains",   x:  56, y:  44, src: "ches", prot: -12, note: "Droite conservatrice, ordre et marché" },
         { name: "Nouvelle Énergie",   x:  62, y:  32, src: "est",  note: "Lisnard — droite libérale et décentralisatrice : choc de dérégulation, retraite par capitalisation, migration hors contrôle des cours européennes" },
-        { name: "Reconquête",         x:  67, y:  82, src: "ches", note: "Libéralisme économique, national-conservatisme" }
+        { name: "Reconquête",         x:  67, y:  82, src: "ches", prot: 37, note: "Libéralisme économique, national-conservatisme" }
       ]
     },
     {
       code: "de", name: "Allemagne", parties: [
-        { name: "Die Linke",          x: -73, y: -54, src: "ches", note: "Gauche radicale, redistribution et ouverture sociétale" },
-        { name: "BSW",                x: -44, y:  41, src: "ches", note: "Scission de Die Linke — étatisme économique et conservatisme culturel, le quadrant que l'échiquier français laisse vide" },
-        { name: "Grüne",              x: -33, y: -68, src: "ches", note: "Écologie politique, libéralisme culturel" },
-        { name: "SPD",                x: -31, y: -28, src: "ches", note: "Social-démocratie de gouvernement" },
-        { name: "Freie Wähler",       x:  29, y:  34, src: "ches", note: "Centre-droit localiste, ancré en Bavière" },
-        { name: "CDU",                x:  32, y:  31, src: "ches", note: "Démocratie chrétienne, centre-droit de gouvernement" },
-        { name: "CSU",                x:  35, y:  51, src: "ches", note: "Aile bavaroise de la CDU, nettement plus conservatrice" },
-        { name: "FDP",                x:  52, y: -36, src: "ches", note: "Libéralisme de marché ET libéralisme culturel — sans équivalent français de ce poids" },
-        { name: "AfD",                x:  53, y:  88, src: "ches", note: "Droite radicale nationaliste" }
+        { name: "Die Linke",          x: -73, y: -54, src: "ches", prot: 60, note: "Gauche radicale, redistribution et ouverture sociétale" },
+        { name: "BSW",                x: -44, y:  41, src: "ches", prot: 63, note: "Scission de Die Linke — étatisme économique et conservatisme culturel, le quadrant que l'échiquier français laisse vide" },
+        { name: "Grüne",              x: -33, y: -68, src: "ches", prot: -6, note: "Écologie politique, libéralisme culturel" },
+        { name: "SPD",                x: -31, y: -28, src: "ches", prot: 6, note: "Social-démocratie de gouvernement" },
+        { name: "Freie Wähler",       x:  29, y:  34, src: "ches", prot: 10, note: "Centre-droit localiste, ancré en Bavière" },
+        { name: "CDU",                x:  32, y:  31, src: "ches", prot: -29, note: "Démocratie chrétienne, centre-droit de gouvernement" },
+        { name: "CSU",                x:  35, y:  51, src: "ches", prot: 0, note: "Aile bavaroise de la CDU, nettement plus conservatrice" },
+        { name: "FDP",                x:  52, y: -36, src: "ches", prot: -63, note: "Libéralisme de marché ET libéralisme culturel — sans équivalent français de ce poids" },
+        { name: "AfD",                x:  53, y:  88, src: "ches", prot: 40, note: "Droite radicale nationaliste" }
       ]
     },
     {
-      code: "it", name: "Italie", parties: [
+      code: "it", name: "Italie",
+      protWhy: "pour l'Italie, les neuf positions du CHES 2024 sur le protectionnisme sont des "
+             + "nombres entiers, là où les autres pays reposent sur cinq à onze experts : "
+             + "vraisemblablement un seul expert, trop peu pour placer les partis.",
+      parties: [
         { name: "Sinistra Italiana",  x: -72, y: -66, src: "ches", note: "Gauche radicale, composante de l'alliance AVS" },
         { name: "Europa Verde",       x: -56, y: -66, src: "ches", note: "Écologistes, composante de l'alliance AVS" },
         { name: "M5S",                x: -43, y: -35, src: "ches", note: "Mouvement 5 étoiles — populisme devenu social, longtemps hors du clivage" },
@@ -969,13 +981,13 @@
     },
     {
       code: "uk", name: "Royaume-Uni", parties: [
-        { name: "Green Party",        x: -58, y: -71, src: "ches", note: "Écologistes d'Angleterre et du pays de Galles" },
-        { name: "Plaid Cymru",        x: -42, y: -31, src: "ches", note: "Nationalisme gallois de gauche" },
-        { name: "SNP",                x: -38, y: -44, src: "ches", note: "Indépendantisme écossais, social-démocrate" },
-        { name: "Labour",             x: -28, y: -33, src: "ches", note: "Travaillisme de gouvernement, recentré" },
-        { name: "Liberal Democrats",  x: -14, y: -65, src: "ches", note: "Centre libéral, très libéral culturellement" },
-        { name: "Conservative Party", x:  49, y:  43, src: "ches", note: "Conservatisme de marché" },
-        { name: "Reform UK",          x:  68, y:  82, src: "ches", note: "Droite radicale issue du Brexit" }
+        { name: "Green Party",        x: -58, y: -71, src: "ches", prot: 0, note: "Écologistes d'Angleterre et du pays de Galles" },
+        { name: "Plaid Cymru",        x: -42, y: -31, src: "ches", prot: -4, note: "Nationalisme gallois de gauche" },
+        { name: "SNP",                x: -38, y: -44, src: "ches", prot: -14, note: "Indépendantisme écossais, social-démocrate" },
+        { name: "Labour",             x: -28, y: -33, src: "ches", prot: -31, note: "Travaillisme de gouvernement, recentré" },
+        { name: "Liberal Democrats",  x: -14, y: -65, src: "ches", prot: -46, note: "Centre libéral, très libéral culturellement" },
+        { name: "Conservative Party", x:  49, y:  43, src: "ches", prot: -16, note: "Conservatisme de marché" },
+        { name: "Reform UK",          x:  68, y:  82, src: "ches", prot: 22, note: "Droite radicale issue du Brexit" }
       ]
     },
     {
@@ -1579,6 +1591,8 @@ window.POLITI_PROFILES = [];
     <label><input type="checkbox" id="t-labels" checked> <span data-i18n="optLabels"></span></label>
     <label><input type="checkbox" id="t-centroid"> <span data-i18n="optMean"></span> <span style="color:var(--text-3)" data-i18n="optMeanWhere"></span></label>
     <label><input type="checkbox" id="t-trail" checked> <span data-i18n="optTrail"></span></label>
+    <label class="country"><span data-i18n="optView"></span>
+      <select id="view"></select></label>
   </div>
 
   <div class="layout">
@@ -1599,6 +1613,7 @@ window.POLITI_PROFILES = [];
             <g id="points-layer"></g>
           </svg>
           <div class="tip" id="tip" hidden></div>
+          <p class="hint view-note" id="view-note" hidden></p>
         </div>
         <div class="legend">
           <span>
@@ -1995,6 +2010,35 @@ const LOCALES = {
 
     /* the native questionnaire */
     optTrail: "Trajet depuis PolitiScales",
+    optView: "Lecture",
+    viewOff: "pas de position dans cette lecture",
+    viewOffDetail: "Ce profil n'a pas de position dans cette lecture : il lui manque les réponses "
+      + "au questionnaire qui la mesurent.",
+    viewNoRefs: "aucun parti mesuré dans cette lecture",
+    viewNotePolitiscales: "Lecture d'origine : X et Y calculés depuis PolitiScales seul, sans "
+      + "tenir compte du questionnaire.",
+    viewNoteNoProt: why => "Aucun repère dans cette lecture : " + why,
+    viewNoteAllEstimated: "Aucun repère dans cette lecture : ceux de ce pays sont tous des "
+      + "estimations à la main, et il n'y a rien sur quoi estimer leur protectionnisme.",
+    viewNoteDropped: n => n + " repère" + (n > 1 ? "s" : "") + " placé" + (n > 1 ? "s" : "")
+      + " à la main n'" + (n > 1 ? "ont" : "a") + " pas de position CHES sur le protectionnisme "
+      + "et n'" + (n > 1 ? "apparaissent" : "apparaît") + " pas.",
+    viewNoteOff: n => n + " profil" + (n > 1 ? "s" : "") + " sans réponse au questionnaire "
+      + "économie " + (n > 1 ? "ne sont" : "n'est") + " pas placé" + (n > 1 ? "s" : "")
+      + " : c'est lui qui mesure le protectionnisme.",
+    views: {
+      politiskel: { name: "Politiskel — économie × société" },
+      politiscales: { name: "PolitiScales d'origine" },
+      protectionism: { name: "Économie × protectionnisme",
+        axisTop: "PROTECTIONNISTE — protéger les producteurs",
+        axisBottom: "LIBRE-ÉCHANGISTE — ouvrir les échanges",
+        quadTopLeft: "Gauche protectionniste", quadTopRight: "Droite protectionniste",
+        quadBottomLeft: "Gauche libre-échangiste", quadBottomRight: "Droite libre-échangiste",
+        colY: "Y protect.",
+        titleY: "Positif = protectionniste (haut) · négatif = libre-échangiste (bas)",
+        tipSocial: "Protectionnisme", suffixAuthor: " protect.", suffixLibert: " libre-éch." },
+      populist: { name: "Lecture populiste — thème Institutions, à venir" }
+    },
     quizOpen: "Compléter mon profil", quizEdit: "Modifier mes réponses",
     quizBack: "← Retour à la boussole",
     quizWho: a => "Profil de " + a,
@@ -2181,10 +2225,63 @@ function withQuiz(p, c) {
   c.quiz = PolitiQuiz.score(answers, "economy");
   if (c.quiz.x !== null) {
     c.from = { x: c.x, y: c.y };
+    c.psX = c.x;
     c.x = c.quiz.x;
     c.xSrc = "quiz";
   }
   return c;
+}
+
+/* Readings of the compass. The same profiles and the same parties, seen along
+   two other dimensions: each reading picks what goes on each axis, for the
+   profiles and for the parties alike, so a profile is only ever compared with
+   parties measured on the same thing. A reading with no party counterpart
+   does not belong here — the class readings stay in their own panel.
+
+     politiskel     x from the questionnaire where answered, y from PolitiScales
+     politiscales   the original reading, PolitiScales alone, kept for reference
+     protectionism  x against CHES `protectionism`, which the two usual axes
+                    blur: LFI and the RN sit apart on y, together on this one
+     populist       listed, not available: it needs the institutions theme,
+                    and it is named for the theory it adopts
+
+   A profile with no value on a reading's axis is left off the chart and
+   keeps its row in the table, marked. */
+const VIEWS = [
+  { key: "politiskel" },
+  { key: "politiscales" },
+  { key: "protectionism" },
+  { key: "populist", planned: true }
+];
+const VIEW_KEY = "politicompass.view.v1";
+let view = VIEWS[0];
+
+/* Copy for the current reading, falling back on the default wording. */
+const V = () => Object.assign({}, L, L.views[view.key] || {});
+
+function project(p) {
+  const c = coords(p);
+  if (view.key === "politiskel") return c;
+  const v = Object.assign({}, c, { base: c, from: null });
+  if (view.key === "politiscales") {
+    if (c.psX !== undefined) v.x = c.psX;
+    v.xSrc = null;
+  } else if (view.key === "protectionism") {
+    const y = c.quiz ? c.quiz.protectionism : null;
+    if (y === null || y === undefined) v.off = true; else v.y = y;
+  }
+  return v;
+}
+
+function viewReferences() {
+  if (view.key !== "protectionism") return country.parties;
+  return country.parties.filter(r => r.prot !== undefined).map(r => ({ ...r, y: r.prot }));
+}
+
+/* The journey and the result screen always speak of the default reading. */
+function nearestBase(x, y) {
+  const refs = country.parties;
+  return PolitiModel.nearestReference(x, y, refs, PolitiModel.limitsFor(refs));
 }
 
 /* Nearest neighbour, replacing a cascade of thresholds that left gaps (the
@@ -2219,7 +2316,7 @@ const COUNTRY_KEY = "politicompass.country.v1";
 function setCountry(code) {
   const found = COUNTRIES.find(c => c.code === code);
   if (found) country = found;
-  REFERENCES = country.parties;
+  REFERENCES = viewReferences();
   LIMITS = PolitiModel.limitsFor(REFERENCES);
   /* `selection` holds an index into the previous table, which now points at
      another party or at nothing at all. */
@@ -2243,6 +2340,7 @@ function applyCountry() {
   const gap = PolitiModel.widestEconGap(REFERENCES);
   $("method-gap").textContent = gap ? L.methodGap(gap.lo.name, gap.hi.name, gap.d) : "";
   $("method-tie").textContent = L.methodTie(LIMITS.tie);
+  applyView();
 }
 
 /* Distances to every reference, nearest first, with the wording added. */
@@ -2254,9 +2352,10 @@ function rankParties(c) {
 /* The mirror image: which profiles come closest to a given party. */
 function rankProfiles(r, computed) {
   return computed
-    .map(({ p, c }, i) => ({ name: p.alias, note: null, i,
+    .map(({ p, c }, i) => ({ name: p.alias, note: null, i, off: c.off,
                              d: Math.round(Math.hypot(c.x - r.x, c.y - r.y)),
                              dx: c.x - r.x, dy: c.y - r.y }))
+    .filter(o => !o.off)
     .sort((a, b) => a.d - b.d);
 }
 
@@ -2395,13 +2494,14 @@ function renderChrome() {
     grid.appendChild(el("line", { class: "grid-line", x1: 50, y1: toSvgY(v), x2: 550, y2: toSvgY(v) }));
   }
 
+  const W = V();
   const caps = [
-    { t: L.axisTop,    x: 300, y: 38,  anchor: "middle", cls: "axis-cap" },
-    { t: L.axisBottom, x: 300, y: 574, anchor: "middle", cls: "axis-cap" },
-    { t: L.quadTopLeft,     x:  60, y:  68, anchor: "start", cls: "quad-cap" },
-    { t: L.quadTopRight,    x: 540, y:  68, anchor: "end",   cls: "quad-cap" },
-    { t: L.quadBottomLeft,  x:  60, y: 538, anchor: "start", cls: "quad-cap" },
-    { t: L.quadBottomRight, x: 540, y: 538, anchor: "end",   cls: "quad-cap" },
+    { t: W.axisTop,    x: 300, y: 38,  anchor: "middle", cls: "axis-cap" },
+    { t: W.axisBottom, x: 300, y: 574, anchor: "middle", cls: "axis-cap" },
+    { t: W.quadTopLeft,     x:  60, y:  68, anchor: "start", cls: "quad-cap" },
+    { t: W.quadTopRight,    x: 540, y:  68, anchor: "end",   cls: "quad-cap" },
+    { t: W.quadBottomLeft,  x:  60, y: 538, anchor: "start", cls: "quad-cap" },
+    { t: W.quadBottomRight, x: 540, y: 538, anchor: "end",   cls: "quad-cap" },
     { t: "−100", x: 52,  y: 315, anchor: "start",  cls: "tick-cap" },
     { t: "−50",  x: 175, y: 315, anchor: "middle", cls: "tick-cap" },
     { t: "+50",  x: 425, y: 315, anchor: "middle", cls: "tick-cap" },
@@ -2414,8 +2514,8 @@ function renderChrome() {
   }
 
   const side = [
-    { t: L.axisLeft,  x: 22,  y: 300, rot: -90 },
-    { t: L.axisRight, x: 578, y: 300, rot: 90 }
+    { t: W.axisLeft,  x: 22,  y: 300, rot: -90 },
+    { t: W.axisRight, x: 578, y: 300, rot: 90 }
   ];
   for (const s of side) {
     const t = el("text", { class: "axis-cap", x: s.x, y: s.y, "text-anchor": "middle",
@@ -2454,7 +2554,8 @@ function render() {
   const showRefLabels = $("t-reflabels").checked;
   const showLabels    = $("t-labels").checked;
 
-  const computed = profiles.map(p => ({ p, c: coords(p) }));
+  const computed = profiles.map(p => ({ p, c: project(p) }));
+  const placed = computed.filter(r => !r.c.off);
 
   /* Background text (ticks, quadrant corners) occupies space just like a
      marker: without this a label would be laid on top of it. */
@@ -2470,15 +2571,15 @@ function render() {
 
   /* The group mean is drawn later but reserves its space here, otherwise a
      party label lands on top of it. */
-  if ($("t-centroid").checked && computed.length >= 2) {
-    const cx = toSvgX(computed.reduce((a, r) => a + r.c.x, 0) / computed.length);
-    const cy = toSvgY(computed.reduce((a, r) => a + r.c.y, 0) / computed.length);
+  if ($("t-centroid").checked && placed.length >= 2) {
+    const cx = toSvgX(placed.reduce((a, r) => a + r.c.x, 0) / placed.length);
+    const cy = toSvgY(placed.reduce((a, r) => a + r.c.y, 0) / placed.length);
     taken.push({ x0: cx - 13, x1: cx + 125, y0: cy - 13, y1: cy + 13 });
   }
 
   /* Every marker claims space first, profiles before parties: party labels
      give way to profile labels, not the other way round. */
-  for (const { c } of computed) {
+  for (const { c } of placed) {
     const x = toSvgX(c.x), y = toSvgY(c.y);
     taken.push({ x0: x - 10, x1: x + 10, y0: y - 10, y1: y + 10 });
   }
@@ -2493,7 +2594,7 @@ function render() {
   const ptW = showLabels ? measureWidths(ptTexts, "pt-label") : [];
   const ptPlacements = computed.map(({ c }, i) => {
     const x = toSvgX(c.x), y = toSvgY(c.y);
-    if (!showLabels) return null;
+    if (!showLabels || c.off) return null;
     /* A profile always keeps its label: it is the subject of the chart. */
     return placeLabel({ x, y, text: ptTexts[i], w: ptW[i], size: 10.5 }, taken)
         || CANDIDATES[0];
@@ -2567,10 +2668,10 @@ function render() {
       t.textContent = p.alias.slice(0, 16);
       g.appendChild(t);
     }
-    ptsLayer.appendChild(g);
+    if (!c.off) ptsLayer.appendChild(g);
 
     /* textContent throughout: the alias is free input, never HTML. */
-    const nearest = nearestReference(c.x, c.y);
+    const nearest = c.off ? null : nearestReference(c.x, c.y);
     const tr = document.createElement("tr");
     tr.dataset.idx = String(i);
     if (selection && selection.kind === "profile" && selection.i === i) tr.classList.add("sel");
@@ -2591,28 +2692,35 @@ function render() {
     }
     tr.appendChild(tdAlias);
 
-    [c.x, c.y, c.ecol].forEach((v, k) => {
+    [c.x, c.off ? null : c.y, c.ecol].forEach((v, k) => {
       const td = document.createElement("td");
       td.className = "num";
-      td.textContent = signed(v);
+      td.textContent = v === null ? "—" : signed(v);
       if (k === 0 && c.xSrc === "quiz") {
         td.classList.add("quiz");
-        td.title = L.fromQuiz(signed(c.from.x));
+        td.title = L.fromQuiz(signed(c.psX));
       }
       tr.appendChild(td);
     });
 
     const tdFam = document.createElement("td");
     tdFam.className = "fam";
+    if (!nearest) {
+      const tag = document.createElement("span");
+      tag.className = "tag";
+      tag.textContent = c.off ? L.viewOff : L.viewNoRefs;
+      tdFam.appendChild(tag);
+    } else {
     const tag = document.createElement("span");
     tag.className = "tag";
     tag.textContent = " · " + fitPhrase(nearest.d) + " (" + nearest.d + ")";
     if (nearest.d > LIMITS.far) tag.classList.add("far-note");
     tdFam.append(document.createTextNode(nearest.name), tag);
+    }
 
     /* A near-tie is shown rather than hidden behind the winner: the runner-up
        was already computed, and which of the two comes first is not robust. */
-    if (nearest.margin <= LIMITS.tie) {
+    if (nearest && nearest.margin <= LIMITS.tie) {
       const tie = document.createElement("span");
       tie.className = "tie";
       tie.textContent = L.tieWith(nearest.second.name, nearest.margin);
@@ -2666,8 +2774,9 @@ function render() {
     tbody.appendChild(tr);
   }
 
+  applyView();   /* its note counts the profiles left off, which answers change */
   renderStrips(computed);
-  renderCentroid(computed, annot);
+  renderCentroid(placed, annot);
   renderAnnotations(computed, annot);
   renderDetail(computed);
   ptsLayer.classList.toggle("dim", !!selection);
@@ -2933,7 +3042,7 @@ function renderAnnotations(computed, annot) {
   const origin = selection.kind === "profile"
     ? (computed[selection.i] ? computed[selection.i].c : null)
     : REFERENCES[selection.i];
-  if (!origin) return;
+  if (!origin || origin.off) return;
 
   const ox = toSvgX(origin.x), oy = toSvgY(origin.y);
   annot.appendChild(el("circle", { class: "sel-disc", cx: ox, cy: oy, r: 50 }));
@@ -2978,7 +3087,8 @@ function renderDetail(computed) {
   const origin = isProfile ? computed[selection.i] : { p: REFERENCES[selection.i] };
   if (!origin) { selection = null; wrap.hidden = true; hint.hidden = false; return; }
 
-  const rows = isProfile ? rankParties(origin.c) : rankProfiles(REFERENCES[selection.i], computed);
+  const rows = isProfile ? (origin.c.off ? [] : rankParties(origin.c))
+                         : rankProfiles(REFERENCES[selection.i], computed);
   const label = isProfile ? origin.p.alias : REFERENCES[selection.i].name;
 
   title.replaceChildren(document.createTextNode(
@@ -3006,7 +3116,7 @@ function renderDetail(computed) {
     meta.append(d, conceptsEl(p));
     card.appendChild(meta);
     card.hidden = false;
-    renderReadings(p, origin.c);
+    renderReadings(p, origin.c.base || origin.c);
   } else {
     card.hidden = true;
     $("detail-readings").hidden = true;
@@ -3016,7 +3126,7 @@ function renderDetail(computed) {
     const tr = document.createElement("tr");
     const td = document.createElement("td");
     td.colSpan = 6; td.className = "empty";
-    td.textContent = L.nothingToCompare;
+    td.textContent = isProfile && origin.c.off ? L.viewOffDetail : L.nothingToCompare;
     tr.appendChild(td); tbody.appendChild(tr);
     return;
   }
@@ -3074,8 +3184,8 @@ function readingsEl(c) {
   const q = c.quiz;
 
   if (c.from) {
-    const was = PolitiModel.nearestReference(c.from.x, c.from.y, REFERENCES, LIMITS);
-    const now = nearestReference(c.x, c.y);
+    const was = nearestBase(c.from.x, c.from.y);
+    const now = nearestBase(c.x, c.y);
     const j = document.createElement("p");
     j.className = "journey";
     j.textContent = c.from.x === c.x
@@ -3542,9 +3652,9 @@ function journeyStrip(c, width) {
     svg.appendChild(e);
   }
 
-  const was = PolitiModel.nearestReference(c.from.x, c.from.y, REFERENCES, LIMITS);
-  const now = nearestReference(c.x, c.y);
-  for (const r of REFERENCES) {
+  const was = nearestBase(c.from.x, c.from.y);
+  const now = nearestBase(c.x, c.y);
+  for (const r of country.parties) {
     const x = sx(r.x);
     const g = el("g", {});
     g.appendChild(el("path", { class: "ref",
@@ -3628,6 +3738,7 @@ function wireHover(computed) {
   const show = (idx, clientX, clientY) => {
     const { p, c } = computed[idx];
     const nearest = nearestReference(c.x, c.y);
+    const Vc = V();
 
     tip.replaceChildren();
     const b = document.createElement("b");
@@ -3637,8 +3748,8 @@ function wireHover(computed) {
     const dl = document.createElement("dl");
     const rows = [
       [L.tipEcon, signed(c.x)],
-      [L.tipSocial, signed(c.y)
-        + (c.y > 0 ? L.suffixAuthor : c.y < 0 ? L.suffixLibert : "")],
+      [Vc.tipSocial, signed(c.y)
+        + (c.y > 0 ? Vc.suffixAuthor : c.y < 0 ? Vc.suffixLibert : "")],
       [L.tipEcol, signed(c.ecol)]
     ];
     if (c.method) rows.push([L.tipMethod, c.method]);
@@ -3663,7 +3774,7 @@ function wireHover(computed) {
 
     const near = document.createElement("p");
     near.className = "near";
-    near.textContent = (nearest.d > LIMITS.far
+    near.textContent = !nearest ? L.viewNoRefs : (nearest.d > LIMITS.far
       ? L.nearestFar + nearest.name + " (" + nearest.d + ")"
       : L.nearest + nearest.name + " (" + L.proximity + nearest.fit + ")")
       + (nearest.margin <= LIMITS.tie ? L.tieWith(nearest.second.name, nearest.margin) : "");
@@ -3962,6 +4073,53 @@ function applyLocale() {
   });
 }
 applyLocale();
+
+/* Reading picker. Changing reading changes both axes, the party table (only
+   the parties measured on the new axis), and so the thresholds, which are
+   derived from those parties' spacing. */
+function applyView() {
+  const W = V();
+  document.querySelector('#profiles-table th[data-i18n="colY"]').textContent = W.colY;
+  document.querySelector('#profiles-table th[data-i18n="colY"]').title = W.titleY;
+  const note = $("view-note");
+  const parts = [];
+  if (view.key === "politiscales") parts.push(L.viewNotePolitiscales);
+  if (view.key === "protectionism") {
+    const dropped = country.parties.length - REFERENCES.length;
+    if (country.protWhy) parts.push(L.viewNoteNoProt(country.protWhy));
+    else if (!REFERENCES.length) parts.push(L.viewNoteAllEstimated);
+    else if (dropped) parts.push(L.viewNoteDropped(dropped));
+    const off = profiles.filter(p => project(p).off).length;
+    if (off) parts.push(L.viewNoteOff(off));
+  }
+  note.textContent = parts.join(" ");
+  note.hidden = !parts.length;
+}
+
+(function () {
+  const sel = $("view");
+  for (const v of VIEWS) {
+    const o = document.createElement("option");
+    o.value = v.key;
+    o.textContent = L.views[v.key].name;
+    if (v.planned) o.disabled = true;
+    sel.appendChild(o);
+  }
+  let saved = null;
+  try { saved = localStorage.getItem(VIEW_KEY); } catch (_) { /* private browsing */ }
+  const found = VIEWS.find(v => v.key === saved && !v.planned);
+  if (found) view = found;
+  sel.value = view.key;
+  sel.addEventListener("change", () => {
+    view = VIEWS.find(v => v.key === sel.value) || VIEWS[0];
+    try { localStorage.setItem(VIEW_KEY, view.key); } catch (_) { /* quota, or private browsing */ }
+    selection = null;
+    setCountry(country.code);
+    applyCountry();
+    renderChrome();
+    render();
+  });
+})();
 
 /* Country picker. The labels that name the country or count its references are
    written from the data, so adding a party cannot leave a wrong figure in the
