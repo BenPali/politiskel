@@ -15,9 +15,9 @@ PolitiScales profile, or start one from nothing.
 ## Direction
 
 - **A native test is the goal.** Answering inside Politiskel, no detour and no
-  import. The first theme, the economy, exists; society, Europe and the world,
-  ecology and institutions are planned, each with its counterpart in CHES so
-  its readings stay comparable to the parties.
+  import. The economy and society themes exist, and replace both compass axes;
+  Europe and the world, ecology and institutions are planned, each with its
+  counterpart in CHES so its readings stay comparable to the parties.
 - **PolitiScales import stays.** It is the fastest way to a real profile today,
   and nobody who already took that test should have to retake anything.
 - **Other questionnaires are plausible.** Not implemented.
@@ -98,7 +98,8 @@ European Values Study — in its official French questionnaire, and carries its
 source down to the variable. The one set that has no French version, Erik Olin
 Wright's class scale, is translated and flagged as such on every item.
 
-The economy theme asks 32 items and feeds five readings:
+The economy theme asks 32 items and feeds five readings; the society theme
+asks 40 and feeds y.
 
 | Reading | Items | Compared to parties |
 | --- | --- | --- |
@@ -107,11 +108,18 @@ The economy theme asks 32 items and feeds five readings:
 | class (Wright's anticapitalism scale) | 5 | no |
 | perceived class conflict | 4 | no |
 | capital / labour balance | 3 | no |
+| y — libertarian/authoritarian | 40, over CHES's seven society sub-scales | yes, `galtan` |
 
 x is the plain mean of redistribution, public services vs taxes and
 deregulation: across the 279 parties of CHES 2024 their mean reproduces
 `lrecon` at r = 0.96, so a weighting would have nothing to recover.
 Protectionism runs against `lrecon` there (r = −0.37) and is kept out of x.
+y is built the same way from immigration, multiculturalism, civil liberties
+vs law and order, women's rights, LGBT rights, religion in politics and
+nationalism, whose mean reproduces `galtan` at r = 0.97; dropping any one
+leaves 0.96. The society bank also holds 20 verified items that are not
+asked (`reserve`), each with the reason, so a thin sub-dimension can be
+widened without sourcing again.
 Wright's scale is reported only complete, since a partial sum of an additive
 scale is not the scale.
 

@@ -110,6 +110,130 @@
            "Pas du tout d'accord"],
       dk: "Ne sait pas", dkScores: 0
     },
+    /* ---- society ---- */
+    /* ISSP National Identity, France, 2023, Q08. */
+    immigNumberIssp: {
+      values: [-1, -0.5, 0, 0.5, 1],
+      fr: ["Être beaucoup augmenté", "Être un peu augmenté", "Rester le même",
+           "Être un peu diminué", "Être beaucoup diminué"],
+      dk: "Ne peut choisir"
+    },
+    /* ISSP 2023, Q09: three positions, from keeping one's culture only to
+       giving it up. */
+    cultureIssp: {
+      values: [-1, 0, 1],
+      fr: ["Les immigrés devraient conserver leur culture d'origine et ne pas adopter la culture française",
+           "Les immigrés devraient conserver leur culture d'origine et adopter également la culture française",
+           "Les immigrés devraient renoncer à leur culture d'origine et adopter la culture française"],
+      dk: "Ne peut choisir"
+    },
+    /* ISSP 2023, Q04. */
+    bornIssp: {
+      values: [-1, -1 / 3, 1 / 3, 1],
+      fr: ["Je suis tout à fait d'accord avec l'affirmation A",
+           "Je suis plus d'accord avec l'affirmation A qu'avec l'affirmation B",
+           "Je suis plus d'accord avec l'affirmation B qu'avec l'affirmation A",
+           "Je suis tout à fait d'accord avec l'affirmation B"],
+      dk: "Ne peut choisir"
+    },
+    /* ISSP 2023, Q01. */
+    importanceIssp: {
+      values: [1, 1 / 3, -1 / 3, -1],
+      fr: ["Très important", "Plutôt important", "Plutôt pas important", "Pas important du tout"],
+      dk: "Ne peut choisir"
+    },
+    /* ISSP Role of Government, France, 2016. */
+    obeyIssp: {
+      values: [1, -1],
+      fr: ["Il faut toujours obéir aux lois, sans exception",
+           "Dans certains cas, il faut suivre sa conscience"],
+      dk: "Ne peut choisir"
+    },
+    errorIssp: {
+      values: [-1, 1],
+      fr: ["Condamner un innocent", "Laisser une personne coupable en liberté"],
+      dk: "Ne peut choisir"
+    },
+    allowIssp: {
+      values: [-1, -1 / 3, 1 / 3, 1],
+      fr: ["Certainement autorisées", "Probablement autorisées", "Probablement pas autorisées",
+           "Certainement pas autorisées"],
+      dk: "Ne peut choisir"
+    },
+    rightIssp: {
+      values: [1, 1 / 3, -1 / 3, -1],
+      fr: ["Absolument le droit", "Probablement le droit", "Probablement pas le droit",
+           "Absolument pas le droit"],
+      dk: "Ne peut choisir"
+    },
+    respIssp: {
+      values: [1, 1 / 3, -1 / 3, -1],
+      fr: ["Tout à fait", "Probablement", "Probablement pas", "Pas du tout"],
+      dk: "Ne peut choisir"
+    },
+    /* ISSP Family, France, 2022: its own card ("Pas d'accord du tout"). */
+    agreeFam: {
+      values: [1, 0.5, 0, -0.5, -1],
+      fr: ["Tout à fait d'accord", "Plutôt d'accord", "Ni d'accord, ni pas d'accord",
+           "Plutôt pas d'accord", "Pas d'accord du tout"],
+      dk: "Ne peut choisir"
+    },
+    /* ISSP 2022, the French national add-on block: four points. */
+    agreeFamFr: {
+      values: [1, 1 / 3, -1 / 3, -1],
+      fr: ["Tout à fait d'accord", "Plutôt d'accord", "Plutôt pas d'accord", "Pas d'accord du tout"],
+      dk: "Ne peut choisir"
+    },
+    /* ISSP Religion, France, 2018 and 2008: each wave printed its own card. */
+    agreeRel18: {
+      values: [1, 0.5, 0, -0.5, -1],
+      fr: ["Tout à fait d'accord", "D'accord", "Ni d'accord, ni pas d'accord", "En désaccord",
+           "Fortement en désaccord"],
+      dk: "Ne peut pas dire"
+    },
+    agreeRel18b: {
+      values: [1, 0.5, 0, -0.5, -1],
+      fr: ["Tout à fait d'accord", "D'accord", "Ni d'accord, ni pas d'accord", "Pas d'accord",
+           "Pas d'accord du tout"],
+      dk: "Ne peut pas dire"
+    },
+    agreeRel08: {
+      values: [1, 0.5, 0, -0.5, -1],
+      fr: ["Tout à fait d'accord", "D'accord", "Ni d'accord ni pas d'accord", "Pas d'accord",
+           "Pas d'accord du tout"],
+      dk: "Ne peut pas dire"
+    },
+    powerRel18: {
+      values: [1, 0.5, 0, -0.5, -1],
+      fr: ["Beaucoup trop de pouvoir", "Trop de pouvoir", "Ce qu'il faut de pouvoir",
+           "Trop peu de pouvoir", "Beaucoup trop peu de pouvoir"],
+      dk: "Ne peut pas dire"
+    },
+    /* EVS 2017, France: a four-point card with no midpoint, and a five-point
+       one. "NSP" was an interviewer code, never read out. */
+    agree4Evs: {
+      values: [1, 1 / 3, -1 / 3, -1],
+      fr: ["Tout à fait d'accord", "Plutôt d'accord", "Plutôt pas d'accord", "Pas d'accord du tout"]
+    },
+    agree5Evs: {
+      values: [1, 0.5, 0, -0.5, -1],
+      fr: ["Tout à fait d'accord", "Plutôt d'accord", "Ni d'accord, ni pas d'accord",
+           "Plutôt pas d'accord", "Pas d'accord du tout"]
+    },
+    /* EVS 2017, Q37: not ordered — indifference sits between the two. */
+    goodThingEvs: {
+      values: [1, -1, 0],
+      fr: ["Une bonne chose", "Une mauvaise chose", "Ça vous est égal"]
+    },
+    citedEvs: { values: [1, -1], fr: ["Cité", "Pas cité"] },
+    /* ESS 11, B40: four answers. */
+    allowEss: {
+      values: [-1, -1 / 3, 1 / 3, 1],
+      fr: ["Elle doit autoriser un grand nombre d'entre eux à venir vivre ici",
+           "Elle doit autoriser certains d'entre eux", "Elle ne doit autoriser que peu d'entre eux",
+           "Elle ne doit autoriser aucun d'entre eux"]
+    },
+
     /* Salience. Not a survey item — no field-tested per-theme importance
        question exists; the surveys ask for "the most important problem"
        instead. Four labelled points rather than CHES's expert 0-10: a
@@ -142,6 +266,42 @@
     id: "issp.owner." + id, theme: "economy", reading: "x", dim: "deregulation",
     scale: "ownerIssp", pole: 1, stem: OWNER_STEM, fr,
     src: { survey: "ISSP", wave: "Rôle de l'État 1996", variable: "Q18", url: GESIS(6806) } });
+
+  /* Society items are many and alike: `soc` builds one, the source helpers
+     below name the questionnaire it is quoted from. */
+  const soc = (id, dim, scale, pole, extra, src) =>
+    Object.assign({ id, theme: "society", reading: "y", dim, scale, pole }, extra, { src });
+  const ESS11 = v => ({ survey: "ESS", wave: "round 11", variable: v,
+                        url: ESS_FR + "round11/fieldwork/france/ESS11_questionnaires_FR.pdf" });
+  const ESS9 = v => ({ survey: "ESS", wave: "round 9", variable: v,
+                       url: ESS_FR + "round9/fieldwork/france/ESS9_questionnaires_FR.pdf" });
+  const ESS8 = v => ({ survey: "ESS", wave: "round 8", variable: v,
+                       url: ESS_FR + "round8/fieldwork/france/ESS8_questionnaires_FR.pdf" });
+  const NI23 = v => ({ survey: "ISSP", wave: "Identité nationale 2023", variable: v, url: GESIS(80546) });
+  const NI13 = v => ({ survey: "ISSP", wave: "Identité nationale 2013", variable: v, url: GESIS(55581) });
+  const ROG16 = v => ({ survey: "ISSP", wave: "Rôle de l'État 2016", variable: v, url: GESIS(63847) });
+  const FAM22 = v => ({ survey: "ISSP", wave: "Famille 2022", variable: v, url: GESIS(79168) });
+  const REL18 = v => ({ survey: "ISSP", wave: "Religion 2018", variable: v, url: GESIS(67283) });
+  const REL08 = v => ({ survey: "ISSP", wave: "Religion 2008", variable: v, url: GESIS(16212) });
+  const EVS = v => ({ survey: "EVS", wave: "2017", variable: v, url: GESIS(66251) });
+
+  const IMMIG_STEM = "Il existe différentes opinions concernant les immigrés venus d'autres pays pour vivre en France. Êtes-vous d'accord ou pas d'accord avec chacune des affirmations suivantes :";
+  const IMMIG_STEM_13 = "Il existe différentes opinions concernant les immigrés venus d'autres pays pour vivre en France. Etes-vous d'accord ou pas d'accord avec chacune des affirmations suivantes :";
+  const REFUGEE_STEM = "Certaines personnes arrivent en France et demandent le statut de réfugié parce qu'elles craignent des persécutions dans leur propre pays. Dites-moi si vous êtes d'accord ou pas d'accord avec la proposition suivante.";
+  const MINORITIES_STEM = "Maintenant, abordons quelques questions sur les minorités en France. Etes-vous d'accord ou pas d'accord avec les affirmations suivantes ?";
+  const EVS_SCALES_STEM = "Voici différentes phrases. Personnellement, où vous situez-vous sur ces échelles?";
+  const EVS_AGREE_STEM = "Etes-vous d'accord ou pas d'accord avec les affirmations suivantes ?";
+  const EVS_OPINIONS_STEM = "Pour chacune des opinions que je vais vous lire, pouvez-vous me dire si vous êtes tout à fait d'accord, plutôt d'accord, plutôt pas d'accord, pas d'accord du tout ?";
+  const EVS_JUSTIF_STEM = "Pour chacune des choses que je vais vous citer, voulez-vous me dire en vous plaçant sur cette échelle si vous pensez que cela peut toujours se justifier, que cela ne peut jamais se justifier ou que c'est entre les deux ?";
+  const PROTEST_STEM = "Il y a plusieurs façons de s'opposer à une décision gouvernementale que l'on désapprouve fortement. Pouvez-vous indiquer si de votre point de vue, les actions suivantes doivent être autorisées ou non autorisées ?";
+  const TERROR_STEM = "Imaginez que le gouvernement s'attende à un attentat terroriste. Selon vous, les autorités devraient-elles ou non avoir le droit de…";
+  const ESS_B38_STEM = "À l'aide de cette liste de réponses, dites-moi dans quelle mesure vous êtes d'accord ou non avec chacune des propositions suivantes.";
+  const ESS_B33_STEM = "Veuillez m'indiquer, à l'aide de cette carte, dans quelle mesure vous êtes d'accord ou non avec les phrases suivantes.";
+  const FAM_STEM = "Dans quelle mesure êtes-vous d'accord ou pas d'accord avec les propositions suivantes ?";
+  const FAM_FR_STEM = "Voici maintenant une liste de phrases. Pour chacune d'elles, pouvez-vous me dire si vous êtes tout à fait d'accord, plutôt d'accord, plutôt pas d'accord, pas d'accord du tout ou si vous ne savez pas ?";
+  const FAMILIES_STEM = "Les enfants grandissent dans différents types de familles. Dans quelle mesure êtes-vous d'accord ou pas d'accord avec les affirmations suivantes ?";
+  const NI_AGREE_STEM = "Êtes-vous d'accord ou pas d'accord avec les affirmations suivantes ?";
+  const NI13_AGREE_STEM = "Etes-vous d'accord ou pas d'accord avec les propositions suivantes ?";
 
   const ITEMS = [
     /* --- x: redistribution (CHES `redistribution`, r = 0.96 with lrecon) --- */
@@ -289,7 +449,208 @@
     { id: "issp.power.business", theme: "economy", reading: "labour",
       scale: "powerIssp", pole: 1, follows: "issp.power.unions",
       fr: "Et les dirigeants du commerce et de l'industrie, ont-ils trop ou pas assez de pouvoir ?",
-      src: { survey: "ISSP", wave: "Rôle de l'État 1996", variable: "Q11b", url: GESIS(6806) } }
+      src: { survey: "ISSP", wave: "Rôle de l'État 1996", variable: "Q11b", url: GESIS(6806) } },
+
+    /* ================= society: y, the libertarian-authoritarian axis =====
+       Seven sub-dimensions, the ones CHES 2024 rates and whose plain mean
+       reproduces galtan at r = 0.97 across its 279 parties (each alone 0.77
+       to 0.94, and none indispensable: dropping any leaves 0.96). After
+       orientation +1 always means authoritarian, as on the compass.
+
+       `reserve: true` items are verified and sourced but not asked: kept so
+       that a thin sub-dimension can be widened without searching again. Each
+       says why it is not asked. */
+
+    /* --- immigration (CHES immigrate_policy, r = 0.88) --- */
+    soc("ess.imbgeco", "immigration", "bipolar11", -1, {
+      fr: "Dans l'ensemble, diriez-vous que c'est mauvais ou bon pour l'économie française que des personnes d'autres pays viennent vivre en France ?",
+      left: "Mauvais pour l'économie", right: "Bon pour l'économie" }, ESS11("B43 imbgeco")),
+    soc("ess.imwbcnt", "immigration", "bipolar11", -1, {
+      fr: "Diriez-vous que la présence de personnes d'autres pays venant vivre en France rend la vie plus agréable ou moins agréable ?",
+      left: "Moins agréable", right: "Plus agréable" }, ESS11("B45 imwbcnt")),
+    soc("issp.immig.number", "immigration", "immigNumberIssp", 1, {
+      fr: "Pensez-vous qu'aujourd'hui, le nombre d'immigrés qui viennent en France devrait… ?" },
+      NI23("Q08")),
+    soc("issp.immig.priority", "immigration", "agreeIssp", 1, { stem: IMMIG_STEM,
+      fr: "Les personnes nées en France devraient avoir la priorité sur les immigrés en matière d'emploi, de logement ou de santé" },
+      NI23("Q07_E")),
+    soc("issp.immig.expel", "immigration", "agreeIssp", 1, { stem: IMMIG_STEM_13,
+      fr: "La France devrait prendre des mesures plus sévères pour renvoyer les immigrés clandestins" },
+      NI13("Q9g")),
+    soc("ess.gvrfgap", "immigration", "agreePlutot", -1, { stem: REFUGEE_STEM,
+      fr: "Les pouvoirs publics devraient se montrer plus ouverts dans l'examen des demandes du statut de réfugié." },
+      ESS8("C42 gvrfgap")),
+    soc("ess.rfgbfml", "immigration", "agreePlutot", -1, { stem: REFUGEE_STEM,
+      fr: "Les réfugiés dont la demande est acceptée devraient avoir le droit de faire venir leur famille proche." },
+      ESS8("C44 rfgbfml")),
+    soc("ess.imsmetn", "immigration", "allowEss", 1, { reserve: "opens a chain of three whose next two depend on it",
+      fr: "Maintenant, en utilisant cette liste de réponses, dans quelle mesure pensez-vous que la France doit autoriser des gens de même origine ethnique que la plupart des Français à venir vivre ici ?" },
+      ESS11("B40 imsmetn")),
+    soc("ess.imdfetn", "immigration", "allowEss", 1, { reserve: "worded as a follow-up to imsmetn",
+      follows: "ess.imsmetn",
+      fr: "Et à propos des gens d'une origine ethnique différente de la plupart des Français ? Utilisez de nouveau cette liste de réponses." },
+      ESS11("B41 imdfetn")),
+    soc("ess.impcntr", "immigration", "allowEss", 1, { reserve: "worded as a follow-up to imsmetn",
+      follows: "ess.imdfetn",
+      fr: "En ce qui concerne les gens venant des pays pauvres non européens ? Utilisez de nouveau cette liste de réponses." },
+      ESS11("B42 impcntr")),
+    soc("ess.rfgfrpc", "immigration", "agreePlutot", 1, { reserve: "a factual belief about claimants more than a policy position",
+      stem: REFUGEE_STEM,
+      fr: "La plupart des personnes qui demandent ce statut ne risquent pas vraiment des persécutions dans leur pays." },
+      ESS8("C43 rfgfrpc")),
+
+    /* --- multiculturalism vs assimilation (CHES multiculturalism, 0.87) --- */
+    soc("issp.culture", "multiculturalism", "cultureIssp", 1, {
+      fr: "Parmi ces affirmations sur les immigrés, laquelle est la plus proche de ce que vous pensez ?" },
+      NI23("Q09")),
+    soc("ess.imueclt", "multiculturalism", "bipolar11", -1, {
+      fr: "Diriez-vous que, dans l'ensemble, la culture française est menacée ou enrichie par la présence de personnes d'autres pays venant vivre ici ?",
+      left: "La culture est menacée", right: "La culture est enrichie" }, ESS11("B44 imueclt")),
+    soc("evs.v188", "multiculturalism", "bipolar10", 1, { stem: EVS_SCALES_STEM,
+      left: "Il vaut mieux que les immigrés conservent leurs propres coutumes et traditions",
+      right: "Il vaut mieux que les immigrés ne conservent pas leurs propres coutumes et traditions" },
+      EVS("v188")),
+    soc("issp.never.french", "multiculturalism", "agreeIssp", 1, { stem: MINORITIES_STEM,
+      fr: "Les personnes qui ne partagent pas les coutumes et les traditions françaises ne seront jamais des Français à part entière" },
+      NI13("Q7a")),
+    soc("issp.minorities.help", "multiculturalism", "agreeIssp", -1, { reserve: "state support for customs, narrower than the integration question CHES asks",
+      stem: MINORITIES_STEM,
+      fr: "Les minorités ethniques devraient bénéficier de l'aide du gouvernement pour préserver leurs coutumes et leurs traditions" },
+      NI13("Q7b")),
+    soc("issp.same.rights", "multiculturalism", "agreeIssp", -1, { reserve: "closer to CHES ethnic_minorities, not one of the seven",
+      stem: IMMIG_STEM_13,
+      fr: "Les immigrés en situation régulière en France, mais qui ne sont pas français, devraient avoir les mêmes droits que les citoyens français" },
+      NI13("Q9f")),
+    soc("evs.v80", "multiculturalism", "agree5Evs", 1, { reserve: "the French version drops the master's \"over immigrants\"",
+      stem: EVS_AGREE_STEM,
+      fr: "Quand les emplois sont rares, les employeurs devraient embaucher en priorité des Français" },
+      EVS("v80")),
+    soc("evs.v22", "multiculturalism", "citedEvs", 1, { reserve: "social distance, not a political position",
+      stem: "Sur cette liste figurent différentes catégories de gens. Voulez-vous m'indiquer s'il y en a que vous n'aimeriez pas avoir comme voisins?",
+      fr: "Des gens d'une autre race" }, EVS("v22")),
+
+    /* --- civil liberties vs law and order (CHES civlib_laworder, 0.91) --- */
+    soc("issp.obey", "laworder", "obeyIssp", 1, {
+      fr: "Selon vous, faut-il absolument toujours obéir aux lois ou existe-t-il des circonstances exceptionnelles où il faut suivre sa conscience, même si cela conduit à enfreindre la loi ?" },
+      ROG16("Q1")),
+    soc("issp.worse.error", "laworder", "errorIssp", 1, {
+      fr: "Tous les systèmes judiciaires font des erreurs, mais selon vous, laquelle est la pire ?" },
+      ROG16("Q4")),
+    soc("issp.protest", "laworder", "allowIssp", 1, { stem: PROTEST_STEM,
+      fr: "Organiser des réunions publiques de protestation contre le gouvernement" }, ROG16("Q2a")),
+    soc("issp.detain", "laworder", "rightIssp", 1, { stem: TERROR_STEM,
+      fr: "…détenir des personnes, aussi longtemps qu'elles le souhaitent, sans les traduire en justice" },
+      ROG16("Q14a")),
+    soc("issp.wiretap", "laworder", "rightIssp", 1, { stem: TERROR_STEM,
+      fr: "…mettre sur écoute les conversations téléphoniques des individus" }, ROG16("Q14b")),
+    soc("evs.v163", "laworder", "bipolar10", 1, { stem: EVS_JUSTIF_STEM, fr: "La peine de mort",
+      left: "Jamais justifié", right: "Toujours justifié" }, EVS("v163")),
+    soc("ess.lrnobed", "laworder", "agreePlutot", 1, { stem: ESS_B38_STEM,
+      fr: "L'obéissance et le respect de l'autorité sont les valeurs les plus importantes que les enfants doivent apprendre." },
+      ESS11("B38 lrnobed")),
+    soc("issp.demos", "laworder", "allowIssp", 1, { reserve: "repeats the protest-meetings item one step further",
+      stem: PROTEST_STEM, fr: "Organiser des manifestations de rue" }, ROG16("Q2b")),
+    soc("issp.stop", "laworder", "rightIssp", 1, { reserve: "a third item of the same grid, kept short",
+      stem: TERROR_STEM, fr: "…arrêter les gens au hasard dans la rue" }, ROG16("Q14c")),
+    soc("ess.loylead", "laworder", "agreePlutot", 1, { reserve: "loyalty to leaders is closer to the institutions theme",
+      stem: ESS_B38_STEM,
+      fr: "Ce dont la France a le plus besoin, c'est de loyauté envers ses leaders politiques." },
+      ESS11("B39 loylead")),
+    soc("evs.v114", "laworder", "goodThingEvs", 1, { reserve: "its third answer, indifference, is not a point on the scale",
+      stem: "Je vais vous citer deux changements qui pourraient se produire dans notre manière de vivre d'ici quelque temps. Si cela arrivait, pensez-vous que ce serait une bonne chose, une mauvaise chose ou ça vous est égal ?",
+      fr: "Qu'on respecte davantage l'autorité" }, EVS("v114")),
+
+    /* --- women's rights (CHES womens_rights, 0.89) --- */
+    soc("issp.working.mother", "women", "agreeFam", -1, { stem: FAM_STEM,
+      fr: "Une mère qui travaille peut avoir avec ses enfants des relations aussi chaleureuses et sécurisantes qu'une mère qui ne travaille pas" },
+      FAM22("Q01a")),
+    soc("issp.breadwinner", "women", "agreeFam", 1, { stem: FAM_STEM,
+      fr: "Le rôle d'un homme, c'est de gagner l'argent du ménage ; le rôle d'une femme, c'est de s'occuper de la maison et de la famille" },
+      FAM22("Q01f")),
+    soc("evs.v76", "women", "agree4Evs", 1, { stem: EVS_OPINIONS_STEM,
+      fr: "En général, les hommes s'avèrent être de meilleurs dirigeants politiques que les femmes" },
+      EVS("v76")),
+    soc("evs.v81", "women", "agree5Evs", 1, { stem: EVS_AGREE_STEM,
+      fr: "Quand les emplois sont rares, un homme a plus droit à un travail qu'une femme" }, EVS("v81")),
+    soc("evs.v154", "women", "bipolar10", -1, { stem: EVS_JUSTIF_STEM, fr: "L'avortement",
+      left: "Jamais justifié", right: "Toujours justifié" }, EVS("v154")),
+    soc("issp.feminism", "women", "agreeFamFr", 1, { stem: FAM_FR_STEM,
+      fr: "Dans la société actuelle, le féminisme va trop loin",
+      note: "Question ajoutée par l'équipe française de l'ISSP, non posée dans les autres pays." },
+      FAM22("OF21c")),
+    soc("issp.preschool", "women", "agreeFam", 1, { reserve: "the mirror of the working-mother item, asked once",
+      stem: FAM_STEM,
+      fr: "Un enfant qui n'a pas encore l'âge d'aller à l'école a des chances de souffrir si sa mère travaille" },
+      FAM22("Q01b")),
+    soc("evs.v72", "women", "agree4Evs", 1, { reserve: "the mirror of the working-mother item, asked once",
+      stem: EVS_OPINIONS_STEM, fr: "Quand une mère a un emploi, les enfants en souffrent" }, EVS("v72")),
+    soc("issp.leaders.fr", "women", "agreeFamFr", 1, { reserve: "repeats EVS v76",
+      stem: FAM_FR_STEM, fr: "Les hommes font de meilleurs dirigeants que les femmes" }, FAM22("OF21a")),
+    soc("issp.equality.gov", "women", "respIssp", -1, { reserve: "government responsibility, which mixes in the economic axis",
+      stem: "Globalement, les responsabilités suivantes doivent-elles ou non incomber au gouvernement ?",
+      fr: "Promouvoir l'égalité entre hommes et femmes" }, ROG16("Q7k")),
+
+    /* --- LGBT rights (CHES lgbtq_rights, 0.94, and samesex_marriage) --- */
+    soc("ess.freehms", "lgbt", "agreePlutot", -1, { stem: ESS_B33_STEM,
+      fr: "Les homosexuels hommes et femmes devraient être libres de vivre leur vie comme ils le souhaitent." },
+      ESS9("B34 freehms")),
+    soc("ess.hmsacld", "lgbt", "agreePlutot", -1, { stem: ESS_B33_STEM,
+      fr: "Les couples homosexuels, hommes ou femmes, devraient avoir les mêmes droits à l'adoption que les couples hétérosexuels." },
+      ESS9("B36 hmsacld")),
+    soc("ess.hmsfmlsh", "lgbt", "agreePlutot", 1, { stem: ESS_B33_STEM,
+      fr: "Si un membre de ma famille proche était homosexuel, homme ou femme, j'aurais honte." },
+      ESS9("B35 hmsfmlsh")),
+    soc("evs.v153", "lgbt", "bipolar10", -1, { stem: EVS_JUSTIF_STEM, fr: "L'homosexualité",
+      left: "Jamais justifié", right: "Toujours justifié" }, EVS("v153")),
+    soc("issp.two.women", "lgbt", "agreeFam", -1, { stem: FAMILIES_STEM,
+      fr: "Un couple de deux femmes peut élever un enfant aussi bien qu'un couple hétérosexuel" },
+      FAM22("Q05c")),
+    soc("issp.trans", "lgbt", "agreeFamFr", -1, { stem: FAM_FR_STEM,
+      fr: "Une personne transgenre, c'est-à-dire un garçon né dans un corps de fille ou une fille née dans un corps de garçon, doit pouvoir être légalement reconnue comme elle le souhaite",
+      note: "Question ajoutée par l'équipe française de l'ISSP, non posée dans les autres pays. C'est la seule, dans ces enquêtes, sur les droits des personnes trans, que le CHES cite." },
+      FAM22("OF21i")),
+    soc("issp.two.men", "lgbt", "agreeFam", -1, { reserve: "the mirror of the two-women item, asked once",
+      stem: FAMILIES_STEM,
+      fr: "Un couple de deux hommes peut élever un enfant aussi bien qu'un couple hétérosexuel" },
+      FAM22("Q05d")),
+    soc("evs.v82", "lgbt", "agree5Evs", -1, { reserve: "its French stem opens on \"Et\", after another question",
+      stem: "Et êtes-vous d'accord ou pas d'accord avec les affirmations suivantes ?",
+      fr: "Les couples homosexuels sont d'aussi bons parents que les autres couples" }, EVS("v82")),
+
+    /* --- religion in politics (CHES religious_principles, 0.77) --- */
+    soc("issp.rel.vote", "religion", "agreeRel18", -1, {
+      fr: "Dans quelle mesure êtes-vous d'accord ou non avec l'opinion suivante : Les autorités religieuses ne devraient pas essayer d'influencer le vote des gens aux élections." },
+      REL18("Q8")),
+    soc("issp.rel.gov", "religion", "agreeRel08", -1, {
+      fr: "Les autorités religieuses ne devraient pas essayer d'influencer les décisions du gouvernement" },
+      REL08("Q10b")),
+    soc("issp.faith", "religion", "agreeRel18b", 1, {
+      stem: "Voici plusieurs affirmations : pouvez-vous me dire si vous êtes d'accord ou pas d'accord avec elles ?",
+      fr: "Nous faisons trop confiance à la science et pas assez à la foi religieuse" }, REL18("Q9a")),
+    soc("evs.v156", "religion", "bipolar10", -1, { stem: EVS_JUSTIF_STEM,
+      fr: "L'euthanasie (c'est-à-dire mettre fin aux jours de quelqu'un qui est incurable)",
+      left: "Jamais justifié", right: "Toujours justifié" }, EVS("v156")),
+    soc("issp.church.power", "religion", "powerRel18", -1, { reserve: "power of churches, where religion's role in politics is what CHES rates",
+      fr: "Pensez-vous que, dans ce pays, les églises et les organisations religieuses ont trop ou pas assez de pouvoir ?" },
+      REL18("Q10")),
+
+    /* --- nationalism (CHES nationalism, 0.90) --- */
+    soc("issp.rather.french", "nationalism", "agreeIssp", 1, { stem: NI_AGREE_STEM,
+      fr: "Je préfère être français(e) plutôt que citoyen(ne) d'un autre pays" }, NI23("Q02_A")),
+    soc("issp.better.country", "nationalism", "agreeIssp", 1, { stem: NI_AGREE_STEM,
+      fr: "D'une manière générale, la France est un pays meilleur que la plupart des autres" }, NI23("Q02_D")),
+    soc("issp.world.better", "nationalism", "agreeIssp", 1, { stem: NI_AGREE_STEM,
+      fr: "Le monde serait meilleur si les gens des autres pays ressemblaient plus aux Français" }, NI23("Q02_C")),
+    soc("issp.support.wrong", "nationalism", "agreeIssp", 1, { stem: NI_AGREE_STEM,
+      fr: "Les gens devraient soutenir leur pays même lorsque ce pays se trompe" }, NI23("Q02_E")),
+    soc("issp.world.citizen", "nationalism", "agreeIssp", -1, { stem: NI13_AGREE_STEM,
+      fr: "Je me sens plus citoyen du monde que de n'importe quel pays" }, NI13("Q6e")),
+    soc("issp.born", "nationalism", "bornIssp", 1, {
+      fr: "Certaines personnes disent qu'il est possible de devenir vraiment français si l'on fait un effort. D'autres disent qu'il faut être né en France pour être vraiment français. Quelle est votre position ? A : Il est possible de devenir vraiment français si l'on fait un effort. B : Il faut naître en France pour être vraiment français." },
+      NI23("Q04")),
+    soc("issp.born.important", "nationalism", "importanceIssp", 1, { reserve: "asks again what Q04 asks",
+      stem: "Certaines personnes estiment que pour être vraiment français, il est important de posséder certaines des caractéristiques suivantes. Pour d'autres, cela n'est pas important. À votre avis, pour être vraiment français, est-il important… ?",
+      fr: "…d'être né en France" }, NI23("Q01_A"))
   ];
 
   /* The economy is the first theme, not the only one. The others are listed
@@ -297,9 +658,13 @@
      its readings will be comparable to the parties like x is. `planned`
      themes have no items yet. */
   const THEMES = [
-    { key: "economy", readings: ["x", "protectionism", "class", "conflict", "labour"],
+    /* `axis` is the compass axis a theme replaces, built from `dims`; the
+       other readings are its own, read beside the compass. */
+    { key: "economy", axis: "x", readings: ["x", "protectionism", "class", "conflict", "labour"],
       dims: ["redistribution", "spendvtax", "deregulation"] },
-    { key: "society", planned: true },       /* y: galtan, immigration, rights, law and order */
+    { key: "society", axis: "y", readings: ["y"],
+      dims: ["immigration", "multiculturalism", "laworder", "women", "lgbt", "religion",
+             "nationalism"] },
     { key: "europe", planned: true },        /* eu_position, eu_russia */
     { key: "ecology", planned: true },       /* environment, climate_change */
     { key: "institutions", planned: true }   /* executive_power, judicial_independence,
@@ -353,13 +718,17 @@
     return item.pole * scale.values[answer];
   }
 
+  /* The items a theme asks: its bank, minus the reserve. */
+  const askedItems = themeKey => ITEMS.filter(i => i.theme === themeKey && !i.reserve);
+
   /* Answers -> readings, each on [-100, 100], or null when nothing feeding it
      was answered.
 
-     x is the mean of the three CHES sub-dimensions, each the mean of its
-     items. Equal weights, because the plain mean of redistribution, spendvtax
-     and deregulation already reproduces lrecon at r = 0.96 across the 279
-     CHES 2024 parties — there is no gap for a weighting to close.
+     A theme's axis is the mean of its CHES sub-dimensions, each the mean of
+     its items. Equal weights, because the plain mean of the sub-scales already
+     reproduces the experts' axis across the 279 CHES 2024 parties — lrecon at
+     r = 0.96 for the economy, galtan at 0.97 for society — so there is no gap
+     for a weighting to close. Reserve items never count.
 
      Wright's scale is his sum rescaled, and only reported complete: a partial
      sum of a five-item additive scale is not the scale.
@@ -368,34 +737,38 @@
      thin it is. */
   function score(answers, themeKey) {
     const theme = THEMES.find(t => t.key === themeKey);
-    const items = ITEMS.filter(i => i.theme === themeKey);
+    const items = askedItems(themeKey);
     const answered = items
       .map(i => ({ i, v: itemValue(i, answers[i.id]) }))
       .filter(a => a.v !== null);
 
     const out = { n: {} };
+    const axis = theme.axis;
 
     const dims = {};
     for (const d of theme.dims) {
-      const vs = answered.filter(a => a.i.reading === "x" && a.i.dim === d).map(a => a.v);
+      const vs = answered.filter(a => a.i.reading === axis && a.i.dim === d).map(a => a.v);
       dims[d] = vs.length ? Math.round(100 * mean(vs)) : null;
     }
     const present = theme.dims.filter(d => dims[d] !== null);
-    out.x = present.length ? Math.round(mean(present.map(d => dims[d]))) : null;
+    out[axis] = present.length ? Math.round(mean(present.map(d => dims[d]))) : null;
     out.dims = dims;
-    out.n.x = answered.filter(a => a.i.reading === "x").length;
+    out.n[axis] = answered.filter(a => a.i.reading === axis).length;
 
-    for (const r of ["protectionism", "conflict", "labour"]) {
+    for (const r of theme.readings) {
+      if (r === axis || r === "class") continue;
       const vs = answered.filter(a => a.i.reading === r).map(a => a.v);
       out[r] = vs.length ? Math.round(100 * mean(vs)) : null;
       out.n[r] = vs.length;
     }
 
-    const wright = items.filter(i => i.reading === "class");
-    const wv = answered.filter(a => a.i.reading === "class");
-    out.class = wv.length === wright.length
-      ? Math.round(100 * wv.reduce((s, a) => s + a.v, 0) / wright.length) : null;
-    out.n.class = wv.length;
+    if (theme.readings.includes("class")) {
+      const wright = items.filter(i => i.reading === "class");
+      const wv = answered.filter(a => a.i.reading === "class");
+      out.class = wv.length === wright.length
+        ? Math.round(100 * wv.reduce((s, a) => s + a.v, 0) / wright.length) : null;
+      out.n.class = wv.length;
+    }
 
     const level = key => {
       const v = answers[key];
@@ -407,7 +780,7 @@
     return out;
   }
 
-  const api = { SCALES, ITEMS, THEMES, itemById, itemValue, score, mixedOrder };
+  const api = { SCALES, ITEMS, THEMES, itemById, itemValue, score, mixedOrder, askedItems };
   if (typeof module !== "undefined" && module.exports) module.exports = api;
   else global.PolitiQuiz = api;
 
