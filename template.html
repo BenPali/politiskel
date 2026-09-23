@@ -2641,10 +2641,14 @@ const LOCALES = {
     nativeEmpty: "questionnaire pas encore commencé",
     nativeNoY: "pas encore de Y — répondez au thème Société",
     nativeNoX: "pas encore de X — répondez au thème Économie",
-    nativeOffDetail: missing => "Ce profil n'a pas encore de " + missing + " : il viendra du "
-      + "thème " + (missing === "X" ? "Économie" : "Société") + " du questionnaire. En "
-      + "attendant, il n'est pas placé sur cette boussole."
-      + (missing === "Y" ? " La lecture « Économie × protectionnisme » le place." : ""),
+    nativeNoXY: "pas encore de position — répondez aux thèmes Économie et Société",
+    nativeOffDetail: missing => missing.length > 1
+      ? "Ce profil n'a encore ni X ni Y : ils viendront des thèmes Économie et Société du "
+        + "questionnaire. En attendant, il n'est pas placé sur cette boussole."
+      : "Ce profil n'a pas encore de " + missing[0] + " : il viendra du thème "
+        + (missing[0] === "X" ? "Économie" : "Société") + " du questionnaire. En attendant, il "
+        + "n'est pas placé sur cette boussole."
+        + (missing[0] === "Y" ? " La lecture « Économie × protectionnisme » le place." : ""),
     fromQuizNative: "X tiré du questionnaire",
     fromQuizNativeY: "Y tiré du questionnaire",
     journeyNative: pair => "Politiskel " + pair,
@@ -2817,6 +2821,7 @@ function project(p) {
   } else if (view.key === "protectionism") {
     const y = c.quiz ? c.quiz.protectionism : null;
     v.y = y === undefined ? null : y;
+    v.ySrc = null;   /* y is protectionism here: "Y from the questionnaire" would name the social axis */
   }
   /* no value on one axis, no place on the chart */
   if (v.x === null || v.y === null) v.off = true;
@@ -3270,6 +3275,7 @@ function render() {
         : c.native && !c.quiz ? L.nativeEmpty
         : c.native && view.key === "politiskel" && c.x !== null ? L.nativeNoY
         : c.native && view.key === "politiskel" && c.y !== null ? L.nativeNoX
+        : c.native && view.key === "politiskel" ? L.nativeNoXY
         : L.viewOff;
       tdFam.appendChild(tag);
     } else {
@@ -3693,7 +3699,8 @@ function renderDetail(computed) {
     td.colSpan = 6; td.className = "empty";
     td.textContent = !(isProfile && origin.c.off) ? L.nothingToCompare
       : origin.c.native && view.key === "politiskel"
-        ? L.nativeOffDetail(origin.c.x === null ? "X" : "Y") : L.viewOffDetail;
+        ? L.nativeOffDetail([origin.c.x === null && "X", origin.c.y === null && "Y"].filter(Boolean))
+        : L.viewOffDetail;
     tr.appendChild(td); tbody.appendChild(tr);
     return;
   }
@@ -4765,9 +4772,11 @@ function applyView() {
     /* why each profile is off: never answered, skipped protectionism, or
        answered protectionism but nothing that places it on x */
     const offs = profiles.map(project).filter(c => c.off);
-    const none = offs.filter(c => !c.quiz).length;
-    const noProt = offs.filter(c => c.quiz && c.y === null).length;
-    const noX = offs.filter(c => c.quiz && c.y !== null && c.x === null).length;
+    /* c.quiz exists as soon as any theme is answered, so ask the economy's own counts */
+    const econ = c => c.quiz && Object.values(c.quiz.n).some(n => n > 0);
+    const none = offs.filter(c => !econ(c)).length;
+    const noProt = offs.filter(c => econ(c) && c.y === null).length;
+    const noX = offs.filter(c => econ(c) && c.y !== null && c.x === null).length;
     if (none) parts.push(L.viewNoteOff(none));
     if (noProt) parts.push(L.viewNoteSkippedProt(noProt));
     if (noX) parts.push(L.viewNoteNoX(noX));
