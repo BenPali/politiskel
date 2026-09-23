@@ -82,6 +82,7 @@ The page's sources are in `web/`, one file per part:
 | `web/locale-fr.js` | every sentence the page shows |
 | `web/compass.js` | the compass, the profiles table, the strips, the distance panel |
 | `web/quiz.js` | the questionnaire's pages and readings |
+| `web/flag-icons.js`, `web/flag.js` | the Politiskel flag: its symbols (CC BY 3.0) and how readings choose colours, layout and symbol |
 | `web/wiring.js` | hover cards, the PolitiScales form and reader, controls, start-up |
 | `web/site.js` | server mode: accounts, groups, the site's pages and router |
 
@@ -272,4 +273,7 @@ country changes. A crowded board earns tighter thresholds than a sparse one.
 
 ## Licence
 
-MIT.
+MIT. The flag symbols in `web/flag-icons.js` come from
+[game-icons.net](https://game-icons.net/), by Lorc and Delapouite, under
+[CC BY 3.0](https://creativecommons.org/licenses/by/3.0/); the page credits
+them under each generated flag and in its footer.

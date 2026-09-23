@@ -181,22 +181,67 @@ const LOCALES = {
     optFlags: "Drapeaux",
     flagsPolitiscales: "PolitiScales quand il existe", flagsPolitiskel: "Politiskel pour tous",
     flagGeneratedAlt: a => "Drapeau Politiskel de " + a,
-    flagFigureTitle: "Drapeau Politiskel — calculé à partir des lectures ci-dessus, sans symbole ni "
-      + "couleur de parti :",
-    flagBand: (x, dim, v) => "Bande de hampe : l'économie, du côté " + (x < 0 ? "gauche" : "droit")
-      + " (X " + signed(x) + "), d'autant plus large que la position est marquée"
-      + (dim ? " — teinte de « " + dim + " » (" + signed(v) + "), sa sous-dimension la plus marquée."
-             : " — teinte neutre, faute de réponses au thème Économie."),
-    flagField: (dim, v, y, shape) => "Fond : la société"
-      + (dim ? ", teinte de « " + dim + " » (" + signed(v) + "), sa sous-dimension la plus marquée"
-             : ", teinte neutre faute de réponses au thème Société")
-      + (y === null ? "." : " ; " + (shape === "stripe" ? "bande centrale : Y " + signed(y) + ", vers l'autoritaire (symétrie)"
-        : shape === "diagonal" ? "diagonale : Y " + signed(y) + ", vers le libertaire (asymétrie)"
-        : "uni : Y " + signed(y) + ", près du centre") + "."),
-    flagSymbol: v => (v >= 20 ? "Disque plein : lecture de classe anticapitaliste"
-      : v <= -20 ? "Anneau : lecture de classe procapitaliste" : "Point : lecture de classe près du centre")
-      + " (" + signed(v) + "), d'autant plus grand qu'elle est marquée.",
-    flagBorder: v => "Bordure : protectionnisme marqué (" + signed(v) + ").",
+    flagFigureTitle: "Drapeau Politiskel — tiré des lectures, selon les conventions des drapeaux "
+      + "politiques :",
+    flagCredit: "Symboles : game-icons.net (Lorc, Delapouite), licence CC BY 3.0.",
+    flagLayouts: {
+      diagonal: t => "Diagonale, noir en bas côté battant : la convention des drapeaux anarchistes, "
+        + "pour un profil nettement libertaire (Y " + signed(t.y) + ").",
+      revolution: t => "Triangle de hampe et bandes : la famille des drapeaux révolutionnaires, "
+        + "pour une lecture révolutionnaire ou de classe très marquée (" + signed(Math.round(t.rev)) + ").",
+      royal: t => t.monarchy !== null && t.monarchy >= 60
+        ? "Champ blanc et bordure d'or : la famille des drapeaux royaux, pour un monarchisme marqué ("
+          + signed(Math.round(t.monarchy)) + ")."
+        : "Champ blanc et bordure d'or : ordre (Y " + signed(t.y) + ") et tradition marqués.",
+      nordic: t => "Croix nordique : la famille des drapeaux d'ordre, pour un profil autoritaire (Y "
+        + signed(t.y) + ").",
+      pall: t => "Pall en Y, comme sur le drapeau sud-africain : la convergence, pour un "
+        + "multiculturalisme marqué (" + signed(Math.round(t.multi)) + ").",
+      stripes: t => "Canton et bandes : l'ouverture sur le monde, pour un cosmopolitisme marqué ("
+        + signed(Math.round(t.intl)) + ").",
+      triband: t => "Triband : la famille des drapeaux nationaux, pour un nationalisme marqué ("
+        + signed(Math.round(t.nat)) + ").",
+      pale: t => "Bandes verticales : la disposition des tricolores républicains, quand rien ne "
+        + "l'emporte nettement."
+    },
+    flagColourLines: {
+      red: v => "Rouge : la gauche économique (" + v + ").",
+      gold: v => "Or : le libéralisme économique (" + v + ").",
+      blue: v => "Bleu : l'ordre (" + v + ").",
+      purple: v => "Violet, la couleur des suffragettes : le féminisme (" + v + ").",
+      pink: v => "Rose : les droits des personnes LGBT (" + v + ").",
+      green: v => "Vert : l'écologie, d'après PolitiScales (" + v + ").",
+      sky: v => "Bleu ciel, celui des Nations unies : le cosmopolitisme (" + v + ").",
+      orange: () => "Orange, la couleur des centristes : aucun axe ne penche nettement.",
+      white: () => "Blanc : aucune lecture assez marquée pour une couleur.",
+      black: v => "Noir : le libertarisme, dans la tradition anarchiste (" + v + ")."
+    },
+    flagRevolutionStar: v => "Étoile : la révolution (" + v + ").",
+    flagRainbow: v => "Barre arc-en-ciel : un soutien marqué aux droits des personnes LGBT (" + v + ").",
+    flagSymbolLines: {
+      fist: v => "Poing levé : une lecture de classe anticapitaliste (" + v + ").",
+      swallow: v => "Hirondelle, l'oiseau en vol du libéralisme : le libre marché (" + v + ").",
+      liberty: v => "Colombe brisant ses chaînes : les libertés publiques (" + v + ").",
+      sword: v => "Épée : l'ordre et la fermeté (" + v + ").",
+      globe: v => "Globe : le cosmopolitisme (" + v + ").",
+      oak: v => "Feuille de chêne : l'enracinement national (" + v + ").",
+      tower: v => "Tour : le protectionnisme (" + v + ").",
+      book: v => "Livre ouvert : la religion tenue hors de la politique (" + v + ").",
+      column: v => "Colonne : la tradition (" + v + ").",
+      scales: v => "Balance : la redistribution (" + v + ").",
+      rings: v => "Anneaux entrelacés : le multiculturalisme (" + v + ").",
+      star: v => "Étoile : la révolution (" + v + ").",
+      sprout: v => "Pousse : l'écologie (" + v + ").",
+      torch: v => "Torche : le progressisme (" + v + ").",
+      venus: v => "Symbole ♀ : le féminisme (" + v + ").",
+      handshake: v => "Poignée de mains : le réformisme (" + v + ").",
+      factory: v => "Usine : le productivisme (" + v + ").",
+      anarchy: v => "A cerclé : un libertarisme radical (" + v + ").",
+      phrygian: v => "Bonnet phrygien : la révolution et la liberté (" + v + ").",
+      croix: v => "Croix de guerre : le patriotisme martial, nation et ordre ensemble (" + v + ").",
+      crown: v => "Couronne : le monarchisme (" + v + ").",
+      fleur: v => "Fleur de lys : un monarchisme légitimiste (" + v + ")."
+    },
     tabCompass: "Boussole", tabQuiz: "Questionnaire", tabGroups: "Groupes", tabAccount: "Mon compte",
     welcomeTitle: "Politiskel, en groupe",
     welcomeLead: "Chaque membre a son compte et son profil, et voit ceux des groupes qu'il a "

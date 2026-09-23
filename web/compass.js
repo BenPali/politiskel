@@ -305,7 +305,7 @@ function flagEl(p, cls, captureOnly) {
      read (captureOnly) shows what it holds and nothing else. */
   const ps = p.flag && /^data:image\/(png|jpeg|webp);base64,/.test(p.flag);
   if (!captureOnly && (flagMode === "politiskel" || !ps)) {
-    const f = politiskelFlag(coords(p));
+    const f = politiskelFlag(coords(p), p);
     if (f) {
       const img = document.createElement("img");
       img.className = "flag " + (cls || "");
