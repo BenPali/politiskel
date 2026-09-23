@@ -94,14 +94,14 @@ async function loadGroup() {
     const r = await api("GET", "/api/groups/" + SERVER.group.id + "/profiles");
     list = r.ok ? r.data : [];
   } else if (SERVER.me) {
-    list = [{ username: SERVER.me.username, me: true,
+    list = [{ username: SERVER.me.username, me: true, flag: SERVER.me.profile.flag,
               politiscales: SERVER.me.profile.politiscales, answers: SERVER.me.profile.answers }];
   }
   SEED.length = 0;
   for (const k of Object.keys(SEED_ANSWERS)) delete SEED_ANSWERS[k];
   for (const m of list) {
     const p = Object.assign({ alias: m.username, source: "user:" + m.username, me: !!m.me,
-                              flag: null, slogan: null }, m.politiscales || {});
+                              flag: m.flag || null, slogan: null }, m.politiscales || {});
     SEED.push(p);
     if (m.answers && Object.keys(m.answers).length) SEED_ANSWERS[idOf(p)] = m.answers;
   }
@@ -143,7 +143,10 @@ async function flushAnswers() {
 async function savePolitiscales(p) {
   const values = {};
   for (const a of AXES) for (const k of [a.neg[0], a.pos[0]]) if (Number.isFinite(p[k])) values[k] = p[k];
-  const r = await api("PUT", "/api/me/profile", { politiscales: values });
+  /* The flag follows only when the values are still the screenshot's (readForm
+     keeps it then): a profile typed by hand must not carry a flag it no
+     longer matches. */
+  const r = await api("PUT", "/api/me/profile", { politiscales: values, flag: p.flag || null });
   if (!r.ok) { $("form-error").textContent = apiError(r); $("form-error").hidden = false; return; }
   SERVER.me.profile = r.data;
   SERVER.status = L.savedPolitiscales;

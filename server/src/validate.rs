@@ -108,6 +108,23 @@ pub fn politiscales(v: &Value) -> Result<(), &'static str> {
     Ok(())
 }
 
+/// The flag PolitiScales draws, cropped from the screenshot in the browser:
+/// a PNG data URL, small (the page scales it to 160 px wide), and nothing
+/// else — it is shown to the group as an image.
+pub const MAX_FLAG: usize = 24 * 1024;
+
+pub fn flag(v: &str) -> Result<(), &'static str> {
+    const PREFIX: &str = "data:image/png;base64,";
+    let Some(b64) = v.strip_prefix(PREFIX) else { return Err("flag_not_png") };
+    if v.len() > MAX_FLAG {
+        return Err("flag_too_large");
+    }
+    if b64.is_empty() || !b64.bytes().all(|c| c.is_ascii_alphanumeric() || c == b'+' || c == b'/' || c == b'=') {
+        return Err("flag_not_png");
+    }
+    Ok(())
+}
+
 /// Questionnaire answers: item or salience keys mapped to an option index or
 /// "dk" ("can't choose").
 pub fn answers(v: &Value) -> Result<(), &'static str> {
@@ -173,6 +190,15 @@ mod tests {
         assert!(politiscales(&json!({"com": 101})).is_err());
         assert!(politiscales(&json!({"nope": 1})).is_err());
         assert!(politiscales(&json!([1, 2])).is_err());
+    }
+
+    #[test]
+    fn flag_shapes() {
+        assert!(flag("data:image/png;base64,iVBORw0KGgo=").is_ok());
+        assert!(flag("data:image/svg+xml;base64,PHN2Zz4=").is_err());
+        assert!(flag("javascript:alert(1)").is_err());
+        assert!(flag("data:image/png;base64,<b>").is_err());
+        assert!(flag(&format!("data:image/png;base64,{}", "A".repeat(MAX_FLAG))).is_err());
     }
 
     #[test]

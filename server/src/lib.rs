@@ -418,10 +418,10 @@ async fn groups_of(state: &AppState, user: i64) -> ApiResult<Vec<Value>> {
 }
 
 async fn profile_of(state: &AppState, user: i64) -> ApiResult<Value> {
-    let (ps, answers): (Option<String>, String) =
-        sqlx::query_as("SELECT politiscales, answers FROM profiles WHERE user_id = ?")
+    let (ps, answers, flag): (Option<String>, String, Option<String>) =
+        sqlx::query_as("SELECT politiscales, answers, flag FROM profiles WHERE user_id = ?")
             .bind(user).fetch_one(&state.db).await?;
-    Ok(json!({ "politiscales": parse_json(ps), "answers": parse_json(Some(answers)) }))
+    Ok(json!({ "politiscales": parse_json(ps), "answers": parse_json(Some(answers)), "flag": flag }))
 }
 
 async fn me(State(state): State<AppState>, jar: CookieJar) -> ApiResult<Json<Value>> {
@@ -438,6 +438,8 @@ struct ProfileUpdate {
     #[serde(default, deserialize_with = "some_or_null")]
     politiscales: Option<Value>,
     answers: Option<Value>,
+    #[serde(default, deserialize_with = "some_or_null")]
+    flag: Option<Value>,
 }
 
 /// Distinguishes a missing field (leave as is) from an explicit null (clear).
@@ -455,6 +457,15 @@ async fn put_profile(State(state): State<AppState>, jar: CookieJar, Json(body): 
         }
         let text = if ps.is_null() { None } else { Some(ps.to_string()) };
         sqlx::query("UPDATE profiles SET politiscales = ?, updated_at = ? WHERE user_id = ?")
+            .bind(text).bind(now()).bind(id).execute(&state.db).await?;
+    }
+    if let Some(f) = &body.flag {
+        let text = match f {
+            Value::Null => None,
+            Value::String(s) => { validate::flag(s).map_err(bad)?; Some(s.clone()) }
+            _ => return Err(bad("flag_not_png")),
+        };
+        sqlx::query("UPDATE profiles SET flag = ?, updated_at = ? WHERE user_id = ?")
             .bind(text).bind(now()).bind(id).execute(&state.db).await?;
     }
     if let Some(a) = &body.answers {
@@ -573,13 +584,13 @@ async fn group_profiles(State(state): State<AppState>, jar: CookieJar, Path(gid)
     if !is_member(&state, gid, user).await? {
         return Err(ApiError(StatusCode::NOT_FOUND, "no_such_group"));
     }
-    let rows: Vec<(i64, String, Option<String>, String)> = sqlx::query_as(
-        "SELECT u.id, u.username, p.politiscales, p.answers
+    let rows: Vec<(i64, String, Option<String>, String, Option<String>)> = sqlx::query_as(
+        "SELECT u.id, u.username, p.politiscales, p.answers, p.flag
          FROM members m JOIN users u ON u.id = m.user_id JOIN profiles p ON p.user_id = u.id
          WHERE m.group_id = ? ORDER BY u.username")
         .bind(gid).fetch_all(&state.db).await?;
-    Ok(Json(Value::Array(rows.into_iter().map(|(uid, name, ps, a)| json!({
+    Ok(Json(Value::Array(rows.into_iter().map(|(uid, name, ps, a, flag)| json!({
         "username": name, "me": uid == user,
-        "politiscales": parse_json(ps), "answers": parse_json(Some(a)),
+        "politiscales": parse_json(ps), "answers": parse_json(Some(a)), "flag": flag,
     })).collect())))
 }

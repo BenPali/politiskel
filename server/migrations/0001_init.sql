@@ -43,6 +43,7 @@ CREATE INDEX members_user ON members(user_id);
 CREATE TABLE profiles (
     user_id       INTEGER PRIMARY KEY REFERENCES users(id) ON DELETE CASCADE,
     politiscales  TEXT,                        -- JSON object, or NULL
+    flag          TEXT,                        -- the PolitiScales flag, a small PNG data URL, or NULL
     answers       TEXT NOT NULL DEFAULT '{}',  -- JSON object
     updated_at    INTEGER NOT NULL
 );

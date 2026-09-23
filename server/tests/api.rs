@@ -162,6 +162,13 @@ async fn profile_updates_are_checked() {
     assert_eq!(s, StatusCode::OK);
     assert_eq!(p["answers"]["issp.obey"], "dk");
     assert_eq!(p["politiscales"], Value::Null);
+    // the flag: a PNG data URL, or null to clear it; nothing else
+    let (s, p) = c.call("PUT", "/api/me/profile", Some(json!({ "flag": "data:image/png;base64,iVBORw0KGgo=" }))).await;
+    assert_eq!((s, p["flag"].as_str()), (StatusCode::OK, Some("data:image/png;base64,iVBORw0KGgo=")));
+    let (s, b) = c.call("PUT", "/api/me/profile", Some(json!({ "flag": "javascript:alert(1)" }))).await;
+    assert_eq!((s, b["error"].as_str()), (StatusCode::BAD_REQUEST, Some("flag_not_png")));
+    let (_, p) = c.call("PUT", "/api/me/profile", Some(json!({ "flag": null }))).await;
+    assert_eq!(p["flag"], Value::Null);
     // answers alone leave PolitiScales values as they were, null clears them
     c.call("PUT", "/api/me/profile", Some(json!({ "politiscales": { "com": 50 } }))).await;
     let (_, p) = c.call("PUT", "/api/me/profile", Some(json!({ "answers": {} }))).await;

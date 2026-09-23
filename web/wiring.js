@@ -339,6 +339,21 @@ drop.addEventListener("drop", e => {
   if (f) readCapture(f);
 });
 
+/* A screenshot dropped anywhere else on the page used to be opened by the
+   browser in its place, leaving the page. Anywhere now counts as the drop
+   zone: the image is read, and the form it fills is brought into view. */
+const draggingFiles = e => e.dataTransfer && [...e.dataTransfer.types].includes("Files");
+document.addEventListener("dragover", e => { if (draggingFiles(e)) e.preventDefault(); });
+document.addEventListener("drop", e => {
+  if (!draggingFiles(e) || e.defaultPrevented || e.target.closest("#drop")) return;
+  e.preventDefault();
+  const f = e.dataTransfer.files[0];
+  if (!f || !/^image\//.test(f.type)) return;
+  if (SERVER.on && location.pathname !== "/compte") go("/compte");
+  readCapture(f);
+  $("drop").scrollIntoView({ block: "center", behavior: "smooth" });
+});
+
 /* Fills the static markup from the locale. Every node carrying data-i18n gets
    its text, data-i18n-title its tooltip, data-i18n-placeholder its placeholder.
    Nothing below hardcodes copy, so another language is one more object in
