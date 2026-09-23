@@ -74,6 +74,14 @@ that what makes an attachment fragile is a tight margin to the runner-up, not
 the weighting. It reads no profile; it exercises the model over its own input
 space. `--country de` and `--profiles N` change what it runs on.
 
+`node tools/model-check.js` asks the questions synthetic profiles cannot answer,
+on the profiles you actually extracted: whether the "Souv." and "Écolo."
+readouts repeat an axis, how coherently the social components are answered,
+and how many attachments are toss-ups in each country. Every correlation comes
+with its 95% interval and the verdict is read off the interval, so a small group
+gets "too few profiles to conclude" rather than a number that looks like a
+finding. It reads `profiles-data.js` and writes nothing.
+
 ## How it reads a screenshot
 
 Percentages come from **bar geometry**, not text: a 5% segment carries no label
