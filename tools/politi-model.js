@@ -170,6 +170,9 @@
     return {
       x: Math.round(axisScore(p, "x")),
       y: Math.round(axisScore(p, "y")),
+      /* No longer shown: tools/model-check.js, run on a real group, found it
+         repeating y while looking like a separate reading. Kept so the check
+         can be re-run on other groups. */
       sov: Math.round((Number(p.nat) || 0) - (Number(p.int) || 0)),
       ecol: Math.round((Number(p.eco) || 0) - (Number(p.prod) || 0)),
       method: methodTag(p)
