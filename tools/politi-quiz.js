@@ -295,9 +295,18 @@
       src: { survey: "ISSP", wave: "Rôle de l'État 1996", variable: "Q11b", url: GESIS(6806) } }
   ];
 
+  /* The economy is the first theme, not the only one. The others are listed
+     so the page can say what is coming; each has its counterpart in CHES, so
+     its readings will be comparable to the parties like x is. `planned`
+     themes have no items yet. */
   const THEMES = [
     { key: "economy", readings: ["x", "protectionism", "class", "conflict", "labour"],
-      dims: ["redistribution", "spendvtax", "deregulation"] }
+      dims: ["redistribution", "spendvtax", "deregulation"] },
+    { key: "society", planned: true },       /* y: galtan, immigration, rights, law and order */
+    { key: "europe", planned: true },        /* eu_position, eu_russia */
+    { key: "ecology", planned: true },       /* environment, climate_change */
+    { key: "institutions", planned: true }   /* executive_power, judicial_independence,
+                                                regions, and people_v_elite */
   ];
 
   const itemById = id => ITEMS.find(i => i.id === id) || null;

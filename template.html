@@ -506,6 +506,21 @@
                     font: inherit; font-size: 0.85rem; }
   .quiz-nav .skip:hover { color: var(--text); }
   .quiz-keys { text-align: center; font-size: 0.72rem; color: var(--text-3); margin-top: 14px; }
+  .theme-list { display: grid; gap: 10px; margin-top: 6px; }
+  .theme-card { display: grid; grid-template-columns: 1fr auto; gap: 6px 18px; align-items: center;
+                border: 1px solid var(--border); border-radius: 12px; padding: 16px 18px;
+                background: var(--bg); }
+  .theme-card h3 { margin: 0; font-size: 1.05rem; font-weight: 600; color: var(--text);
+                   text-transform: none; letter-spacing: 0; }
+  .theme-card p { margin: 0; font-size: 0.84rem; color: var(--text-2); grid-column: 1; }
+  .theme-card .status { font-size: 0.75rem; color: var(--text-3); grid-column: 1; }
+  .theme-card .go { grid-column: 2; grid-row: 1 / span 3; }
+  .theme-card.planned { background: none; border-style: dashed; }
+  .theme-card.planned h3, .theme-card.planned p { color: var(--text-3); }
+  @media (max-width: 640px) {
+    .theme-card { grid-template-columns: 1fr; }
+    .theme-card .go { grid-column: 1; grid-row: auto; justify-self: start; margin-top: 6px; }
+  }
   .journey-strip { width: 100%; height: auto; margin: 4px 0 18px; overflow: visible; }
   .journey-strip .axis { stroke: var(--axis); stroke-width: 1; }
   .journey-strip .ref { fill: var(--surface); stroke: var(--ref-ink); stroke-width: 1; }
@@ -1415,9 +1430,18 @@
       src: { survey: "ISSP", wave: "Rôle de l'État 1996", variable: "Q11b", url: GESIS(6806) } }
   ];
 
+  /* The economy is the first theme, not the only one. The others are listed
+     so the page can say what is coming; each has its counterpart in CHES, so
+     its readings will be comparable to the parties like x is. `planned`
+     themes have no items yet. */
   const THEMES = [
     { key: "economy", readings: ["x", "protectionism", "class", "conflict", "labour"],
-      dims: ["redistribution", "spendvtax", "deregulation"] }
+      dims: ["redistribution", "spendvtax", "deregulation"] },
+    { key: "society", planned: true },       /* y: galtan, immigration, rights, law and order */
+    { key: "europe", planned: true },        /* eu_position, eu_russia */
+    { key: "ecology", planned: true },       /* environment, climate_change */
+    { key: "institutions", planned: true }   /* executive_power, judicial_independence,
+                                                regions, and people_v_elite */
   ];
 
   const itemById = id => ITEMS.find(i => i.id === id) || null;
@@ -1974,6 +1998,29 @@ const LOCALES = {
     quizOpen: "Compléter mon profil", quizEdit: "Modifier mes réponses",
     quizBack: "← Retour à la boussole",
     quizWho: a => "Profil de " + a,
+    backToThemes: "← Tous les thèmes", otherThemes: "Autres thèmes",
+    hubEyebrow: "Questionnaire Politiskel",
+    hubLead: "Le questionnaire est découpé en thèmes, que vous remplissez dans l'ordre que "
+      + "vous voulez. Chacun remplace ou ajoute une lecture de votre profil ; l'économie est la "
+      + "première disponible, pas la seule.",
+    hubPlanned: "À venir",
+    hubProgress: (n, m) => n + " / " + m + " réponses",
+    themes: {
+      economy: { name: "Économie",
+        desc: "Redistribution, impôts et services publics, régulation des marchés — qui remplacent "
+          + "l'axe X de PolitiScales — et, à part, le protectionnisme et trois lectures de classe." },
+      society: { name: "Société",
+        desc: "Immigration, multiculturalisme, droits des femmes et des personnes LGBT, ordre "
+          + "public, religion. Remplacera l'axe Y." },
+      europe: { name: "Europe et monde",
+        desc: "Intégration européenne et rapport à la Russie, que PolitiScales ne demande pas : "
+          + "de quoi faire enfin une vraie lecture de la souveraineté." },
+      ecology: { name: "Écologie",
+        desc: "Environnement et climat, lus à part de l'économie, comme le fait le CHES." },
+      institutions: { name: "Institutions",
+        desc: "Pouvoir exécutif, indépendance de la justice, régions — et la lecture populiste, "
+          + "peuple contre élites, présentée comme telle." }
+    },
     quizCount: (i, n) => i + " / " + n,
     quizIntroEyebrow: "Questionnaire Politiskel · Économie",
     quizIntroTitle: a => "Compléter le profil de " + a,
@@ -3090,7 +3137,7 @@ function renderReadings(p, c) {
     box.append(h, readingsEl(c));
   }
   const btn = document.createElement("a");
-  btn.href = QUIZ_ROUTE + encodeURIComponent(idOf(p));
+  btn.href = hubHref(idOf(p));
   btn.className = "button " + (c.quiz ? "ghost" : "primary");
   btn.textContent = c.quiz ? L.quizEdit : L.quizOpen;
   const actions = document.createElement("div");
@@ -3118,19 +3165,26 @@ function renderReadings(p, c) {
    the moment it is given, so leaving halfway loses nothing. */
 const QUIZ_ROUTE = "#questionnaire/";
 const quizItems = () => PolitiQuiz.ITEMS.filter(i => i.theme === "economy");
-let quiz = null;          /* { p, id, step } while the questionnaire is shown */
+/* { p, id, theme, step } while the questionnaire is shown; theme null = the
+   list of themes */
+let quiz = null;
 let quizAdvance = null;   /* pending auto-advance after an answer */
 
 function route() {
   const h = location.hash;
   if (h.startsWith(QUIZ_ROUTE)) {
-    const id = decodeURIComponent(h.slice(QUIZ_ROUTE.length));
+    /* #questionnaire/<id> lists the themes, #questionnaire/<id>/<theme> runs
+       one. The id is URI-encoded, so it holds no slash of its own. */
+    const [rawId, themeKey] = h.slice(QUIZ_ROUTE.length).split("/");
+    const id = decodeURIComponent(rawId);
     const p = profiles.find(q => idOf(q) === id);
+    const theme = PolitiQuiz.THEMES.find(t => t.key === themeKey && !t.planned);
     if (p) {
-      if (!quiz || quiz.id !== id) quiz = { p, id, step: 0 };
+      const key = theme ? theme.key : null;
+      if (!quiz || quiz.id !== id || quiz.theme !== key) quiz = { p, id, theme: key, step: 0 };
       $("view-main").hidden = true;
       $("view-quiz").hidden = false;
-      renderQuiz();
+      if (key) renderQuiz(); else renderHub();
       window.scrollTo(0, 0);
       return;
     }
@@ -3150,6 +3204,71 @@ function route() {
 window.addEventListener("hashchange", route);
 
 function answersOf(id) { return overlay.answers[id] || {}; }
+
+const hubHref = id => QUIZ_ROUTE + encodeURIComponent(id);
+const themeHref = (id, key) => hubHref(id) + "/" + key;
+
+/* The list of themes: what exists, what is coming, and how far this profile
+   has got in each. It is the questionnaire's front page, so that the economy
+   reads as a first theme rather than the whole test. */
+function renderHub() {
+  const root = $("view-quiz");
+  root.replaceChildren();
+  const saved = answersOf(quiz.id);
+
+  const top = document.createElement("div");
+  top.className = "quiz-top";
+  const back = document.createElement("a");
+  back.href = "#";
+  back.textContent = L.quizBack;
+  const who = document.createElement("span");
+  who.className = "who";
+  who.textContent = L.quizWho(quiz.p.alias);
+  top.append(back, who);
+  root.appendChild(top);
+
+  const card = document.createElement("section");
+  card.className = "quiz-card";
+  const eb = document.createElement("p");
+  eb.className = "eyebrow";
+  eb.textContent = L.hubEyebrow;
+  const h = document.createElement("h2");
+  h.textContent = L.quizIntroTitle(quiz.p.alias);
+  const lead = document.createElement("p");
+  lead.className = "lead";
+  lead.textContent = L.hubLead;
+  card.append(eb, h, lead);
+
+  const list = document.createElement("div");
+  list.className = "theme-list";
+  for (const t of PolitiQuiz.THEMES) {
+    const copy = L.themes[t.key];
+    const item = document.createElement("div");
+    item.className = "theme-card" + (t.planned ? " planned" : "");
+    const name = document.createElement("h3");
+    name.textContent = copy.name;
+    const desc = document.createElement("p");
+    desc.textContent = copy.desc;
+    const status = document.createElement("span");
+    status.className = "status";
+    item.append(name, desc, status);
+    if (t.planned) {
+      status.textContent = L.hubPlanned;
+    } else {
+      const items = PolitiQuiz.ITEMS.filter(i => i.theme === t.key);
+      const done = items.filter(i => saved[i.id] !== undefined).length;
+      status.textContent = L.hubProgress(done, items.length);
+      const go = document.createElement("a");
+      go.className = "button go " + (done === items.length ? "ghost" : "primary");
+      go.href = themeHref(quiz.id, t.key);
+      go.textContent = !done ? L.quizStart : done < items.length ? L.quizResume : L.quizReview;
+      item.appendChild(go);
+    }
+    list.appendChild(item);
+  }
+  card.appendChild(list);
+  root.appendChild(card);
+}
 
 function setAnswer(key, value) {
   const a = overlay.answers[quiz.id] || (overlay.answers[quiz.id] = {});
@@ -3176,8 +3295,8 @@ function renderQuiz() {
   const top = document.createElement("div");
   top.className = "quiz-top";
   const back = document.createElement("a");
-  back.href = "#";
-  back.textContent = L.quizBack;
+  back.href = hubHref(quiz.id);
+  back.textContent = L.backToThemes;
   top.appendChild(back);
   if (step >= 1 && step <= nQ) {
     const bar = document.createElement("div");
@@ -3397,6 +3516,7 @@ function resultScreen(card, nav, button) {
   right.style.display = "flex";
   right.style.gap = "10px";
   right.append(button(L.quizReview, "ghost", () => goStep(1)),
+               button(L.otherThemes, "ghost", () => { location.hash = hubHref(quiz.id); }),
                button(L.backToCompass, "primary", () => { location.hash = ""; }));
   nav.append(erase, right);
 }
