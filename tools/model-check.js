@@ -228,7 +228,9 @@ function questionnaireChecks() {
 politiscalesChecks();
 questionnaireChecks();
 
-if (N < 30 || answerFiles.length < 30) {
+/* Said once, for whichever set was tested and is still small. */
+const small = n => n >= 4 && n < 30;
+if (small(N) || small(answerFiles.length)) {
   console.log("\nUnder 30 profiles, only a clear repetition can be established; showing that"
     + "\na readout adds information takes more answers than a group usually has.");
 }

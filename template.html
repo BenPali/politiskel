@@ -2727,6 +2727,8 @@ const SEED_ANSWERS = {};
 for (const a of window.POLITI_ANSWERS || []) {
   const match = a.source && SEED.find(p => p.source === a.source);
   if (match) { SEED_ANSWERS[idOf(match)] = a.answers; continue; }
+  /* tools/extract.js already matched aliases to screenshots and kept one
+     file per profile, so this only guards a hand-edited data file */
   if (SEED.some(p => p.alias.toLowerCase() === a.alias.toLowerCase())) continue;
   const p = { alias: a.alias, native: true, source: null };
   SEED.push(p);
@@ -2759,8 +2761,13 @@ let overlay = loadOverlay();
 
 function rebuild() {
   const hidden = new Set(overlay.hidden);
+  /* A profile added in this browser and one imported with the page can share
+     an id: the organiser's own questionnaire-only profile, exported, dropped
+     in politi-results/answers/ and rebuilt. They are the same person, so it
+     is listed once, as imported; its local answers still take precedence. */
+  const seeded = new Set(SEED.map(idOf));
   profiles = SEED.filter(p => !hidden.has(idOf(p))).map(p => ({ ...p }))
-    .concat(overlay.added.map(p => ({ ...p })));
+    .concat(overlay.added.filter(p => !seeded.has(idOf(p))).map(p => ({ ...p })));
 }
 
 let profiles = [];
@@ -2790,7 +2797,8 @@ function coords(p) {
 function withQuiz(p, c) {
   const id = idOf(p);
   const answers = overlay.answers[id] || SEED_ANSWERS[id];
-  if (!answers) return c;
+  /* an erased profile keeps an empty entry (see the erase button): no answers */
+  if (!answers || !Object.keys(answers).length) return c;
   c.quiz = PolitiQuiz.score(answers, "economy");
   c.soc = PolitiQuiz.score(answers, "society");
   const ps = { x: c.x, y: c.y };
@@ -3881,7 +3889,8 @@ const slugOf = a => a.normalize("NFD").replace(/[\u0300-\u036f]/g, "").toLowerCa
 
 function exportAnswers(p) {
   const data = { format: "politiskel-answers", version: 1, alias: p.alias,
-                 source: p.source || null, answers: answersOf(idOf(p)) };
+                 source: p.source || null, exported: new Date().toISOString(),
+                 answers: answersOf(idOf(p)) };
   const blob = new Blob([JSON.stringify(data, null, 1) + "\n"], { type: "application/json" });
   const a = document.createElement("a");
   a.href = URL.createObjectURL(blob);
