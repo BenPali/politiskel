@@ -132,8 +132,8 @@
   /* the country decides what everything else is compared against, where the
      rest of the row only toggles what is drawn: a rule keeps the two apart
      without the stretch of empty bar that pushing them to opposite ends left */
-  .controls .country { font-weight: 600; color: var(--text);
-                       padding-right: 18px; border-right: 1px solid var(--border); }
+  .controls .country { font-weight: 600; color: var(--text); }
+  .controls .country:first-child { padding-right: 18px; border-right: 1px solid var(--border); }
 
   .layout {
     display: grid;
@@ -146,6 +146,11 @@
   /* without min-width:0 the nowrap table forces the column past the viewport */
   .layout > * { min-width: 0; }
   @media (max-width: 1000px) { .layout { grid-template-columns: 1fr; } }
+  /* the table and the profile card run far below the chart: keep the chart in
+     view beside them, where the screen is tall enough to hold it whole */
+  @media (min-width: 1001px) and (min-height: 760px) {
+    .layout > :first-child { position: sticky; top: 16px; }
+  }
 
   .card {
     background: var(--surface);
@@ -447,7 +452,9 @@
   .readings dd small { color: var(--text-3); }
 
   /* The questionnaire: a page of its own, one question per screen. */
-  main[hidden] { display: none; }
+  /* a class's display rule would otherwise beat the attribute: the empty
+     server tabs once drew a stray rule under the local page's header */
+  [hidden] { display: none !important; }
   .quiz-view { max-width: 720px; margin: 8px auto 40px; }
   .quiz-top { display: flex; align-items: center; gap: 16px; margin-bottom: 22px;
               font-size: 0.85rem; flex-wrap: wrap; }
@@ -480,7 +487,8 @@
   .choice:has(input:checked) .key { background: var(--series-1); border-color: var(--series-1); color: #fff; }
   .choice:has(input:focus-visible) { outline: 2px solid var(--focus); outline-offset: 2px; }
   .choice.dk { background: none; border-style: dashed; color: var(--text-2); font-size: 0.85rem; }
-  .poles { display: grid; grid-template-columns: 1fr 1fr; gap: 24px; margin-bottom: 18px; }
+  /* scoped: the manual-entry form has its own .poles, a row label */
+  .quiz-view .poles { display: grid; grid-template-columns: 1fr 1fr; gap: 24px; margin-bottom: 18px; }
   .pole { font-size: 1.08rem; line-height: 1.42; font-weight: 600; }
   .pole small { display: block; font-size: 0.7rem; font-weight: 600; color: var(--text-3);
                 text-transform: uppercase; letter-spacing: 0.06em; margin-bottom: 5px; }
@@ -489,7 +497,7 @@
   .ladder .choice { justify-content: center; padding: 11px 0; font-variant-numeric: tabular-nums; }
   .ladder + .choices { margin-top: 10px; }
   @media (max-width: 640px) {
-    .poles { grid-template-columns: 1fr; gap: 12px; }
+    .quiz-view .poles { grid-template-columns: 1fr; gap: 12px; }
     .pole.r { text-align: left; }
     .ladder { gap: 3px; }
     .ladder .choice { font-size: 0.78rem; padding: 9px 0; }
@@ -526,6 +534,7 @@
   .flag-drawn.large { width: 100%; max-width: 560px; }
   .flag-legend { margin: 8px 0 0; padding-left: 18px; font-size: 0.78rem; color: var(--text-2); }
   .flag-legend li { margin-bottom: 3px; }
+  .flag-figure .note { margin: 8px 0 0; font-size: 0.72rem; color: var(--text-3); }
 
   /* server mode: the site's tabs and pages */
   .tabs { display: flex; gap: 4px; align-items: center; flex-wrap: wrap; margin: -8px 0 22px;
