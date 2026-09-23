@@ -26,7 +26,9 @@
      conflict       perceived conflict between classes (ISSP), reported beside
                     Wright's scale rather than mixed into it: adding items to a
                     validated scale makes it a different, unvalidated one
-   Salience is asked per theme and returned as is. */
+   Salience is asked per theme, twice: before the items and after them. The
+   first records the weight the theme had coming in, the second whether
+   answering moved it; both are returned as is, never folded into a score. */
 (function (global) {
 
   /* Answer scales. `values` go from the first option to the last, in [-1, 1],
@@ -271,9 +273,12 @@
       ? Math.round(100 * wv.reduce((s, a) => s + a.v, 0) / wright.length) : null;
     out.n.class = wv.length;
 
-    const sal = answers["salience." + themeKey];
-    out.salience = Number.isInteger(sal) && sal >= 0 && sal < SCALES.salience.values.length
-      ? sal : null;
+    const level = key => {
+      const v = answers[key];
+      return Number.isInteger(v) && v >= 0 && v < SCALES.salience.values.length ? v : null;
+    };
+    out.salience = level("salience." + themeKey);
+    out.salienceAfter = level("salience." + themeKey + ".after");
 
     return out;
   }

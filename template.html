@@ -1146,7 +1146,9 @@
      conflict       perceived conflict between classes (ISSP), reported beside
                     Wright's scale rather than mixed into it: adding items to a
                     validated scale makes it a different, unvalidated one
-   Salience is asked per theme and returned as is. */
+   Salience is asked per theme, twice: before the items and after them. The
+   first records the weight the theme had coming in, the second whether
+   answering moved it; both are returned as is, never folded into a score. */
 (function (global) {
 
   /* Answer scales. `values` go from the first option to the last, in [-1, 1],
@@ -1391,9 +1393,12 @@
       ? Math.round(100 * wv.reduce((s, a) => s + a.v, 0) / wright.length) : null;
     out.n.class = wv.length;
 
-    const sal = answers["salience." + themeKey];
-    out.salience = Number.isInteger(sal) && sal >= 0 && sal < SCALES.salience.values.length
-      ? sal : null;
+    const level = key => {
+      const v = answers[key];
+      return Number.isInteger(v) && v >= 0 && v < SCALES.salience.values.length ? v : null;
+    };
+    out.salience = level("salience." + themeKey);
+    out.salienceAfter = level("salience." + themeKey + ".after");
 
     return out;
   }
@@ -1888,7 +1893,8 @@ const LOCALES = {
     quizCount: (i, n) => i + " / " + n,
     quizIntroEyebrow: "Questionnaire Politiskel · Économie",
     quizIntroTitle: a => "Compléter le profil de " + a,
-    quizIntroMeta: n => n + " questions · environ cinq minutes",
+    quizIntroMeta: n => n + " questions, et deux fois la même sur l'importance du thème · "
+      + "environ cinq minutes",
     quizLead: "Ces questions remplacent l'axe économique de PolitiScales, qui ne repose que sur "
       + "deux de ses axes et ne pose rien sur la redistribution. Y reste celui de PolitiScales "
       + "tant que le thème société n'existe pas.",
@@ -1932,7 +1938,11 @@ const LOCALES = {
       class: "anticapitaliste si positif — une lecture rivale de X, pas une composante",
       conflict: "à côté de l'échelle de Wright, pas dedans"
     },
-    salienceOf: s => "Importance déclarée : " + s
+    salienceOf: s => "Importance déclarée : " + s,
+    salienceMoved: (a, b, d) => "Importance déclarée : " + a + " au début, " + b + " à la fin"
+      + (d === 0 ? " — inchangée" : d > 0 ? " — en hausse" : " — en baisse"),
+    quizSalienceAfter: "Maintenant que vous avez répondu : quelle place l'économie tient-elle "
+      + "dans vos choix politiques ?"
   }
 };
 const LANG = (document.documentElement.lang || "fr").slice(0, 2);
@@ -2969,10 +2979,13 @@ function readingsEl(c) {
       L.answeredOf(q.n.conflict, count("conflict")) + " · " + L.readingNotes.conflict);
   box.appendChild(dl);
 
-  if (q.salience !== null) {
+  const lvl = PolitiQuiz.SCALES.salience.fr;
+  if (q.salience !== null || q.salienceAfter !== null) {
     const sal = document.createElement("p");
     sal.className = "hint";
-    sal.textContent = L.salienceOf(PolitiQuiz.SCALES.salience.fr[q.salience]);
+    sal.textContent = q.salience !== null && q.salienceAfter !== null
+      ? L.salienceMoved(lvl[q.salience], lvl[q.salienceAfter], q.salienceAfter - q.salience)
+      : L.salienceOf(lvl[q.salience !== null ? q.salience : q.salienceAfter]);
     box.appendChild(sal);
   }
   return box;
@@ -3006,10 +3019,12 @@ function renderReadings(p, c) {
    HTML file, because the answers live in this page's localStorage, and
    browsers do not all share that storage between two file:// pages.
 
-   Screens: an introduction, the salience question, one per item, the result.
+   Screens: an introduction, the salience question, one per item, salience
+   again, the result.
    Salience comes first: asked after eighteen questions on the economy, it
    would measure how much the respondent had just been made to think about
-   it, not how much it weighs in their politics.
+   it, not how much it weighs in their politics. It is asked once more at the
+   end, so the page can show whether answering moved it.
    Items keep the bank order and carry no section heading — a heading such as
    "class" would tell the respondent what an item is for. Every answer is saved
    the moment it is given, so leaving halfway loses nothing. */
@@ -3056,7 +3071,7 @@ function setAnswer(key, value) {
 
 function goStep(step) {
   clearTimeout(quizAdvance);
-  const last = quizItems().length + 2;
+  const last = quizItems().length + 3;
   quiz.step = Math.max(0, Math.min(last, step));
   renderQuiz();
   window.scrollTo(0, 0);
@@ -3066,7 +3081,7 @@ function renderQuiz() {
   const root = $("view-quiz");
   root.replaceChildren();
   const items = quizItems();
-  const nQ = items.length + 1;               /* items + salience */
+  const nQ = items.length + 2;               /* salience, the items, salience again */
   const step = quiz.step;
   const saved = answersOf(quiz.id);
 
@@ -3108,7 +3123,7 @@ function renderQuiz() {
   const spacer = () => document.createElement("span");
 
   if (step === 0) {
-    introScreen(card, items.length + 1);
+    introScreen(card, items.length);
     const started = Object.keys(saved).length > 0;
     nav.append(spacer(), button(started ? L.quizResume : L.quizStart, "primary", () => goStep(1)));
     return;
@@ -3124,6 +3139,15 @@ function renderQuiz() {
     src.textContent = L.quizSalienceSrc;
     questionScreen(card, { key: "salience.economy", scale: PolitiQuiz.SCALES.salience,
                            text: L.quizSalience, source: src }, saved["salience.economy"]);
+  } else if (step === nQ) {
+    /* Not pre-filled, and the first answer is not recalled: shown it, most
+       people repeat it to stay consistent, and nothing would be measured. */
+    const src = document.createElement("p");
+    src.className = "q-src";
+    src.textContent = L.quizSalienceSrc;
+    questionScreen(card, { key: "salience.economy.after", scale: PolitiQuiz.SCALES.salience,
+                           text: L.quizSalienceAfter, source: src },
+                   saved["salience.economy.after"]);
   } else {
     const item = items[step - 2];
     questionScreen(card, {
