@@ -1,0 +1,23 @@
+[package]
+name = "politiskel-server"
+version = "0.1.0"
+edition = "2021"
+description = "Optional backend for Politiskel: accounts, groups, and saved profiles"
+license = "MIT"
+publish = false
+
+[dependencies]
+axum = "0.8"
+axum-extra = { version = "0.10", features = ["cookie"] }
+tokio = { version = "1", features = ["macros", "rt-multi-thread", "net", "signal"] }
+sqlx = { version = "0.8", default-features = false, features = ["runtime-tokio", "sqlite", "migrate", "macros"] }
+argon2 = "0.5"
+rand = "0.8"
+sha2 = "0.10"
+serde = { version = "1", features = ["derive"] }
+serde_json = "1"
+time = "0.3"
+
+[dev-dependencies]
+tower = { version = "0.5", features = ["util"] }
+http-body-util = "0.1"
