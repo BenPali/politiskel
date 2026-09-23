@@ -41,14 +41,9 @@
   const even = n => Array.from({ length: n }, (_, i) => -1 + 2 * i / (n - 1));
 
   const SCALES = {
-    /* ESS rounds 9-11, show card. */
-    agreeEss: {
-      values: [1, 0.5, 0, -0.5, -1],
-      fr: ["Tout à fait d'accord", "D'accord", "Ni d'accord, ni pas d'accord",
-           "Pas d'accord", "Pas du tout d'accord"]
-    },
-    /* ESS rounds 1 and 8, France: the card said "Plutôt", unlike rounds 9-11.
-       "Ne sait pas" was an interviewer code, never read out. */
+    /* ESS, France: the agree/disagree card, as printed from round 1 to round
+       11 ("LISTE 13" in round 9). "Ne sait pas" was an interviewer code, never
+       read out. */
     agreePlutot: {
       values: [1, 0.5, 0, -0.5, -1],
       fr: ["Tout à fait d'accord", "Plutôt d'accord", "Ni d'accord, ni pas d'accord",
@@ -151,7 +146,7 @@
   const ITEMS = [
     /* --- x: redistribution (CHES `redistribution`, r = 0.96 with lrecon) --- */
     { id: "ess.gincdif", theme: "economy", reading: "x", dim: "redistribution",
-      scale: "agreeEss", pole: -1,
+      scale: "agreePlutot", pole: -1,
       fr: "Le gouvernement devrait prendre des mesures pour réduire les différences de revenu.",
       src: { survey: "ESS", wave: "rounds 4-11", variable: "gincdif",
              url: ESS_FR + "round9/fieldwork/france/ESS9_questionnaires_FR.pdf" } },
