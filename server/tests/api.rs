@@ -4,20 +4,23 @@
 use axum::body::Body;
 use axum::http::{header, Request, StatusCode};
 use http_body_util::BodyExt;
-use politiskel_server::{app, migrate, AppState};
+use politiskel_server::{app, migrate, AppState, Signup};
 use serde_json::{json, Value};
 use sqlx::sqlite::SqlitePoolOptions;
 use tower::ServiceExt;
 
 async fn server() -> axum::Router { server_with(false).await }
 
-async fn server_with(trust_proxy: bool) -> axum::Router {
+async fn server_with(trust_proxy: bool) -> axum::Router { server_full(trust_proxy, Signup::Open).await }
+
+async fn server_full(trust_proxy: bool, signup: Signup) -> axum::Router {
     // One connection: an in-memory SQLite database lives per connection.
     let db = SqlitePoolOptions::new().max_connections(1)
         .connect("sqlite::memory:").await.unwrap();
     sqlx::query("PRAGMA foreign_keys = ON").execute(&db).await.unwrap();
     migrate(&db).await.unwrap();
-    app(AppState::new(db, "<!doctype html><title>Politiskel</title>".into(), true).trusting_proxy(trust_proxy))
+    app(AppState::new(db, "<!doctype html><title>Politiskel</title>".into(), true)
+        .trusting_proxy(trust_proxy).with_signup(signup))
 }
 
 /// A client that keeps its session cookie between requests.
@@ -391,4 +394,135 @@ async fn site_paths_serve_the_page_and_unknown_api_paths_do_not() {
     assert_eq!(res.status(), StatusCode::NOT_FOUND);
     let res = app.oneshot(Request::post("/groupes").body(Body::empty()).unwrap()).await.unwrap();
     assert_eq!(res.status(), StatusCode::NOT_FOUND);
+}
+
+/// A group created by `owner`, joined by the others; returns (id, invite).
+async fn group_of(owner: &mut Client, others: &mut [&mut Client]) -> (i64, String) {
+    let (_, g) = owner.call("POST", "/api/groups", Some(json!({ "name": "Les copains" }))).await;
+    let (id, invite) = (g["id"].as_i64().unwrap(), g["invite"].as_str().unwrap().to_string());
+    for c in others.iter_mut() {
+        assert_eq!(c.call("POST", "/api/groups/join", Some(json!({ "code": invite }))).await.0, StatusCode::OK);
+    }
+    (id, invite)
+}
+
+#[tokio::test]
+async fn only_the_owner_manages_a_group() {
+    let app = server().await;
+    let (mut ben, mut zoe, mut jc) = (Client::new(&app), Client::new(&app), Client::new(&app));
+    ben.register("Ben").await; zoe.register("Zoé").await; jc.register("Jc").await;
+    let (gid, old) = group_of(&mut ben, &mut [&mut zoe, &mut jc]).await;
+    let (_, me) = ben.call("GET", "/api/me", None).await;
+    assert_eq!(me["groups"][0]["owner"], json!(true));
+    let (_, me) = zoe.call("GET", "/api/me", None).await;
+    assert_eq!(me["groups"][0]["owner"], json!(false));
+
+    // a member who is not the owner is refused, an outsider sees no group
+    let uri = format!("/api/groups/{gid}/invite");
+    assert_eq!(zoe.call("POST", &uri, None).await.0, StatusCode::FORBIDDEN);
+    let mut out = Client::new(&app); out.register("Line").await;
+    assert_eq!(out.call("POST", &uri, None).await.0, StatusCode::NOT_FOUND);
+
+    // a new link retires the old one
+    let (s, b) = ben.call("POST", &uri, None).await;
+    assert_eq!(s, StatusCode::OK);
+    let new = b["invite"].as_str().unwrap().to_string();
+    assert_ne!(new, old);
+    assert_eq!(out.call("POST", "/api/groups/join", Some(json!({ "code": old }))).await.0, StatusCode::NOT_FOUND);
+
+    // removing a member takes the group out of their sight
+    let rm = format!("/api/groups/{gid}/remove");
+    assert_eq!(zoe.call("POST", &rm, Some(json!({ "username": "Jc" }))).await.0, StatusCode::FORBIDDEN);
+    assert_eq!(ben.call("POST", &rm, Some(json!({ "username": "Ben" }))).await.0, StatusCode::NOT_FOUND);
+    assert_eq!(ben.call("POST", &rm, Some(json!({ "username": "jc" }))).await.0, StatusCode::NO_CONTENT);
+    let list = format!("/api/groups/{gid}/profiles");
+    assert_eq!(jc.call("GET", &list, None).await.0, StatusCode::NOT_FOUND);
+    let (_, p) = ben.call("GET", &list, None).await;
+    assert_eq!(p.as_array().unwrap().len(), 2);
+    assert_eq!(p.as_array().unwrap().iter().filter(|m| m["owner"] == json!(true)).count(), 1);
+
+    // handing over, then deleting: only the new owner can
+    let own = format!("/api/groups/{gid}/owner");
+    assert_eq!(ben.call("POST", &own, Some(json!({ "username": "Zoé" }))).await.0, StatusCode::NO_CONTENT);
+    let del = format!("/api/groups/{gid}");
+    assert_eq!(ben.call("DELETE", &del, None).await.0, StatusCode::FORBIDDEN);
+    assert_eq!(zoe.call("DELETE", &del, None).await.0, StatusCode::NO_CONTENT);
+    assert_eq!(ben.call("GET", &list, None).await.0, StatusCode::NOT_FOUND);
+    // profiles outlive the group
+    assert_eq!(ben.call("GET", "/api/me", None).await.0, StatusCode::OK);
+}
+
+#[tokio::test]
+async fn an_owner_leaving_or_deleting_hands_the_group_over() {
+    let app = server().await;
+    let (mut ben, mut zoe, mut jc) = (Client::new(&app), Client::new(&app), Client::new(&app));
+    ben.register("Ben").await; zoe.register("Zoé").await; jc.register("Jc").await;
+    let (gid, _) = group_of(&mut ben, &mut [&mut zoe, &mut jc]).await;
+    assert_eq!(ben.call("POST", &format!("/api/groups/{gid}/leave"), None).await.0, StatusCode::NO_CONTENT);
+    // the longest-standing member takes over
+    let (_, me) = zoe.call("GET", "/api/me", None).await;
+    assert_eq!(me["groups"][0]["owner"], json!(true));
+    // and when that owner deletes their account, the next one does
+    let (s, _) = zoe.call("DELETE", "/api/me", Some(json!({ "password": "correct horse battery" }))).await;
+    assert_eq!(s, StatusCode::NO_CONTENT);
+    let (_, me) = jc.call("GET", "/api/me", None).await;
+    assert_eq!(me["groups"][0]["owner"], json!(true));
+    assert_eq!(jc.call("POST", &format!("/api/groups/{gid}/invite"), None).await.0, StatusCode::OK);
+}
+
+#[tokio::test]
+async fn sign_ups_are_limited_per_address() {
+    let app = server_with(true).await;
+    for n in 0..5 {
+        assert_eq!(Client::from_ip(&app, "198.51.100.7").register(&format!("Membre {n}")).await, StatusCode::CREATED);
+    }
+    let mut c = Client::from_ip(&app, "198.51.100.7");
+    let (s, b) = c.call("POST", "/api/register",
+        Some(json!({ "username": "Encore", "password": "correct horse battery", "consent": true }))).await;
+    assert_eq!((s, b["error"].as_str()), (StatusCode::TOO_MANY_REQUESTS, Some("too_many_signups")));
+    // another address is not held back
+    assert_eq!(Client::from_ip(&app, "198.51.100.8").register("Ailleurs").await, StatusCode::CREATED);
+}
+
+#[tokio::test]
+async fn a_closed_site_opens_accounts_only_on_invitation() {
+    let app = server_full(false, Signup::Invite).await;
+    let (_, cfg) = Client::new(&app).call("GET", "/api/config", None).await;
+    assert_eq!(cfg["signup"], json!("invite"));
+    let mut c = Client::new(&app);
+    let (s, b) = c.call("POST", "/api/register",
+        Some(json!({ "username": "Zoé", "password": "correct horse battery", "consent": true }))).await;
+    assert_eq!((s, b["error"].as_str()), (StatusCode::FORBIDDEN, Some("signup_invite_only")));
+    let (s, _) = c.call("POST", "/api/register", Some(json!({ "username": "Zoé",
+        "password": "correct horse battery", "consent": true, "invite": "0123456789abcdef0123456789abcdef" }))).await;
+    assert_eq!(s, StatusCode::FORBIDDEN);
+}
+
+#[tokio::test]
+async fn changing_the_password_signs_out_everywhere_else() {
+    let app = server().await;
+    let mut here = Client::new(&app);
+    here.register("Ben").await;
+    let mut there = Client::new(&app);
+    let login = json!({ "username": "Ben", "password": "correct horse battery" });
+    assert_eq!(there.call("POST", "/api/login", Some(login)).await.0, StatusCode::OK);
+    let (s, _) = here.call("POST", "/api/me/password",
+        Some(json!({ "current": "wrong wrong wrong", "new": "another good password" }))).await;
+    assert_eq!(s, StatusCode::UNAUTHORIZED);
+    let (s, _) = here.call("POST", "/api/me/password",
+        Some(json!({ "current": "correct horse battery", "new": "short" }))).await;
+    assert_eq!(s, StatusCode::BAD_REQUEST);
+    let (s, _) = here.call("POST", "/api/me/password",
+        Some(json!({ "current": "correct horse battery", "new": "another good password" }))).await;
+    assert_eq!(s, StatusCode::NO_CONTENT);
+    assert_eq!(here.call("GET", "/api/me", None).await.0, StatusCode::OK);
+    assert_eq!(there.call("GET", "/api/me", None).await.0, StatusCode::UNAUTHORIZED);
+    let mut again = Client::new(&app);
+    let (s, _) = again.call("POST", "/api/login",
+        Some(json!({ "username": "Ben", "password": "another good password" }))).await;
+    assert_eq!(s, StatusCode::OK);
+    // and ending the other sessions keeps this one
+    assert_eq!(here.call("DELETE", "/api/me/sessions/others", None).await.0, StatusCode::NO_CONTENT);
+    assert_eq!(here.call("GET", "/api/me", None).await.0, StatusCode::OK);
+    assert_eq!(again.call("GET", "/api/me", None).await.0, StatusCode::UNAUTHORIZED);
 }

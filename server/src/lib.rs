@@ -43,6 +43,21 @@ const SESSION_DAYS: i64 = 30;
 /// minimum; IPv6 addresses count per /64, since one host holds a whole block.
 const MAX_FAILURES: u32 = 5;
 const FAILURE_WINDOW: i64 = 15 * 60;
+/// Accounts one address may open per hour. Each sign-up runs argon2, so an
+/// unbounded endpoint is both a way to fill the database and to spend the
+/// server's processor.
+const MAX_SIGNUPS: u32 = 5;
+const SIGNUP_WINDOW: i64 = 60 * 60;
+
+/// Who may open an account.
+#[derive(Clone, Copy, PartialEq, Eq, Debug)]
+pub enum Signup {
+    /// Anyone who reaches the site.
+    Open,
+    /// Only someone holding a valid invitation link: the site then grows
+    /// only through its groups.
+    Invite,
+}
 
 #[derive(Clone)]
 pub struct AppState {
@@ -58,13 +73,20 @@ pub struct AppState {
     /// The public origin browsers load the page from ("https://host"), when
     /// the proxy does not pass the Host header through (nginx by default).
     pub origin: Option<String>,
+    pub signup: Signup,
     failures: Arc<Mutex<HashMap<String, (u32, i64)>>>,
+    signups: Arc<Mutex<HashMap<String, (u32, i64)>>>,
 }
 
 impl AppState {
     pub fn new(db: SqlitePool, page: String, secure_cookies: bool) -> Self {
         Self { db, page: Arc::new(page), secure_cookies, trust_proxy: false, origin: None,
-               failures: Arc::default() }
+               signup: Signup::Open, failures: Arc::default(), signups: Arc::default() }
+    }
+
+    pub fn with_signup(mut self, signup: Signup) -> Self {
+        self.signup = signup;
+        self
     }
 
     pub fn trusting_proxy(mut self, yes: bool) -> Self {
@@ -124,16 +146,23 @@ pub async fn migrate(db: &SqlitePool) -> Result<(), sqlx::migrate::MigrateError>
 pub fn app(state: AppState) -> Router {
     Router::new()
         .route("/", get(page))
+        .route("/api/config", get(config))
         .route("/api/register", post(register))
         .route("/api/login", post(login))
         .route("/api/logout", post(logout))
         .route("/api/me", get(me).delete(delete_me))
         .route("/api/me/profile", put(put_profile))
         .route("/api/me/export", get(export))
+        .route("/api/me/password", post(change_password))
+        .route("/api/me/sessions/others", axum::routing::delete(end_other_sessions))
         .route("/api/groups", post(create_group))
         .route("/api/groups/join", post(join_group))
         .route("/api/invites/{code}", get(invite_preview))
+        .route("/api/groups/{id}", axum::routing::delete(delete_group))
         .route("/api/groups/{id}/leave", post(leave_group))
+        .route("/api/groups/{id}/invite", post(new_invite))
+        .route("/api/groups/{id}/remove", post(remove_member))
+        .route("/api/groups/{id}/owner", post(hand_over_group))
         .route("/api/groups/{id}/profiles", get(group_profiles))
         // The site's pages — /connexion, /groupes, /rejoindre/<code>… — are
         // one page that routes itself; an unknown /api/ path stays a 404.
@@ -184,7 +213,7 @@ fn token_hash(token: &str) -> Vec<u8> {
 }
 
 /// Argon2id is deliberately slow: it runs off the async threads.
-async fn hash_password(password: String) -> ApiResult<String> {
+pub async fn hash_password(password: String) -> ApiResult<String> {
     tokio::task::spawn_blocking(move || {
         let salt = SaltString::generate(&mut OsRng);
         Argon2::default().hash_password(password.as_bytes(), &salt).map(|h| h.to_string())
@@ -245,6 +274,36 @@ async fn current_user(state: &AppState, jar: &CookieJar) -> ApiResult<(i64, Stri
         .fetch_optional(&state.db)
         .await?;
     row.ok_or(ApiError(StatusCode::UNAUTHORIZED, "not_signed_in"))
+}
+
+/// Passes for the group's owner; a member who is not gets 403, anyone else
+/// the 404 of a group that does not exist.
+async fn owned_group(state: &AppState, group: i64, user: i64) -> ApiResult<()> {
+    let row: Option<(Option<i64>,)> = sqlx::query_as(
+        "SELECT g.owner_id FROM groups g JOIN members m ON m.group_id = g.id
+         WHERE g.id = ? AND m.user_id = ?")
+        .bind(group).bind(user).fetch_optional(&state.db).await?;
+    match row {
+        None => Err(ApiError(StatusCode::NOT_FOUND, "no_such_group")),
+        Some((owner,)) if owner == Some(user) => Ok(()),
+        Some(_) => Err(ApiError(StatusCode::FORBIDDEN, "not_owner")),
+    }
+}
+
+/// A group with no member left is deleted; one whose owner is gone — left,
+/// or deleted their account, which the foreign key sets to NULL — passes to
+/// its longest-standing member.
+pub async fn settle_groups(tx: &mut sqlx::SqliteConnection) -> Result<(), sqlx::Error> {
+    sqlx::query("DELETE FROM groups WHERE id NOT IN (SELECT group_id FROM members)")
+        .execute(&mut *tx).await?;
+    sqlx::query(
+        "UPDATE groups SET owner_id = (
+             SELECT m.user_id FROM members m WHERE m.group_id = groups.id
+             ORDER BY m.joined_at, m.user_id LIMIT 1)
+         WHERE owner_id IS NULL
+            OR owner_id NOT IN (SELECT m2.user_id FROM members m2 WHERE m2.group_id = groups.id)")
+        .execute(&mut *tx).await?;
+    Ok(())
 }
 
 async fn is_member(state: &AppState, group: i64, user: i64) -> ApiResult<bool> {
@@ -327,11 +386,22 @@ async fn site_page(State(state): State<AppState>, req: Request<axum::body::Body>
     Html(state.page.as_ref().clone()).into_response()
 }
 
-#[derive(Deserialize)]
-struct Register { username: String, password: String, consent: bool }
+/// What the page needs to know before anyone signs in.
+async fn config(State(state): State<AppState>) -> Json<Value> {
+    Json(json!({ "signup": match state.signup { Signup::Open => "open", Signup::Invite => "invite" } }))
+}
 
-async fn register(State(state): State<AppState>, jar: CookieJar, Json(body): Json<Register>)
-    -> ApiResult<(StatusCode, CookieJar, Json<Value>)>
+#[derive(Deserialize)]
+struct Register {
+    username: String,
+    password: String,
+    consent: bool,
+    #[serde(default)]
+    invite: Option<String>,
+}
+
+async fn register(State(state): State<AppState>, ClientIp(ip): ClientIp, jar: CookieJar,
+                  Json(body): Json<Register>) -> ApiResult<(StatusCode, CookieJar, Json<Value>)>
 {
     // Consent to the processing of political opinions, explicit and recorded:
     // art. 9(2)(a) GDPR is what makes storing them lawful at all.
@@ -340,6 +410,28 @@ async fn register(State(state): State<AppState>, jar: CookieJar, Json(body): Jso
     }
     let name = validate::username(&body.username).map_err(bad)?;
     validate::password(&body.password).map_err(bad)?;
+    // A closed site opens an account only to someone holding a live
+    // invitation; joining the group is still asked for afterwards.
+    if state.signup == Signup::Invite {
+        let code = body.invite.as_deref().unwrap_or("").trim().to_string();
+        let row: Option<(i64,)> = sqlx::query_as("SELECT id FROM groups WHERE invite_code = ?")
+            .bind(&code).fetch_optional(&state.db).await?;
+        if code.is_empty() || row.is_none() {
+            return Err(ApiError(StatusCode::FORBIDDEN, "signup_invite_only"));
+        }
+    }
+    // Counted before argon2 runs, like login attempts, so a burst cannot slip
+    // past the check while the first hash is still being computed.
+    {
+        let t = now();
+        let mut m = state.signups.lock().unwrap();
+        m.retain(|_, (_, since)| t - *since < SIGNUP_WINDOW);
+        let e = m.entry(ip).or_insert((0, t));
+        if e.0 >= MAX_SIGNUPS {
+            return Err(ApiError(StatusCode::TOO_MANY_REQUESTS, "too_many_signups"));
+        }
+        e.0 += 1;
+    }
     let hash = hash_password(body.password).await?;
     let t = now();
     // One transaction: an account without its profile row would answer 500
@@ -406,14 +498,15 @@ async fn logout(State(state): State<AppState>, jar: CookieJar) -> ApiResult<(Sta
 }
 
 async fn groups_of(state: &AppState, user: i64) -> ApiResult<Vec<Value>> {
-    let rows: Vec<(i64, String, String, i64)> = sqlx::query_as(
+    let rows: Vec<(i64, String, String, i64, Option<i64>)> = sqlx::query_as(
         "SELECT g.id, g.name, g.invite_code,
-                (SELECT COUNT(*) FROM members m2 WHERE m2.group_id = g.id)
+                (SELECT COUNT(*) FROM members m2 WHERE m2.group_id = g.id), g.owner_id
          FROM groups g JOIN members m ON m.group_id = g.id
          WHERE m.user_id = ? ORDER BY g.name")
         .bind(user).fetch_all(&state.db).await?;
     Ok(rows.into_iter()
-        .map(|(id, name, invite, n)| json!({ "id": id, "name": name, "invite": invite, "members": n }))
+        .map(|(id, name, invite, n, owner)| json!({ "id": id, "name": name, "invite": invite,
+                                                    "members": n, "owner": owner == Some(user) }))
         .collect())
 }
 
@@ -506,8 +599,7 @@ async fn delete_me(State(state): State<AppState>, jar: CookieJar, Json(body): Js
     }
     let mut tx = state.db.begin().await?;
     sqlx::query("DELETE FROM users WHERE id = ?").bind(id).execute(&mut *tx).await?;
-    sqlx::query("DELETE FROM groups WHERE id NOT IN (SELECT group_id FROM members)")
-        .execute(&mut *tx).await?;
+    settle_groups(&mut tx).await?;
     tx.commit().await?;
     Ok((StatusCode::NO_CONTENT, jar.remove(Cookie::build(SESSION_COOKIE).path("/"))))
 }
@@ -523,12 +615,13 @@ async fn create_group(State(state): State<AppState>, jar: CookieJar, Json(body):
     let t = now();
     let invite = random_hex(16);
     let mut tx = state.db.begin().await?;
-    let gid = sqlx::query("INSERT INTO groups (name, invite_code, created_at) VALUES (?, ?, ?)")
-        .bind(&name).bind(&invite).bind(t).execute(&mut *tx).await?.last_insert_rowid();
+    let gid = sqlx::query("INSERT INTO groups (name, invite_code, created_at, owner_id) VALUES (?, ?, ?, ?)")
+        .bind(&name).bind(&invite).bind(t).bind(user).execute(&mut *tx).await?.last_insert_rowid();
     sqlx::query("INSERT INTO members (group_id, user_id, joined_at) VALUES (?, ?, ?)")
         .bind(gid).bind(user).bind(t).execute(&mut *tx).await?;
     tx.commit().await?;
-    Ok((StatusCode::CREATED, Json(json!({ "id": gid, "name": name, "invite": invite, "members": 1 }))))
+    Ok((StatusCode::CREATED, Json(json!({ "id": gid, "name": name, "invite": invite, "members": 1,
+                                          "owner": true }))))
 }
 
 /// What an invitation leads to, so the page can ask before joining: joining
@@ -569,10 +662,111 @@ async fn leave_group(State(state): State<AppState>, jar: CookieJar, Path(gid): P
     let mut tx = state.db.begin().await?;
     sqlx::query("DELETE FROM members WHERE group_id = ? AND user_id = ?")
         .bind(gid).bind(user).execute(&mut *tx).await?;
-    sqlx::query("DELETE FROM groups WHERE id = ? AND id NOT IN (SELECT group_id FROM members)")
-        .bind(gid).execute(&mut *tx).await?;
+    settle_groups(&mut tx).await?;
     tx.commit().await?;
     Ok(StatusCode::NO_CONTENT)
+}
+
+/// A new invitation link: the old one stops working at once. For when a link
+/// went further than meant.
+async fn new_invite(State(state): State<AppState>, jar: CookieJar, Path(gid): Path<i64>)
+    -> ApiResult<Json<Value>>
+{
+    let (user, _) = current_user(&state, &jar).await?;
+    owned_group(&state, gid, user).await?;
+    let invite = random_hex(16);
+    sqlx::query("UPDATE groups SET invite_code = ? WHERE id = ?")
+        .bind(&invite).bind(gid).execute(&state.db).await?;
+    Ok(Json(json!({ "invite": invite })))
+}
+
+#[derive(Deserialize)]
+struct Member { username: String }
+
+/// The member of `gid` named `name`, other than `user`.
+async fn member_named(state: &AppState, gid: i64, user: i64, name: &str) -> ApiResult<i64> {
+    let row: Option<(i64,)> = sqlx::query_as(
+        "SELECT u.id FROM users u JOIN members m ON m.user_id = u.id
+         WHERE m.group_id = ? AND u.username_key = ? AND u.id != ?")
+        .bind(gid).bind(validate::username_key(name)).bind(user)
+        .fetch_optional(&state.db).await?;
+    row.map(|r| r.0).ok_or(ApiError(StatusCode::NOT_FOUND, "no_such_member"))
+}
+
+/// Shows a member out. They lose sight of the group at once; with the link
+/// changed as well, they cannot come back on their own.
+async fn remove_member(State(state): State<AppState>, jar: CookieJar, Path(gid): Path<i64>,
+                       Json(body): Json<Member>) -> ApiResult<StatusCode>
+{
+    let (user, _) = current_user(&state, &jar).await?;
+    owned_group(&state, gid, user).await?;
+    let target = member_named(&state, gid, user, &body.username).await?;
+    sqlx::query("DELETE FROM members WHERE group_id = ? AND user_id = ?")
+        .bind(gid).bind(target).execute(&state.db).await?;
+    Ok(StatusCode::NO_CONTENT)
+}
+
+/// Hands the group to another member, who becomes its owner.
+async fn hand_over_group(State(state): State<AppState>, jar: CookieJar, Path(gid): Path<i64>,
+                         Json(body): Json<Member>) -> ApiResult<StatusCode>
+{
+    let (user, _) = current_user(&state, &jar).await?;
+    owned_group(&state, gid, user).await?;
+    let target = member_named(&state, gid, user, &body.username).await?;
+    sqlx::query("UPDATE groups SET owner_id = ? WHERE id = ?")
+        .bind(target).bind(gid).execute(&state.db).await?;
+    Ok(StatusCode::NO_CONTENT)
+}
+
+/// Deletes the group for everyone. Profiles stay with their accounts: only
+/// the memberships go.
+async fn delete_group(State(state): State<AppState>, jar: CookieJar, Path(gid): Path<i64>)
+    -> ApiResult<StatusCode>
+{
+    let (user, _) = current_user(&state, &jar).await?;
+    owned_group(&state, gid, user).await?;
+    sqlx::query("DELETE FROM groups WHERE id = ?").bind(gid).execute(&state.db).await?;
+    Ok(StatusCode::NO_CONTENT)
+}
+
+#[derive(Deserialize)]
+struct NewPassword { current: String, new: String }
+
+/// Changes the password and ends every other session: whoever might have
+/// known the old one is signed out wherever they were.
+async fn change_password(State(state): State<AppState>, jar: CookieJar, Json(body): Json<NewPassword>)
+    -> ApiResult<StatusCode>
+{
+    let (id, _) = current_user(&state, &jar).await?;
+    let (hash,): (String,) = sqlx::query_as("SELECT pw_hash FROM users WHERE id = ?")
+        .bind(id).fetch_one(&state.db).await?;
+    if !verify_password(body.current, hash).await {
+        return Err(ApiError(StatusCode::UNAUTHORIZED, "bad_credentials"));
+    }
+    validate::password(&body.new).map_err(bad)?;
+    let new_hash = hash_password(body.new).await?;
+    let mut tx = state.db.begin().await?;
+    sqlx::query("UPDATE users SET pw_hash = ? WHERE id = ?")
+        .bind(new_hash).bind(id).execute(&mut *tx).await?;
+    end_sessions_but(&mut tx, id, &jar).await?;
+    tx.commit().await?;
+    Ok(StatusCode::NO_CONTENT)
+}
+
+/// Signs the account out everywhere but here.
+async fn end_other_sessions(State(state): State<AppState>, jar: CookieJar) -> ApiResult<StatusCode> {
+    let (id, _) = current_user(&state, &jar).await?;
+    let mut tx = state.db.begin().await?;
+    end_sessions_but(&mut tx, id, &jar).await?;
+    tx.commit().await?;
+    Ok(StatusCode::NO_CONTENT)
+}
+
+async fn end_sessions_but(tx: &mut sqlx::SqliteConnection, user: i64, jar: &CookieJar) -> ApiResult<()> {
+    let keep = jar.get(SESSION_COOKIE).map(|c| token_hash(c.value())).unwrap_or_default();
+    sqlx::query("DELETE FROM sessions WHERE user_id = ? AND token_hash != ?")
+        .bind(user).bind(keep).execute(&mut *tx).await?;
+    Ok(())
 }
 
 /// A group's profiles, for its members only. A non-member gets the same 404
@@ -584,13 +778,14 @@ async fn group_profiles(State(state): State<AppState>, jar: CookieJar, Path(gid)
     if !is_member(&state, gid, user).await? {
         return Err(ApiError(StatusCode::NOT_FOUND, "no_such_group"));
     }
-    let rows: Vec<(i64, String, Option<String>, String, Option<String>)> = sqlx::query_as(
-        "SELECT u.id, u.username, p.politiscales, p.answers, p.flag
+    let rows: Vec<(i64, String, Option<String>, String, Option<String>, bool)> = sqlx::query_as(
+        "SELECT u.id, u.username, p.politiscales, p.answers, p.flag, g.owner_id IS u.id
          FROM members m JOIN users u ON u.id = m.user_id JOIN profiles p ON p.user_id = u.id
+         JOIN groups g ON g.id = m.group_id
          WHERE m.group_id = ? ORDER BY u.username")
         .bind(gid).fetch_all(&state.db).await?;
-    Ok(Json(Value::Array(rows.into_iter().map(|(uid, name, ps, a, flag)| json!({
-        "username": name, "me": uid == user,
+    Ok(Json(Value::Array(rows.into_iter().map(|(uid, name, ps, a, flag, owner)| json!({
+        "username": name, "me": uid == user, "owner": owner,
         "politiscales": parse_json(ps), "answers": parse_json(Some(a)), "flag": flag,
     })).collect())))
 }
