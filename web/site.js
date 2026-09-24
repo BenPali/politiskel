@@ -13,12 +13,20 @@
 const GROUP_KEY = "politicompass.group.v1";
 const JOIN_KEY = "politiskel.join";
 
+/* Never rejects: a network failure comes back as { ok: false, status: 0 },
+   so a dropped connection cannot abort a caller half-way (a group switch,
+   a sign-out) or lose what it was sending. */
 async function api(method, path, body) {
-  const res = await fetch(path, {
-    method, credentials: "same-origin",
-    headers: body ? { "Content-Type": "application/json" } : {},
-    body: body ? JSON.stringify(body) : undefined
-  });
+  let res;
+  try {
+    res = await fetch(path, {
+      method, credentials: "same-origin",
+      headers: body ? { "Content-Type": "application/json" } : {},
+      body: body ? JSON.stringify(body) : undefined
+    });
+  } catch (_) {
+    return { ok: false, status: 0, data: { error: "network" } };
+  }
   let data = null;
   try { data = await res.json(); } catch (_) { /* 204, or not JSON */ }
   return { ok: res.ok, status: res.status, data };
@@ -41,14 +49,14 @@ const unstash = k => { try { return sessionStorage.getItem(k); } catch (_) { ret
    from a plain static host, a network error — leaves the page local. */
 async function detectServer() {
   if (!/^https?:$/.test(location.protocol)) return;
-  let r;
-  try { r = await api("GET", "/api/me"); } catch (_) { return; }
+  const r = await api("GET", "/api/me");
   const ours = r.status === 200 ? r.data && typeof r.data.username === "string"
              : r.status === 401 && r.data && r.data.error === "not_signed_in";
   if (!ours) return;
   SERVER.on = true;
   SERVER.me = r.status === 200 ? r.data : null;
   document.body.classList.add("server-mode");
+  $("foot-privacy").textContent = L.footPrivacyServer;
   /* The PolitiScales form belongs to the account page on a server. */
   $("add-card-title").textContent = L.addTitleServer;
   $("view-account").appendChild(document.querySelector(".add-card"));
@@ -88,10 +96,14 @@ async function chooseGroup(id) {
    data and redraws the compass, and never changes page: the caller decides
    where to go next, or two navigations would race. */
 async function loadGroup() {
+  /* Two switches in a row start two loads: only the latest may draw, or a
+     slow answer for the first group would show under the second's name. */
+  const seq = SERVER.loadSeq = (SERVER.loadSeq || 0) + 1;
   await flushAnswers();   /* an answer still waiting must reach the server first */
   let list = [];
   if (SERVER.me && SERVER.group) {
     const r = await api("GET", "/api/groups/" + SERVER.group.id + "/profiles");
+    if (seq !== SERVER.loadSeq) return;
     list = r.ok ? r.data : [];
   } else if (SERVER.me) {
     list = [{ username: SERVER.me.username, me: true, flag: SERVER.me.profile.flag,
@@ -136,6 +148,13 @@ async function flushAnswers() {
     const r = await api("PUT", "/api/me/profile", { answers });
     SERVER.status = r.ok ? L.saved : apiError(r);
     if (r.ok && SERVER.me) SERVER.me.profile = r.data;
+    /* Not sent: keep the answers, unless newer ones are already waiting,
+       and try again shortly. */
+    if (r.status === 0) {
+      if (!SERVER.pending) SERVER.pending = answers;
+      clearTimeout(SERVER.saving);
+      SERVER.saving = setTimeout(flushAnswers, 5000);
+    }
   })();
   try { await SERVER.inflight; } finally { SERVER.inflight = null; }
 }
@@ -180,7 +199,9 @@ async function serverRoute() {
   renderTabs(path);
 
   if (path.startsWith("/rejoindre/")) {
-    const code = decodeURIComponent(path.slice("/rejoindre/".length));
+    const raw = path.slice("/rejoindre/".length);
+    let code;
+    try { code = decodeURIComponent(raw); } catch (_) { code = raw; }   /* a mangled link: the server will say no such invite */
     if (!SERVER.me) {
       stash(JOIN_KEY, code);
       history.replaceState(null, "", "/connexion");
@@ -271,6 +292,7 @@ function renderGroupBar() {
   if (g) menu.append(h("option", { value: "alone", textContent: L.groupNone }));
   menu.addEventListener("change", async () => {
     const v = menu.value;
+    menu.disabled = true;
     await chooseGroup(v === "alone" ? null : Number(v));
     await loadGroup();
     renderGroupBar();
@@ -310,6 +332,7 @@ function renderGroupBar() {
   box.append(h("div", { className: "group-top" }, title, actions));
   if (g) box.append(members);
   if (SERVER.status) box.append(h("p", { className: "status", textContent: SERVER.status }));
+  SERVER.status = "";   /* said once, not left standing */
 }
 
 function errorLine() {

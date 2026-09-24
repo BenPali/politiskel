@@ -157,6 +157,8 @@
      view beside them, where the screen is tall enough to hold it whole */
   @media (min-width: 1001px) and (min-height: 760px) {
     .layout > :first-child { position: sticky; top: 16px; }
+    /* with the method open the column outgrows the screen: let it scroll */
+    .layout > :first-child:has(details[open]) { position: static; }
   }
 
   .card {
@@ -2411,7 +2413,7 @@ window.POLITI_PROFILES = [];
     <div class="cols">
       <div>
         <h2 data-i18n="footPrivacy"></h2>
-        <p>
+        <p id="foot-privacy">
           Tout reste sur votre machine. Les captures, les profils, les réponses au
           questionnaire et cette page assemblée ne sont envoyés nulle part — il n'y
           a ni serveur, ni compte, ni traceur. Les réponses restent dans ce
@@ -2650,6 +2652,10 @@ const LOCALES = {
     flagsPolitiscales: "PolitiScales quand il existe", flagsPolitiskel: "Politiskel pour tous",
     flagGeneratedAlt: a => "Drapeau Politiskel de " + a,
     manualEntry: "Saisir les pourcentages à la main",
+    footPrivacyServer: "Sur ce site, vos réponses et vos pourcentages PolitiScales sont enregistrés "
+      + "sur ce serveur et visibles des seuls membres de vos groupes. Les captures ne quittent "
+      + "jamais votre navigateur. Aucun traceur, aucun e-mail demandé ; vous pouvez exporter vos "
+      + "données ou supprimer votre compte à tout moment.",
     flagInTriangle: "Dans le triangle — ", flagOnBand: "Sur la bande — ",
     flagEnlarge: "Agrandir", flagShrink: "Taille par défaut",
     flagFigureTitle: "Drapeau Politiskel — tiré des lectures, selon les conventions des drapeaux "
@@ -2778,6 +2784,9 @@ const LOCALES = {
     saved: "Enregistré.", addTitleServer: "Mon résultat PolitiScales",
     apiErrors: {
       default: "Le serveur n'a pas pu traiter la demande.",
+      network: "Pas de connexion au serveur : ce qui n'a pas pu partir sera renvoyé.",
+      flag_too_large: "Le drapeau de la capture est trop lourd pour être enregistré.",
+      flag_not_png: "Le drapeau de la capture n'est pas une image PNG valide.",
       consent_required: "Cochez la case de consentement pour créer un compte.",
       username_length: "Le pseudonyme doit faire de 2 à 24 caractères.",
       username_chars: "Le pseudonyme ne peut contenir que des lettres, des chiffres, des espaces et - _ . '",
@@ -5090,8 +5099,9 @@ function politiskelFlag(c, p) {
        into the lower corner read as stray */
     places = star ? [{ x: 110, y: 50, size: 25, bg: "white" }]
                   : [{ x: 24, y: 50, size: 26, bg: tri }, { x: 110, y: 50, size: 25, bg: "white" }];
-    /* a black band chosen for want of a second colour is filler, not a reading */
-    drawn = [tri, b && b !== tri ? band : null].filter(k => k && k !== "white");
+    /* a red triangle or a black band chosen for want of a colour is filler,
+       not a reading */
+    drawn = [a !== "white" ? tri : null, b && b !== tri ? band : null].filter(k => k && k !== "white");
   } else if (layout === "royal") {
     const field = a === "blue" || a === "white" ? "white" : a;
     P.push('<rect width="150" height="100" fill="' + C(field) + '"/>',
@@ -5703,6 +5713,7 @@ function applyView() {
     flagMode = sel.value;
     try { localStorage.setItem(FLAG_KEY, flagMode); } catch (_) { /* quota, or private browsing */ }
     render();
+    if (SERVER.on && SERVER.me && !$("account").hidden) renderGroupBar();   /* its member chips carry flags too */
   });
 })();
 
@@ -5759,12 +5770,20 @@ route();   /* a reload on #questionnaire/... lands back on the questionnaire */
 const GROUP_KEY = "politicompass.group.v1";
 const JOIN_KEY = "politiskel.join";
 
+/* Never rejects: a network failure comes back as { ok: false, status: 0 },
+   so a dropped connection cannot abort a caller half-way (a group switch,
+   a sign-out) or lose what it was sending. */
 async function api(method, path, body) {
-  const res = await fetch(path, {
-    method, credentials: "same-origin",
-    headers: body ? { "Content-Type": "application/json" } : {},
-    body: body ? JSON.stringify(body) : undefined
-  });
+  let res;
+  try {
+    res = await fetch(path, {
+      method, credentials: "same-origin",
+      headers: body ? { "Content-Type": "application/json" } : {},
+      body: body ? JSON.stringify(body) : undefined
+    });
+  } catch (_) {
+    return { ok: false, status: 0, data: { error: "network" } };
+  }
   let data = null;
   try { data = await res.json(); } catch (_) { /* 204, or not JSON */ }
   return { ok: res.ok, status: res.status, data };
@@ -5787,14 +5806,14 @@ const unstash = k => { try { return sessionStorage.getItem(k); } catch (_) { ret
    from a plain static host, a network error — leaves the page local. */
 async function detectServer() {
   if (!/^https?:$/.test(location.protocol)) return;
-  let r;
-  try { r = await api("GET", "/api/me"); } catch (_) { return; }
+  const r = await api("GET", "/api/me");
   const ours = r.status === 200 ? r.data && typeof r.data.username === "string"
              : r.status === 401 && r.data && r.data.error === "not_signed_in";
   if (!ours) return;
   SERVER.on = true;
   SERVER.me = r.status === 200 ? r.data : null;
   document.body.classList.add("server-mode");
+  $("foot-privacy").textContent = L.footPrivacyServer;
   /* The PolitiScales form belongs to the account page on a server. */
   $("add-card-title").textContent = L.addTitleServer;
   $("view-account").appendChild(document.querySelector(".add-card"));
@@ -5834,10 +5853,14 @@ async function chooseGroup(id) {
    data and redraws the compass, and never changes page: the caller decides
    where to go next, or two navigations would race. */
 async function loadGroup() {
+  /* Two switches in a row start two loads: only the latest may draw, or a
+     slow answer for the first group would show under the second's name. */
+  const seq = SERVER.loadSeq = (SERVER.loadSeq || 0) + 1;
   await flushAnswers();   /* an answer still waiting must reach the server first */
   let list = [];
   if (SERVER.me && SERVER.group) {
     const r = await api("GET", "/api/groups/" + SERVER.group.id + "/profiles");
+    if (seq !== SERVER.loadSeq) return;
     list = r.ok ? r.data : [];
   } else if (SERVER.me) {
     list = [{ username: SERVER.me.username, me: true, flag: SERVER.me.profile.flag,
@@ -5882,6 +5905,13 @@ async function flushAnswers() {
     const r = await api("PUT", "/api/me/profile", { answers });
     SERVER.status = r.ok ? L.saved : apiError(r);
     if (r.ok && SERVER.me) SERVER.me.profile = r.data;
+    /* Not sent: keep the answers, unless newer ones are already waiting,
+       and try again shortly. */
+    if (r.status === 0) {
+      if (!SERVER.pending) SERVER.pending = answers;
+      clearTimeout(SERVER.saving);
+      SERVER.saving = setTimeout(flushAnswers, 5000);
+    }
   })();
   try { await SERVER.inflight; } finally { SERVER.inflight = null; }
 }
@@ -5926,7 +5956,9 @@ async function serverRoute() {
   renderTabs(path);
 
   if (path.startsWith("/rejoindre/")) {
-    const code = decodeURIComponent(path.slice("/rejoindre/".length));
+    const raw = path.slice("/rejoindre/".length);
+    let code;
+    try { code = decodeURIComponent(raw); } catch (_) { code = raw; }   /* a mangled link: the server will say no such invite */
     if (!SERVER.me) {
       stash(JOIN_KEY, code);
       history.replaceState(null, "", "/connexion");
@@ -6017,6 +6049,7 @@ function renderGroupBar() {
   if (g) menu.append(h("option", { value: "alone", textContent: L.groupNone }));
   menu.addEventListener("change", async () => {
     const v = menu.value;
+    menu.disabled = true;
     await chooseGroup(v === "alone" ? null : Number(v));
     await loadGroup();
     renderGroupBar();
@@ -6056,6 +6089,7 @@ function renderGroupBar() {
   box.append(h("div", { className: "group-top" }, title, actions));
   if (g) box.append(members);
   if (SERVER.status) box.append(h("p", { className: "status", textContent: SERVER.status }));
+  SERVER.status = "";   /* said once, not left standing */
 }
 
 function errorLine() {

@@ -217,8 +217,9 @@ function politiskelFlag(c, p) {
        into the lower corner read as stray */
     places = star ? [{ x: 110, y: 50, size: 25, bg: "white" }]
                   : [{ x: 24, y: 50, size: 26, bg: tri }, { x: 110, y: 50, size: 25, bg: "white" }];
-    /* a black band chosen for want of a second colour is filler, not a reading */
-    drawn = [tri, b && b !== tri ? band : null].filter(k => k && k !== "white");
+    /* a red triangle or a black band chosen for want of a colour is filler,
+       not a reading */
+    drawn = [a !== "white" ? tri : null, b && b !== tri ? band : null].filter(k => k && k !== "white");
   } else if (layout === "royal") {
     const field = a === "blue" || a === "white" ? "white" : a;
     P.push('<rect width="150" height="100" fill="' + C(field) + '"/>',

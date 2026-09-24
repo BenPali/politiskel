@@ -182,6 +182,10 @@ const LOCALES = {
     flagsPolitiscales: "PolitiScales quand il existe", flagsPolitiskel: "Politiskel pour tous",
     flagGeneratedAlt: a => "Drapeau Politiskel de " + a,
     manualEntry: "Saisir les pourcentages à la main",
+    footPrivacyServer: "Sur ce site, vos réponses et vos pourcentages PolitiScales sont enregistrés "
+      + "sur ce serveur et visibles des seuls membres de vos groupes. Les captures ne quittent "
+      + "jamais votre navigateur. Aucun traceur, aucun e-mail demandé ; vous pouvez exporter vos "
+      + "données ou supprimer votre compte à tout moment.",
     flagInTriangle: "Dans le triangle — ", flagOnBand: "Sur la bande — ",
     flagEnlarge: "Agrandir", flagShrink: "Taille par défaut",
     flagFigureTitle: "Drapeau Politiskel — tiré des lectures, selon les conventions des drapeaux "
@@ -310,6 +314,9 @@ const LOCALES = {
     saved: "Enregistré.", addTitleServer: "Mon résultat PolitiScales",
     apiErrors: {
       default: "Le serveur n'a pas pu traiter la demande.",
+      network: "Pas de connexion au serveur : ce qui n'a pas pu partir sera renvoyé.",
+      flag_too_large: "Le drapeau de la capture est trop lourd pour être enregistré.",
+      flag_not_png: "Le drapeau de la capture n'est pas une image PNG valide.",
       consent_required: "Cochez la case de consentement pour créer un compte.",
       username_length: "Le pseudonyme doit faire de 2 à 24 caractères.",
       username_chars: "Le pseudonyme ne peut contenir que des lettres, des chiffres, des espaces et - _ . '",

@@ -466,6 +466,7 @@ function applyView() {
     flagMode = sel.value;
     try { localStorage.setItem(FLAG_KEY, flagMode); } catch (_) { /* quota, or private browsing */ }
     render();
+    if (SERVER.on && SERVER.me && !$("account").hidden) renderGroupBar();   /* its member chips carry flags too */
   });
 })();
 

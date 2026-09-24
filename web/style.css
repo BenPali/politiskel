@@ -150,6 +150,8 @@
      view beside them, where the screen is tall enough to hold it whole */
   @media (min-width: 1001px) and (min-height: 760px) {
     .layout > :first-child { position: sticky; top: 16px; }
+    /* with the method open the column outgrows the screen: let it scroll */
+    .layout > :first-child:has(details[open]) { position: static; }
   }
 
   .card {
