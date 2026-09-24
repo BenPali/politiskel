@@ -277,5 +277,6 @@ MIT. Most flag symbols in `web/flag-icons.js` come from
 [game-icons.net](https://game-icons.net/), by Lorc and Delapouite, under
 [CC BY 3.0](https://creativecommons.org/licenses/by/3.0/); the page credits
 them under each generated flag and in its footer. The star, the broken chain,
-the globe, the Phrygian cap, the croix de guerre, the crown and the column are
-drawn for Politiskel, by `tools/draw-flag-symbols.js`.
+the globe, the Phrygian cap, the croix de guerre, the crown, the column, the
+tower, the torch, the shield, the book and the factory are drawn for
+Politiskel, by `tools/draw-flag-symbols.js`.

@@ -1,7 +1,10 @@
 #!/usr/bin/env node
-/* The flag symbols drawn for Politiskel, where game-icons.net's did not read
-   at flag size: the broken chain, the globe, the Phrygian cap, the croix de
-   guerre, the crown and the column. Each is built here from plain shapes in
+/* The flag symbols drawn for Politiskel: those of game-icons.net that did
+   not read at flag size (the broken chain, the globe, the Phrygian cap, the
+   croix de guerre, the crown, the column, the tower, the torch), and those
+   redrawn to share their look (the shield, the book, the factory): plain
+   solid silhouettes, few details, cut-outs wide enough to survive 24px.
+   Each is built here from plain shapes in
    the 512 × 512 box the other symbols use, and written into
    web/flag-icons.js in place of its previous entry:
 
@@ -121,6 +124,56 @@ ICONS.column = [
   EO(P([178, 138], [334, 138], [326, 398], [186, 398]), ...[205, 249, 293].map(x => rrect(x, 150, x + 14, 386, 7))),
   rrect(158, 404, 354, 428, 3),
   rrect(128, 434, 384, 460, 3)
+];
+
+/* Tower: a keep with three merlons, two arrow slits and an arched door. */
+ICONS.tower = [
+  EO(P([164, 150], [348, 150], [362, 440], [150, 440]),
+     rrect(241, 194, 271, 264, 10),
+     "M216,440 L216,384 A40,40 0 0 1 296,384 L296,440 Z"),
+  rrect(136, 114, 376, 162, 6),
+  rrect(136, 58, 194, 122, 6), rrect(227, 58, 285, 122, 6), rrect(318, 58, 376, 122, 6),
+  rrect(118, 436, 394, 464, 6)
+];
+
+/* Torch: an upright flame with its heart cut out, a cup, a tapering handle. */
+ICONS.torch = [
+  EO("M256,34 C312,98 348,146 348,200 C348,250 306,284 256,284 C206,284 164,250 164,200 "
+     + "C164,160 188,132 210,100 C220,132 232,150 246,160 C242,118 244,78 256,34 Z",
+     "M258,150 C284,186 300,206 300,230 C300,254 280,266 258,266 C236,266 216,254 216,230 "
+     + "C216,206 236,186 258,150 Z"),
+  rrect(168, 290, 344, 318, 8),
+  P([186, 318], [326, 318], [300, 362], [212, 362]),
+  "M224,370 L288,370 L270,466 A14,14 0 0 1 242,466 Z"
+];
+
+/* Shield: a plain heater shield, a chevron cut through it. */
+ICONS.shield = [
+  EO("M256,40 C318,70 372,78 430,78 C430,250 390,388 256,470 C122,388 82,250 82,78 "
+     + "C140,78 194,70 256,40 Z",
+     P([256, 196], [380, 314], [380, 360], [256, 244], [132, 360], [132, 314]))
+];
+
+/* Book: an open book, two pages on a cover, three lines cut in each. */
+{
+  const lines = side => [0, 1, 2].map(i => {
+    const y = 170 + i * 58;
+    return side < 0 ? rrect(118, y, 222, y + 20, 10) : rrect(290, y, 394, y + 20, 10);
+  });
+  ICONS.book = [
+    EO("M244,128 C200,100 140,92 84,104 L84,396 C140,384 200,392 244,420 Z", ...lines(-1)),
+    EO("M268,128 C312,100 372,92 428,104 L428,396 C372,384 312,392 268,420 Z", ...lines(1)),
+    "M56,136 L72,136 L72,412 C140,398 206,406 256,436 C306,406 372,398 440,412 L440,136 L456,136 "
+      + "L456,440 C380,426 312,432 256,462 C200,432 132,426 56,440 Z"
+  ];
+}
+
+/* Factory: a sawtooth roof, a chimney, a row of windows. */
+ICONS.factory = [
+  EO(P([62, 444], [62, 206], [162, 270], [162, 206], [262, 270], [262, 206], [362, 270], [362, 444]),
+     rrect(98, 322, 140, 382, 6), rrect(184, 322, 226, 382, 6), rrect(270, 322, 312, 382, 6)),
+  P([378, 444], [382, 96], [438, 96], [450, 444]),
+  rrect(372, 74, 448, 102, 6)
 ];
 
 if (require.main === module) {
