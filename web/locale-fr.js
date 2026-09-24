@@ -250,6 +250,7 @@ const LOCALES = {
       phrygian: v => "Bonnet phrygien : la révolution et la liberté (" + v + ").",
       croix: v => "Croix de guerre : le patriotisme martial, nation et ordre ensemble (" + v + ").",
       crown: v => "Couronne : le monarchisme (" + v + ").",
+      equality: v => "Signe égal : l'égalité des droits pour tous — personnes LGBT, femmes, minorités — plutôt qu'une cause parmi d'autres (" + v + ").",
       fleur: v => "Fleur de lys : un monarchisme légitimiste (" + v + ")."
     },
     tabCompass: "Boussole", tabQuiz: "Questionnaire", tabGroups: "Groupes", tabAccount: "Mon compte",

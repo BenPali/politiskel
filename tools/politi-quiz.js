@@ -781,6 +781,17 @@
 
      `n` counts the answers behind each reading, so the page can say how
      thin it is. */
+  /* The items that ask about a group's rights, by group — not about a
+     policy, an effect or a movement. "Immigration" in CHES mixes the rights
+     of immigrants with immigration policy (how many, deportations, the
+     economy), and "women" includes a judgement on feminism: those are left
+     out here. Equal rights across groups is read on these alone. */
+  const RIGHTS = {
+    lgbt: ["ess.freehms", "ess.hmsacld", "ess.hmsfmlsh", "evs.v153", "issp.two.women", "issp.trans"],
+    women: ["issp.working.mother", "issp.breadwinner", "evs.v76", "evs.v81", "evs.v154"],
+    minorities: ["issp.immig.priority", "ess.rfgbfml", "issp.never.french"]
+  };
+
   function score(answers, themeKey) {
     const theme = THEMES.find(t => t.key === themeKey);
     const items = askedItems(themeKey);
@@ -820,13 +831,28 @@
       const v = answers[key];
       return Number.isInteger(v) && v >= 0 && v < SCALES.salience.values.length ? v : null;
     };
+    /* Equal rights: for each group, how egalitarian the answers on its rights
+       are (positive = equal rights, on [0, 100] once oriented), and the
+       weakest of the three — a profile egalitarian for one group only is not
+       read as egalitarian for all. Null unless every group was answered. */
+    if (themeKey === "society") {
+      const groups = {};
+      for (const [g, ids] of Object.entries(RIGHTS)) {
+        const vs = answered.filter(a => ids.includes(a.i.id)).map(a => a.v);
+        groups[g] = vs.length ? Math.round(-100 * mean(vs)) : null;
+      }
+      const gs = Object.values(groups);
+      out.equality = gs.every(v => v !== null)
+        ? { groups, min: Math.min(...gs), mean: Math.round(mean(gs)) } : null;
+    }
+
     out.salience = level("salience." + themeKey);
     out.salienceAfter = level("salience." + themeKey + ".after");
 
     return out;
   }
 
-  const api = { SCALES, ITEMS, THEMES, itemById, itemValue, score, mixedOrder, askedItems };
+  const api = { SCALES, ITEMS, THEMES, RIGHTS, itemById, itemValue, score, mixedOrder, askedItems };
   if (typeof module !== "undefined" && module.exports) module.exports = api;
   else global.PolitiQuiz = api;
 

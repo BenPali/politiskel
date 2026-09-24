@@ -2058,6 +2058,17 @@
 
      `n` counts the answers behind each reading, so the page can say how
      thin it is. */
+  /* The items that ask about a group's rights, by group — not about a
+     policy, an effect or a movement. "Immigration" in CHES mixes the rights
+     of immigrants with immigration policy (how many, deportations, the
+     economy), and "women" includes a judgement on feminism: those are left
+     out here. Equal rights across groups is read on these alone. */
+  const RIGHTS = {
+    lgbt: ["ess.freehms", "ess.hmsacld", "ess.hmsfmlsh", "evs.v153", "issp.two.women", "issp.trans"],
+    women: ["issp.working.mother", "issp.breadwinner", "evs.v76", "evs.v81", "evs.v154"],
+    minorities: ["issp.immig.priority", "ess.rfgbfml", "issp.never.french"]
+  };
+
   function score(answers, themeKey) {
     const theme = THEMES.find(t => t.key === themeKey);
     const items = askedItems(themeKey);
@@ -2097,13 +2108,28 @@
       const v = answers[key];
       return Number.isInteger(v) && v >= 0 && v < SCALES.salience.values.length ? v : null;
     };
+    /* Equal rights: for each group, how egalitarian the answers on its rights
+       are (positive = equal rights, on [0, 100] once oriented), and the
+       weakest of the three — a profile egalitarian for one group only is not
+       read as egalitarian for all. Null unless every group was answered. */
+    if (themeKey === "society") {
+      const groups = {};
+      for (const [g, ids] of Object.entries(RIGHTS)) {
+        const vs = answered.filter(a => ids.includes(a.i.id)).map(a => a.v);
+        groups[g] = vs.length ? Math.round(-100 * mean(vs)) : null;
+      }
+      const gs = Object.values(groups);
+      out.equality = gs.every(v => v !== null)
+        ? { groups, min: Math.min(...gs), mean: Math.round(mean(gs)) } : null;
+    }
+
     out.salience = level("salience." + themeKey);
     out.salienceAfter = level("salience." + themeKey + ".after");
 
     return out;
   }
 
-  const api = { SCALES, ITEMS, THEMES, itemById, itemValue, score, mixedOrder, askedItems };
+  const api = { SCALES, ITEMS, THEMES, RIGHTS, itemById, itemValue, score, mixedOrder, askedItems };
   if (typeof module !== "undefined" && module.exports) module.exports = api;
   else global.PolitiQuiz = api;
 
@@ -2774,6 +2800,7 @@ const LOCALES = {
       phrygian: v => "Bonnet phrygien : la révolution et la liberté (" + v + ").",
       croix: v => "Croix de guerre : le patriotisme martial, nation et ordre ensemble (" + v + ").",
       crown: v => "Couronne : le monarchisme (" + v + ").",
+      equality: v => "Signe égal : l'égalité des droits pour tous — personnes LGBT, femmes, minorités — plutôt qu'une cause parmi d'autres (" + v + ").",
       fleur: v => "Fleur de lys : un monarchisme légitimiste (" + v + ")."
     },
     tabCompass: "Boussole", tabQuiz: "Questionnaire", tabGroups: "Groupes", tabAccount: "Mon compte",
@@ -4915,7 +4942,7 @@ document.addEventListener("keydown", e => {
    The page has one script: the web/*.js files are concatenated in the order
    web/shell.html includes them, and share its top-level scope. */
 
-const FLAG_ICON_CREDITS = {"fist": "Lorc", "swallow": "Delapouite", "liberty": "Politiskel (drawn)", "shield": "Politiskel (drawn)", "globe": "Politiskel (drawn)", "oak": "Delapouite", "tower": "Politiskel (drawn)", "book": "Politiskel (drawn)", "column": "Politiskel (drawn)", "scales": "Lorc", "rings": "Lorc", "star": "Politiskel (drawn)", "sprout": "Lorc", "torch": "Politiskel (drawn)", "anarchy": "Delapouite", "phrygian": "Politiskel (drawn)", "venus": "Delapouite", "handshake": "Delapouite", "factory": "Politiskel (drawn)", "croix": "Politiskel (drawn)", "crown": "Politiskel (drawn)", "fleur": "Delapouite"};
+const FLAG_ICON_CREDITS = {"fist": "Lorc", "swallow": "Delapouite", "liberty": "Politiskel (drawn)", "shield": "Politiskel (drawn)", "globe": "Politiskel (drawn)", "oak": "Delapouite", "tower": "Politiskel (drawn)", "book": "Politiskel (drawn)", "column": "Politiskel (drawn)", "scales": "Lorc", "rings": "Lorc", "star": "Politiskel (drawn)", "sprout": "Lorc", "torch": "Politiskel (drawn)", "anarchy": "Delapouite", "phrygian": "Politiskel (drawn)", "venus": "Delapouite", "handshake": "Delapouite", "factory": "Politiskel (drawn)", "croix": "Politiskel (drawn)", "crown": "Politiskel (drawn)", "fleur": "Delapouite", "equality": "Politiskel (drawn)"};
 
 const FLAG_ICONS = {
   fist: ["M227.227 21.777c-1.845 0-3.704.05-5.567.157-15.314.875-30.76 5.305-39.494 10.863l-.008 73.15c2.884-.094 5.777-.147 8.676-.142 23.382.036 47.104 3.286 68.47 9.513l.01-87.507c-7.034-3.518-19.178-6.03-32.087-6.033zm80.74 9.16c-11.925.15-23.077 2.364-29.967 5.596l-.008 77.602v7.658c38.486 15.67 64.814 42.48 58.735 78.764l-.96 5.73-5.562 1.674c-17.45 5.253-34.872 9.703-52.225 13.335v25.234c25.562-.704 51.327-2.687 77.145-6.098l.02-197.928c-8.284-5.563-23.508-10.243-38.842-11.328a100.065 100.065 0 0 0-8.336-.238zM143.223 46.294a99.206 99.206 0 0 0-16.491 1.172c-15.67 2.454-31.477 8.565-40.406 15.402l-.01 72.955c18.808-15.81 46.704-25.143 77.15-28.54l.007-57.966c-4.82-1.752-12.018-2.916-20.25-3.023zm258.394 3.46c-10.804.117-20.722 1.93-27.043 4.655l-.02 183.182c25.074-4.02 50.16-9.412 75.122-16.358l1.99-158.447c-8.352-5.9-23.648-11.025-39.05-12.553a100.98 100.98 0 0 0-11-.478zm-222.775 74.202c-53.72.702-101.407 20.365-97.887 66.6 15.836-3.918 30.84-5.893 44.94-6.1 34.84-.51 64.213 9.704 87.318 27.613 34.608-3.11 69.852-10 105.412-20.314.14-41.287-74.098-68.657-139.783-67.8zm-48.877 78.65c-1.296-.003-2.603.012-3.92.045-17.256.436-36.45 4.03-57.566 11.037 5.79 53.808 26.325 106.41 58.5 143.346 6.226 7.15 12.856 13.712 19.875 19.615 29.303 9.282 69.26 12.917 110.534 12.14 3.777-55.805-8.717-108.357-36.193-142.74-21.265-26.61-51.064-43.39-91.232-43.444zm129.326 22.282a545.177 545.177 0 0 1-27.995 4.15 138.77 138.77 0 0 1 4.502 5.346c3.146 3.937 6.094 8.062 8.873 12.334 9.916.144 19.868.125 29.857-.106H259.29v-21.723zm191.817 15.343c-65.406 17.826-131.462 25.41-195.85 25.315 16.998 35.144 23.828 78.093 21.013 122.6 42.482-2.08 85.03-8.23 118.187-15.983 26.693-32.78 47.37-77.118 56.65-131.932zM400.51 389.9c-38.334 9.145-87.95 16.056-136.873 17.454-47.67 1.36-94.336-2.228-129.448-15.262l-.01 78.93c27.187 12.568 76.414 20.205 127.318 20.298 51.224.094 104.214-7.173 139-20.773l.012-80.647z"],
@@ -4939,7 +4966,8 @@ const FLAG_ICONS = {
   factory: [{"d":"M62,444 L62,206 L162,270 L162,206 L262,270 L262,206 L362,270 L362,444 Z M104,322 L134,322 A6,6 0 0 1 140,328 L140,376 A6,6 0 0 1 134,382 L104,382 A6,6 0 0 1 98,376 L98,328 A6,6 0 0 1 104,322 Z M190,322 L220,322 A6,6 0 0 1 226,328 L226,376 A6,6 0 0 1 220,382 L190,382 A6,6 0 0 1 184,376 L184,328 A6,6 0 0 1 190,322 Z M276,322 L306,322 A6,6 0 0 1 312,328 L312,376 A6,6 0 0 1 306,382 L276,382 A6,6 0 0 1 270,376 L270,328 A6,6 0 0 1 276,322 Z","rule":"evenodd"},"M378,444 L382,96 L438,96 L450,444 Z","M378,74 L442,74 A6,6 0 0 1 448,80 L448,96 A6,6 0 0 1 442,102 L378,102 A6,6 0 0 1 372,96 L372,80 A6,6 0 0 1 378,74 Z"],
   croix: ["M90.5,90.5 L133,104.7 L326.7,298.4 L298.4,326.7 L104.7,133 Z","M258.8,366.3 L366.3,258.8 L387.5,280 L280,387.5 Z","M325.3,342.3 L342.3,325.3 L383.3,366.3 L366.3,383.3 Z","M364.9,388.9 A24,24 0 1 0 412.9,388.9 A24,24 0 1 0 364.9,388.9 Z","M421.5,90.5 L407.3,133 L213.6,326.7 L185.3,298.4 L379,104.7 Z","M145.7,258.8 L253.2,366.3 L232,387.5 L124.5,280 Z","M169.7,325.3 L186.7,342.3 L145.7,383.3 L128.7,366.3 Z","M99.1,388.9 A24,24 0 1 0 147.1,388.9 A24,24 0 1 0 99.1,388.9 Z",{"d":"M222,256 L186,112 L326,112 L290,256 Z M256,222 L400,186 L400,326 L256,290 Z M290,256 L326,400 L186,400 L222,256 Z M256,290 L112,326 L112,186 L256,222 Z","knock":1},"M236,256 L202,128 L310,128 L276,256 Z M256,236 L384,202 L384,310 L256,276 Z M276,256 L310,384 L202,384 L236,256 Z M256,276 L128,310 L128,202 L256,236 Z",{"d":"M196,256 A60,60 0 1 0 316,256 A60,60 0 1 0 196,256 Z","knock":1},"M210,256 A46,46 0 1 0 302,256 A46,46 0 1 0 210,256 Z"],
   crown: ["M118,330 L92,168 L182,248 L256,124 L330,248 L420,168 L394,330 Z",{"d":"M118,336 L394,336 A10,10 0 0 1 404,346 L404,386 A10,10 0 0 1 394,396 L118,396 A10,10 0 0 1 108,386 L108,346 A10,10 0 0 1 118,336 Z M166,366 A14,14 0 1 0 194,366 A14,14 0 1 0 166,366 Z M242,366 A14,14 0 1 0 270,366 A14,14 0 1 0 242,366 Z M318,366 A14,14 0 1 0 346,366 A14,14 0 1 0 318,366 Z","rule":"evenodd"},"M68,150 A24,24 0 1 0 116,150 A24,24 0 1 0 68,150 Z","M230,104 A26,26 0 1 0 282,104 A26,26 0 1 0 230,104 Z","M396,150 A24,24 0 1 0 444,150 A24,24 0 1 0 396,150 Z","M169,240 A13,13 0 1 0 195,240 A13,13 0 1 0 169,240 Z","M317,240 A13,13 0 1 0 343,240 A13,13 0 1 0 317,240 Z"],
-  fleur: ["M256 24c-31.466 48-62.932 96-62.932 160 0 56.794 37.144 113.568 45.514 148h34.836c8.37-34.432 45.514-91.206 45.514-148 0-64-31.466-112-62.932-160zM98.637 206c-47.2 0-78.664 32-78.664 80 0 32 22.115 63.526 62.93 64-15.732-16 .002-64 31.468-64 31.89 0 56.58 21.916 69.253 46h33.828c-13.744-47.52-49.108-126-118.813-126zm314.726 0c-69.705 0-105.07 78.48-118.814 126h33.827c12.673-24.084 37.362-46 69.252-46 31.465 0 47.2 48 31.466 64 40.816-.474 62.93-32 62.93-64 0-48-31.464-80-78.663-80zM153.076 350c-38.705 0-54.44 16-54.44 48 0 16 15.734 48 47.2 48 35.4 0 61.948-27 73.01-54h-35.682c-4.657 3.57-11.5 6-21.596 6-15.733 0-31.464-32-8.492-48zm37.694 0c.017.064.03.127.048.19-13.29 2.16-12.694 23.343 1.793 23.79v.02H319.39l-.003-.02c14.486-.447 15.083-21.63 1.792-23.79.017-.063.03-.126.048-.19H190.77zm168.154 0c22.972 16 7.24 48-8.492 48-10.096 0-16.94-2.43-21.596-6h-35.682c11.062 27 37.61 54 73.01 54 31.466 0 47.2-32 47.2-48 0-32-15.735-48-54.44-48zm-118.656 42c-15.733 16-15.734 48-31.467 64l31.468-16c0 16 0 32 15.732 48 15.733-16 15.732-32 15.732-48l31.467 16c-15.734-16-15.735-48-31.468-64h-31.464z"]
+  fleur: ["M256 24c-31.466 48-62.932 96-62.932 160 0 56.794 37.144 113.568 45.514 148h34.836c8.37-34.432 45.514-91.206 45.514-148 0-64-31.466-112-62.932-160zM98.637 206c-47.2 0-78.664 32-78.664 80 0 32 22.115 63.526 62.93 64-15.732-16 .002-64 31.468-64 31.89 0 56.58 21.916 69.253 46h33.828c-13.744-47.52-49.108-126-118.813-126zm314.726 0c-69.705 0-105.07 78.48-118.814 126h33.827c12.673-24.084 37.362-46 69.252-46 31.465 0 47.2 48 31.466 64 40.816-.474 62.93-32 62.93-64 0-48-31.464-80-78.663-80zM153.076 350c-38.705 0-54.44 16-54.44 48 0 16 15.734 48 47.2 48 35.4 0 61.948-27 73.01-54h-35.682c-4.657 3.57-11.5 6-21.596 6-15.733 0-31.464-32-8.492-48zm37.694 0c.017.064.03.127.048.19-13.29 2.16-12.694 23.343 1.793 23.79v.02H319.39l-.003-.02c14.486-.447 15.083-21.63 1.792-23.79.017-.063.03-.126.048-.19H190.77zm168.154 0c22.972 16 7.24 48-8.492 48-10.096 0-16.94-2.43-21.596-6h-35.682c11.062 27 37.61 54 73.01 54 31.466 0 47.2-32 47.2-48 0-32-15.735-48-54.44-48zm-118.656 42c-15.733 16-15.734 48-31.467 64l31.468-16c0 16 0 32 15.732 48 15.733-16 15.732-32 15.732-48l31.467 16c-15.734-16-15.735-48-31.468-64h-31.464z"],
+  equality: [{"d":"M42,256 A214,214 0 1 0 470,256 A214,214 0 1 0 42,256 Z M72,256 A184,184 0 1 0 440,256 A184,184 0 1 0 72,256 Z","rule":"evenodd"},"M156,190 L356,190 A12,12 0 0 1 368,202 L368,224 A12,12 0 0 1 356,236 L156,236 A12,12 0 0 1 144,224 L144,202 A12,12 0 0 1 156,190 Z","M156,276 L356,276 A12,12 0 0 1 368,288 L368,310 A12,12 0 0 1 356,322 L156,322 A12,12 0 0 1 144,310 L144,288 A12,12 0 0 1 156,276 Z"]
 };
 /* The Politiskel flag: an emblem drawn from a profile's readings, for the
    profiles PolitiScales never drew one for, and for anyone who prefers it.
@@ -5034,6 +5062,10 @@ function flagTraits(c, p) {
      services, redistribution. Until the institutions theme asks about the
      state itself, the diagonal and the circled A are not drawn. */
   const antistate = futureReading(c, "antistate");
+  /* Equal rights for every group (LGBT people, women, minorities), read on
+     the items about rights alone; it only counts when the weakest group is
+     marked too. */
+  const eq = c.soc && c.soc.equality ? c.soc.equality : null;
   const stands = (v, axis) => v >= 80 || !has(axis) || v >= axis + 15;
 
   const T = [
@@ -5067,6 +5099,9 @@ function flagTraits(c, p) {
                              ? 60 - Math.max(Math.abs(x), Math.abs(y)) : null, min: 1, colour: "orange" },
     /* composites, which outrank the traits they combine */
     { k: "anarchy",     s: antistate,                   min: 80, symbol: "anarchy", bonus: 12 },
+    /* no bonus: it takes a place at its own strength, never ahead of a
+       stronger trait; the causes it replaces give way to it regardless */
+    { k: "equality",    s: eq && eq.min >= 60 ? eq.mean : null, min: 60, symbol: "equality" },
     { k: "phrygian",    s: has(y) && y <= -30 ? rev : null, min: 70, symbol: "phrygian", bonus: 12 },
     { k: "croix",       s: has(nat) && has(ord) ? Math.min(nat, ord) : null,
                              min: 60, symbol: "croix", bonus: 20, when: () => nat >= 70 },
@@ -5075,6 +5110,10 @@ function flagTraits(c, p) {
   ].filter(t => has(t.s) && t.s >= t.min && (!t.when || t.when()))
    .map(t => Object.assign(t, { v: Math.round(t.s), rank: t.s + (t.bonus || 0) }))
    .sort((a, b) => b.rank - a.rank);
+  /* Equal rights for all says at once what LGBT rights and feminism said
+     one by one: they give way to it, colours and rainbow bar included. */
+  if (T.some(t => t.k === "equality"))
+    for (const k of ["lgbt", "feminism"]) { const i = T.findIndex(t => t.k === k); if (i >= 0) T.splice(i, 1); }
 
   /* colours: each trait's, strongest first, each colour once */
   const cols = [];
@@ -5091,7 +5130,7 @@ function flagTraits(c, p) {
     for (const k of covers[t.k] || []) hidden.add(k);
   }
   const trait = k => T.find(t => t.k === k) || null;
-  return { x, y, traits: T, cols: cols.slice(0, 3), syms, trait,
+  return { x, y, traits: T, cols: cols.slice(0, 3), colsAll: cols, syms, trait,
            intl: has(intl) ? intl : 0, rev, nat: has(nat) ? nat : 0, monarchy, antistate,
            tradition: (trait("tradition") || {}).s || 0,
            multi: (trait("multicultural") || {}).s || 0, lgbt: (trait("lgbt") || {}).s || 0,
@@ -5135,8 +5174,12 @@ const inkOn = bg => (FLAG_LIGHT.has(bg) ? "#151515" : "#ffffff");
 function politiskelFlag(c, p) {
   const t = flagTraits(c, p);
   if (t.x === null && t.y === null && !t.traits.length) return null;
-  const cols = t.cols.length ? t.cols : ["white"];
   const layout = flagLayout(t);
+  /* The rainbow bar already says LGBT rights: pink would say it a second
+     time, so it gives its field to the next colour. */
+  const rainbow = t.lgbt >= 80 && layout !== "revolution";
+  const pool = rainbow ? t.colsAll.filter(k => k !== "pink") : t.colsAll;
+  const cols = pool.length ? pool.slice(0, 3) : ["white"];
   const C = k => FLAG_COLOURS[k];
   const [a, b, c3] = cols;
   const P = [];
@@ -5225,7 +5268,6 @@ function politiskelFlag(c, p) {
   }
 
   /* modifiers */
-  const rainbow = t.lgbt >= 80 && layout !== "revolution";
   if (rainbow)
     FLAG_RAINBOW.forEach((col, i) => P.push('<rect x="138" y="' + (i * 100 / 6) + '" width="12" height="' + (100 / 6 + 0.2) + '" fill="' + col + '"/>'));
   const border = t.prot >= 75 && layout !== "royal";

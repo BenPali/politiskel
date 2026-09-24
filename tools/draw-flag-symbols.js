@@ -183,13 +183,27 @@ ICONS.factory = [
   rrect(372, 74, 448, 102, 6)
 ];
 
+/* Equality: an equals sign in a ring — equal rights for everyone, rather
+   than one cause among others. */
+ICONS.equality = [
+  EO(circle(256, 256, 214), circle(256, 256, 184)),
+  rrect(144, 190, 368, 236, 12),
+  rrect(144, 276, 368, 322, 12)
+];
+
 if (require.main === module) {
   const file = path.join(__dirname, "..", "web", "flag-icons.js");
   let src = fs.readFileSync(file, "utf8");
   for (const [k, v] of Object.entries(ICONS)) {
     const re = new RegExp("\\n  " + k + ": \\[[^\\n]*\\],?(?=\\n)");
-    if (!re.test(src)) throw new Error("no entry for " + k + " in web/flag-icons.js");
-    src = src.replace(re, m => "\n  " + k + ": " + JSON.stringify(v) + (m.endsWith(",") ? "," : ""));
+    if (re.test(src)) {
+      src = src.replace(re, m => "\n  " + k + ": " + JSON.stringify(v) + (m.endsWith(",") ? "," : ""));
+    } else {
+      /* a new symbol: appended to FLAG_ICONS, credited as drawn */
+      src = src.replace(/(\n  [a-z]+: \[[^\n]*\])\n};/, (m, last) => last + ",\n  " + k + ": " + JSON.stringify(v) + "\n};");
+      src = src.replace(/(const FLAG_ICON_CREDITS = \{[^\n]*)\};/, (m, head) => head + ", " + JSON.stringify(k) + ": \"Politiskel (drawn)\"};");
+      if (!src.includes("\n  " + k + ": ")) throw new Error("could not add " + k + " to web/flag-icons.js");
+    }
   }
   fs.writeFileSync(file, src);
   console.log("drew " + Object.keys(ICONS).join(", "));

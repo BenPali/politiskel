@@ -91,6 +91,10 @@ function flagTraits(c, p) {
      services, redistribution. Until the institutions theme asks about the
      state itself, the diagonal and the circled A are not drawn. */
   const antistate = futureReading(c, "antistate");
+  /* Equal rights for every group (LGBT people, women, minorities), read on
+     the items about rights alone; it only counts when the weakest group is
+     marked too. */
+  const eq = c.soc && c.soc.equality ? c.soc.equality : null;
   const stands = (v, axis) => v >= 80 || !has(axis) || v >= axis + 15;
 
   const T = [
@@ -124,6 +128,9 @@ function flagTraits(c, p) {
                              ? 60 - Math.max(Math.abs(x), Math.abs(y)) : null, min: 1, colour: "orange" },
     /* composites, which outrank the traits they combine */
     { k: "anarchy",     s: antistate,                   min: 80, symbol: "anarchy", bonus: 12 },
+    /* no bonus: it takes a place at its own strength, never ahead of a
+       stronger trait; the causes it replaces give way to it regardless */
+    { k: "equality",    s: eq && eq.min >= 60 ? eq.mean : null, min: 60, symbol: "equality" },
     { k: "phrygian",    s: has(y) && y <= -30 ? rev : null, min: 70, symbol: "phrygian", bonus: 12 },
     { k: "croix",       s: has(nat) && has(ord) ? Math.min(nat, ord) : null,
                              min: 60, symbol: "croix", bonus: 20, when: () => nat >= 70 },
@@ -132,6 +139,10 @@ function flagTraits(c, p) {
   ].filter(t => has(t.s) && t.s >= t.min && (!t.when || t.when()))
    .map(t => Object.assign(t, { v: Math.round(t.s), rank: t.s + (t.bonus || 0) }))
    .sort((a, b) => b.rank - a.rank);
+  /* Equal rights for all says at once what LGBT rights and feminism said
+     one by one: they give way to it, colours and rainbow bar included. */
+  if (T.some(t => t.k === "equality"))
+    for (const k of ["lgbt", "feminism"]) { const i = T.findIndex(t => t.k === k); if (i >= 0) T.splice(i, 1); }
 
   /* colours: each trait's, strongest first, each colour once */
   const cols = [];
@@ -148,7 +159,7 @@ function flagTraits(c, p) {
     for (const k of covers[t.k] || []) hidden.add(k);
   }
   const trait = k => T.find(t => t.k === k) || null;
-  return { x, y, traits: T, cols: cols.slice(0, 3), syms, trait,
+  return { x, y, traits: T, cols: cols.slice(0, 3), colsAll: cols, syms, trait,
            intl: has(intl) ? intl : 0, rev, nat: has(nat) ? nat : 0, monarchy, antistate,
            tradition: (trait("tradition") || {}).s || 0,
            multi: (trait("multicultural") || {}).s || 0, lgbt: (trait("lgbt") || {}).s || 0,
@@ -192,8 +203,12 @@ const inkOn = bg => (FLAG_LIGHT.has(bg) ? "#151515" : "#ffffff");
 function politiskelFlag(c, p) {
   const t = flagTraits(c, p);
   if (t.x === null && t.y === null && !t.traits.length) return null;
-  const cols = t.cols.length ? t.cols : ["white"];
   const layout = flagLayout(t);
+  /* The rainbow bar already says LGBT rights: pink would say it a second
+     time, so it gives its field to the next colour. */
+  const rainbow = t.lgbt >= 80 && layout !== "revolution";
+  const pool = rainbow ? t.colsAll.filter(k => k !== "pink") : t.colsAll;
+  const cols = pool.length ? pool.slice(0, 3) : ["white"];
   const C = k => FLAG_COLOURS[k];
   const [a, b, c3] = cols;
   const P = [];
@@ -282,7 +297,6 @@ function politiskelFlag(c, p) {
   }
 
   /* modifiers */
-  const rainbow = t.lgbt >= 80 && layout !== "revolution";
   if (rainbow)
     FLAG_RAINBOW.forEach((col, i) => P.push('<rect x="138" y="' + (i * 100 / 6) + '" width="12" height="' + (100 / 6 + 0.2) + '" fill="' + col + '"/>'));
   const border = t.prot >= 75 && layout !== "royal";
