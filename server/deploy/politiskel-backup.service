@@ -1,0 +1,14 @@
+# A dated, consistent copy of the database, then only the last 14 kept.
+# Triggered daily by politiskel-backup.timer; safe while the server runs.
+
+[Unit]
+Description=Politiskel database backup
+
+[Service]
+Type=oneshot
+User=politiskel
+Group=politiskel
+EnvironmentFile=/etc/politiskel/politiskel.env
+ExecStart=/bin/sh -c '/opt/politiskel/politiskel-server backup /var/backups/politiskel/politiskel-$(date +%%F).db'
+ExecStartPost=/bin/sh -c 'ls -1t /var/backups/politiskel/politiskel-*.db | tail -n +15 | xargs -r rm --'
+UMask=0077

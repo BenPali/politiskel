@@ -223,6 +223,19 @@ Secure, so plain http only works for local development, with
 `POLITISKEL_INSECURE_COOKIES=1`. The database is one SQLite
 file: back it up like any other.
 
+Each group has an owner — its creator, then its longest-standing member if
+they leave — who can issue a new invitation link (the old one stops working),
+remove a member, hand the group over or delete it. `POLITISKEL_SIGNUP=invite`
+opens accounts only from an invitation link (the very first account, the
+host's, is always allowed); either way an address may open five accounts an
+hour. Members change their password, which ends their other sessions; there
+is no e-mail, so a forgotten one is reset on the server with
+`politiskel-server reset-password <name>`. `politiskel-server backup <file>`
+copies the database while it runs. Without an account, `/essai` is the local
+page, nothing sent. [`server/DEPLOY.md`](server/DEPLOY.md) walks through a
+deployment — systemd, nginx or Caddy, daily backups, updates — and
+`server/deploy/` holds the files it uses, with a privacy notice template.
+
 What the server holds, and why it is careful about it: political opinions are
 special-category data under GDPR art. 9. It stores a pseudonym, an argon2id
 password hash, the date consent was given, group memberships, PolitiScales
