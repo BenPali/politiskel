@@ -111,9 +111,12 @@ pub(crate) async fn current_user(state: &AppState, jar: &CookieJar) -> ApiResult
     row.ok_or(ApiError(StatusCode::UNAUTHORIZED, "not_signed_in"))
 }
 
-/// What the page needs to know before anyone signs in.
-pub(crate) async fn config(State(state): State<AppState>) -> Json<Value> {
-    Json(json!({ "signup": match state.signup { Signup::Open => "open", Signup::Invite => "invite" } }))
+/// What the page needs to know before anyone signs in: who may sign up, and
+/// whether the site is still empty (its first account is always let in).
+pub(crate) async fn config(State(state): State<AppState>) -> ApiResult<Json<Value>> {
+    let (accounts,): (i64,) = sqlx::query_as("SELECT COUNT(*) FROM users").fetch_one(&state.db).await?;
+    Ok(Json(json!({ "signup": match state.signup { Signup::Open => "open", Signup::Invite => "invite" },
+                    "empty": accounts == 0 })))
 }
 
 #[derive(Deserialize)]
@@ -137,7 +140,10 @@ pub(crate) async fn register(State(state): State<AppState>, ClientIp(ip): Client
     validate::password(&body.password).map_err(bad)?;
     // A closed site opens an account only to someone holding a live
     // invitation; joining the group is still asked for afterwards.
-    if state.signup == Signup::Invite {
+    // The very first account is always allowed: on a closed site nobody could
+    // otherwise open the account that creates the first group and its link.
+    let (accounts,): (i64,) = sqlx::query_as("SELECT COUNT(*) FROM users").fetch_one(&state.db).await?;
+    if state.signup == Signup::Invite && accounts > 0 {
         let code = body.invite.as_deref().unwrap_or("").trim().to_string();
         let row: Option<(i64,)> = sqlx::query_as("SELECT id FROM groups WHERE invite_code = ?")
             .bind(&code).fetch_optional(&state.db).await?;

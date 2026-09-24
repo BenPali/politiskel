@@ -12,7 +12,8 @@ pub enum Signup {
     /// Anyone who reaches the site.
     Open,
     /// Only someone holding a valid invitation link: the site then grows
-    /// only through its groups.
+    /// only through its groups. The first account, on an empty database, is
+    /// the exception — someone has to create the first group.
     Invite,
 }
 

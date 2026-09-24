@@ -488,7 +488,12 @@ async fn sign_ups_are_limited_per_address() {
 async fn a_closed_site_opens_accounts_only_on_invitation() {
     let app = server_full(false, Signup::Invite).await;
     let (_, cfg) = Client::new(&app).call("GET", "/api/config", None).await;
-    assert_eq!(cfg["signup"], json!("invite"));
+    assert_eq!((&cfg["signup"], &cfg["empty"]), (&json!("invite"), &json!(true)));
+    // the first account is let in, to create the first group
+    let mut host = Client::new(&app);
+    assert_eq!(host.register("Hôte").await, StatusCode::CREATED);
+    let (_, g) = host.call("POST", "/api/groups", Some(json!({ "name": "Premier" }))).await;
+    let invite = g["invite"].as_str().unwrap().to_string();
     let mut c = Client::new(&app);
     let (s, b) = c.call("POST", "/api/register",
         Some(json!({ "username": "Zoé", "password": "correct horse battery", "consent": true }))).await;
@@ -496,6 +501,12 @@ async fn a_closed_site_opens_accounts_only_on_invitation() {
     let (s, _) = c.call("POST", "/api/register", Some(json!({ "username": "Zoé",
         "password": "correct horse battery", "consent": true, "invite": "0123456789abcdef0123456789abcdef" }))).await;
     assert_eq!(s, StatusCode::FORBIDDEN);
+    // a live invitation opens the door, without joining by itself
+    let (s, _) = c.call("POST", "/api/register", Some(json!({ "username": "Zoé",
+        "password": "correct horse battery", "consent": true, "invite": invite }))).await;
+    assert_eq!(s, StatusCode::CREATED);
+    let (_, me) = c.call("GET", "/api/me", None).await;
+    assert_eq!(me["groups"].as_array().unwrap().len(), 0);
 }
 
 #[tokio::test]
