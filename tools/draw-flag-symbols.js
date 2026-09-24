@@ -147,12 +147,19 @@ ICONS.torch = [
   "M224,370 L288,370 L270,466 A14,14 0 0 1 242,466 Z"
 ];
 
-/* Shield: a plain heater shield, a chevron cut through it. */
-ICONS.shield = [
-  EO("M256,40 C318,70 372,78 430,78 C430,250 390,388 256,470 C122,388 82,250 82,78 "
-     + "C140,78 194,70 256,40 Z",
-     P([256, 196], [380, 314], [380, 360], [256, 244], [132, 360], [132, 314]))
-];
+/* Shield: a heater shield — straight top, rounded point — in outline, per
+   pale: its left half solid. `inset` draws the same outline further in. */
+{
+  const shield = i => `M${f(84 + i)},${f(64 + i)} L${f(428 - i)},${f(64 + i)} L${f(428 - i)},230 `
+    + `C${f(428 - i)},${f(352 - i * 0.5)} ${f(356 - i * 0.6)},${f(428 - i * 0.9)} 256,${f(474 - i * 1.3)} `
+    + `C${f(156 + i * 0.6)},${f(428 - i * 0.9)} ${f(84 + i)},${f(352 - i * 0.5)} ${f(84 + i)},230 Z`;
+  const i = 54;
+  ICONS.shield = [
+    EO(shield(0), shield(30)),
+    `M${f(84 + i)},${f(64 + i)} L246,${f(64 + i)} L246,${f(474 - i * 1.3 - 8)} `
+      + `C${f(160 + i * 0.6)},${f(426 - i * 0.9)} ${f(84 + i)},${f(352 - i * 0.5)} ${f(84 + i)},230 Z`
+  ];
+}
 
 /* Book: an open book, two pages on a cover, three lines cut in each. */
 {
