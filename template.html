@@ -1728,11 +1728,12 @@
       fr: "Et les dirigeants du commerce et de l'industrie, ont-ils trop ou pas assez de pouvoir ?",
       src: { survey: "ISSP", wave: "Rôle de l'État 1996", variable: "Q11b", url: GESIS(6806) } },
 
-    /* ================= society: y, the libertarian-authoritarian axis =====
+    /* ================= society: y, the GAL-TAN axis (cultural, not the state) =====
        Seven sub-dimensions, the ones CHES 2024 rates and whose plain mean
        reproduces galtan at r = 0.97 across its 279 parties (each alone 0.77
        to 0.94, and none indispensable: dropping any leaves 0.96). After
-       orientation +1 always means authoritarian, as on the compass.
+       orientation +1 always means the TAN end (tradition, authority,
+       nation), up on the compass.
 
        `reserve: true` items are verified and sourced but not asked: kept so
        that a thin sub-dimension can be widened without searching again. Each
@@ -2198,7 +2199,7 @@ window.POLITI_PROFILES = [];
         <h2 data-i18n="chartTitle"></h2>
         <div class="plot">
           <svg id="compass" viewBox="0 0 600 600" role="img"
-               aria-label="Boussole Politiskel : axe horizontal gauche-droite économique, axe vertical autoritaire (en haut) - libertaire (en bas). Cliquez un profil ou un parti pour voir toutes les distances. Les valeurs chiffrées sont dans les tableaux ci-dessous.">
+               aria-label="Boussole Politiskel : axe horizontal gauche-droite économique, axe vertical sociétal, tradition, autorité et nation en haut, écologie, alternatives et libertés en bas. Cliquez un profil ou un parti pour voir toutes les distances. Les valeurs chiffrées sont dans les tableaux ci-dessous.">
             <rect class="plot-frame" x="50" y="50" width="500" height="500" rx="4"/>
             <g id="grid-layer"></g>
             <line class="axis-line" x1="50" y1="300" x2="550" y2="300"/>
@@ -2248,7 +2249,7 @@ window.POLITI_PROFILES = [];
               séparée). L'y inclure revenait à comparer deux axes différents. Cette dimension
               est affichée à part, dans la colonne « Écolo. ».
             </p>
-            <p><strong>Axe Y depuis PolitiScales — sociétal (libertaire ▼ ▲ autoritaire)</strong>,
+            <p><strong>Axe Y depuis PolitiScales — sociétal (ouverture ▼ ▲ tradition)</strong>,
               moyenne pondérée de :</p>
             <ul>
               <li><code>0,30</code> × (Essentialisme − Constructivisme)</li>
@@ -2257,8 +2258,13 @@ window.POLITI_PROFILES = [];
               <li><code>0,20</code> × (Nationalisme − Internationalisme)</li>
             </ul>
             <p>
-              Convention : <strong>Y positif = autoritaire</strong>, vers le haut, comme sur
-              les boussoles politiques classiques. Plus le nombre est grand, plus le point est haut.
+              Convention : <strong>Y positif = tradition, autorité, nation</strong>, vers le haut ;
+              négatif = écologie, alternatives, libertés, vers le bas. C'est l'axe GAL-TAN du
+              Chapel Hill Expert Survey (Hooghe, Marks et Wilson, 2002) : <em>Green, Alternative,
+              Libertarian</em> contre <em>Traditional, Authoritarian, Nationalist</em>. Il mesure
+              des valeurs culturelles, pas le rapport à l'État : on peut être tout en bas et
+              demander plus d'État, pour l'économie comme pour les services publics. Plus le nombre
+              est grand, plus le point est haut.
             </p>
             <p>
               Les poids sont renormalisés sur les seules composantes renseignées : un profil
@@ -2567,12 +2573,12 @@ const LOCALES = {
     nearestFar: "Aucun parti vraiment proche — le moins lointain : ",
     method: { revolutionary: "Révolutionnaire", reformist: "Réformiste", neither: "Ni l'un ni l'autre" },
 
-    axisTop: "AUTORITAIRE — ordre et tradition",
-    axisBottom: "LIBERTAIRE — ouverture sociétale",
+    axisTop: "TRADITION · AUTORITÉ · NATION",
+    axisBottom: "ÉCOLOGIE · ALTERNATIVES · LIBERTÉS",
     axisLeft: "GAUCHE économique",
     axisRight: "DROITE économique",
-    quadTopLeft: "Gauche autoritaire", quadTopRight: "Droite autoritaire",
-    quadBottomLeft: "Gauche libertaire", quadBottomRight: "Droite libertaire",
+    quadTopLeft: "Gauche traditionaliste", quadTopRight: "Droite traditionaliste",
+    quadBottomLeft: "Gauche d'ouverture", quadBottomRight: "Droite d'ouverture",
 
     tipEcon: "Axe économique", tipSocial: "Axe sociétal",
     tipEcol: "Écologie", tipMethod: "Méthode",
@@ -2684,10 +2690,10 @@ const LOCALES = {
       + "premier dépend de pondérations d'axes qui n'ont rien d'évident. À marge aussi courte, "
       + "environ un profil sur trois change de repère sous des pondérations tout aussi défendables.",
     colDistance: "Distance", colDeltaEcon: "Δ éco", colDeltaSocial: "Δ soc.",
-    titleY: "Positif = autoritaire (haut) · négatif = libertaire (bas)",
+    titleY: "Positif = tradition, autorité, nation (haut) · négatif = écologie, alternatives, libertés (bas)",
     titleEcol: "Écologie − Productivisme : positif = écologiste. Hors des deux axes, comme dans le CHES.",
     titleDeltaEcon: "Écart sur l'axe économique",
-    titleDeltaSocial: "Écart sur l'axe sociétal : positif = le parti est plus autoritaire que vous",
+    titleDeltaSocial: "Écart sur l'axe sociétal : positif = le parti est plus traditionaliste que vous",
 
     neutralPct: "Neutre", positionLabel: "Position",
     uncertainty: "Incertitude", uncertaintyNone: "aucune",
@@ -2718,7 +2724,7 @@ const LOCALES = {
         ? "Champ blanc et bordure d'or : la famille des drapeaux royaux, pour un monarchisme marqué ("
           + signed(Math.round(t.monarchy)) + ")."
         : "Champ blanc et bordure d'or : ordre (Y " + signed(t.y) + ") et tradition marqués.",
-      nordic: t => "Croix nordique : la famille des drapeaux d'ordre, pour un profil autoritaire (Y "
+      nordic: t => "Croix nordique : la famille des drapeaux d'ordre, pour un profil traditionaliste (Y "
         + signed(t.y) + ").",
       pall: t => "Pall en Y, comme sur le drapeau sud-africain : la convergence, pour un "
         + "multiculturalisme marqué (" + signed(Math.round(t.multi)) + ").",
@@ -2909,8 +2915,9 @@ const LOCALES = {
         lead: "Ces questions remplacent l'axe sociétal de PolitiScales par les sept dimensions "
           + "sur lesquelles les experts du CHES placent les partis, de l'immigration à la "
           + "place de la religion.",
-        leadNative: "Ces questions placent votre profil sur l'axe libertaire-autoritaire, sur "
-          + "l'échelle qu'utilisent les experts du CHES pour les partis.",
+        leadNative: "Ces questions placent votre profil sur l'axe sociétal — tradition, autorité et "
+          + "nation contre écologie, alternatives et libertés —, sur l'échelle qu'utilisent les "
+          + "experts du CHES pour les partis.",
         salience: "Quelle place les questions de société tiennent-elles dans vos choix "
           + "politiques ?",
         salienceAfter: "Maintenant que vous avez répondu : quelle place les questions de "
@@ -2950,7 +2957,7 @@ const LOCALES = {
     resultNoAxis: (theme, native) => "Aucune réponse au thème " + theme
       + (native ? " pour l'instant." : " : cet axe reste celui de PolitiScales."),
     resultWas: "PolitiScales", resultNow: "Politiskel",
-    resultEnds: { x: ["gauche", "droite"], y: ["libertaire", "autoritaire"] },
+    resultEnds: { x: ["gauche", "droite"], y: ["ouverture", "tradition"] },
     backToCompass: "Voir sur la boussole", quizReview: "Revoir mes réponses",
     quizTranslated: { item: "traduction Politiskel", anchors: "bornes traduites par Politiskel" },
     quizSalienceSrc: "Question Politiskel — aucune enquête publique ne mesure l'importance "
@@ -2976,7 +2983,7 @@ const LOCALES = {
     answeredOf: (n, m) => n + "/" + m + " réponses",
     readingNotes: {
       x: "négatif = gauche, positif = droite, sur l'échelle lrecon du CHES",
-      y: "négatif = libertaire, positif = autoritaire, sur l'échelle galtan du CHES",
+      y: "négatif = écologie, alternatives, libertés ; positif = tradition, autorité, nation — le GAL-TAN du CHES",
       protectionism: "hors de l'axe X : dans le CHES, il va contre la gauche-droite économique",
       class: "anticapitaliste si positif — une lecture rivale de X, pas une composante",
       conflict: "à côté de l'échelle de Wright, pas dedans",
@@ -3496,8 +3503,8 @@ function renderChrome() {
   const heads = [
     "M 52 300 L 62 295 L 62 305 Z",      /* gauche */
     "M 548 300 L 538 295 L 538 305 Z",   /* droite */
-    "M 300 52 L 295 62 L 305 62 Z",      /* haut : autoritaire */
-    "M 300 548 L 295 538 L 305 538 Z"    /* bas : libertaire */
+    "M 300 52 L 295 62 L 305 62 Z",      /* top: tradition, authority, nation (TAN) */
+    "M 300 548 L 295 538 L 305 538 Z"    /* bottom: ecology, alternatives, liberties (GAL) */
   ];
   for (const d of heads) chrome.appendChild(el("path", { class: "axis-head", d }));
 }
@@ -3528,8 +3535,12 @@ function render() {
   const taken = [
     { x0:  46, x1:  90, y0: 306, y1: 318 }, { x0: 160, x1: 190, y0: 306, y1: 318 },
     { x0: 410, x1: 440, y0: 306, y1: 318 }, { x0: 510, x1: 554, y0: 306, y1: 318 },
-    { x0:  56, x1: 150, y0:  58, y1:  72 }, { x0: 452, x1: 544, y0:  58, y1:  72 },
-    { x0:  56, x1: 156, y0: 528, y1: 542 }, { x0: 446, x1: 544, y0: 528, y1: 542 },
+    /* the quadrant corners, measured: their wording changes with the reading */
+    ...(() => {
+      const W = V(), qw = measureWidths([W.quadTopLeft, W.quadTopRight, W.quadBottomLeft, W.quadBottomRight], "quad-cap");
+      return [{ x0: 56, x1: 64 + qw[0], y0: 58, y1: 72 }, { x0: 536 - qw[1], x1: 544, y0: 58, y1: 72 },
+              { x0: 56, x1: 64 + qw[2], y0: 528, y1: 542 }, { x0: 536 - qw[3], x1: 544, y0: 528, y1: 542 }];
+    })(),
     /* the four axis arrowheads */
     { x0:  50, x1:  64, y0: 293, y1: 307 }, { x0: 536, x1: 550, y0: 293, y1: 307 },
     { x0: 293, x1: 307, y0:  50, y1:  64 }, { x0: 293, x1: 307, y0: 536, y1: 550 }

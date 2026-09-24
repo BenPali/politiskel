@@ -112,7 +112,7 @@ window.POLITI_PROFILES = [];
         <h2 data-i18n="chartTitle"></h2>
         <div class="plot">
           <svg id="compass" viewBox="0 0 600 600" role="img"
-               aria-label="Boussole Politiskel : axe horizontal gauche-droite économique, axe vertical autoritaire (en haut) - libertaire (en bas). Cliquez un profil ou un parti pour voir toutes les distances. Les valeurs chiffrées sont dans les tableaux ci-dessous.">
+               aria-label="Boussole Politiskel : axe horizontal gauche-droite économique, axe vertical sociétal, tradition, autorité et nation en haut, écologie, alternatives et libertés en bas. Cliquez un profil ou un parti pour voir toutes les distances. Les valeurs chiffrées sont dans les tableaux ci-dessous.">
             <rect class="plot-frame" x="50" y="50" width="500" height="500" rx="4"/>
             <g id="grid-layer"></g>
             <line class="axis-line" x1="50" y1="300" x2="550" y2="300"/>
@@ -162,7 +162,7 @@ window.POLITI_PROFILES = [];
               séparée). L'y inclure revenait à comparer deux axes différents. Cette dimension
               est affichée à part, dans la colonne « Écolo. ».
             </p>
-            <p><strong>Axe Y depuis PolitiScales — sociétal (libertaire ▼ ▲ autoritaire)</strong>,
+            <p><strong>Axe Y depuis PolitiScales — sociétal (ouverture ▼ ▲ tradition)</strong>,
               moyenne pondérée de :</p>
             <ul>
               <li><code>0,30</code> × (Essentialisme − Constructivisme)</li>
@@ -171,8 +171,13 @@ window.POLITI_PROFILES = [];
               <li><code>0,20</code> × (Nationalisme − Internationalisme)</li>
             </ul>
             <p>
-              Convention : <strong>Y positif = autoritaire</strong>, vers le haut, comme sur
-              les boussoles politiques classiques. Plus le nombre est grand, plus le point est haut.
+              Convention : <strong>Y positif = tradition, autorité, nation</strong>, vers le haut ;
+              négatif = écologie, alternatives, libertés, vers le bas. C'est l'axe GAL-TAN du
+              Chapel Hill Expert Survey (Hooghe, Marks et Wilson, 2002) : <em>Green, Alternative,
+              Libertarian</em> contre <em>Traditional, Authoritarian, Nationalist</em>. Il mesure
+              des valeurs culturelles, pas le rapport à l'État : on peut être tout en bas et
+              demander plus d'État, pour l'économie comme pour les services publics. Plus le nombre
+              est grand, plus le point est haut.
             </p>
             <p>
               Les poids sont renormalisés sur les seules composantes renseignées : un profil

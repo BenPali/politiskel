@@ -478,8 +478,8 @@ function renderChrome() {
   const heads = [
     "M 52 300 L 62 295 L 62 305 Z",      /* gauche */
     "M 548 300 L 538 295 L 538 305 Z",   /* droite */
-    "M 300 52 L 295 62 L 305 62 Z",      /* haut : autoritaire */
-    "M 300 548 L 295 538 L 305 538 Z"    /* bas : libertaire */
+    "M 300 52 L 295 62 L 305 62 Z",      /* top: tradition, authority, nation (TAN) */
+    "M 300 548 L 295 538 L 305 538 Z"    /* bottom: ecology, alternatives, liberties (GAL) */
   ];
   for (const d of heads) chrome.appendChild(el("path", { class: "axis-head", d }));
 }
@@ -510,8 +510,12 @@ function render() {
   const taken = [
     { x0:  46, x1:  90, y0: 306, y1: 318 }, { x0: 160, x1: 190, y0: 306, y1: 318 },
     { x0: 410, x1: 440, y0: 306, y1: 318 }, { x0: 510, x1: 554, y0: 306, y1: 318 },
-    { x0:  56, x1: 150, y0:  58, y1:  72 }, { x0: 452, x1: 544, y0:  58, y1:  72 },
-    { x0:  56, x1: 156, y0: 528, y1: 542 }, { x0: 446, x1: 544, y0: 528, y1: 542 },
+    /* the quadrant corners, measured: their wording changes with the reading */
+    ...(() => {
+      const W = V(), qw = measureWidths([W.quadTopLeft, W.quadTopRight, W.quadBottomLeft, W.quadBottomRight], "quad-cap");
+      return [{ x0: 56, x1: 64 + qw[0], y0: 58, y1: 72 }, { x0: 536 - qw[1], x1: 544, y0: 58, y1: 72 },
+              { x0: 56, x1: 64 + qw[2], y0: 528, y1: 542 }, { x0: 536 - qw[3], x1: 544, y0: 528, y1: 542 }];
+    })(),
     /* the four axis arrowheads */
     { x0:  50, x1:  64, y0: 293, y1: 307 }, { x0: 536, x1: 550, y0: 293, y1: 307 },
     { x0: 293, x1: 307, y0:  50, y1:  64 }, { x0: 293, x1: 307, y0: 536, y1: 550 }

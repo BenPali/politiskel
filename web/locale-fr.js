@@ -49,12 +49,12 @@ const LOCALES = {
     nearestFar: "Aucun parti vraiment proche — le moins lointain : ",
     method: { revolutionary: "Révolutionnaire", reformist: "Réformiste", neither: "Ni l'un ni l'autre" },
 
-    axisTop: "AUTORITAIRE — ordre et tradition",
-    axisBottom: "LIBERTAIRE — ouverture sociétale",
+    axisTop: "TRADITION · AUTORITÉ · NATION",
+    axisBottom: "ÉCOLOGIE · ALTERNATIVES · LIBERTÉS",
     axisLeft: "GAUCHE économique",
     axisRight: "DROITE économique",
-    quadTopLeft: "Gauche autoritaire", quadTopRight: "Droite autoritaire",
-    quadBottomLeft: "Gauche libertaire", quadBottomRight: "Droite libertaire",
+    quadTopLeft: "Gauche traditionaliste", quadTopRight: "Droite traditionaliste",
+    quadBottomLeft: "Gauche d'ouverture", quadBottomRight: "Droite d'ouverture",
 
     tipEcon: "Axe économique", tipSocial: "Axe sociétal",
     tipEcol: "Écologie", tipMethod: "Méthode",
@@ -166,10 +166,10 @@ const LOCALES = {
       + "premier dépend de pondérations d'axes qui n'ont rien d'évident. À marge aussi courte, "
       + "environ un profil sur trois change de repère sous des pondérations tout aussi défendables.",
     colDistance: "Distance", colDeltaEcon: "Δ éco", colDeltaSocial: "Δ soc.",
-    titleY: "Positif = autoritaire (haut) · négatif = libertaire (bas)",
+    titleY: "Positif = tradition, autorité, nation (haut) · négatif = écologie, alternatives, libertés (bas)",
     titleEcol: "Écologie − Productivisme : positif = écologiste. Hors des deux axes, comme dans le CHES.",
     titleDeltaEcon: "Écart sur l'axe économique",
-    titleDeltaSocial: "Écart sur l'axe sociétal : positif = le parti est plus autoritaire que vous",
+    titleDeltaSocial: "Écart sur l'axe sociétal : positif = le parti est plus traditionaliste que vous",
 
     neutralPct: "Neutre", positionLabel: "Position",
     uncertainty: "Incertitude", uncertaintyNone: "aucune",
@@ -200,7 +200,7 @@ const LOCALES = {
         ? "Champ blanc et bordure d'or : la famille des drapeaux royaux, pour un monarchisme marqué ("
           + signed(Math.round(t.monarchy)) + ")."
         : "Champ blanc et bordure d'or : ordre (Y " + signed(t.y) + ") et tradition marqués.",
-      nordic: t => "Croix nordique : la famille des drapeaux d'ordre, pour un profil autoritaire (Y "
+      nordic: t => "Croix nordique : la famille des drapeaux d'ordre, pour un profil traditionaliste (Y "
         + signed(t.y) + ").",
       pall: t => "Pall en Y, comme sur le drapeau sud-africain : la convergence, pour un "
         + "multiculturalisme marqué (" + signed(Math.round(t.multi)) + ").",
@@ -391,8 +391,9 @@ const LOCALES = {
         lead: "Ces questions remplacent l'axe sociétal de PolitiScales par les sept dimensions "
           + "sur lesquelles les experts du CHES placent les partis, de l'immigration à la "
           + "place de la religion.",
-        leadNative: "Ces questions placent votre profil sur l'axe libertaire-autoritaire, sur "
-          + "l'échelle qu'utilisent les experts du CHES pour les partis.",
+        leadNative: "Ces questions placent votre profil sur l'axe sociétal — tradition, autorité et "
+          + "nation contre écologie, alternatives et libertés —, sur l'échelle qu'utilisent les "
+          + "experts du CHES pour les partis.",
         salience: "Quelle place les questions de société tiennent-elles dans vos choix "
           + "politiques ?",
         salienceAfter: "Maintenant que vous avez répondu : quelle place les questions de "
@@ -432,7 +433,7 @@ const LOCALES = {
     resultNoAxis: (theme, native) => "Aucune réponse au thème " + theme
       + (native ? " pour l'instant." : " : cet axe reste celui de PolitiScales."),
     resultWas: "PolitiScales", resultNow: "Politiskel",
-    resultEnds: { x: ["gauche", "droite"], y: ["libertaire", "autoritaire"] },
+    resultEnds: { x: ["gauche", "droite"], y: ["ouverture", "tradition"] },
     backToCompass: "Voir sur la boussole", quizReview: "Revoir mes réponses",
     quizTranslated: { item: "traduction Politiskel", anchors: "bornes traduites par Politiskel" },
     quizSalienceSrc: "Question Politiskel — aucune enquête publique ne mesure l'importance "
@@ -458,7 +459,7 @@ const LOCALES = {
     answeredOf: (n, m) => n + "/" + m + " réponses",
     readingNotes: {
       x: "négatif = gauche, positif = droite, sur l'échelle lrecon du CHES",
-      y: "négatif = libertaire, positif = autoritaire, sur l'échelle galtan du CHES",
+      y: "négatif = écologie, alternatives, libertés ; positif = tradition, autorité, nation — le GAL-TAN du CHES",
       protectionism: "hors de l'axe X : dans le CHES, il va contre la gauche-droite économique",
       class: "anticapitaliste si positif — une lecture rivale de X, pas une composante",
       conflict: "à côté de l'échelle de Wright, pas dedans",

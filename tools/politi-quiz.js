@@ -451,11 +451,12 @@
       fr: "Et les dirigeants du commerce et de l'industrie, ont-ils trop ou pas assez de pouvoir ?",
       src: { survey: "ISSP", wave: "Rôle de l'État 1996", variable: "Q11b", url: GESIS(6806) } },
 
-    /* ================= society: y, the libertarian-authoritarian axis =====
+    /* ================= society: y, the GAL-TAN axis (cultural, not the state) =====
        Seven sub-dimensions, the ones CHES 2024 rates and whose plain mean
        reproduces galtan at r = 0.97 across its 279 parties (each alone 0.77
        to 0.94, and none indispensable: dropping any leaves 0.96). After
-       orientation +1 always means authoritarian, as on the compass.
+       orientation +1 always means the TAN end (tradition, authority,
+       nation), up on the compass.
 
        `reserve: true` items are verified and sourced but not asked: kept so
        that a thin sub-dimension can be widened without searching again. Each

@@ -3,7 +3,7 @@
 Discover your political skeleton.
 
 Politiskel places political profiles on several readings of the political
-space — economic left/right against libertarian/authoritarian by default —
+space — economic left/right against CHES's cultural GAL-TAN axis by default —
 compares them against the parties of a chosen country, and breaks each profile
 down axis by axis, so a group can see where it actually diverges rather than
 only where its average sits.
@@ -153,7 +153,7 @@ asks 40 and feeds y.
 | class (Wright's anticapitalism scale) | 5 | no |
 | perceived class conflict | 4 | no |
 | capital / labour balance | 3 | no |
-| y — libertarian/authoritarian | 40, over CHES's seven society sub-scales | yes, `galtan` |
+| y — GAL-TAN (cultural) | 40, over CHES's seven society sub-scales | yes, `galtan` |
 
 x is the plain mean of redistribution, public services vs taxes and
 deregulation: across the 279 parties of CHES 2024 their mean reproduces
