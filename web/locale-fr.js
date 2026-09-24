@@ -178,6 +178,8 @@ const LOCALES = {
     /* the native questionnaire */
     optTrail: "Trajet depuis PolitiScales",
     optView: "Lecture",
+    themeLabel: "Thème",
+    uiThemes: { auto: "Auto", light: "Clair", dark: "Sombre", contrast: "Contraste élevé", sepia: "Sépia" },
     optFlags: "Drapeaux",
     flagsPolitiscales: "PolitiScales quand il existe", flagsPolitiskel: "Politiskel pour tous",
     flagGeneratedAlt: a => "Drapeau Politiskel de " + a,
@@ -306,6 +308,36 @@ const LOCALES = {
       + "invite. En le rejoignant, vos réponses et vos pourcentages PolitiScales seront visibles "
       + "de ses membres.",
     inviteAccept: "Rejoindre", inviteDecline: "Refuser",
+    ownerYou: "Vous en êtes propriétaire", ownerIs: n => "Propriétaire : " + n,
+    ownerManage: "Gérer le groupe",
+    ownerNewLink: "Changer le lien d'invitation",
+    ownerNewLinkConfirm: "Changer le lien ? L'ancien cessera de fonctionner aussitôt ; les membres "
+      + "actuels restent dans le groupe.",
+    ownerNewLinkDone: "Nouveau lien créé : l'ancien ne fonctionne plus.",
+    ownerRemove: "Retirer", ownerRemoveConfirm: (m, g) => "Retirer " + m + " de « " + g + " » ? Il ou elle "
+      + "ne verra plus le groupe. Pensez à changer le lien s'il circule encore.",
+    ownerHandOver: "Transmettre", ownerHandOverConfirm: (m, g) => "Transmettre « " + g + " » à " + m
+      + " ? Vous resterez membre, sans pouvoir le gérer.",
+    ownerDelete: "Supprimer le groupe",
+    ownerDeleteConfirm: g => "Supprimer « " + g + " » pour tous ses membres ? Les profils restent sur "
+      + "leurs comptes ; seul le groupe disparaît.",
+    ownerNote: "Si le lien a circulé au-delà du groupe, changez-le : l'ancien ne mènera plus nulle part.",
+    passwordTitle: "Mot de passe", passwordCurrent: "Mot de passe actuel",
+    passwordWrong: "Le mot de passe actuel n'est pas le bon.",
+    passwordChange: "Changer le mot de passe",
+    passwordChanged: "Mot de passe changé : vos autres sessions sont fermées.",
+    passwordNote: "Changer de mot de passe ferme toutes vos autres sessions. Sans e-mail, un mot de passe "
+      + "perdu ne peut être réinitialisé que par la personne qui héberge ce site.",
+    signOutOthers: "Se déconnecter partout ailleurs",
+    signedOutOthers: "Vos autres sessions sont fermées.",
+    signupInviteOnly: "Sur ce site, on crée un compte depuis le lien d'invitation d'un groupe. Si vous en "
+      + "avez un, ouvrez-le : le formulaire vous attendra.",
+    guestTry: "Essayer sans compte",
+    guestNote: "Sans compte, rien n'est enregistré sur le serveur : vos réponses restent dans ce navigateur, "
+      + "et vous ne voyez aucun groupe.",
+    guestBanner: "Mode invité : vos réponses restent dans ce navigateur, rien n'est envoyé au serveur.",
+    guestSignUp: "Créer un compte", guestSignIn: "Se connecter",
+    guestCarry: n => "Reprendre les " + n + " réponses données en mode invité",
     accountMore: "Nouveau groupe, mes données",
     exportAccount: "Exporter toutes mes données",
     deleteWarn: "Votre compte, votre profil, vos réponses et vos appartenances aux groupes seront "
@@ -329,7 +361,12 @@ const LOCALES = {
       not_signed_in: "Votre session a expiré : reconnectez-vous.",
       no_such_invite: "Ce lien d'invitation ne mène à aucun groupe.",
       no_such_group: "Ce groupe n'existe plus, ou vous n'en êtes plus membre.",
-      group_name_length: "Donnez au groupe un nom de 1 à 60 caractères."
+      group_name_length: "Donnez au groupe un nom de 1 à 60 caractères.",
+      not_owner: "Seul le propriétaire du groupe peut faire cela.",
+      no_such_member: "Ce membre n'est plus dans le groupe.",
+      signup_invite_only: "Sur ce site, on crée un compte depuis un lien d'invitation : demandez-en un au "
+        + "groupe que vous voulez rejoindre.",
+      too_many_signups: "Trop de comptes créés depuis cette adresse : réessayez dans une heure."
     },
     viewOff: "pas de position dans cette lecture",
     viewOffDetail: "Ce profil n'a pas de position dans cette lecture : il lui manque les réponses "

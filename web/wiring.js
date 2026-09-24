@@ -470,6 +470,23 @@ function applyView() {
   });
 })();
 
+/* Theme picker, in the header. "Auto" follows the system; a picked theme is
+   remembered in this browser, and applied from <head> on the next visit. */
+(function () {
+  const KEY = "politicompass.theme.v1";
+  const sel = $("theme");
+  let saved = "auto";
+  try { saved = localStorage.getItem(KEY) || "auto"; } catch (_) { /* private browsing */ }
+  for (const k of ["auto", "light", "dark", "contrast", "sepia"])
+    sel.appendChild(Object.assign(document.createElement("option"), { value: k, textContent: L.uiThemes[k] }));
+  sel.value = L.uiThemes[saved] ? saved : "auto";
+  sel.addEventListener("change", () => {
+    if (sel.value === "auto") delete document.documentElement.dataset.theme;
+    else document.documentElement.dataset.theme = sel.value;
+    try { localStorage.setItem(KEY, sel.value); } catch (_) { /* quota, or private browsing */ }
+  });
+})();
+
 /* Country picker. The labels that name the country or count its references are
    written from the data, so adding a party cannot leave a wrong figure in the
    copy — and a country change rewrites them all through applyCountry(). */

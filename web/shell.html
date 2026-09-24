@@ -4,6 +4,12 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
 <title>Politiskel</title>
+<!-- The chosen theme, applied before anything is drawn so the page does not
+     flash in the other one. The picker in the header sets it. -->
+<script>
+try { var t = localStorage.getItem("politicompass.theme.v1");
+      if (t && t !== "auto") document.documentElement.dataset.theme = t; } catch (e) {}
+</script>
 <style>
 /* @include web/style.css */
 </style>
@@ -70,6 +76,8 @@ window.POLITI_PROFILES = [];
         </svg>
         <span data-i18n="navSource"></span>
       </a>
+      <label class="theme-pick"><span data-i18n="themeLabel"></span>
+        <select id="theme"></select></label>
     </nav>
   </header>
 

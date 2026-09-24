@@ -4,6 +4,12 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
 <title>Politiskel</title>
+<!-- The chosen theme, applied before anything is drawn so the page does not
+     flash in the other one. The picker in the header sets it. -->
+<script>
+try { var t = localStorage.getItem("politicompass.theme.v1");
+      if (t && t !== "auto") document.documentElement.dataset.theme = t; } catch (e) {}
+</script>
 <style>
   /* The page's stylesheet: colour tokens for light and dark on :root, then
      each part of the page in turn — header, compass, tables, strips, forms,
@@ -25,8 +31,9 @@
     --warn:          #ec835a;
     --focus:         #2a78d6;
   }
+  /* the system's choice, unless a theme was picked in the header */
   @media (prefers-color-scheme: dark) {
-    :root:not([data-theme="light"]) {
+    :root:not([data-theme]) {
       color-scheme: dark;
       --bg:            #121211;
       --surface:       #1a1a19;
@@ -58,6 +65,41 @@
     --ref-ink:       #86847c;
     --warn:          #ec835a;
     --focus:         #3987e5;
+  }
+  /* high contrast: pure black on white, borders and secondary text dark
+     enough to read at a glance */
+  :root[data-theme="contrast"] {
+    color-scheme: light;
+    --bg:            #ffffff;
+    --surface:       #ffffff;
+    --border:        #5c5c5c;
+    --grid:          #c8c8c8;
+    --axis:          #2b2b2b;
+    --text:          #000000;
+    --text-2:        #1c1c1c;
+    --text-3:        #3a3a3a;
+    --series-1:      #0048a8;
+    --series-1-soft: #c9dcff;
+    --ref-ink:       #2b2b2b;
+    --warn:          #a8200d;
+    --focus:         #0048a8;
+  }
+  /* sepia: warm paper, for long reading */
+  :root[data-theme="sepia"] {
+    color-scheme: light;
+    --bg:            #f2eadb;
+    --surface:       #faf5ea;
+    --border:        #ddd0b8;
+    --grid:          #e6dac4;
+    --axis:          #8a7c63;
+    --text:          #2a2317;
+    --text-2:        #574a36;
+    --text-3:        #82745c;
+    --series-1:      #8a5424;
+    --series-1-soft: #ecd6b8;
+    --ref-ink:       #82745c;
+    --warn:          #b8521f;
+    --focus:         #8a5424;
   }
 
   * { box-sizing: border-box; }
@@ -95,6 +137,9 @@
   }
   .masthead nav a:hover { color: var(--text); border-color: var(--text-3); }
   .masthead nav a svg { flex: none; }
+  .theme-pick { display: inline-flex; align-items: center; gap: 6px; font-size: 0.82rem; color: var(--text-2); }
+  .theme-pick select { font: inherit; padding: 5px 8px; border-radius: 7px; border: 1px solid var(--border);
+                       background: var(--surface); color: var(--text); cursor: pointer; }
 
   /* ----------------------------------------------------------- pied de page --- */
   footer.site {
@@ -612,6 +657,19 @@
                      margin-bottom: 10px; }
   .account .status { color: var(--text-3); font-size: 0.78rem; }
   .account .note { color: var(--text-3); font-size: 0.75rem; margin: 8px 0 0; max-width: 90ch; }
+  .guest-bar { display: flex; flex-wrap: wrap; align-items: center; justify-content: space-between; gap: 10px 20px; }
+  .guest-bar p { margin: 0; color: var(--text-2); }
+  .guest-offer { max-width: 460px; margin: 18px auto 0; text-align: center; }
+  .guest-offer .note { color: var(--text-3); font-size: 0.8rem; margin: 8px 0 0; }
+  .owner-tools { margin-top: 12px; border-top: 1px solid var(--border); padding-top: 10px; }
+  .owner-tools summary { cursor: pointer; color: var(--text-2); font-size: 0.85rem; }
+  .owner-tools .actions { margin: 10px 0; }
+  .member-rows { list-style: none; margin: 0; padding: 0; }
+  .member-rows li { display: flex; justify-content: space-between; align-items: center; gap: 12px;
+                    padding: 6px 0; border-bottom: 1px solid var(--border); font-size: 0.85rem; }
+  .member-rows .actions { display: inline-flex; gap: 6px; margin: 0; }
+  .member-rows button, .owner-tools button { padding: 5px 10px; font-size: 0.8rem; }
+  button.danger { color: var(--warn); border-color: var(--warn); }
   /* the compass's group header: which group, who is in it, where to go */
   .group-head { padding: 16px 20px; }
   .group-top { display: flex; flex-wrap: wrap; align-items: flex-end; justify-content: space-between;
@@ -2183,6 +2241,8 @@ window.POLITI_PROFILES = [];
         </svg>
         <span data-i18n="navSource"></span>
       </a>
+      <label class="theme-pick"><span data-i18n="themeLabel"></span>
+        <select id="theme"></select></label>
     </nav>
   </header>
 
@@ -2728,6 +2788,8 @@ const LOCALES = {
     /* the native questionnaire */
     optTrail: "Trajet depuis PolitiScales",
     optView: "Lecture",
+    themeLabel: "Thème",
+    uiThemes: { auto: "Auto", light: "Clair", dark: "Sombre", contrast: "Contraste élevé", sepia: "Sépia" },
     optFlags: "Drapeaux",
     flagsPolitiscales: "PolitiScales quand il existe", flagsPolitiskel: "Politiskel pour tous",
     flagGeneratedAlt: a => "Drapeau Politiskel de " + a,
@@ -2856,6 +2918,36 @@ const LOCALES = {
       + "invite. En le rejoignant, vos réponses et vos pourcentages PolitiScales seront visibles "
       + "de ses membres.",
     inviteAccept: "Rejoindre", inviteDecline: "Refuser",
+    ownerYou: "Vous en êtes propriétaire", ownerIs: n => "Propriétaire : " + n,
+    ownerManage: "Gérer le groupe",
+    ownerNewLink: "Changer le lien d'invitation",
+    ownerNewLinkConfirm: "Changer le lien ? L'ancien cessera de fonctionner aussitôt ; les membres "
+      + "actuels restent dans le groupe.",
+    ownerNewLinkDone: "Nouveau lien créé : l'ancien ne fonctionne plus.",
+    ownerRemove: "Retirer", ownerRemoveConfirm: (m, g) => "Retirer " + m + " de « " + g + " » ? Il ou elle "
+      + "ne verra plus le groupe. Pensez à changer le lien s'il circule encore.",
+    ownerHandOver: "Transmettre", ownerHandOverConfirm: (m, g) => "Transmettre « " + g + " » à " + m
+      + " ? Vous resterez membre, sans pouvoir le gérer.",
+    ownerDelete: "Supprimer le groupe",
+    ownerDeleteConfirm: g => "Supprimer « " + g + " » pour tous ses membres ? Les profils restent sur "
+      + "leurs comptes ; seul le groupe disparaît.",
+    ownerNote: "Si le lien a circulé au-delà du groupe, changez-le : l'ancien ne mènera plus nulle part.",
+    passwordTitle: "Mot de passe", passwordCurrent: "Mot de passe actuel",
+    passwordWrong: "Le mot de passe actuel n'est pas le bon.",
+    passwordChange: "Changer le mot de passe",
+    passwordChanged: "Mot de passe changé : vos autres sessions sont fermées.",
+    passwordNote: "Changer de mot de passe ferme toutes vos autres sessions. Sans e-mail, un mot de passe "
+      + "perdu ne peut être réinitialisé que par la personne qui héberge ce site.",
+    signOutOthers: "Se déconnecter partout ailleurs",
+    signedOutOthers: "Vos autres sessions sont fermées.",
+    signupInviteOnly: "Sur ce site, on crée un compte depuis le lien d'invitation d'un groupe. Si vous en "
+      + "avez un, ouvrez-le : le formulaire vous attendra.",
+    guestTry: "Essayer sans compte",
+    guestNote: "Sans compte, rien n'est enregistré sur le serveur : vos réponses restent dans ce navigateur, "
+      + "et vous ne voyez aucun groupe.",
+    guestBanner: "Mode invité : vos réponses restent dans ce navigateur, rien n'est envoyé au serveur.",
+    guestSignUp: "Créer un compte", guestSignIn: "Se connecter",
+    guestCarry: n => "Reprendre les " + n + " réponses données en mode invité",
     accountMore: "Nouveau groupe, mes données",
     exportAccount: "Exporter toutes mes données",
     deleteWarn: "Votre compte, votre profil, vos réponses et vos appartenances aux groupes seront "
@@ -2879,7 +2971,12 @@ const LOCALES = {
       not_signed_in: "Votre session a expiré : reconnectez-vous.",
       no_such_invite: "Ce lien d'invitation ne mène à aucun groupe.",
       no_such_group: "Ce groupe n'existe plus, ou vous n'en êtes plus membre.",
-      group_name_length: "Donnez au groupe un nom de 1 à 60 caractères."
+      group_name_length: "Donnez au groupe un nom de 1 à 60 caractères.",
+      not_owner: "Seul le propriétaire du groupe peut faire cela.",
+      no_such_member: "Ce membre n'est plus dans le groupe.",
+      signup_invite_only: "Sur ce site, on crée un compte depuis un lien d'invitation : demandez-en un au "
+        + "groupe que vous voulez rejoindre.",
+      too_many_signups: "Trop de comptes créés depuis cette adresse : réessayez dans une heure."
     },
     viewOff: "pas de position dans cette lecture",
     viewOffDetail: "Ce profil n'a pas de position dans cette lecture : il lui manque les réponses "
@@ -5828,6 +5925,23 @@ function applyView() {
   });
 })();
 
+/* Theme picker, in the header. "Auto" follows the system; a picked theme is
+   remembered in this browser, and applied from <head> on the next visit. */
+(function () {
+  const KEY = "politicompass.theme.v1";
+  const sel = $("theme");
+  let saved = "auto";
+  try { saved = localStorage.getItem(KEY) || "auto"; } catch (_) { /* private browsing */ }
+  for (const k of ["auto", "light", "dark", "contrast", "sepia"])
+    sel.appendChild(Object.assign(document.createElement("option"), { value: k, textContent: L.uiThemes[k] }));
+  sel.value = L.uiThemes[saved] ? saved : "auto";
+  sel.addEventListener("change", () => {
+    if (sel.value === "auto") delete document.documentElement.dataset.theme;
+    else document.documentElement.dataset.theme = sel.value;
+    try { localStorage.setItem(KEY, sel.value); } catch (_) { /* quota, or private browsing */ }
+  });
+})();
+
 /* Country picker. The labels that name the country or count its references are
    written from the data, so adding a party cannot leave a wrong figure in the
    copy — and a country change rewrites them all through applyCountry(). */
@@ -5921,6 +6035,12 @@ async function detectServer() {
   const ours = r.status === 200 ? r.data && typeof r.data.username === "string"
              : r.status === 401 && r.data && r.data.error === "not_signed_in";
   if (!ours) return;
+  const cfg = await api("GET", "/api/config");
+  /* a closed site still lets its very first account in */
+  SERVER.signup = cfg.ok && cfg.data && cfg.data.signup === "invite" && !cfg.data.empty ? "invite" : "open";
+  /* A guest stays a local page: no account, nothing sent, every answer kept
+     in this browser, as on a copy of the file. */
+  if (r.status !== 200 && location.pathname.replace(/\/+$/, "") === "/essai") return enterGuest();
   SERVER.on = true;
   SERVER.me = r.status === 200 ? r.data : null;
   document.body.classList.add("server-mode");
@@ -5941,6 +6061,28 @@ async function detectServer() {
   if (SERVER.me) await chooseGroup();
   await loadGroup();
   serverRoute();
+}
+
+/* The local page, on a server, with a way back to the site. Its links load
+   the site afresh, so the server mode starts from a clean page. */
+function enterGuest() {
+  SERVER.guest = true;
+  const box = $("account");
+  box.className = "account guest-bar";
+  box.hidden = false;
+  box.replaceChildren(h("p", { textContent: L.guestBanner }),
+    h("div", { className: "actions" },
+      h("a", { href: "/connexion?inscription", className: "button primary", textContent: L.guestSignUp }),
+      h("a", { href: "/connexion", className: "button ghost", textContent: L.guestSignIn })));
+}
+
+/* The answers given as a guest in this browser, the fullest set: offered at
+   sign-up, so trying the site first costs nothing. */
+function guestAnswers() {
+  const sets = Object.values((overlay && overlay.answers) || {})
+    .map(a => Object.fromEntries(Object.entries(a || {}).filter(([k]) =>
+      PolitiQuiz.itemById(k) || k.startsWith("salience."))));
+  return sets.sort((a, b) => Object.keys(b).length - Object.keys(a).length)[0] || {};
 }
 
 async function refreshMe() {
@@ -6213,7 +6355,7 @@ function renderLogin() {
   show("view-login", L.signInTitle);
   const root = $("view-login");
   root.replaceChildren();
-  const mode = root.dataset.mode || "in";
+  const mode = root.dataset.mode || (location.search.includes("inscription") ? "up" : "in");
   const card = h("section", { className: "card login-card" });
   const switchIn = h("button", { type: "button", textContent: L.signInTitle, className: mode === "in" ? "on" : "" });
   const switchUp = h("button", { type: "button", textContent: L.registerTitle, className: mode === "up" ? "on" : "" });
@@ -6237,17 +6379,25 @@ function renderLogin() {
       serverRoute();   /* from /connexion: to a pending invitation, else the compass */
     });
     card.append(form);
+  } else if (SERVER.signup === "invite" && !unstash(JOIN_KEY)) {
+    card.append(h("p", { className: "lead", textContent: L.signupInviteOnly }));
   } else {
     const pass = h("input", { type: "password", placeholder: L.passwordNew, autocomplete: "new-password", required: true });
     const consent = h("input", { type: "checkbox" });
+    const kept = guestAnswers();
+    const nKept = Object.keys(kept).length;
+    const carry = h("input", { type: "checkbox", checked: true });
     const form = h("form", {}, user, pass,
       h("label", { className: "consent" }, consent, h("span", { textContent: L.consent })),
+      nKept ? h("label", { className: "consent" }, carry, h("span", { textContent: L.guestCarry(nKept) })) : null,
       h("button", { type: "submit", className: "primary", textContent: L.register }), err);
     form.addEventListener("submit", async e => {
       e.preventDefault();
       if (!consent.checked) return err.fail(L.apiErrors.consent_required);
-      const r = await api("POST", "/api/register", { username: user.value, password: pass.value, consent: true });
+      const r = await api("POST", "/api/register", { username: user.value, password: pass.value, consent: true,
+                                                     invite: unstash(JOIN_KEY) || undefined });
       if (!r.ok) return err.fail(r);
+      if (nKept && carry.checked) await api("PUT", "/api/me/profile", { answers: kept });
       await refreshMe();
       await chooseGroup();
       await loadGroup();
@@ -6255,7 +6405,10 @@ function renderLogin() {
     });
     card.append(form, h("p", { className: "note", textContent: L.serverNote }));
   }
-  root.append(h("h2", { textContent: L.welcomeTitle }), h("p", { className: "lead", textContent: L.welcomeLead }), card);
+  const guest = h("button", { type: "button", className: "ghost", textContent: L.guestTry });
+  guest.addEventListener("click", () => { location.href = "/essai"; });
+  root.append(h("h2", { textContent: L.welcomeTitle }), h("p", { className: "lead", textContent: L.welcomeLead }), card,
+    h("div", { className: "guest-offer" }, guest, h("p", { className: "note", textContent: L.guestNote })));
   user.focus();
 }
 
@@ -6332,10 +6485,42 @@ async function renderGroups() {
       await loadGroup();
       renderGroups();
     });
+    const members = lists[i].ok ? lists[i].data : [];
+    const owner = members.find(m => m.owner);
+    const redo = async () => { await refreshMe(); await chooseGroup(SERVER.group ? SERVER.group.id : undefined); await loadGroup(); renderGroups(); };
+    const act = async (method, path, body, done) => {
+      const r = await api(method, path, body);
+      if (!r.ok) return err.fail(r);
+      if (done) SERVER.status = done;
+      await redo();
+    };
+    let manage = null;
+    if (g.owner) {
+      const fresh = h("button", { type: "button", className: "ghost", textContent: L.ownerNewLink });
+      fresh.addEventListener("click", () => confirm(L.ownerNewLinkConfirm)
+        && act("POST", "/api/groups/" + g.id + "/invite", null, L.ownerNewLinkDone));
+      const rows = members.filter(m => !m.me).map(m => {
+        const out = h("button", { type: "button", className: "ghost", textContent: L.ownerRemove });
+        out.addEventListener("click", () => confirm(L.ownerRemoveConfirm(m.username, g.name))
+          && act("POST", "/api/groups/" + g.id + "/remove", { username: m.username }));
+        const give = h("button", { type: "button", className: "ghost", textContent: L.ownerHandOver });
+        give.addEventListener("click", () => confirm(L.ownerHandOverConfirm(m.username, g.name))
+          && act("POST", "/api/groups/" + g.id + "/owner", { username: m.username }));
+        return h("li", {}, h("span", { textContent: m.username }), h("span", { className: "actions" }, give, out));
+      });
+      const drop = h("button", { type: "button", className: "ghost danger", textContent: L.ownerDelete });
+      drop.addEventListener("click", () => confirm(L.ownerDeleteConfirm(g.name))
+        && act("DELETE", "/api/groups/" + g.id, null));
+      manage = h("details", { className: "owner-tools" }, h("summary", { textContent: L.ownerManage }),
+        h("div", { className: "actions" }, fresh, drop),
+        rows.length ? h("ul", { className: "member-rows" }, ...rows) : null,
+        h("p", { className: "note", textContent: L.ownerNote }));
+    }
     root.append(h("section", { className: "card group-card" },
       h("h3", { textContent: g.name }),
       h("p", { className: "members", textContent: L.memberCount(g.members) + (names.length ? " : " + names.join(", ") : "") }),
-      h("div", { className: "actions" }, view, copy, leave), linkLine, err));
+      h("p", { className: "note", textContent: g.owner ? L.ownerYou : owner ? L.ownerIs(owner.username) : "" }),
+      h("div", { className: "actions" }, view, copy, leave), linkLine, manage, err));
   });
 
   /* create one */
@@ -6399,6 +6584,25 @@ function renderAccountPage() {
   const logout = h("button", { type: "button", className: "ghost", textContent: L.signOut });
   logout.addEventListener("click", async () => { await flushAnswers(); await api("POST", "/api/logout"); await signedOut(); });
 
+  const others = h("button", { type: "button", className: "ghost", textContent: L.signOutOthers });
+  others.addEventListener("click", async () => {
+    const r = await api("DELETE", "/api/me/sessions/others");
+    SERVER.status = r.ok ? L.signedOutOthers : apiError(r);
+    renderAccountPage();
+  });
+
+  const errP = errorLine();
+  const cur = h("input", { type: "password", placeholder: L.passwordCurrent, autocomplete: "current-password", required: true });
+  const nxt = h("input", { type: "password", placeholder: L.passwordNew, autocomplete: "new-password", required: true });
+  const pw = h("form", { className: "row" }, cur, nxt, h("button", { type: "submit", className: "ghost", textContent: L.passwordChange }));
+  pw.addEventListener("submit", async e => {
+    e.preventDefault();
+    const r = await api("POST", "/api/me/password", { current: cur.value, new: nxt.value });
+    if (!r.ok) return errP.fail(r.data && r.data.error === "bad_credentials" ? L.passwordWrong : r);
+    SERVER.status = L.passwordChanged;
+    renderAccountPage();
+  });
+
   const err = errorLine();
   const delPass = h("input", { type: "password", placeholder: L.password, autocomplete: "current-password", required: true });
   const del = h("form", { className: "row" }, delPass, h("button", { type: "submit", className: "ghost", textContent: L.deleteAccount }));
@@ -6421,7 +6625,9 @@ function renderAccountPage() {
   const tail = [
     h("section", { className: "card" }, h("h3", { textContent: L.myData }),
       h("p", { className: "note", textContent: L.serverNoteIn }),
-      h("div", { className: "actions" }, exportBtn, logout)),
+      h("div", { className: "actions" }, exportBtn, others, logout)),
+    h("section", { className: "card" }, h("h3", { textContent: L.passwordTitle }), pw, errP,
+      h("p", { className: "note", textContent: L.passwordNote })),
     h("section", { className: "card" }, h("h3", { textContent: L.deleteTitle }),
       h("p", { textContent: L.deleteWarn }), del, err)
   ];

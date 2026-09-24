@@ -53,6 +53,12 @@ async function detectServer() {
   const ours = r.status === 200 ? r.data && typeof r.data.username === "string"
              : r.status === 401 && r.data && r.data.error === "not_signed_in";
   if (!ours) return;
+  const cfg = await api("GET", "/api/config");
+  /* a closed site still lets its very first account in */
+  SERVER.signup = cfg.ok && cfg.data && cfg.data.signup === "invite" && !cfg.data.empty ? "invite" : "open";
+  /* A guest stays a local page: no account, nothing sent, every answer kept
+     in this browser, as on a copy of the file. */
+  if (r.status !== 200 && location.pathname.replace(/\/+$/, "") === "/essai") return enterGuest();
   SERVER.on = true;
   SERVER.me = r.status === 200 ? r.data : null;
   document.body.classList.add("server-mode");
@@ -73,6 +79,28 @@ async function detectServer() {
   if (SERVER.me) await chooseGroup();
   await loadGroup();
   serverRoute();
+}
+
+/* The local page, on a server, with a way back to the site. Its links load
+   the site afresh, so the server mode starts from a clean page. */
+function enterGuest() {
+  SERVER.guest = true;
+  const box = $("account");
+  box.className = "account guest-bar";
+  box.hidden = false;
+  box.replaceChildren(h("p", { textContent: L.guestBanner }),
+    h("div", { className: "actions" },
+      h("a", { href: "/connexion?inscription", className: "button primary", textContent: L.guestSignUp }),
+      h("a", { href: "/connexion", className: "button ghost", textContent: L.guestSignIn })));
+}
+
+/* The answers given as a guest in this browser, the fullest set: offered at
+   sign-up, so trying the site first costs nothing. */
+function guestAnswers() {
+  const sets = Object.values((overlay && overlay.answers) || {})
+    .map(a => Object.fromEntries(Object.entries(a || {}).filter(([k]) =>
+      PolitiQuiz.itemById(k) || k.startsWith("salience."))));
+  return sets.sort((a, b) => Object.keys(b).length - Object.keys(a).length)[0] || {};
 }
 
 async function refreshMe() {
@@ -345,7 +373,7 @@ function renderLogin() {
   show("view-login", L.signInTitle);
   const root = $("view-login");
   root.replaceChildren();
-  const mode = root.dataset.mode || "in";
+  const mode = root.dataset.mode || (location.search.includes("inscription") ? "up" : "in");
   const card = h("section", { className: "card login-card" });
   const switchIn = h("button", { type: "button", textContent: L.signInTitle, className: mode === "in" ? "on" : "" });
   const switchUp = h("button", { type: "button", textContent: L.registerTitle, className: mode === "up" ? "on" : "" });
@@ -369,17 +397,25 @@ function renderLogin() {
       serverRoute();   /* from /connexion: to a pending invitation, else the compass */
     });
     card.append(form);
+  } else if (SERVER.signup === "invite" && !unstash(JOIN_KEY)) {
+    card.append(h("p", { className: "lead", textContent: L.signupInviteOnly }));
   } else {
     const pass = h("input", { type: "password", placeholder: L.passwordNew, autocomplete: "new-password", required: true });
     const consent = h("input", { type: "checkbox" });
+    const kept = guestAnswers();
+    const nKept = Object.keys(kept).length;
+    const carry = h("input", { type: "checkbox", checked: true });
     const form = h("form", {}, user, pass,
       h("label", { className: "consent" }, consent, h("span", { textContent: L.consent })),
+      nKept ? h("label", { className: "consent" }, carry, h("span", { textContent: L.guestCarry(nKept) })) : null,
       h("button", { type: "submit", className: "primary", textContent: L.register }), err);
     form.addEventListener("submit", async e => {
       e.preventDefault();
       if (!consent.checked) return err.fail(L.apiErrors.consent_required);
-      const r = await api("POST", "/api/register", { username: user.value, password: pass.value, consent: true });
+      const r = await api("POST", "/api/register", { username: user.value, password: pass.value, consent: true,
+                                                     invite: unstash(JOIN_KEY) || undefined });
       if (!r.ok) return err.fail(r);
+      if (nKept && carry.checked) await api("PUT", "/api/me/profile", { answers: kept });
       await refreshMe();
       await chooseGroup();
       await loadGroup();
@@ -387,7 +423,10 @@ function renderLogin() {
     });
     card.append(form, h("p", { className: "note", textContent: L.serverNote }));
   }
-  root.append(h("h2", { textContent: L.welcomeTitle }), h("p", { className: "lead", textContent: L.welcomeLead }), card);
+  const guest = h("button", { type: "button", className: "ghost", textContent: L.guestTry });
+  guest.addEventListener("click", () => { location.href = "/essai"; });
+  root.append(h("h2", { textContent: L.welcomeTitle }), h("p", { className: "lead", textContent: L.welcomeLead }), card,
+    h("div", { className: "guest-offer" }, guest, h("p", { className: "note", textContent: L.guestNote })));
   user.focus();
 }
 
@@ -464,10 +503,42 @@ async function renderGroups() {
       await loadGroup();
       renderGroups();
     });
+    const members = lists[i].ok ? lists[i].data : [];
+    const owner = members.find(m => m.owner);
+    const redo = async () => { await refreshMe(); await chooseGroup(SERVER.group ? SERVER.group.id : undefined); await loadGroup(); renderGroups(); };
+    const act = async (method, path, body, done) => {
+      const r = await api(method, path, body);
+      if (!r.ok) return err.fail(r);
+      if (done) SERVER.status = done;
+      await redo();
+    };
+    let manage = null;
+    if (g.owner) {
+      const fresh = h("button", { type: "button", className: "ghost", textContent: L.ownerNewLink });
+      fresh.addEventListener("click", () => confirm(L.ownerNewLinkConfirm)
+        && act("POST", "/api/groups/" + g.id + "/invite", null, L.ownerNewLinkDone));
+      const rows = members.filter(m => !m.me).map(m => {
+        const out = h("button", { type: "button", className: "ghost", textContent: L.ownerRemove });
+        out.addEventListener("click", () => confirm(L.ownerRemoveConfirm(m.username, g.name))
+          && act("POST", "/api/groups/" + g.id + "/remove", { username: m.username }));
+        const give = h("button", { type: "button", className: "ghost", textContent: L.ownerHandOver });
+        give.addEventListener("click", () => confirm(L.ownerHandOverConfirm(m.username, g.name))
+          && act("POST", "/api/groups/" + g.id + "/owner", { username: m.username }));
+        return h("li", {}, h("span", { textContent: m.username }), h("span", { className: "actions" }, give, out));
+      });
+      const drop = h("button", { type: "button", className: "ghost danger", textContent: L.ownerDelete });
+      drop.addEventListener("click", () => confirm(L.ownerDeleteConfirm(g.name))
+        && act("DELETE", "/api/groups/" + g.id, null));
+      manage = h("details", { className: "owner-tools" }, h("summary", { textContent: L.ownerManage }),
+        h("div", { className: "actions" }, fresh, drop),
+        rows.length ? h("ul", { className: "member-rows" }, ...rows) : null,
+        h("p", { className: "note", textContent: L.ownerNote }));
+    }
     root.append(h("section", { className: "card group-card" },
       h("h3", { textContent: g.name }),
       h("p", { className: "members", textContent: L.memberCount(g.members) + (names.length ? " : " + names.join(", ") : "") }),
-      h("div", { className: "actions" }, view, copy, leave), linkLine, err));
+      h("p", { className: "note", textContent: g.owner ? L.ownerYou : owner ? L.ownerIs(owner.username) : "" }),
+      h("div", { className: "actions" }, view, copy, leave), linkLine, manage, err));
   });
 
   /* create one */
@@ -531,6 +602,25 @@ function renderAccountPage() {
   const logout = h("button", { type: "button", className: "ghost", textContent: L.signOut });
   logout.addEventListener("click", async () => { await flushAnswers(); await api("POST", "/api/logout"); await signedOut(); });
 
+  const others = h("button", { type: "button", className: "ghost", textContent: L.signOutOthers });
+  others.addEventListener("click", async () => {
+    const r = await api("DELETE", "/api/me/sessions/others");
+    SERVER.status = r.ok ? L.signedOutOthers : apiError(r);
+    renderAccountPage();
+  });
+
+  const errP = errorLine();
+  const cur = h("input", { type: "password", placeholder: L.passwordCurrent, autocomplete: "current-password", required: true });
+  const nxt = h("input", { type: "password", placeholder: L.passwordNew, autocomplete: "new-password", required: true });
+  const pw = h("form", { className: "row" }, cur, nxt, h("button", { type: "submit", className: "ghost", textContent: L.passwordChange }));
+  pw.addEventListener("submit", async e => {
+    e.preventDefault();
+    const r = await api("POST", "/api/me/password", { current: cur.value, new: nxt.value });
+    if (!r.ok) return errP.fail(r.data && r.data.error === "bad_credentials" ? L.passwordWrong : r);
+    SERVER.status = L.passwordChanged;
+    renderAccountPage();
+  });
+
   const err = errorLine();
   const delPass = h("input", { type: "password", placeholder: L.password, autocomplete: "current-password", required: true });
   const del = h("form", { className: "row" }, delPass, h("button", { type: "submit", className: "ghost", textContent: L.deleteAccount }));
@@ -553,7 +643,9 @@ function renderAccountPage() {
   const tail = [
     h("section", { className: "card" }, h("h3", { textContent: L.myData }),
       h("p", { className: "note", textContent: L.serverNoteIn }),
-      h("div", { className: "actions" }, exportBtn, logout)),
+      h("div", { className: "actions" }, exportBtn, others, logout)),
+    h("section", { className: "card" }, h("h3", { textContent: L.passwordTitle }), pw, errP,
+      h("p", { className: "note", textContent: L.passwordNote })),
     h("section", { className: "card" }, h("h3", { textContent: L.deleteTitle }),
       h("p", { textContent: L.deleteWarn }), del, err)
   ];

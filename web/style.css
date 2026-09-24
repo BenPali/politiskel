@@ -18,8 +18,9 @@
     --warn:          #ec835a;
     --focus:         #2a78d6;
   }
+  /* the system's choice, unless a theme was picked in the header */
   @media (prefers-color-scheme: dark) {
-    :root:not([data-theme="light"]) {
+    :root:not([data-theme]) {
       color-scheme: dark;
       --bg:            #121211;
       --surface:       #1a1a19;
@@ -51,6 +52,41 @@
     --ref-ink:       #86847c;
     --warn:          #ec835a;
     --focus:         #3987e5;
+  }
+  /* high contrast: pure black on white, borders and secondary text dark
+     enough to read at a glance */
+  :root[data-theme="contrast"] {
+    color-scheme: light;
+    --bg:            #ffffff;
+    --surface:       #ffffff;
+    --border:        #5c5c5c;
+    --grid:          #c8c8c8;
+    --axis:          #2b2b2b;
+    --text:          #000000;
+    --text-2:        #1c1c1c;
+    --text-3:        #3a3a3a;
+    --series-1:      #0048a8;
+    --series-1-soft: #c9dcff;
+    --ref-ink:       #2b2b2b;
+    --warn:          #a8200d;
+    --focus:         #0048a8;
+  }
+  /* sepia: warm paper, for long reading */
+  :root[data-theme="sepia"] {
+    color-scheme: light;
+    --bg:            #f2eadb;
+    --surface:       #faf5ea;
+    --border:        #ddd0b8;
+    --grid:          #e6dac4;
+    --axis:          #8a7c63;
+    --text:          #2a2317;
+    --text-2:        #574a36;
+    --text-3:        #82745c;
+    --series-1:      #8a5424;
+    --series-1-soft: #ecd6b8;
+    --ref-ink:       #82745c;
+    --warn:          #b8521f;
+    --focus:         #8a5424;
   }
 
   * { box-sizing: border-box; }
@@ -88,6 +124,9 @@
   }
   .masthead nav a:hover { color: var(--text); border-color: var(--text-3); }
   .masthead nav a svg { flex: none; }
+  .theme-pick { display: inline-flex; align-items: center; gap: 6px; font-size: 0.82rem; color: var(--text-2); }
+  .theme-pick select { font: inherit; padding: 5px 8px; border-radius: 7px; border: 1px solid var(--border);
+                       background: var(--surface); color: var(--text); cursor: pointer; }
 
   /* ----------------------------------------------------------- pied de page --- */
   footer.site {
@@ -605,6 +644,19 @@
                      margin-bottom: 10px; }
   .account .status { color: var(--text-3); font-size: 0.78rem; }
   .account .note { color: var(--text-3); font-size: 0.75rem; margin: 8px 0 0; max-width: 90ch; }
+  .guest-bar { display: flex; flex-wrap: wrap; align-items: center; justify-content: space-between; gap: 10px 20px; }
+  .guest-bar p { margin: 0; color: var(--text-2); }
+  .guest-offer { max-width: 460px; margin: 18px auto 0; text-align: center; }
+  .guest-offer .note { color: var(--text-3); font-size: 0.8rem; margin: 8px 0 0; }
+  .owner-tools { margin-top: 12px; border-top: 1px solid var(--border); padding-top: 10px; }
+  .owner-tools summary { cursor: pointer; color: var(--text-2); font-size: 0.85rem; }
+  .owner-tools .actions { margin: 10px 0; }
+  .member-rows { list-style: none; margin: 0; padding: 0; }
+  .member-rows li { display: flex; justify-content: space-between; align-items: center; gap: 12px;
+                    padding: 6px 0; border-bottom: 1px solid var(--border); font-size: 0.85rem; }
+  .member-rows .actions { display: inline-flex; gap: 6px; margin: 0; }
+  .member-rows button, .owner-tools button { padding: 5px 10px; font-size: 0.8rem; }
+  button.danger { color: var(--warn); border-color: var(--warn); }
   /* the compass's group header: which group, who is in it, where to go */
   .group-head { padding: 16px 20px; }
   .group-top { display: flex; flex-wrap: wrap; align-items: flex-end; justify-content: space-between;
