@@ -213,8 +213,10 @@ function politiskelFlag(c, p) {
     if (star) P.push(flagIcon("star", 24, 50, 26, "#ffffff"));
     else syms = [claim].concat(syms.filter(s => s !== claim && s.symbol !== "star"));
     layoutStar = star;
-    places = star ? [{ x: 108, y: 50, size: 30, bg: "white" }, { x: 132, y: 84, size: 18, bg: band }]
-                  : [{ x: 24, y: 50, size: 26, bg: tri }, { x: 108, y: 50, size: 30, bg: "white" }];
+    /* one symbol on the band, sized to sit inside it: a second one tucked
+       into the lower corner read as stray */
+    places = star ? [{ x: 110, y: 50, size: 25, bg: "white" }]
+                  : [{ x: 24, y: 50, size: 26, bg: tri }, { x: 110, y: 50, size: 25, bg: "white" }];
     /* a black band chosen for want of a second colour is filler, not a reading */
     drawn = [tri, b && b !== tri ? band : null].filter(k => k && k !== "white");
   } else if (layout === "royal") {
@@ -299,7 +301,7 @@ function flagLegend(t, drawn, layout, shown, border, rainbow, starOfLayout) {
   if (layout === "diagonal") lines.push(L.flagColourLines.black(Math.round(-t.y)));
   if (layout === "revolution" && starOfLayout) lines.push(L.flagRevolutionStar(Math.round(t.rev)));
   /* In the revolution layout without its own star, the triangle holds the
-     first symbol and the white band the second, larger: say where, not "smaller". */
+     first symbol and the white band the second: say where, not "smaller". */
   const inTriangle = layout === "revolution" && !starOfLayout;
   shown.forEach((s, i) => lines.push((inTriangle ? (i ? L.flagOnBand : L.flagInTriangle) : i ? L.flagSecond : "")
     + L.flagSymbolLines[s.symbol](s.v)));
