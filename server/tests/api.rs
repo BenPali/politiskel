@@ -537,3 +537,41 @@ async fn changing_the_password_signs_out_everywhere_else() {
     assert_eq!(here.call("GET", "/api/me", None).await.0, StatusCode::OK);
     assert_eq!(again.call("GET", "/api/me", None).await.0, StatusCode::UNAUTHORIZED);
 }
+
+#[tokio::test]
+async fn a_built_site_is_served_page_by_page() {
+    let dir = std::env::temp_dir().join(format!("politiskel-site-{}", std::process::id()));
+    std::fs::create_dir_all(dir.join("_app/immutable")).unwrap();
+    for (f, body) in [("index.html", "home"), ("connexion.html", "sign-in"), ("200.html", "fallback"),
+                      ("_app/immutable/app.1a2b.js", "js"), ("robots.txt", "robots"), (".secret", "no")] {
+        std::fs::write(dir.join(f), body).unwrap();
+    }
+    let db = SqlitePoolOptions::new().max_connections(1).connect("sqlite::memory:").await.unwrap();
+    migrate(&db).await.unwrap();
+    let app = app(AppState::new(db, String::new(), true).serving_site(Some(dir.clone())));
+    let get = |uri: &'static str| {
+        let app = app.clone();
+        async move {
+            let res = app.oneshot(Request::builder().uri(uri).body(Body::empty()).unwrap()).await.unwrap();
+            let status = res.status();
+            let cache = res.headers().get(header::CACHE_CONTROL).map(|v| v.to_str().unwrap().to_string());
+            let body = res.into_body().collect().await.unwrap().to_bytes();
+            (status, String::from_utf8_lossy(&body).to_string(), cache)
+        }
+    };
+    assert_eq!(get("/").await.1, "home");
+    let (s, body, cache) = get("/connexion").await;
+    assert_eq!((s, body.as_str(), cache.as_deref()), (StatusCode::OK, "sign-in", Some("no-cache")));
+    // an address with an id routes in the browser, from the fallback page
+    assert_eq!(get("/boussole/zoe").await.1, "fallback");
+    assert_eq!(get("/rejoindre/0123abcd").await.1, "fallback");
+    let (_, body, cache) = get("/_app/immutable/app.1a2b.js").await;
+    assert_eq!((body.as_str(), cache.as_deref()), ("js", Some("public, max-age=31536000, immutable")));
+    assert_eq!(get("/robots.txt").await.1, "robots");
+    // no hidden file, no way out of the directory, and the API keeps its 404s
+    assert_eq!(get("/.secret").await.0, StatusCode::NOT_FOUND);
+    assert_eq!(get("/_app/../.secret").await.0, StatusCode::NOT_FOUND);
+    let (s, body, _) = get("/api/nope").await;
+    assert_eq!((s, body.contains("not_found")), (StatusCode::NOT_FOUND, true));
+    std::fs::remove_dir_all(&dir).ok();
+}

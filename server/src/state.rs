@@ -23,6 +23,8 @@ pub struct AppState {
     /// The page, served as is: template.html already carries every script
     /// inlined and an empty data slot.
     pub page: Arc<String>,
+    /// The built site (site/build): when set, it is served instead of `page`.
+    pub site_dir: Option<std::path::PathBuf>,
     /// Off only for local development over plain http.
     pub secure_cookies: bool,
     /// Whether to read the client's address from X-Forwarded-For, as set by
@@ -39,7 +41,12 @@ pub struct AppState {
 impl AppState {
     pub fn new(db: SqlitePool, page: String, secure_cookies: bool) -> Self {
         Self { db, page: Arc::new(page), secure_cookies, trust_proxy: false, origin: None,
-               signup: Signup::Open, failures: Arc::default(), signups: Arc::default() }
+               signup: Signup::Open, failures: Arc::default(), signups: Arc::default(), site_dir: None }
+    }
+
+    pub fn serving_site(mut self, dir: Option<std::path::PathBuf>) -> Self {
+        self.site_dir = dir;
+        self
     }
 
     pub fn with_signup(mut self, signup: Signup) -> Self {
