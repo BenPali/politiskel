@@ -412,18 +412,134 @@
   /* what a section claims, above the smaller print explaining how to read it */
   .lead { font-size: 0.85rem; color: var(--text-2); margin: 0 0 10px; }
   .actions { display: flex; gap: 10px; flex-wrap: wrap; margin-top: 16px; align-items: center; }
-  button.primary {
+  /* a link that navigates, dressed as the button it stands for */
+  a.button { display: inline-block; text-decoration: none; }
+  button.primary, a.button.primary {
     background: var(--series-1); color: #fff; border: none; border-radius: 7px;
     padding: 9px 16px; font: inherit; font-weight: 600; font-size: 0.85rem; cursor: pointer;
   }
-  button.primary:hover { filter: brightness(1.08); }
-  button.ghost {
+  button.primary:hover, a.button.primary:hover { filter: brightness(1.08); }
+  button.ghost, a.button.ghost {
     background: none; color: var(--text-2); border: 1px solid var(--border);
     border-radius: 7px; padding: 9px 14px; font: inherit; font-size: 0.85rem; cursor: pointer;
   }
-  button.ghost:hover { background: var(--bg); color: var(--text); }
+  button.ghost:hover, a.button.ghost:hover { background: var(--bg); color: var(--text); }
   .error { color: var(--warn); font-size: 0.8rem; margin: 10px 0 0; }
   .error[hidden] { display: none !important; }
+
+  /* Where a profile started on PolitiScales, when the questionnaire has
+     replaced one of its axes: a hollow ghost and a dashed path to the dot. */
+  .trail       { stroke: var(--series-1); stroke-width: 1.2; stroke-dasharray: 3 3;
+                 opacity: 0.55; fill: none; }
+  .trail-ghost { fill: var(--surface); stroke: var(--series-1); stroke-width: 1.2;
+                 opacity: 0.7; }
+  g.sel .trail, g.sel .trail-ghost { opacity: 1; }
+  td.num.quiz::after { content: "Q"; font-size: 0.6rem; color: var(--series-1);
+                       vertical-align: super; margin-left: 1px; }
+
+  /* The readings the questionnaire adds, in the distance panel. */
+  .readings { border-top: 1px solid var(--border); margin: 0 0 14px; padding-top: 12px; }
+  .readings h3 { font-size: 0.75rem; text-transform: uppercase; letter-spacing: 0.05em;
+                 color: var(--text-3); margin: 0 0 8px; font-weight: 600; }
+  .readings .journey { font-size: 0.85rem; margin: 0 0 10px; }
+  .readings .readings-theme { font-size: 0.8rem; font-weight: 600; margin: 12px 0 6px; }
+  .readings dl { display: grid; grid-template-columns: auto 1fr; gap: 4px 14px;
+                 font-size: 0.8rem; margin: 0 0 10px; }
+  .readings dt { color: var(--text-2); }
+  .readings dd { margin: 0; font-variant-numeric: tabular-nums; }
+  .readings dd small { color: var(--text-3); }
+
+  /* The questionnaire: a page of its own, one question per screen. */
+  main[hidden] { display: none; }
+  .quiz-view { max-width: 720px; margin: 8px auto 40px; }
+  .quiz-top { display: flex; align-items: center; gap: 16px; margin-bottom: 22px;
+              font-size: 0.85rem; flex-wrap: wrap; }
+  .quiz-top a { color: var(--text-2); text-decoration: none; }
+  .quiz-top a:hover { color: var(--text); }
+  .quiz-top .who { color: var(--text-3); margin-left: auto; }
+  .progress { flex: 1; min-width: 120px; max-width: 260px; height: 4px;
+              background: var(--grid); border-radius: 2px; overflow: hidden; }
+  .progress > div { height: 100%; background: var(--series-1); transition: width 0.25s; }
+  .quiz-count { font-variant-numeric: tabular-nums; color: var(--text-3); }
+  .quiz-card { background: var(--surface); border: 1px solid var(--border); border-radius: 14px;
+               padding: 36px 38px 26px; min-height: 380px; display: flex; flex-direction: column; }
+  @media (max-width: 640px) { .quiz-card { padding: 24px 18px 18px; min-height: 0; } }
+  .quiz-card h2 { font-size: 1.4rem; line-height: 1.38; font-weight: 600; margin: 0 0 26px;
+                  letter-spacing: -0.01em; }
+  .quiz-card .eyebrow { font-size: 0.72rem; text-transform: uppercase; letter-spacing: 0.06em;
+                        color: var(--text-3); font-weight: 600; margin: 0 0 12px; }
+  .quiz-card .stem { font-size: 0.92rem; color: var(--text-2); margin: 0 0 10px; }
+  .quiz-card .lead { font-size: 0.95rem; }
+  .choices { display: flex; flex-direction: column; gap: 8px; }
+  .choice { position: relative; display: flex; align-items: center; gap: 12px; padding: 11px 16px;
+            border: 1px solid var(--border); border-radius: 10px; cursor: pointer;
+            font-size: 0.95rem; background: var(--bg); transition: border-color 0.15s; }
+  .choice:hover { border-color: var(--text-3); }
+  .choice input { position: absolute; opacity: 0; pointer-events: none; }
+  .choice .key { flex: none; width: 22px; height: 22px; border-radius: 6px; display: grid;
+                 place-items: center; font-size: 0.72rem; color: var(--text-3);
+                 border: 1px solid var(--border); background: var(--surface); }
+  .choice:has(input:checked) { border-color: var(--series-1); background: var(--series-1-soft); }
+  .choice:has(input:checked) .key { background: var(--series-1); border-color: var(--series-1); color: #fff; }
+  .choice:has(input:focus-visible) { outline: 2px solid var(--focus); outline-offset: 2px; }
+  .choice.dk { background: none; border-style: dashed; color: var(--text-2); font-size: 0.85rem; }
+  .poles { display: grid; grid-template-columns: 1fr 1fr; gap: 24px; margin-bottom: 18px; }
+  .pole { font-size: 1.08rem; line-height: 1.42; font-weight: 600; }
+  .pole small { display: block; font-size: 0.7rem; font-weight: 600; color: var(--text-3);
+                text-transform: uppercase; letter-spacing: 0.06em; margin-bottom: 5px; }
+  .pole.r { text-align: right; }
+  .ladder { display: grid; grid-auto-flow: column; grid-auto-columns: 1fr; gap: 6px; }
+  .ladder .choice { justify-content: center; padding: 11px 0; font-variant-numeric: tabular-nums; }
+  .ladder + .choices { margin-top: 10px; }
+  @media (max-width: 640px) {
+    .poles { grid-template-columns: 1fr; gap: 12px; }
+    .pole.r { text-align: left; }
+    .ladder { gap: 3px; }
+    .ladder .choice { font-size: 0.78rem; padding: 9px 0; }
+  }
+  .q-note { font-size: 0.8rem; color: var(--text-2); font-style: italic; margin: 14px 0 0; }
+  .q-src { font-size: 0.72rem; color: var(--text-3); margin: 0; padding-top: 24px; margin-top: auto; }
+  .q-src a { color: inherit; }
+  .q-src .tr { color: var(--warn); }
+  .quiz-nav { display: flex; justify-content: space-between; align-items: center; gap: 10px;
+              margin-top: 18px; }
+  .quiz-nav .skip { background: none; border: none; color: var(--text-3); cursor: pointer;
+                    font: inherit; font-size: 0.85rem; }
+  .quiz-nav .skip:hover { color: var(--text); }
+  .quiz-keys { text-align: center; font-size: 0.72rem; color: var(--text-3); margin-top: 14px; }
+  .theme-list { display: grid; gap: 10px; margin-top: 6px; }
+  .theme-card { display: grid; grid-template-columns: 1fr auto; gap: 6px 18px; align-items: center;
+                border: 1px solid var(--border); border-radius: 12px; padding: 16px 18px;
+                background: var(--bg); }
+  .theme-card h3 { margin: 0; font-size: 1.05rem; font-weight: 600; color: var(--text);
+                   text-transform: none; letter-spacing: 0; }
+  .theme-card p { margin: 0; font-size: 0.84rem; color: var(--text-2); grid-column: 1; }
+  .theme-card .status { font-size: 0.75rem; color: var(--text-3); grid-column: 1; }
+  .theme-card .go { grid-column: 2; grid-row: 1 / span 3; }
+  .theme-card.planned { background: none; border-style: dashed; }
+  .theme-card.all { border-color: var(--series-1); background: var(--surface); }
+  .start-native { display: flex; flex-wrap: wrap; gap: 8px 10px; align-items: center;
+                  margin: -6px 0 20px; font-size: 0.85rem; color: var(--text-2); }
+  .start-native input { font: inherit; padding: 7px 10px; border: 1px solid var(--border);
+                        border-radius: 7px; background: var(--surface); color: var(--text);
+                        width: 11em; }
+  .start-native button.primary { padding: 7px 14px; }
+  .start-native .error { margin: 0; flex-basis: 100%; }
+  .theme-card.planned h3, .theme-card.planned p { color: var(--text-3); }
+  @media (max-width: 640px) {
+    .theme-card { grid-template-columns: 1fr; }
+    .theme-card .go { grid-column: 1; grid-row: auto; justify-self: start; margin-top: 6px; }
+  }
+  .journey-strip { width: 100%; height: auto; margin: 4px 0 18px; overflow: visible; }
+  .journey-strip .axis { stroke: var(--axis); stroke-width: 1; }
+  .journey-strip .ref { fill: var(--surface); stroke: var(--ref-ink); stroke-width: 1; }
+  .journey-strip .ref-name { font-size: 10px; fill: var(--text-3); }
+  .journey-strip .end { font-size: 10px; fill: var(--text-3); }
+  .journey-strip .cap { font-size: 11px; font-weight: 600; fill: var(--text); }
+  .journey-strip .cap.was { fill: var(--text-2); font-weight: 400; }
+  .journey-strip .dot { fill: var(--series-1); }
+  .journey-strip .arrow { stroke: var(--series-1); stroke-width: 1.5; fill: none; }
+  .journey-strip .head { fill: var(--series-1); }
 
   details.method { margin-top: 20px; }
   details.method summary { cursor: pointer; font-size: 0.8rem; color: var(--text-2);
@@ -806,6 +922,14 @@
                 conversion is a rescaling and nothing more.
        "est"  — hand estimate, calibrated against the CHES entries around it.
 
+     `prot` is CHES `protectionism` (0 = trade liberalisation, 10 = protection
+     of domestic producers), converted the same way. It is carried for France,
+     Germany and the UK only. For Italy all nine party means are whole
+     numbers, where the other countries' rest on five to eleven experts —
+     consistent with a single rater, so the variable is left out rather than
+     drawn as if it were a measure; `protWhy` says so on the page. Hand
+     estimates carry no `prot`: there is nothing to estimate it from.
+
      What does NOT transpose is the meaning of "a party". CHES rates parties, so
      in a multi-party system each reference is one. The United States are not in
      CHES — no expert survey on these scales covers them — and two parties that
@@ -818,36 +942,40 @@
       code: "fr", name: "France", parties: [
         { name: "Lutte ouvrière",     x: -92, y: -30, src: "est",  note: "Trotskisme, anticapitalisme de classe" },
         { name: "NPA / Rév. perm.",   x: -88, y: -70, src: "est",  note: "Anticapitalisme, forte ouverture sociétale" },
-        { name: "La France insoumise",x: -82, y: -64, src: "ches", note: "Rupture écosocialiste, populisme de gauche" },
-        { name: "PCF",                x: -75, y: -29, src: "ches", note: "Étatisme économique, sensibilité souverainiste" },
-        { name: "Les Écologistes",    x: -54, y: -66, src: "ches", note: "Écologie politique, libéralisme culturel" },
-        { name: "Parti socialiste",   x: -33, y: -45, src: "ches", note: "Social-démocratie réformiste" },
+        { name: "La France insoumise",x: -82, y: -64, src: "ches", prot: 48, note: "Rupture écosocialiste, populisme de gauche" },
+        { name: "PCF",                x: -75, y: -29, src: "ches", prot: 56, note: "Étatisme économique, sensibilité souverainiste" },
+        { name: "Les Écologistes",    x: -54, y: -66, src: "ches", prot: 15, note: "Écologie politique, libéralisme culturel" },
+        { name: "Parti socialiste",   x: -33, y: -45, src: "ches", prot: 8, note: "Social-démocratie réformiste" },
         { name: "La France humaniste",x: -15, y: -22, src: "est",  note: "Villepin, 2025 — gaullisme social : patrimoine et successions taxés, mais déficit sous 3 %, simplification par ordonnances. Postérieur au CHES, placement incertain" },
-        { name: "MoDem",              x:  14, y: -10, src: "ches", note: "Centrisme social, europhilie" },
-        { name: "Rassemblement national", x: 20, y: 67, src: "ches", note: "Étatisme social ciblé, nationalisme" },
-        { name: "Renaissance",        x:  24, y: -18, src: "ches", note: "Libéralisme économique, centre-droit" },
-        { name: "Horizons",           x:  36, y:   6, src: "ches", note: "Droite libérale gestionnaire" },
+        { name: "MoDem",              x:  14, y: -10, src: "ches", prot: -24, note: "Centrisme social, europhilie" },
+        { name: "Rassemblement national", x: 20, y: 67, src: "ches", prot: 70, note: "Étatisme social ciblé, nationalisme" },
+        { name: "Renaissance",        x:  24, y: -18, src: "ches", prot: -24, note: "Libéralisme économique, centre-droit" },
+        { name: "Horizons",           x:  36, y:   6, src: "ches", prot: -28, note: "Droite libérale gestionnaire" },
         { name: "Debout la France",   x:  38, y:  62, src: "est",  note: "Souverainisme gaulliste" },
-        { name: "Les Républicains",   x:  56, y:  44, src: "ches", note: "Droite conservatrice, ordre et marché" },
+        { name: "Les Républicains",   x:  56, y:  44, src: "ches", prot: -12, note: "Droite conservatrice, ordre et marché" },
         { name: "Nouvelle Énergie",   x:  62, y:  32, src: "est",  note: "Lisnard — droite libérale et décentralisatrice : choc de dérégulation, retraite par capitalisation, migration hors contrôle des cours européennes" },
-        { name: "Reconquête",         x:  67, y:  82, src: "ches", note: "Libéralisme économique, national-conservatisme" }
+        { name: "Reconquête",         x:  67, y:  82, src: "ches", prot: 37, note: "Libéralisme économique, national-conservatisme" }
       ]
     },
     {
       code: "de", name: "Allemagne", parties: [
-        { name: "Die Linke",          x: -73, y: -54, src: "ches", note: "Gauche radicale, redistribution et ouverture sociétale" },
-        { name: "BSW",                x: -44, y:  41, src: "ches", note: "Scission de Die Linke — étatisme économique et conservatisme culturel, le quadrant que l'échiquier français laisse vide" },
-        { name: "Grüne",              x: -33, y: -68, src: "ches", note: "Écologie politique, libéralisme culturel" },
-        { name: "SPD",                x: -31, y: -28, src: "ches", note: "Social-démocratie de gouvernement" },
-        { name: "Freie Wähler",       x:  29, y:  34, src: "ches", note: "Centre-droit localiste, ancré en Bavière" },
-        { name: "CDU",                x:  32, y:  31, src: "ches", note: "Démocratie chrétienne, centre-droit de gouvernement" },
-        { name: "CSU",                x:  35, y:  51, src: "ches", note: "Aile bavaroise de la CDU, nettement plus conservatrice" },
-        { name: "FDP",                x:  52, y: -36, src: "ches", note: "Libéralisme de marché ET libéralisme culturel — sans équivalent français de ce poids" },
-        { name: "AfD",                x:  53, y:  88, src: "ches", note: "Droite radicale nationaliste" }
+        { name: "Die Linke",          x: -73, y: -54, src: "ches", prot: 60, note: "Gauche radicale, redistribution et ouverture sociétale" },
+        { name: "BSW",                x: -44, y:  41, src: "ches", prot: 63, note: "Scission de Die Linke — étatisme économique et conservatisme culturel, le quadrant que l'échiquier français laisse vide" },
+        { name: "Grüne",              x: -33, y: -68, src: "ches", prot: -6, note: "Écologie politique, libéralisme culturel" },
+        { name: "SPD",                x: -31, y: -28, src: "ches", prot: 6, note: "Social-démocratie de gouvernement" },
+        { name: "Freie Wähler",       x:  29, y:  34, src: "ches", prot: 10, note: "Centre-droit localiste, ancré en Bavière" },
+        { name: "CDU",                x:  32, y:  31, src: "ches", prot: -29, note: "Démocratie chrétienne, centre-droit de gouvernement" },
+        { name: "CSU",                x:  35, y:  51, src: "ches", prot: 0, note: "Aile bavaroise de la CDU, nettement plus conservatrice" },
+        { name: "FDP",                x:  52, y: -36, src: "ches", prot: -63, note: "Libéralisme de marché ET libéralisme culturel — sans équivalent français de ce poids" },
+        { name: "AfD",                x:  53, y:  88, src: "ches", prot: 40, note: "Droite radicale nationaliste" }
       ]
     },
     {
-      code: "it", name: "Italie", parties: [
+      code: "it", name: "Italie",
+      protWhy: "pour l'Italie, les neuf positions du CHES 2024 sur le protectionnisme sont des "
+             + "nombres entiers, là où les autres pays reposent sur cinq à onze experts : "
+             + "vraisemblablement un seul expert, trop peu pour placer les partis.",
+      parties: [
         { name: "Sinistra Italiana",  x: -72, y: -66, src: "ches", note: "Gauche radicale, composante de l'alliance AVS" },
         { name: "Europa Verde",       x: -56, y: -66, src: "ches", note: "Écologistes, composante de l'alliance AVS" },
         { name: "M5S",                x: -43, y: -35, src: "ches", note: "Mouvement 5 étoiles — populisme devenu social, longtemps hors du clivage" },
@@ -862,13 +990,13 @@
     },
     {
       code: "uk", name: "Royaume-Uni", parties: [
-        { name: "Green Party",        x: -58, y: -71, src: "ches", note: "Écologistes d'Angleterre et du pays de Galles" },
-        { name: "Plaid Cymru",        x: -42, y: -31, src: "ches", note: "Nationalisme gallois de gauche" },
-        { name: "SNP",                x: -38, y: -44, src: "ches", note: "Indépendantisme écossais, social-démocrate" },
-        { name: "Labour",             x: -28, y: -33, src: "ches", note: "Travaillisme de gouvernement, recentré" },
-        { name: "Liberal Democrats",  x: -14, y: -65, src: "ches", note: "Centre libéral, très libéral culturellement" },
-        { name: "Conservative Party", x:  49, y:  43, src: "ches", note: "Conservatisme de marché" },
-        { name: "Reform UK",          x:  68, y:  82, src: "ches", note: "Droite radicale issue du Brexit" }
+        { name: "Green Party",        x: -58, y: -71, src: "ches", prot: 0, note: "Écologistes d'Angleterre et du pays de Galles" },
+        { name: "Plaid Cymru",        x: -42, y: -31, src: "ches", prot: -4, note: "Nationalisme gallois de gauche" },
+        { name: "SNP",                x: -38, y: -44, src: "ches", prot: -14, note: "Indépendantisme écossais, social-démocrate" },
+        { name: "Labour",             x: -28, y: -33, src: "ches", prot: -31, note: "Travaillisme de gouvernement, recentré" },
+        { name: "Liberal Democrats",  x: -14, y: -65, src: "ches", prot: -46, note: "Centre libéral, très libéral culturellement" },
+        { name: "Conservative Party", x:  49, y:  43, src: "ches", prot: -16, note: "Conservatisme de marché" },
+        { name: "Reform UK",          x:  68, y:  82, src: "ches", prot: 22, note: "Droite radicale issue du Brexit" }
       ]
     },
     {
@@ -1025,6 +1153,797 @@
 /* POLITI-MODEL:END */
   </script>
   <script>
+/* POLITI-QUIZ:START */
+"use strict";
+/* The native questionnaire: the item bank, the answer scales, and the scoring
+   that turns answers into readings.
+
+   Shared file, like politi-model.js beside it: loaded as-is by the browser
+   (inlined into index.html) and by Node (require). It touches no DOM and holds
+   no state.
+
+   Every item is quoted, not written. The wording comes from a field-tested
+   survey (ESS, ISSP, EVS), in the official French questionnaire of that
+   survey, and each item carries where it comes from. The one exception is
+   Wright's class scale, which has no French version at all — France was not in
+   his project — so its items are translated here and marked `translated`, and
+   the page has to say so. Item text is French because it is quoted material,
+   like the party notes in politi-model.js: a second language adds a key next
+   to `fr`, it does not replace it.
+
+   Several readings, not one point. The economy theme feeds:
+     x              the economic left-right axis, on the scale of CHES `lrecon`
+     protectionism  a separate readout: in CHES 2024 it runs AGAINST lrecon
+                    (r = -0.37 over 279 parties) and with galtan (+0.43) —
+                    LFI and the RN are both protectionist — so folding it into
+                    x would repeat the mistake ecology made at 20%
+     class          Wright's anticapitalism scale, which is a rival account of
+                    the same conflict, not a component of x
+     conflict       perceived conflict between classes (ISSP), reported beside
+                    Wright's scale rather than mixed into it: adding items to a
+                    validated scale makes it a different, unvalidated one
+     labour         the balance of power between capital and labour — unions,
+                    business — which is an attitude to that balance, not a
+                    perception of conflict, so it gets its own reading
+   Salience is asked per theme, twice: before the items and after them. The
+   first records the weight the theme had coming in, the second whether
+   answering moved it; both are returned as is, never folded into a score. */
+(function (global) {
+
+  /* Answer scales. `values` go from the first option to the last, in [-1, 1],
+     and are oriented later by each item's `pole`. `dk` is the survey's own
+     "can't choose" option, which counts as no answer — except in Wright's
+     scale, where it scores 0 and so still counts. */
+  const even = n => Array.from({ length: n }, (_, i) => -1 + 2 * i / (n - 1));
+
+  const SCALES = {
+    /* ESS, France: the agree/disagree card, as printed from round 1 to round
+       11 ("LISTE 13" in round 9). "Ne sait pas" was an interviewer code, never
+       read out. */
+    agreePlutot: {
+      values: [1, 0.5, 0, -0.5, -1],
+      fr: ["Tout à fait d'accord", "Plutôt d'accord", "Ni d'accord, ni pas d'accord",
+           "Plutôt pas d'accord", "Pas du tout d'accord"]
+    },
+    /* ISSP, France, 2013-2023. */
+    agreeIssp: {
+      values: [1, 0.5, 0, -0.5, -1],
+      fr: ["Tout à fait d'accord", "Plutôt d'accord", "Ni d'accord, ni pas d'accord",
+           "Plutôt pas d'accord", "Pas du tout d'accord"],
+      dk: "Ne peut choisir"
+    },
+    /* ISSP Role of Government, France, 2016, Q5. */
+    favourIssp: {
+      values: [1, 0.5, 0, -0.5, -1],
+      fr: ["Très favorable", "Assez favorable", "Ni pour, ni contre",
+           "Assez défavorable", "Très défavorable"],
+      dk: "Ne peut choisir"
+    },
+    /* ISSP Social Inequality, France, 2019, Q08a. */
+    taxShareIssp: {
+      values: [-1, -0.5, 0, 0.5, 1],
+      fr: ["Une part beaucoup plus importante", "Une part plus importante",
+           "Une part égale", "Une part plus faible", "Une part beaucoup plus faible"],
+      dk: "Ne peut choisir"
+    },
+    /* ISSP Social Inequality, France, 2019, Q12. */
+    conflictIssp: {
+      values: [1, 1 / 3, -1 / 3, -1],
+      fr: ["Des conflits très importants", "Des conflits importants",
+           "Des conflits, mais pas très importants", "Pas de conflits du tout"],
+      dk: "Ne peut choisir"
+    },
+    /* ISSP Role of Government, France, 2016, Q6. */
+    spendIssp: {
+      values: [-1, -0.5, 0, 0.5, 1],
+      fr: ["Dépenser beaucoup plus", "Dépenser plus", "Maintenir les dépenses actuelles",
+           "Dépenser moins", "Dépenser beaucoup moins"],
+      dk: "Ne peut choisir"
+    },
+    /* ISSP Role of Government, France, 1996, Q11. */
+    powerIssp: {
+      values: [1, 0.5, 0, -0.5, -1],
+      fr: ["Beaucoup trop", "Trop", "À peu près comme il faut", "Trop peu", "Beaucoup trop peu"],
+      dk: "Ne peut choisir"
+    },
+    /* ISSP Role of Government, France, 1996, Q18: two options only. */
+    ownerIssp: {
+      values: [1, -1],
+      fr: ["Le secteur privé", "L'État"],
+      dk: "Ne peut choisir"
+    },
+    /* EVS 2017: a 1-10 card between two opposed statements, carried by the
+       item (`left`, `right`). Kept at ten points because that is the format
+       it was fielded in; the fine grain matters little once averaged. */
+    bipolar10: { values: even(10), bipolar: true },
+    /* ESS round 4, D34: 0-10. */
+    bipolar11: { values: even(11), bipolar: true },
+    /* Wright: four points, no midpoint, "don't know" scored 0. The French
+       labels are ours, like the items. */
+    agreeWright: {
+      values: [1, 0.5, -0.5, -1],
+      fr: ["Tout à fait d'accord", "Plutôt d'accord", "Plutôt pas d'accord",
+           "Pas du tout d'accord"],
+      dk: "Ne sait pas", dkScores: 0
+    },
+    /* ---- society ---- */
+    /* ISSP National Identity, France, 2023, Q08. */
+    immigNumberIssp: {
+      values: [-1, -0.5, 0, 0.5, 1],
+      fr: ["Être beaucoup augmenté", "Être un peu augmenté", "Rester le même",
+           "Être un peu diminué", "Être beaucoup diminué"],
+      dk: "Ne peut choisir"
+    },
+    /* ISSP 2023, Q09: three positions, from keeping one's culture only to
+       giving it up. */
+    cultureIssp: {
+      values: [-1, 0, 1],
+      fr: ["Les immigrés devraient conserver leur culture d'origine et ne pas adopter la culture française",
+           "Les immigrés devraient conserver leur culture d'origine et adopter également la culture française",
+           "Les immigrés devraient renoncer à leur culture d'origine et adopter la culture française"],
+      dk: "Ne peut choisir"
+    },
+    /* ISSP 2023, Q04. */
+    bornIssp: {
+      values: [-1, -1 / 3, 1 / 3, 1],
+      fr: ["Je suis tout à fait d'accord avec l'affirmation A",
+           "Je suis plus d'accord avec l'affirmation A qu'avec l'affirmation B",
+           "Je suis plus d'accord avec l'affirmation B qu'avec l'affirmation A",
+           "Je suis tout à fait d'accord avec l'affirmation B"],
+      dk: "Ne peut choisir"
+    },
+    /* ISSP 2023, Q01. */
+    importanceIssp: {
+      values: [1, 1 / 3, -1 / 3, -1],
+      fr: ["Très important", "Plutôt important", "Plutôt pas important", "Pas important du tout"],
+      dk: "Ne peut choisir"
+    },
+    /* ISSP Role of Government, France, 2016. */
+    obeyIssp: {
+      values: [1, -1],
+      fr: ["Il faut toujours obéir aux lois, sans exception",
+           "Dans certains cas, il faut suivre sa conscience"],
+      dk: "Ne peut choisir"
+    },
+    errorIssp: {
+      values: [-1, 1],
+      fr: ["Condamner un innocent", "Laisser une personne coupable en liberté"],
+      dk: "Ne peut choisir"
+    },
+    allowIssp: {
+      values: [-1, -1 / 3, 1 / 3, 1],
+      fr: ["Certainement autorisées", "Probablement autorisées", "Probablement pas autorisées",
+           "Certainement pas autorisées"],
+      dk: "Ne peut choisir"
+    },
+    rightIssp: {
+      values: [1, 1 / 3, -1 / 3, -1],
+      fr: ["Absolument le droit", "Probablement le droit", "Probablement pas le droit",
+           "Absolument pas le droit"],
+      dk: "Ne peut choisir"
+    },
+    respIssp: {
+      values: [1, 1 / 3, -1 / 3, -1],
+      fr: ["Tout à fait", "Probablement", "Probablement pas", "Pas du tout"],
+      dk: "Ne peut choisir"
+    },
+    /* ISSP Family, France, 2022: its own card ("Pas d'accord du tout"). */
+    agreeFam: {
+      values: [1, 0.5, 0, -0.5, -1],
+      fr: ["Tout à fait d'accord", "Plutôt d'accord", "Ni d'accord, ni pas d'accord",
+           "Plutôt pas d'accord", "Pas d'accord du tout"],
+      dk: "Ne peut choisir"
+    },
+    /* ISSP 2022, the French national add-on block: four points. */
+    agreeFamFr: {
+      values: [1, 1 / 3, -1 / 3, -1],
+      fr: ["Tout à fait d'accord", "Plutôt d'accord", "Plutôt pas d'accord", "Pas d'accord du tout"],
+      dk: "Ne peut choisir"
+    },
+    /* ISSP Religion, France, 2018 and 2008: each wave printed its own card. */
+    agreeRel18: {
+      values: [1, 0.5, 0, -0.5, -1],
+      fr: ["Tout à fait d'accord", "D'accord", "Ni d'accord, ni pas d'accord", "En désaccord",
+           "Fortement en désaccord"],
+      dk: "Ne peut pas dire"
+    },
+    agreeRel18b: {
+      values: [1, 0.5, 0, -0.5, -1],
+      fr: ["Tout à fait d'accord", "D'accord", "Ni d'accord, ni pas d'accord", "Pas d'accord",
+           "Pas d'accord du tout"],
+      dk: "Ne peut pas dire"
+    },
+    agreeRel08: {
+      values: [1, 0.5, 0, -0.5, -1],
+      fr: ["Tout à fait d'accord", "D'accord", "Ni d'accord ni pas d'accord", "Pas d'accord",
+           "Pas d'accord du tout"],
+      dk: "Ne peut pas dire"
+    },
+    powerRel18: {
+      values: [1, 0.5, 0, -0.5, -1],
+      fr: ["Beaucoup trop de pouvoir", "Trop de pouvoir", "Ce qu'il faut de pouvoir",
+           "Trop peu de pouvoir", "Beaucoup trop peu de pouvoir"],
+      dk: "Ne peut pas dire"
+    },
+    /* EVS 2017, France: a four-point card with no midpoint, and a five-point
+       one. "NSP" was an interviewer code, never read out. */
+    agree4Evs: {
+      values: [1, 1 / 3, -1 / 3, -1],
+      fr: ["Tout à fait d'accord", "Plutôt d'accord", "Plutôt pas d'accord", "Pas d'accord du tout"]
+    },
+    agree5Evs: {
+      values: [1, 0.5, 0, -0.5, -1],
+      fr: ["Tout à fait d'accord", "Plutôt d'accord", "Ni d'accord, ni pas d'accord",
+           "Plutôt pas d'accord", "Pas d'accord du tout"]
+    },
+    /* EVS 2017, Q37: not ordered — indifference sits between the two. */
+    goodThingEvs: {
+      values: [1, -1, 0],
+      fr: ["Une bonne chose", "Une mauvaise chose", "Ça vous est égal"]
+    },
+    citedEvs: { values: [1, -1], fr: ["Cité", "Pas cité"] },
+    /* ESS 11, B40: four answers. */
+    allowEss: {
+      values: [-1, -1 / 3, 1 / 3, 1],
+      fr: ["Elle doit autoriser un grand nombre d'entre eux à venir vivre ici",
+           "Elle doit autoriser certains d'entre eux", "Elle ne doit autoriser que peu d'entre eux",
+           "Elle ne doit autoriser aucun d'entre eux"]
+    },
+
+    /* Salience. Not a survey item — no field-tested per-theme importance
+       question exists; the surveys ask for "the most important problem"
+       instead. Four labelled points rather than CHES's expert 0-10: a
+       respondent cannot tell a 9 from a 10 about themselves. */
+    salience: {
+      values: [0, 1 / 3, 2 / 3, 1],
+      fr: ["Secondaire pour moi", "Assez important", "Très important",
+           "C'est ce qui décide de mon vote"]
+    }
+  };
+
+  const ESS_FR = "https://stessrelpubprodwe.blob.core.windows.net/data/";
+  const GESIS = id => "https://access.gesis.org/dbk/" + id;
+  const WRIGHT = "https://www.sscc.wisc.edu/soc/faculty/pages/wright/";
+
+  /* The item bank. `reading` is what the item feeds, `dim` the CHES
+     sub-dimension for x. `pole: 1` keeps the scale's orientation, `-1` flips
+     it, so that after orientation +1 always means: right on x, protectionist,
+     anticapitalist on class, conflict perceived, on the side of labour. */
+  const SPEND_STEM = "Pour chacun des secteurs suivants, pouvez-vous dire si vous souhaiteriez que le gouvernement dépense plus ou moins ? N'oubliez pas que dépenser « beaucoup plus » peut entraîner une augmentation des impôts, taxes ou cotisations sociales.";
+  const OWNER_STEM = "Qui, d'après vous, devrait principalement gérer les services suivants, l'État ou le secteur privé ?";
+  const ACTIONS_STEM = "Voici un certain nombre d'actions économiques que les gouvernements peuvent faire. Pouvez-vous indiquer si vous y êtes favorable ou défavorable ?";
+  const CONFLICT_STEM = "Dans tous les pays, il y a des différences, ou même des conflits entre les différents groupes. À votre avis, en France, est-ce qu'il y a beaucoup de conflits…";
+
+  const spending = (id, fr) => ({
+    id: "issp.spend." + id, theme: "economy", reading: "x", dim: "spendvtax",
+    scale: "spendIssp", pole: 1, stem: SPEND_STEM, fr,
+    src: { survey: "ISSP", wave: "Rôle de l'État 2016", variable: "Q6", url: GESIS(63847) } });
+  const ownership = (id, fr) => ({
+    id: "issp.owner." + id, theme: "economy", reading: "x", dim: "deregulation",
+    scale: "ownerIssp", pole: 1, stem: OWNER_STEM, fr,
+    src: { survey: "ISSP", wave: "Rôle de l'État 1996", variable: "Q18", url: GESIS(6806) } });
+
+  /* Society items are many and alike: `soc` builds one, the source helpers
+     below name the questionnaire it is quoted from. */
+  const soc = (id, dim, scale, pole, extra, src) =>
+    Object.assign({ id, theme: "society", reading: "y", dim, scale, pole }, extra, { src });
+  const ESS11 = v => ({ survey: "ESS", wave: "round 11", variable: v,
+                        url: ESS_FR + "round11/fieldwork/france/ESS11_questionnaires_FR.pdf" });
+  const ESS9 = v => ({ survey: "ESS", wave: "round 9", variable: v,
+                       url: ESS_FR + "round9/fieldwork/france/ESS9_questionnaires_FR.pdf" });
+  const ESS8 = v => ({ survey: "ESS", wave: "round 8", variable: v,
+                       url: ESS_FR + "round8/fieldwork/france/ESS8_questionnaires_FR.pdf" });
+  const NI23 = v => ({ survey: "ISSP", wave: "Identité nationale 2023", variable: v, url: GESIS(80546) });
+  const NI13 = v => ({ survey: "ISSP", wave: "Identité nationale 2013", variable: v, url: GESIS(55581) });
+  const ROG16 = v => ({ survey: "ISSP", wave: "Rôle de l'État 2016", variable: v, url: GESIS(63847) });
+  const FAM22 = v => ({ survey: "ISSP", wave: "Famille 2022", variable: v, url: GESIS(79168) });
+  const REL18 = v => ({ survey: "ISSP", wave: "Religion 2018", variable: v, url: GESIS(67283) });
+  const REL08 = v => ({ survey: "ISSP", wave: "Religion 2008", variable: v, url: GESIS(16212) });
+  const EVS = v => ({ survey: "EVS", wave: "2017", variable: v, url: GESIS(66251) });
+
+  const IMMIG_STEM = "Il existe différentes opinions concernant les immigrés venus d'autres pays pour vivre en France. Êtes-vous d'accord ou pas d'accord avec chacune des affirmations suivantes :";
+  const IMMIG_STEM_13 = "Il existe différentes opinions concernant les immigrés venus d'autres pays pour vivre en France. Etes-vous d'accord ou pas d'accord avec chacune des affirmations suivantes :";
+  const REFUGEE_STEM = "Certaines personnes arrivent en France et demandent le statut de réfugié parce qu'elles craignent des persécutions dans leur propre pays. Dites-moi si vous êtes d'accord ou pas d'accord avec la proposition suivante.";
+  const MINORITIES_STEM = "Maintenant, abordons quelques questions sur les minorités en France. Etes-vous d'accord ou pas d'accord avec les affirmations suivantes ?";
+  const EVS_SCALES_STEM = "Voici différentes phrases. Personnellement, où vous situez-vous sur ces échelles?";
+  const EVS_AGREE_STEM = "Etes-vous d'accord ou pas d'accord avec les affirmations suivantes ?";
+  const EVS_OPINIONS_STEM = "Pour chacune des opinions que je vais vous lire, pouvez-vous me dire si vous êtes tout à fait d'accord, plutôt d'accord, plutôt pas d'accord, pas d'accord du tout ?";
+  const EVS_JUSTIF_STEM = "Pour chacune des choses que je vais vous citer, voulez-vous me dire en vous plaçant sur cette échelle si vous pensez que cela peut toujours se justifier, que cela ne peut jamais se justifier ou que c'est entre les deux ?";
+  const PROTEST_STEM = "Il y a plusieurs façons de s'opposer à une décision gouvernementale que l'on désapprouve fortement. Pouvez-vous indiquer si de votre point de vue, les actions suivantes doivent être autorisées ou non autorisées ?";
+  const TERROR_STEM = "Imaginez que le gouvernement s'attende à un attentat terroriste. Selon vous, les autorités devraient-elles ou non avoir le droit de…";
+  const ESS_B38_STEM = "À l'aide de cette liste de réponses, dites-moi dans quelle mesure vous êtes d'accord ou non avec chacune des propositions suivantes.";
+  const ESS_B33_STEM = "Veuillez m'indiquer, à l'aide de cette carte, dans quelle mesure vous êtes d'accord ou non avec les phrases suivantes.";
+  const FAM_STEM = "Dans quelle mesure êtes-vous d'accord ou pas d'accord avec les propositions suivantes ?";
+  const FAM_FR_STEM = "Voici maintenant une liste de phrases. Pour chacune d'elles, pouvez-vous me dire si vous êtes tout à fait d'accord, plutôt d'accord, plutôt pas d'accord, pas d'accord du tout ou si vous ne savez pas ?";
+  const FAMILIES_STEM = "Les enfants grandissent dans différents types de familles. Dans quelle mesure êtes-vous d'accord ou pas d'accord avec les affirmations suivantes ?";
+  const NI_AGREE_STEM = "Êtes-vous d'accord ou pas d'accord avec les affirmations suivantes ?";
+  const NI13_AGREE_STEM = "Etes-vous d'accord ou pas d'accord avec les propositions suivantes ?";
+
+  const ITEMS = [
+    /* --- x: redistribution (CHES `redistribution`, r = 0.96 with lrecon) --- */
+    { id: "ess.gincdif", theme: "economy", reading: "x", dim: "redistribution",
+      scale: "agreePlutot", pole: -1,
+      fr: "Le gouvernement devrait prendre des mesures pour réduire les différences de revenu.",
+      src: { survey: "ESS", wave: "rounds 4-11", variable: "gincdif",
+             url: ESS_FR + "round9/fieldwork/france/ESS9_questionnaires_FR.pdf" } },
+    { id: "evs.v106", theme: "economy", reading: "x", dim: "redistribution",
+      scale: "bipolar10", pole: 1,
+      left: "Les revenus devraient être plus égalitaires",
+      right: "Il faudrait encourager davantage les efforts individuels",
+      src: { survey: "EVS", wave: "2017", variable: "v106", url: GESIS(66251) } },
+    { id: "issp.taxshare", theme: "economy", reading: "x", dim: "redistribution",
+      scale: "taxShareIssp", pole: 1,
+      fr: "Pensez-vous que les personnes ayant des revenus élevés devraient payer en impôts une part plus importante, égale ou plus faible que celle des personnes à faibles revenus ?",
+      src: { survey: "ISSP", wave: "Inégalités sociales 2019", variable: "v28", url: GESIS(73310) } },
+    { id: "ess.smdfslv", theme: "economy", reading: "x", dim: "redistribution",
+      scale: "agreePlutot", pole: -1,
+      fr: "Pour qu'une société soit juste, les différences de niveau de vie entre les gens devraient être faibles.",
+      src: { survey: "ESS", wave: "rounds 4 and 8", variable: "smdfslv",
+             url: ESS_FR + "round8/fieldwork/france/ESS8_questionnaires_FR.pdf" } },
+    { id: "ess.dfincac", theme: "economy", reading: "x", dim: "redistribution",
+      scale: "agreePlutot", pole: 1,
+      fr: "De grandes différences de revenus entre les gens sont acceptables pour récompenser convenablement les différences de talents et d'efforts de chacun.",
+      src: { survey: "ESS", wave: "rounds 4 and 8", variable: "dfincac",
+             url: ESS_FR + "round8/fieldwork/france/ESS8_questionnaires_FR.pdf" } },
+
+    /* --- x: public services vs taxes (CHES `spendvtax`, r = 0.92) --- */
+    { id: "ess.ditxssp", theme: "economy", reading: "x", dim: "spendvtax",
+      scale: "bipolar11", pole: -1,
+      fr: "Beaucoup de services et prestations sociales sont financés par les impôts. Si le gouvernement devait choisir entre augmenter les impôts et consacrer plus d'argent aux services et prestations sociales ou, au contraire, diminuer les impôts et consacrer moins d'argent aux services et prestations sociales, que devrait-il choisir ?",
+      /* The question is official French; the two ends of its show card were not
+         found, so these anchors are translated from the English source. */
+      left: "Diminuer beaucoup les impôts et dépenser beaucoup moins",
+      right: "Augmenter beaucoup les impôts et dépenser beaucoup plus",
+      translated: "anchors",
+      src: { survey: "ESS", wave: "round 4", variable: "ditxssp",
+             url: ESS_FR + "round4/fieldwork/france/ESS4_main_questionnaire_FR.pdf" } },
+    { id: "evs.v103", theme: "economy", reading: "x", dim: "spendvtax",
+      scale: "bipolar10", pole: -1,
+      left: "Les individus devraient avoir davantage la responsabilité de subvenir à leurs propres besoins",
+      right: "L'État devrait avoir davantage la responsabilité d'assurer à chacun ses besoins",
+      src: { survey: "EVS", wave: "2017", variable: "v103", url: GESIS(66251) } },
+    spending("health", "La santé"),
+    spending("education", "L'éducation"),
+    spending("pensions", "Les retraites"),
+    spending("unemployment", "Les allocations de chômage"),
+
+    /* --- x: deregulation (CHES `deregulation`, r = 0.90) --- */
+    { id: "issp.dereg", theme: "economy", reading: "x", dim: "deregulation",
+      scale: "favourIssp", pole: 1,
+      stem: ACTIONS_STEM,
+      fr: "Assouplir la réglementation du commerce et des affaires",
+      src: { survey: "ISSP", wave: "Rôle de l'État 2016", variable: "Q5", url: GESIS(63847) } },
+    { id: "evs.v107", theme: "economy", reading: "x", dim: "deregulation",
+      scale: "bipolar10", pole: -1,
+      left: "La propriété privée des entreprises et des industries devrait être développée",
+      right: "La nationalisation des entreprises et des industries devrait être développée",
+      src: { survey: "EVS", wave: "2017", variable: "v107", url: GESIS(66251) } },
+    { id: "evs.v105", theme: "economy", reading: "x", dim: "deregulation",
+      scale: "bipolar10", pole: -1,
+      left: "La concurrence est une bonne chose",
+      right: "La concurrence est dangereuse",
+      src: { survey: "EVS", wave: "2017", variable: "v105", url: GESIS(66251) } },
+    { id: "issp.declining", theme: "economy", reading: "x", dim: "deregulation",
+      scale: "favourIssp", pole: -1, stem: ACTIONS_STEM,
+      fr: "Soutenir les industries en difficulté pour protéger les emplois",
+      src: { survey: "ISSP", wave: "Rôle de l'État 2016", variable: "Q5", url: GESIS(63847) } },
+    ownership("electricity", "L'électricité"),
+    ownership("hospitals", "Les hôpitaux"),
+    /* "Le banques" in the 1996 French questionnaire: its typo, corrected. */
+    ownership("banks", "Les banques"),
+
+    /* --- protectionism (CHES `protectionism`): not part of x --- */
+    { id: "issp.imports", theme: "economy", reading: "protectionism",
+      scale: "agreeIssp", pole: 1,
+      fr: "La France devrait limiter l'importation de produits étrangers afin de protéger son économie nationale.",
+      src: { survey: "ISSP", wave: "Identité nationale 2023", variable: "Q06_A", url: GESIS(80546) } },
+    { id: "issp.multinationals", theme: "economy", reading: "protectionism",
+      scale: "agreeIssp", pole: 1,
+      fr: "Les grands groupes internationaux font de plus en plus de tort aux entreprises locales en France.",
+      src: { survey: "ISSP", wave: "Identité nationale 2023", variable: "Q06_F", url: GESIS(80546) } },
+
+    /* --- class: Wright's anticapitalism scale, Class Counts ch. 11 ---
+       Five items, -2..+2 each, summed to -10..+10. No official French
+       exists; the translations are ours. */
+    { id: "wright.corporations", theme: "economy", reading: "class",
+      scale: "agreeWright", pole: 1, translated: "item",
+      fr: "Les entreprises profitent à leurs propriétaires aux dépens des salariés et des consommateurs.",
+      src: { survey: "Wright", wave: "Class Counts, ch. 11, item 1", url: WRIGHT } },
+    { id: "wright.strikers", theme: "economy", reading: "class",
+      scale: "agreeWright", pole: 1, translated: "item",
+      fr: "Pendant une grève, la loi devrait interdire à la direction d'embaucher des travailleurs pour remplacer les grévistes.",
+      /* Reads differently here: French law already bars temps and fixed-term
+         hires from replacing strikers (Code du travail L1251-10, L1242-6).
+         Kept, because it belongs to the validated scale. */
+      note: "En France, la loi interdit déjà de remplacer des grévistes par des intérimaires ou des CDD.",
+      src: { survey: "Wright", wave: "Class Counts, ch. 11, item 2", url: WRIGHT } },
+    { id: "wright.income", theme: "economy", reading: "class",
+      scale: "agreeWright", pole: 1, translated: "item",
+      fr: "Beaucoup de gens en France gagnent bien moins que ce qu'ils méritent.",
+      src: { survey: "Wright", wave: "Class Counts, ch. 11, item 3", url: WRIGHT } },
+    { id: "wright.power", theme: "economy", reading: "class",
+      scale: "agreeWright", pole: 1, translated: "item",
+      fr: "Les grandes entreprises ont trop de pouvoir dans la société française aujourd'hui.",
+      src: { survey: "Wright", wave: "Class Counts, ch. 11, item 4", url: WRIGHT } },
+    { id: "wright.bosses", theme: "economy", reading: "class",
+      scale: "agreeWright", pole: 1, translated: "item",
+      fr: "Les salariés non-cadres de votre lieu de travail pourraient faire tourner les choses efficacement sans patrons.",
+      src: { survey: "Wright", wave: "Class Counts, ch. 11, item 5", url: WRIGHT } },
+
+    /* --- conflict: ISSP, official French, reported beside Wright's scale --- */
+    { id: "issp.conflict.workers", theme: "economy", reading: "conflict",
+      scale: "conflictIssp", pole: 1,
+      stem: CONFLICT_STEM,
+      fr: "Entre les dirigeants et les travailleurs",
+      src: { survey: "ISSP", wave: "Inégalités sociales 2019", variable: "Q12_c", url: GESIS(73310) } },
+    { id: "issp.conflict.rich", theme: "economy", reading: "conflict",
+      scale: "conflictIssp", pole: 1,
+      stem: CONFLICT_STEM,
+      fr: "Entre les riches et les pauvres",
+      src: { survey: "ISSP", wave: "Inégalités sociales 2019", variable: "Q12_a", url: GESIS(73310) } },
+    { id: "issp.conflict.classes", theme: "economy", reading: "conflict",
+      scale: "conflictIssp", pole: 1, stem: CONFLICT_STEM,
+      fr: "Entre la classe ouvrière et la classe moyenne",
+      src: { survey: "ISSP", wave: "Inégalités sociales 2019", variable: "Q12_b", url: GESIS(73310) } },
+    { id: "issp.cause1", theme: "economy", reading: "conflict",
+      scale: "agreeIssp", pole: 1,
+      fr: "Les inégalités continuent d'exister car elles bénéficient aux riches et aux puissants.",
+      src: { survey: "ISSP", wave: "Inégalités sociales 1999", variable: "V9", url: GESIS(10483) } },
+
+    /* --- labour: the balance of power, +1 = on the side of labour --- */
+    { id: "ess.needtru", theme: "economy", reading: "labour",
+      scale: "agreePlutot", pole: 1,
+      fr: "Les salariés ont besoin de syndicats forts pour défendre leurs conditions de travail et leurs salaires.",
+      src: { survey: "ESS", wave: "round 1", variable: "needtru",
+             url: ESS_FR + "round1/fieldwork/france/ESS1_main_questionnaire_FR.pdf" } },
+    { id: "issp.power.unions", theme: "economy", reading: "labour",
+      scale: "powerIssp", pole: -1,
+      fr: "Selon vous, les syndicats ont-ils trop ou pas assez de pouvoir ?",
+      src: { survey: "ISSP", wave: "Rôle de l'État 1996", variable: "Q11a", url: GESIS(6806) } },
+    /* "Et les dirigeants…" answers the unions question: it cannot be read
+       alone, so it always follows it, whatever the order. */
+    { id: "issp.power.business", theme: "economy", reading: "labour",
+      scale: "powerIssp", pole: 1, follows: "issp.power.unions",
+      fr: "Et les dirigeants du commerce et de l'industrie, ont-ils trop ou pas assez de pouvoir ?",
+      src: { survey: "ISSP", wave: "Rôle de l'État 1996", variable: "Q11b", url: GESIS(6806) } },
+
+    /* ================= society: y, the libertarian-authoritarian axis =====
+       Seven sub-dimensions, the ones CHES 2024 rates and whose plain mean
+       reproduces galtan at r = 0.97 across its 279 parties (each alone 0.77
+       to 0.94, and none indispensable: dropping any leaves 0.96). After
+       orientation +1 always means authoritarian, as on the compass.
+
+       `reserve: true` items are verified and sourced but not asked: kept so
+       that a thin sub-dimension can be widened without searching again. Each
+       says why it is not asked. */
+
+    /* --- immigration (CHES immigrate_policy, r = 0.88) --- */
+    soc("ess.imbgeco", "immigration", "bipolar11", -1, {
+      fr: "Dans l'ensemble, diriez-vous que c'est mauvais ou bon pour l'économie française que des personnes d'autres pays viennent vivre en France ?",
+      left: "Mauvais pour l'économie", right: "Bon pour l'économie" }, ESS11("B43 imbgeco")),
+    soc("ess.imwbcnt", "immigration", "bipolar11", -1, {
+      fr: "Diriez-vous que la présence de personnes d'autres pays venant vivre en France rend la vie plus agréable ou moins agréable ?",
+      left: "Moins agréable", right: "Plus agréable" }, ESS11("B45 imwbcnt")),
+    soc("issp.immig.number", "immigration", "immigNumberIssp", 1, {
+      fr: "Pensez-vous qu'aujourd'hui, le nombre d'immigrés qui viennent en France devrait… ?" },
+      NI23("Q08")),
+    soc("issp.immig.priority", "immigration", "agreeIssp", 1, { stem: IMMIG_STEM,
+      fr: "Les personnes nées en France devraient avoir la priorité sur les immigrés en matière d'emploi, de logement ou de santé" },
+      NI23("Q07_E")),
+    soc("issp.immig.expel", "immigration", "agreeIssp", 1, { stem: IMMIG_STEM_13,
+      fr: "La France devrait prendre des mesures plus sévères pour renvoyer les immigrés clandestins" },
+      NI13("Q9g")),
+    soc("ess.gvrfgap", "immigration", "agreePlutot", -1, { stem: REFUGEE_STEM,
+      fr: "Les pouvoirs publics devraient se montrer plus ouverts dans l'examen des demandes du statut de réfugié." },
+      ESS8("C42 gvrfgap")),
+    soc("ess.rfgbfml", "immigration", "agreePlutot", -1, { stem: REFUGEE_STEM,
+      fr: "Les réfugiés dont la demande est acceptée devraient avoir le droit de faire venir leur famille proche." },
+      ESS8("C44 rfgbfml")),
+    soc("ess.imsmetn", "immigration", "allowEss", 1, { reserve: "opens a chain of three whose next two depend on it",
+      fr: "Maintenant, en utilisant cette liste de réponses, dans quelle mesure pensez-vous que la France doit autoriser des gens de même origine ethnique que la plupart des Français à venir vivre ici ?" },
+      ESS11("B40 imsmetn")),
+    soc("ess.imdfetn", "immigration", "allowEss", 1, { reserve: "worded as a follow-up to imsmetn",
+      follows: "ess.imsmetn",
+      fr: "Et à propos des gens d'une origine ethnique différente de la plupart des Français ? Utilisez de nouveau cette liste de réponses." },
+      ESS11("B41 imdfetn")),
+    soc("ess.impcntr", "immigration", "allowEss", 1, { reserve: "worded as a follow-up to imsmetn",
+      follows: "ess.imdfetn",
+      fr: "En ce qui concerne les gens venant des pays pauvres non européens ? Utilisez de nouveau cette liste de réponses." },
+      ESS11("B42 impcntr")),
+    soc("ess.rfgfrpc", "immigration", "agreePlutot", 1, { reserve: "a factual belief about claimants more than a policy position",
+      stem: REFUGEE_STEM,
+      fr: "La plupart des personnes qui demandent ce statut ne risquent pas vraiment des persécutions dans leur pays." },
+      ESS8("C43 rfgfrpc")),
+
+    /* --- multiculturalism vs assimilation (CHES multiculturalism, 0.87) --- */
+    soc("issp.culture", "multiculturalism", "cultureIssp", 1, {
+      fr: "Parmi ces affirmations sur les immigrés, laquelle est la plus proche de ce que vous pensez ?" },
+      NI23("Q09")),
+    soc("ess.imueclt", "multiculturalism", "bipolar11", -1, {
+      fr: "Diriez-vous que, dans l'ensemble, la culture française est menacée ou enrichie par la présence de personnes d'autres pays venant vivre ici ?",
+      left: "La culture est menacée", right: "La culture est enrichie" }, ESS11("B44 imueclt")),
+    soc("evs.v188", "multiculturalism", "bipolar10", 1, { stem: EVS_SCALES_STEM,
+      left: "Il vaut mieux que les immigrés conservent leurs propres coutumes et traditions",
+      right: "Il vaut mieux que les immigrés ne conservent pas leurs propres coutumes et traditions" },
+      EVS("v188")),
+    soc("issp.never.french", "multiculturalism", "agreeIssp", 1, { stem: MINORITIES_STEM,
+      fr: "Les personnes qui ne partagent pas les coutumes et les traditions françaises ne seront jamais des Français à part entière" },
+      NI13("Q7a")),
+    soc("issp.minorities.help", "multiculturalism", "agreeIssp", -1, { reserve: "state support for customs, narrower than the integration question CHES asks",
+      stem: MINORITIES_STEM,
+      fr: "Les minorités ethniques devraient bénéficier de l'aide du gouvernement pour préserver leurs coutumes et leurs traditions" },
+      NI13("Q7b")),
+    soc("issp.same.rights", "multiculturalism", "agreeIssp", -1, { reserve: "closer to CHES ethnic_minorities, not one of the seven",
+      stem: IMMIG_STEM_13,
+      fr: "Les immigrés en situation régulière en France, mais qui ne sont pas français, devraient avoir les mêmes droits que les citoyens français" },
+      NI13("Q9f")),
+    soc("evs.v80", "multiculturalism", "agree5Evs", 1, { reserve: "the French version drops the master's \"over immigrants\"",
+      stem: EVS_AGREE_STEM,
+      fr: "Quand les emplois sont rares, les employeurs devraient embaucher en priorité des Français" },
+      EVS("v80")),
+    soc("evs.v22", "multiculturalism", "citedEvs", 1, { reserve: "social distance, not a political position",
+      stem: "Sur cette liste figurent différentes catégories de gens. Voulez-vous m'indiquer s'il y en a que vous n'aimeriez pas avoir comme voisins?",
+      fr: "Des gens d'une autre race" }, EVS("v22")),
+
+    /* --- civil liberties vs law and order (CHES civlib_laworder, 0.91) --- */
+    soc("issp.obey", "laworder", "obeyIssp", 1, {
+      fr: "Selon vous, faut-il absolument toujours obéir aux lois ou existe-t-il des circonstances exceptionnelles où il faut suivre sa conscience, même si cela conduit à enfreindre la loi ?" },
+      ROG16("Q1")),
+    soc("issp.worse.error", "laworder", "errorIssp", 1, {
+      fr: "Tous les systèmes judiciaires font des erreurs, mais selon vous, laquelle est la pire ?" },
+      ROG16("Q4")),
+    soc("issp.protest", "laworder", "allowIssp", 1, { stem: PROTEST_STEM,
+      fr: "Organiser des réunions publiques de protestation contre le gouvernement" }, ROG16("Q2a")),
+    soc("issp.detain", "laworder", "rightIssp", 1, { stem: TERROR_STEM,
+      fr: "…détenir des personnes, aussi longtemps qu'elles le souhaitent, sans les traduire en justice" },
+      ROG16("Q14a")),
+    soc("issp.wiretap", "laworder", "rightIssp", 1, { stem: TERROR_STEM,
+      fr: "…mettre sur écoute les conversations téléphoniques des individus" }, ROG16("Q14b")),
+    soc("evs.v163", "laworder", "bipolar10", 1, { stem: EVS_JUSTIF_STEM, fr: "La peine de mort",
+      left: "Jamais justifié", right: "Toujours justifié" }, EVS("v163")),
+    soc("ess.lrnobed", "laworder", "agreePlutot", 1, { stem: ESS_B38_STEM,
+      fr: "L'obéissance et le respect de l'autorité sont les valeurs les plus importantes que les enfants doivent apprendre." },
+      ESS11("B38 lrnobed")),
+    soc("issp.demos", "laworder", "allowIssp", 1, { reserve: "repeats the protest-meetings item one step further",
+      stem: PROTEST_STEM, fr: "Organiser des manifestations de rue" }, ROG16("Q2b")),
+    soc("issp.stop", "laworder", "rightIssp", 1, { reserve: "a third item of the same grid, kept short",
+      stem: TERROR_STEM, fr: "…arrêter les gens au hasard dans la rue" }, ROG16("Q14c")),
+    soc("ess.loylead", "laworder", "agreePlutot", 1, { reserve: "loyalty to leaders is closer to the institutions theme",
+      stem: ESS_B38_STEM,
+      fr: "Ce dont la France a le plus besoin, c'est de loyauté envers ses leaders politiques." },
+      ESS11("B39 loylead")),
+    soc("evs.v114", "laworder", "goodThingEvs", 1, { reserve: "its third answer, indifference, is not a point on the scale",
+      stem: "Je vais vous citer deux changements qui pourraient se produire dans notre manière de vivre d'ici quelque temps. Si cela arrivait, pensez-vous que ce serait une bonne chose, une mauvaise chose ou ça vous est égal ?",
+      fr: "Qu'on respecte davantage l'autorité" }, EVS("v114")),
+
+    /* --- women's rights (CHES womens_rights, 0.89) --- */
+    soc("issp.working.mother", "women", "agreeFam", -1, { stem: FAM_STEM,
+      fr: "Une mère qui travaille peut avoir avec ses enfants des relations aussi chaleureuses et sécurisantes qu'une mère qui ne travaille pas" },
+      FAM22("Q01a")),
+    soc("issp.breadwinner", "women", "agreeFam", 1, { stem: FAM_STEM,
+      fr: "Le rôle d'un homme, c'est de gagner l'argent du ménage ; le rôle d'une femme, c'est de s'occuper de la maison et de la famille" },
+      FAM22("Q01f")),
+    soc("evs.v76", "women", "agree4Evs", 1, { stem: EVS_OPINIONS_STEM,
+      fr: "En général, les hommes s'avèrent être de meilleurs dirigeants politiques que les femmes" },
+      EVS("v76")),
+    soc("evs.v81", "women", "agree5Evs", 1, { stem: EVS_AGREE_STEM,
+      fr: "Quand les emplois sont rares, un homme a plus droit à un travail qu'une femme" }, EVS("v81")),
+    soc("evs.v154", "women", "bipolar10", -1, { stem: EVS_JUSTIF_STEM, fr: "L'avortement",
+      left: "Jamais justifié", right: "Toujours justifié" }, EVS("v154")),
+    soc("issp.feminism", "women", "agreeFamFr", 1, { stem: FAM_FR_STEM,
+      fr: "Dans la société actuelle, le féminisme va trop loin",
+      note: "Question ajoutée par l'équipe française de l'ISSP, non posée dans les autres pays." },
+      FAM22("OF21c")),
+    soc("issp.preschool", "women", "agreeFam", 1, { reserve: "the mirror of the working-mother item, asked once",
+      stem: FAM_STEM,
+      fr: "Un enfant qui n'a pas encore l'âge d'aller à l'école a des chances de souffrir si sa mère travaille" },
+      FAM22("Q01b")),
+    soc("evs.v72", "women", "agree4Evs", 1, { reserve: "the mirror of the working-mother item, asked once",
+      stem: EVS_OPINIONS_STEM, fr: "Quand une mère a un emploi, les enfants en souffrent" }, EVS("v72")),
+    soc("issp.leaders.fr", "women", "agreeFamFr", 1, { reserve: "repeats EVS v76",
+      stem: FAM_FR_STEM, fr: "Les hommes font de meilleurs dirigeants que les femmes" }, FAM22("OF21a")),
+    soc("issp.equality.gov", "women", "respIssp", -1, { reserve: "government responsibility, which mixes in the economic axis",
+      stem: "Globalement, les responsabilités suivantes doivent-elles ou non incomber au gouvernement ?",
+      fr: "Promouvoir l'égalité entre hommes et femmes" }, ROG16("Q7k")),
+
+    /* --- LGBT rights (CHES lgbtq_rights, 0.94, and samesex_marriage) --- */
+    soc("ess.freehms", "lgbt", "agreePlutot", -1, { stem: ESS_B33_STEM,
+      fr: "Les homosexuels hommes et femmes devraient être libres de vivre leur vie comme ils le souhaitent." },
+      ESS9("B34 freehms")),
+    soc("ess.hmsacld", "lgbt", "agreePlutot", -1, { stem: ESS_B33_STEM,
+      fr: "Les couples homosexuels, hommes ou femmes, devraient avoir les mêmes droits à l'adoption que les couples hétérosexuels." },
+      ESS9("B36 hmsacld")),
+    soc("ess.hmsfmlsh", "lgbt", "agreePlutot", 1, { stem: ESS_B33_STEM,
+      fr: "Si un membre de ma famille proche était homosexuel, homme ou femme, j'aurais honte." },
+      ESS9("B35 hmsfmlsh")),
+    soc("evs.v153", "lgbt", "bipolar10", -1, { stem: EVS_JUSTIF_STEM, fr: "L'homosexualité",
+      left: "Jamais justifié", right: "Toujours justifié" }, EVS("v153")),
+    soc("issp.two.women", "lgbt", "agreeFam", -1, { stem: FAMILIES_STEM,
+      fr: "Un couple de deux femmes peut élever un enfant aussi bien qu'un couple hétérosexuel" },
+      FAM22("Q05c")),
+    soc("issp.trans", "lgbt", "agreeFamFr", -1, { stem: FAM_FR_STEM,
+      fr: "Une personne transgenre, c'est-à-dire un garçon né dans un corps de fille ou une fille née dans un corps de garçon, doit pouvoir être légalement reconnue comme elle le souhaite",
+      note: "Question ajoutée par l'équipe française de l'ISSP, non posée dans les autres pays. C'est la seule, dans ces enquêtes, sur les droits des personnes trans, que le CHES cite." },
+      FAM22("OF21i")),
+    soc("issp.two.men", "lgbt", "agreeFam", -1, { reserve: "the mirror of the two-women item, asked once",
+      stem: FAMILIES_STEM,
+      fr: "Un couple de deux hommes peut élever un enfant aussi bien qu'un couple hétérosexuel" },
+      FAM22("Q05d")),
+    soc("evs.v82", "lgbt", "agree5Evs", -1, { reserve: "its French stem opens on \"Et\", after another question",
+      stem: "Et êtes-vous d'accord ou pas d'accord avec les affirmations suivantes ?",
+      fr: "Les couples homosexuels sont d'aussi bons parents que les autres couples" }, EVS("v82")),
+
+    /* --- religion in politics (CHES religious_principles, 0.77) --- */
+    soc("issp.rel.vote", "religion", "agreeRel18", -1, {
+      fr: "Dans quelle mesure êtes-vous d'accord ou non avec l'opinion suivante : Les autorités religieuses ne devraient pas essayer d'influencer le vote des gens aux élections." },
+      REL18("Q8")),
+    soc("issp.rel.gov", "religion", "agreeRel08", -1, {
+      fr: "Les autorités religieuses ne devraient pas essayer d'influencer les décisions du gouvernement" },
+      REL08("Q10b")),
+    soc("issp.faith", "religion", "agreeRel18b", 1, {
+      stem: "Voici plusieurs affirmations : pouvez-vous me dire si vous êtes d'accord ou pas d'accord avec elles ?",
+      fr: "Nous faisons trop confiance à la science et pas assez à la foi religieuse" }, REL18("Q9a")),
+    soc("evs.v156", "religion", "bipolar10", -1, { stem: EVS_JUSTIF_STEM,
+      fr: "L'euthanasie (c'est-à-dire mettre fin aux jours de quelqu'un qui est incurable)",
+      left: "Jamais justifié", right: "Toujours justifié" }, EVS("v156")),
+    soc("issp.church.power", "religion", "powerRel18", -1, { reserve: "power of churches, where religion's role in politics is what CHES rates",
+      fr: "Pensez-vous que, dans ce pays, les églises et les organisations religieuses ont trop ou pas assez de pouvoir ?" },
+      REL18("Q10")),
+
+    /* --- nationalism (CHES nationalism, 0.90) --- */
+    soc("issp.rather.french", "nationalism", "agreeIssp", 1, { stem: NI_AGREE_STEM,
+      fr: "Je préfère être français(e) plutôt que citoyen(ne) d'un autre pays" }, NI23("Q02_A")),
+    soc("issp.better.country", "nationalism", "agreeIssp", 1, { stem: NI_AGREE_STEM,
+      fr: "D'une manière générale, la France est un pays meilleur que la plupart des autres" }, NI23("Q02_D")),
+    soc("issp.world.better", "nationalism", "agreeIssp", 1, { stem: NI_AGREE_STEM,
+      fr: "Le monde serait meilleur si les gens des autres pays ressemblaient plus aux Français" }, NI23("Q02_C")),
+    soc("issp.support.wrong", "nationalism", "agreeIssp", 1, { stem: NI_AGREE_STEM,
+      fr: "Les gens devraient soutenir leur pays même lorsque ce pays se trompe" }, NI23("Q02_E")),
+    soc("issp.world.citizen", "nationalism", "agreeIssp", -1, { stem: NI13_AGREE_STEM,
+      fr: "Je me sens plus citoyen du monde que de n'importe quel pays" }, NI13("Q6e")),
+    soc("issp.born", "nationalism", "bornIssp", 1, {
+      fr: "Certaines personnes disent qu'il est possible de devenir vraiment français si l'on fait un effort. D'autres disent qu'il faut être né en France pour être vraiment français. Quelle est votre position ? A : Il est possible de devenir vraiment français si l'on fait un effort. B : Il faut naître en France pour être vraiment français." },
+      NI23("Q04")),
+    soc("issp.born.important", "nationalism", "importanceIssp", 1, { reserve: "asks again what Q04 asks",
+      stem: "Certaines personnes estiment que pour être vraiment français, il est important de posséder certaines des caractéristiques suivantes. Pour d'autres, cela n'est pas important. À votre avis, pour être vraiment français, est-il important… ?",
+      fr: "…d'être né en France" }, NI23("Q01_A"))
+  ];
+
+  /* The economy is the first theme, not the only one. The others are listed
+     so the page can say what is coming; each has its counterpart in CHES, so
+     its readings will be comparable to the parties like x is. `planned`
+     themes have no items yet. */
+  const THEMES = [
+    /* `axis` is the compass axis a theme replaces, built from `dims`; the
+       other readings are its own, read beside the compass. */
+    { key: "economy", axis: "x", readings: ["x", "protectionism", "class", "conflict", "labour"],
+      dims: ["redistribution", "spendvtax", "deregulation"] },
+    { key: "society", axis: "y", readings: ["y"],
+      dims: ["immigration", "multiculturalism", "laworder", "women", "lgbt", "religion",
+             "nationalism"] },
+    { key: "europe", planned: true },        /* eu_position, eu_russia */
+    { key: "ecology", planned: true },       /* environment, climate_change */
+    { key: "institutions", planned: true }   /* executive_power, judicial_independence,
+                                                regions, and people_v_elite */
+  ];
+
+  const itemById = id => ITEMS.find(i => i.id === id) || null;
+
+  /* Items are asked mixed, in one fixed order that everyone gets — within a
+     theme and in the complete questionnaire alike. Mixed, so that a run of
+     items on one subject does not tell the respondent what is being measured;
+     fixed, so that order effects, if any, are the same for every profile and
+     answers stay comparable.
+
+     The order is a sort on a hash of each item's id (FNV-1a, 32 bits) rather
+     than a seeded shuffle: adding an item slots it in somewhere without
+     moving any of the others, where a shuffle would deal the whole deck
+     again. Items of a shared grid need no special care, since every screen
+     repeats the grid's stem; an item whose wording leans on the one before
+     it says so with `follows`, and the two travel as one block, placed by the
+     first one's hash. */
+  function hashId(id) {
+    let h = 0x811c9dc5;
+    for (let k = 0; k < id.length; k++) {
+      h ^= id.charCodeAt(k);
+      h = Math.imul(h, 0x01000193) >>> 0;
+    }
+    return h;
+  }
+  function mixedOrder(items) {
+    const present = new Set(items.map(i => i.id));
+    const heads = items.filter(i => !i.follows || !present.has(i.follows));
+    const next = new Map(items.filter(i => i.follows && present.has(i.follows))
+                              .map(i => [i.follows, i]));
+    heads.sort((a, b) => hashId(a.id) - hashId(b.id) || (a.id < b.id ? -1 : 1));
+    const out = [];
+    for (const h of heads) {
+      for (let i = h; i; i = next.get(i.id)) out.push(i);
+    }
+    return out;
+  }
+  const mean = xs => xs.reduce((s, v) => s + v, 0) / xs.length;
+
+  /* One answer, oriented: a number in [-1, 1], or null when the item was
+     skipped or answered "can't choose". `answer` is the index of the option
+     chosen, or "dk". */
+  function itemValue(item, answer) {
+    const scale = SCALES[item.scale];
+    if (answer === "dk") return scale.dkScores === undefined ? null : scale.dkScores;
+    if (!Number.isInteger(answer) || answer < 0 || answer >= scale.values.length) return null;
+    return item.pole * scale.values[answer];
+  }
+
+  /* The items a theme asks: its bank, minus the reserve. */
+  const askedItems = themeKey => ITEMS.filter(i => i.theme === themeKey && !i.reserve);
+
+  /* Answers -> readings, each on [-100, 100], or null when nothing feeding it
+     was answered.
+
+     A theme's axis is the mean of its CHES sub-dimensions, each the mean of
+     its items. Equal weights, because the plain mean of the sub-scales already
+     reproduces the experts' axis across the 279 CHES 2024 parties — lrecon at
+     r = 0.96 for the economy, galtan at 0.97 for society — so there is no gap
+     for a weighting to close. Reserve items never count.
+
+     Wright's scale is his sum rescaled, and only reported complete: a partial
+     sum of a five-item additive scale is not the scale.
+
+     `n` counts the answers behind each reading, so the page can say how
+     thin it is. */
+  function score(answers, themeKey) {
+    const theme = THEMES.find(t => t.key === themeKey);
+    const items = askedItems(themeKey);
+    const answered = items
+      .map(i => ({ i, v: itemValue(i, answers[i.id]) }))
+      .filter(a => a.v !== null);
+
+    const out = { n: {} };
+    const axis = theme.axis;
+
+    const dims = {};
+    for (const d of theme.dims) {
+      const vs = answered.filter(a => a.i.reading === axis && a.i.dim === d).map(a => a.v);
+      dims[d] = vs.length ? Math.round(100 * mean(vs)) : null;
+    }
+    const present = theme.dims.filter(d => dims[d] !== null);
+    out[axis] = present.length ? Math.round(mean(present.map(d => dims[d]))) : null;
+    out.dims = dims;
+    out.n[axis] = answered.filter(a => a.i.reading === axis).length;
+
+    for (const r of theme.readings) {
+      if (r === axis || r === "class") continue;
+      const vs = answered.filter(a => a.i.reading === r).map(a => a.v);
+      out[r] = vs.length ? Math.round(100 * mean(vs)) : null;
+      out.n[r] = vs.length;
+    }
+
+    if (theme.readings.includes("class")) {
+      const wright = items.filter(i => i.reading === "class");
+      const wv = answered.filter(a => a.i.reading === "class");
+      out.class = wv.length === wright.length
+        ? Math.round(100 * wv.reduce((s, a) => s + a.v, 0) / wright.length) : null;
+      out.n.class = wv.length;
+    }
+
+    const level = key => {
+      const v = answers[key];
+      return Number.isInteger(v) && v >= 0 && v < SCALES.salience.values.length ? v : null;
+    };
+    out.salience = level("salience." + themeKey);
+    out.salienceAfter = level("salience." + themeKey + ".after");
+
+    return out;
+  }
+
+  const api = { SCALES, ITEMS, THEMES, itemById, itemValue, score, mixedOrder, askedItems };
+  if (typeof module !== "undefined" && module.exports) module.exports = api;
+  else global.PolitiQuiz = api;
+
+})(typeof globalThis !== "undefined" ? globalThis : this);
+/* POLITI-QUIZ:END */
+  </script>
+  <script>
 /* POLITI-DATA:START */
 /* Filled by tools/extract.js from politi-results/.
    This template holds NO personal data: it is the file that is committed,
@@ -1074,7 +1993,15 @@ window.POLITI_PROFILES = [];
     </nav>
   </header>
 
+  <main id="view-main">
   <p class="subtitle" data-i18n="subtitle"></p>
+  <form class="start-native" id="native-form" novalidate>
+    <span data-i18n="nativeLead"></span>
+    <input type="text" id="native-alias" maxlength="24" data-i18n-placeholder="aliasPlaceholder"
+           aria-label="Alias">
+    <button type="submit" class="primary" data-i18n="nativeStart"></button>
+    <p class="error" id="native-error" hidden></p>
+  </form>
 
   <div class="controls">
     <label class="country"><span data-i18n="optCountry"></span>
@@ -1083,6 +2010,9 @@ window.POLITI_PROFILES = [];
     <label><input type="checkbox" id="t-reflabels" checked> <span data-i18n="optRefLabels"></span></label>
     <label><input type="checkbox" id="t-labels" checked> <span data-i18n="optLabels"></span></label>
     <label><input type="checkbox" id="t-centroid"> <span data-i18n="optMean"></span> <span style="color:var(--text-3)" data-i18n="optMeanWhere"></span></label>
+    <label><input type="checkbox" id="t-trail" checked> <span data-i18n="optTrail"></span></label>
+    <label class="country"><span data-i18n="optView"></span>
+      <select id="view"></select></label>
   </div>
 
   <div class="layout">
@@ -1103,6 +2033,7 @@ window.POLITI_PROFILES = [];
             <g id="points-layer"></g>
           </svg>
           <div class="tip" id="tip" hidden></div>
+          <p class="hint view-note" id="view-note" hidden></p>
         </div>
         <div class="legend">
           <span>
@@ -1122,7 +2053,15 @@ window.POLITI_PROFILES = [];
         <details class="method">
           <summary>Méthode de calcul et limites</summary>
           <div class="body">
-            <p><strong>Axe X — économique (gauche ◄ ► droite)</strong>, moyenne pondérée de :</p>
+            <p>
+              Un profil a deux sources possibles : un résultat PolitiScales, lu sur une capture,
+              et le questionnaire Politiskel, rempli sur cette page. Quand un thème du
+              questionnaire est répondu, l'axe qu'il mesure <strong>remplace entièrement</strong>
+              celui de PolitiScales — les deux ne sont jamais moyennés. Chaque coordonnée a donc
+              une seule source, et le tableau la signale (« Q »).
+            </p>
+            <p><strong>Axe X depuis PolitiScales — économique (gauche ◄ ► droite)</strong>,
+              moyenne pondérée de :</p>
             <ul>
               <li><code>0,45</code> × (Capitalisme − Communisme)</li>
               <li><code>0,35</code> × (Laissez-faire − Régulation)</li>
@@ -1131,9 +2070,10 @@ window.POLITI_PROFILES = [];
               Écologie ↔ Productivisme n'entre pas dans l'axe X : les repères partisans
               viennent du CHES, dont l'échelle économique exclut l'environnement (variable
               séparée). L'y inclure revenait à comparer deux axes différents. Cette dimension
-              est affichée à part, comme le souverainisme.
+              est affichée à part, dans la colonne « Écolo. ».
             </p>
-            <p><strong>Axe Y — sociétal (libertaire ▼ ▲ autoritaire)</strong>, moyenne pondérée de :</p>
+            <p><strong>Axe Y depuis PolitiScales — sociétal (libertaire ▼ ▲ autoritaire)</strong>,
+              moyenne pondérée de :</p>
             <ul>
               <li><code>0,30</code> × (Essentialisme − Constructivisme)</li>
               <li><code>0,25</code> × (Justice punitive − réhabilitative)</li>
@@ -1174,8 +2114,60 @@ window.POLITI_PROFILES = [];
               cet écart un doublon, et le présenter comme une information distincte en
               exagérait la portée. Une vraie mesure de la souveraineté — la position sur
               l'intégration européenne, dont les deux axes n'expliquent pas même la moitié
-              dans le CHES — demanderait des questions que PolitiScales ne pose pas.
+              dans le CHES — demanderait des questions que PolitiScales ne pose pas. C'est ce que
+              fera le thème « Europe et monde » du questionnaire.
             </p>
+
+            <p><strong>Le questionnaire Politiskel.</strong> Aucune question n'est écrite ici :
+              chacune est reprise d'une grande enquête publique — European Social Survey,
+              International Social Survey Programme, European Values Study — dans sa version
+              française officielle, avec sa source jusqu'à la variable. Les exceptions sont
+              signalées sur la question même : l'échelle de classe d'Erik Olin Wright, qui n'existe
+              pas en français, et les deux bornes d'une échelle de l'ESS dont la carte n'a pas été
+              retrouvée. Chaque réponse est ramenée entre −1 et +1 ; « ne peut choisir » compte
+              comme une absence de réponse.</p>
+            <p><strong>Axe X depuis le questionnaire.</strong> Moyenne simple de trois
+              sous-dimensions, chacune moyenne de ses questions : redistribution, services publics
+              contre impôts, régulation des marchés. Ce sont les trois sous-échelles économiques du
+              CHES, et leur moyenne reproduit son axe <code>lrecon</code> à <code>r = 0,96</code>
+              sur les 279 partis de 2024 : une pondération n'aurait rien à rattraper. Une limite :
+              être « plutôt d'accord » ne place pas une personne à un point précis de l'échelle
+              0-10 des experts. Les deux échelles sont alignées sur les mêmes dimensions, pas
+              calibrées l'une sur l'autre.</p>
+            <p><strong>Axe Y depuis le questionnaire.</strong> Même principe, sur les sept
+              sous-dimensions sociétales que le CHES note pour chaque parti : immigration,
+              multiculturalisme contre assimilation, libertés publiques contre ordre, droits des
+              femmes, droits LGBT, place de la religion en politique, nationalisme. Leur moyenne
+              reproduit son axe <code>galtan</code> à <code>r = 0,97</code>, et aucune n'est
+              indispensable : en retirer une laisse 0,96. Une seule question, sur les droits des
+              personnes trans, vient du module que l'équipe française a ajouté à l'ISSP 2022, et
+              n'a pas été posée ailleurs ; elle le dit. Certaines questions vérifiées ne sont pas
+              posées : elles restent dans la banque, en réserve, chacune avec la raison.</p>
+            <p><strong>Protectionnisme.</strong> Lu à part, jamais dans X : dans le CHES, il va
+              contre la gauche-droite économique (<code>r = −0,37</code>) et avec l'axe sociétal
+              (+0,43) — LFI et le RN sont tous deux protectionnistes. L'intégrer à X répéterait
+              l'erreur de l'écologie.</p>
+            <p><strong>Trois lectures de classe</strong>, sans équivalent chez les partis :
+              l'échelle anticapitaliste de Wright (<em>Class Counts</em>, chap. 11 : cinq questions,
+              de −2 à +2, sommées ; donnée seulement complète, car une somme partielle n'est pas
+              l'échelle), le conflit de classe perçu (ISSP), et le rapport de force capital /
+              travail (syndicats, pouvoir des patrons). Elles ne sont pas des composantes de X :
+              une analyse de classe est une lecture rivale du même conflit, pas un axe de plus.</p>
+            <p><strong>Importance du thème.</strong> Demandée avant les questions et après, sur
+              quatre réponses nommées plutôt qu'une échelle de 0 à 10 : on ne distingue pas un 9 d'un
+              10 à propos de soi. Posée seulement à la fin, elle mesurerait surtout qu'on vient d'y
+              réfléchir ; la seconde n'est pas pré-remplie, pour ne pas inviter à répéter la
+              première.</p>
+            <p><strong>Ordre des questions.</strong> Mélangé, pour qu'une suite de questions sur un
+              même sujet ne laisse pas deviner ce qu'elle mesure, mais fixe et identique pour tout
+              le monde, pour que les réponses restent comparables. Deux questions dont la seconde
+              répond à la première restent ensemble.</p>
+            <p><strong>Lectures de la boussole.</strong> Chaque lecture place les profils et les
+              partis sur les mêmes variables, pour ne comparer un profil qu'à des partis mesurés sur
+              la même chose. Un profil sans valeur sur un axe garde sa ligne dans le tableau mais
+              n'est pas placé. La lecture « populiste » — peuple contre élites — viendra avec le
+              thème Institutions, sous ce nom : l'adopter comme axe revient à adopter la théorie
+              populiste du conflit.</p>
           </div>
         </details>
       </div>
@@ -1207,6 +2199,7 @@ window.POLITI_PROFILES = [];
       <div class="card" id="detail-card">
         <h2 id="detail-title" data-i18n="distances"></h2>
         <div class="id-card" id="detail-id" hidden></div>
+        <div id="detail-readings" hidden></div>
         <p class="hint" id="detail-hint"></p>
         <div class="table-scroll" id="detail-wrap" hidden>
           <table id="detail-table">
@@ -1276,14 +2269,20 @@ window.POLITI_PROFILES = [];
     </form>
   </div>
 
+  </main>
+
+  <!-- The questionnaire: its own page, built by renderQuiz() from the item bank. -->
+  <main id="view-quiz" class="quiz-view" hidden></main>
+
   <footer class="site">
     <div class="cols">
       <div>
         <h2 data-i18n="footPrivacy"></h2>
         <p>
-          Tout reste sur votre machine. Les captures, les profils et cette page
-          assemblée ne sont envoyés nulle part — il n'y a ni serveur, ni compte,
-          ni traceur. Le dépôt de code ne contient aucun profil.
+          Tout reste sur votre machine. Les captures, les profils, les réponses au
+          questionnaire et cette page assemblée ne sont envoyés nulle part — il n'y
+          a ni serveur, ni compte, ni traceur. Les réponses restent dans ce
+          navigateur. Le dépôt de code ne contient aucun profil.
         </p>
       </div>
       <div>
@@ -1295,7 +2294,16 @@ window.POLITI_PROFILES = [];
           </li>
           <li>
             <a href="https://www.chesdata.eu/ches-europe/" target="_blank" rel="noopener noreferrer">Chapel Hill Expert Survey 2024</a>
-            — position de dix des quinze partis
+            — position des partis, pays par pays
+          </li>
+          <li>
+            <a href="https://www.europeansocialsurvey.org/" target="_blank" rel="noopener noreferrer">ESS</a>,
+            <a href="https://issp.org/" target="_blank" rel="noopener noreferrer">ISSP</a>,
+            <a href="https://europeanvaluesstudy.eu/" target="_blank" rel="noopener noreferrer">EVS</a>
+            — les questions du questionnaire
+          </li>
+          <li>
+            Erik Olin Wright, <em>Class Counts</em> — l'échelle de classe
           </li>
         </ul>
       </div>
@@ -1310,10 +2318,11 @@ window.POLITI_PROFILES = [];
       </div>
     </div>
     <p class="fine">
-      Les repères partisans situent un ordre de grandeur, pas une mesure : dix viennent
-      d'une enquête d'experts, cinq sont des estimations attribuées à la main et signalées
-      comme telles au survol. Les pourcentages des profils, eux, sont lus directement sur
-      les captures.
+      Les repères partisans situent un ordre de grandeur, pas une mesure : la plupart
+      viennent d'une enquête d'experts, les autres sont des estimations à la main,
+      signalées comme telles au survol et comptées dans la méthode, pays par pays. Les
+      pourcentages PolitiScales sont lus directement sur les captures ; les réponses au
+      questionnaire, sur cette page.
     </p>
   </footer>
 </div>
@@ -1421,9 +2430,9 @@ const LOCALES = {
     /* static markup, applied through data-i18n */
     brandTag: "Votre squelette politique",
     navTest: "Passer le test", navSource: "Code source",
-    subtitle: "Projection des profils PolitiScales sur deux axes — gauche-droite économique "
-      + "et libertaire-autoritaire — et comparaison avec la position des principales forces "
-      + "politiques du pays choisi.",
+    subtitle: "Placez un profil — depuis un résultat PolitiScales, ou avec le questionnaire "
+      + "Politiskel — sur plusieurs lectures de l'espace politique, et comparez-le aux principales "
+      + "forces du pays choisi, placées d'après les experts du CHES.",
     optCountry: "Pays de référence",
     optRefs: "Repères partis", optRefLabels: "Étiquettes des repères",
     optLabels: "Étiquettes des profils",
@@ -1483,13 +2492,178 @@ const LOCALES = {
       + "environ un profil sur trois change de repère sous des pondérations tout aussi défendables.",
     colDistance: "Distance", colDeltaEcon: "Δ éco", colDeltaSocial: "Δ soc.",
     titleY: "Positif = autoritaire (haut) · négatif = libertaire (bas)",
-    titleEcol: "Écologie − Productivisme : positif = écologiste. Hors axes, comme le souverainisme.",
+    titleEcol: "Écologie − Productivisme : positif = écologiste. Hors des deux axes, comme dans le CHES.",
     titleDeltaEcon: "Écart sur l'axe économique",
     titleDeltaSocial: "Écart sur l'axe sociétal : positif = le parti est plus autoritaire que vous",
 
     neutralPct: "Neutre", positionLabel: "Position",
     uncertainty: "Incertitude", uncertaintyNone: "aucune",
-    poleNegative: "Pôle négatif", polePositive: "Pôle positif"
+    poleNegative: "Pôle négatif", polePositive: "Pôle positif",
+
+    /* the native questionnaire */
+    optTrail: "Trajet depuis PolitiScales",
+    optView: "Lecture",
+    viewOff: "pas de position dans cette lecture",
+    viewOffDetail: "Ce profil n'a pas de position dans cette lecture : il lui manque les réponses "
+      + "au questionnaire qui la mesurent.",
+    viewNoRefs: "aucun parti mesuré dans cette lecture",
+    viewNotePolitiscales: "Lecture d'origine : X et Y calculés depuis PolitiScales seul, sans "
+      + "tenir compte du questionnaire.",
+    viewNoteNoProt: why => "Aucun repère dans cette lecture : " + why,
+    viewNoteAllEstimated: "Aucun repère dans cette lecture : ceux de ce pays sont tous des "
+      + "estimations à la main, et il n'y a rien sur quoi estimer leur protectionnisme.",
+    viewNoteDropped: n => n + " repère" + (n > 1 ? "s" : "") + " placé" + (n > 1 ? "s" : "")
+      + " à la main n'" + (n > 1 ? "ont" : "a") + " pas de position CHES sur le protectionnisme "
+      + "et n'" + (n > 1 ? "apparaissent" : "apparaît") + " pas.",
+    viewNoteOff: n => n + " profil" + (n > 1 ? "s" : "") + " sans réponse au questionnaire "
+      + "économie " + (n > 1 ? "ne sont" : "n'est") + " pas placé" + (n > 1 ? "s" : "")
+      + " : c'est lui qui mesure le protectionnisme.",
+    viewNoteSkippedProt: n => n + " profil" + (n > 1 ? "s ont" : " a") + " passé les deux "
+      + "questions sur le protectionnisme, et " + (n > 1 ? "ne sont" : "n'est") + " donc pas "
+      + "placé" + (n > 1 ? "s" : "") + ".",
+    viewNoteNoX: n => n + " profil" + (n > 1 ? "s" : "") + " sans réponse sur l'axe économique "
+      + (n > 1 ? "ne sont" : "n'est") + " pas placé" + (n > 1 ? "s" : "") + ".",
+    views: {
+      politiskel: { name: "Politiskel — économie × société" },
+      politiscales: { name: "PolitiScales d'origine" },
+      protectionism: { name: "Économie × protectionnisme",
+        axisTop: "PROTECTIONNISTE — protéger les producteurs",
+        axisBottom: "LIBRE-ÉCHANGISTE — ouvrir les échanges",
+        quadTopLeft: "Gauche protectionniste", quadTopRight: "Droite protectionniste",
+        quadBottomLeft: "Gauche libre-échangiste", quadBottomRight: "Droite libre-échangiste",
+        colY: "Y protect.",
+        titleY: "Positif = protectionniste (haut) · négatif = libre-échangiste (bas)",
+        tipSocial: "Protectionnisme", suffixAuthor: " protect.", suffixLibert: " libre-éch." },
+      populist: { name: "Lecture populiste — thème Institutions, à venir" }
+    },
+    quizOpen: "Compléter mon profil", quizEdit: "Modifier mes réponses",
+    quizBack: "← Retour à la boussole",
+    quizWho: a => "Profil de " + a,
+    backToThemes: "← Tous les thèmes", otherThemes: "Autres thèmes",
+    hubEyebrow: "Questionnaire Politiskel",
+    hubLead: "Le questionnaire est découpé en thèmes, que vous remplissez dans l'ordre que "
+      + "vous voulez. Chacun remplace ou ajoute une lecture de votre profil ; l'économie est la "
+      + "première disponible, pas la seule.",
+    hubPlanned: "À venir",
+    hubProgress: (n, m) => n + " / " + m + " réponses",
+    themes: {
+      economy: { name: "Économie",
+        desc: "Redistribution, impôts et services publics, régulation des marchés — qui remplacent "
+          + "l'axe X de PolitiScales — et, à part, le protectionnisme et trois lectures de classe.",
+        lead: "Ces questions remplacent l'axe économique de PolitiScales, qui ne repose que sur "
+          + "deux de ses axes et ne pose rien sur la redistribution.",
+        leadNative: "Ces questions placent votre profil sur l'axe économique, sur l'échelle "
+          + "qu'utilisent les experts du CHES pour les partis, et en tirent plusieurs autres "
+          + "lectures.",
+        salience: "Quelle place l'économie tient-elle dans vos choix politiques ?",
+        salienceAfter: "Maintenant que vous avez répondu : quelle place l'économie tient-elle "
+          + "dans vos choix politiques ?" },
+      society: { name: "Société",
+        desc: "Immigration, multiculturalisme, ordre et libertés, droits des femmes et des "
+          + "personnes LGBT, religion, nation — qui remplacent l'axe Y de PolitiScales.",
+        lead: "Ces questions remplacent l'axe sociétal de PolitiScales par les sept dimensions "
+          + "sur lesquelles les experts du CHES placent les partis, de l'immigration à la "
+          + "place de la religion.",
+        leadNative: "Ces questions placent votre profil sur l'axe libertaire-autoritaire, sur "
+          + "l'échelle qu'utilisent les experts du CHES pour les partis.",
+        salience: "Quelle place les questions de société tiennent-elles dans vos choix "
+          + "politiques ?",
+        salienceAfter: "Maintenant que vous avez répondu : quelle place les questions de "
+          + "société tiennent-elles dans vos choix politiques ?" },
+      europe: { name: "Europe et monde",
+        desc: "Intégration européenne et rapport à la Russie, que PolitiScales ne demande pas : "
+          + "de quoi faire enfin une vraie lecture de la souveraineté." },
+      ecology: { name: "Écologie",
+        desc: "Environnement et climat, lus à part de l'économie, comme le fait le CHES." },
+      institutions: { name: "Institutions",
+        desc: "Pouvoir exécutif, indépendance de la justice, régions — et la lecture populiste, "
+          + "peuple contre élites, présentée comme telle." }
+    },
+    quizCount: (i, n) => i + " / " + n,
+    quizIntroEyebrow: "Questionnaire Politiskel · Économie",
+    quizIntroTitle: a => "Compléter le profil de " + a,
+    quizIntroMeta: (n, t) => n + " questions, et deux fois la même sur l'importance "
+      + (t > 1 ? "de chaque thème" : "du thème") + " · environ " + Math.max(5, Math.round(n / 3.5))
+      + " minutes",
+    quizHint: "Chaque question est reprise telle quelle d'une grande enquête publique (ESS, ISSP, "
+      + "EVS), dans sa version française officielle, avec sa source. Les exceptions sont "
+      + "signalées : l'échelle de classe d'Erik Olin Wright n'existe pas en français, elle est "
+      + "traduite ici. Vous pouvez passer une question ; vos réponses restent dans ce navigateur.",
+    quizStart: "Commencer", quizResume: "Reprendre", quizPrev: "← Précédent",
+    quizNext: "Suivant →", quizSkip: "Passer", quizSeeResult: "Voir le résultat →",
+    quizErase: "Effacer mes réponses",
+    exportAnswers: "Exporter mes réponses",
+    exportHint: "Le fichier téléchargé contient vos réponses, rien d'autre. Déposé dans "
+      + "politi-results/answers/ par la personne qui assemble la page du groupe, il y ajoute "
+      + "votre profil, et permet de tester le questionnaire sur de vraies réponses.",
+    quizKeys: "Touches 1 à 9 pour répondre · ← → pour naviguer",
+    quizPoleFull: n => "Tout à fait d'accord : " + n,
+    resultEyebrow: t => "Résultat · " + t,
+    resultTitle: "D'où vous partiez, où vous arrivez",
+    resultNoAxis: (theme, native) => "Aucune réponse au thème " + theme
+      + (native ? " pour l'instant." : " : cet axe reste celui de PolitiScales."),
+    resultWas: "PolitiScales", resultNow: "Politiskel",
+    resultEnds: { x: ["gauche", "droite"], y: ["libertaire", "autoritaire"] },
+    backToCompass: "Voir sur la boussole", quizReview: "Revoir mes réponses",
+    quizTranslated: { item: "traduction Politiskel", anchors: "bornes traduites par Politiskel" },
+    quizSalienceSrc: "Question Politiskel — aucune enquête publique ne mesure l'importance "
+      + "d'un thème sur une échelle.",
+    fromQuiz: from => "X tiré du questionnaire (PolitiScales : " + from + ")",
+    fromQuizY: from => "Y tiré du questionnaire (PolitiScales : " + from + ")",
+
+    readingsTitle: "Questionnaire",
+    journey: (from, to, fr, tr) => "PolitiScales " + from + " → Politiskel " + to
+      + (fr === tr ? " · repère inchangé : " + tr : " · repère : " + fr + " → " + tr),
+    dims: { redistribution: "Redistribution", spendvtax: "Services publics / impôts",
+            deregulation: "Régulation des marchés",
+            immigration: "Immigration", multiculturalism: "Multiculturalisme / assimilation",
+            laworder: "Libertés / ordre", women: "Droits des femmes", lgbt: "Droits LGBT",
+            religion: "Religion et politique", nationalism: "Nationalisme" },
+    readingAxis: { x: "Économie (X)", y: "Société (Y)" },
+    readingProtectionism: "Protectionnisme",
+    readingClass: "Classe (Wright)",
+    readingConflict: "Conflit de classe perçu",
+    readingLabour: "Rapport capital / travail",
+    readingNone: "—",
+    readingClassIncomplete: n => "incomplète (" + n + "/5) — l'échelle ne vaut que complète",
+    answeredOf: (n, m) => n + "/" + m + " réponses",
+    readingNotes: {
+      x: "négatif = gauche, positif = droite, sur l'échelle lrecon du CHES",
+      y: "négatif = libertaire, positif = autoritaire, sur l'échelle galtan du CHES",
+      protectionism: "hors de l'axe X : dans le CHES, il va contre la gauche-droite économique",
+      class: "anticapitaliste si positif — une lecture rivale de X, pas une composante",
+      conflict: "à côté de l'échelle de Wright, pas dedans",
+      labour: "du côté du travail si positif — syndicats, pouvoir des patrons"
+    },
+    salienceOf: s => "Importance déclarée : " + s,
+    salienceMoved: (a, b, d) => "Importance déclarée : " + a + " au début, " + b + " à la fin"
+      + (d === 0 ? " — inchangée" : d > 0 ? " — en hausse" : " — en baisse"),
+    nativeLead: "Pas de résultat PolitiScales ? Partez d'ici :",
+    nativeStart: "Commencer le questionnaire",
+    nativeTitle: a => "Le profil de " + a,
+    nativeMotto: "Profil Politiskel, sans résultat PolitiScales",
+    nativeEmpty: "questionnaire pas encore commencé",
+    nativeNoY: "pas encore de Y — répondez au thème Société",
+    nativeNoX: "pas encore de X — répondez au thème Économie",
+    nativeNoXY: "pas encore de position — répondez aux thèmes Économie et Société",
+    nativeOffDetail: missing => missing.length > 1
+      ? "Ce profil n'a encore ni X ni Y : ils viendront des thèmes Économie et Société du "
+        + "questionnaire. En attendant, il n'est pas placé sur cette boussole."
+      : "Ce profil n'a pas encore de " + missing[0] + " : il viendra du thème "
+        + (missing[0] === "X" ? "Économie" : "Société") + " du questionnaire. En attendant, il "
+        + "n'est pas placé sur cette boussole."
+        + (missing[0] === "Y" ? " La lecture « Économie × protectionnisme » le place." : ""),
+    fromQuizNative: "X tiré du questionnaire",
+    fromQuizNativeY: "Y tiré du questionnaire",
+    journeyNative: pair => "Politiskel " + pair,
+    resultTitleNative: "Où vous placent vos réponses",
+    allName: "Questionnaire complet",
+    allDesc: names => "Toutes les questions de tous les thèmes disponibles, mélangées dans un "
+      + "ordre fixe, le même pour tout le monde. Pour l'instant : " + names.join(", ") + ".",
+    allLead: (n, m) => "Toutes les questions des thèmes disponibles — " + n + " sur " + m
+      + " pour l'instant — mélangées dans un ordre fixe, le même pour tout le monde : une suite "
+      + "de questions sur un même sujet laisse deviner ce qu'elle mesure. Les réponses sont les "
+      + "mêmes que thème par thème : ce qui est déjà répondu d'un côté l'est de l'autre."
   }
 };
 const LANG = (document.documentElement.lang || "fr").slice(0, 2);
@@ -1544,18 +2718,39 @@ const STORE_KEY = "politicompass.overlay.v4";
    have none, so we fall back to the alias. */
 const idOf = p => p.source || ("alias:" + p.alias);
 
+/* Answers exported by the group's members and dropped in
+   politi-results/answers/: the build folds them in as POLITI_ANSWERS. A file
+   naming a screenshot completes that profile; one that names none is a
+   profile started on the site, and joins the list as such. Answers given in
+   this browser afterwards take precedence (see answersOf). */
+const SEED_ANSWERS = {};
+for (const a of window.POLITI_ANSWERS || []) {
+  const match = a.source && SEED.find(p => p.source === a.source);
+  if (match) { SEED_ANSWERS[idOf(match)] = a.answers; continue; }
+  /* tools/extract.js already matched aliases to screenshots and kept one
+     file per profile, so this only guards a hand-edited data file */
+  if (SEED.some(p => p.alias.toLowerCase() === a.alias.toLowerCase())) continue;
+  const p = { alias: a.alias, native: true, source: null };
+  SEED.push(p);
+  SEED_ANSWERS[idOf(p)] = a.answers;
+}
+
 function loadOverlay() {
   try {
     const raw = localStorage.getItem(STORE_KEY);
-    if (!raw) return { hidden: [], added: [] };
+    if (!raw) return { hidden: [], added: [], answers: {} };
     const o = JSON.parse(raw);
     return {
       hidden: Array.isArray(o && o.hidden) ? o.hidden.filter(x => typeof x === "string") : [],
       added: Array.isArray(o && o.added)
-        ? o.added.filter(x => x && typeof x.alias === "string") : []
+        ? o.added.filter(x => x && typeof x.alias === "string") : [],
+      /* Questionnaire answers, keyed by profile id. They live here and nowhere
+         else: the repository never holds anything derived from a person. */
+      answers: o && o.answers && typeof o.answers === "object" && !Array.isArray(o.answers)
+        ? o.answers : {}
     };
   } catch (_) {
-    return { hidden: [], added: [] };
+    return { hidden: [], added: [], answers: {} };
   }
 }
 function saveOverlay() {
@@ -1566,8 +2761,13 @@ let overlay = loadOverlay();
 
 function rebuild() {
   const hidden = new Set(overlay.hidden);
+  /* A profile added in this browser and one imported with the page can share
+     an id: the organiser's own questionnaire-only profile, exported, dropped
+     in politi-results/answers/ and rebuilt. They are the same person, so it
+     is listed once, as imported; its local answers still take precedence. */
+  const seeded = new Set(SEED.map(idOf));
   profiles = SEED.filter(p => !hidden.has(idOf(p))).map(p => ({ ...p }))
-    .concat(overlay.added.map(p => ({ ...p })));
+    .concat(overlay.added.filter(p => !seeded.has(idOf(p))).map(p => ({ ...p })));
 }
 
 let profiles = [];
@@ -1575,10 +2775,96 @@ rebuild();
 
 /* The model returns keys, not sentences, so the wrappers below are the whole
    of the presentation layer: they look the wording up and change nothing else. */
+/* A profile started on this site has no PolitiScales result at all: nothing
+   to project, so its coordinates start empty rather than at a centre it never
+   answered. Whatever it gets comes from the questionnaire. */
+const hasPolitiscales = p => AXES.some(a => Number.isFinite(p[a.neg[0]])
+                                         || Number.isFinite(p[a.pos[0]]));
+
 function coords(p) {
+  if (!hasPolitiscales(p)) {
+    return withQuiz(p, { x: null, y: null, ecol: null, sov: null, method: null, native: true });
+  }
   const c = PolitiModel.coords(p);
   if (c.method) c.method = L.method[c.method];
+  return withQuiz(p, c);
+}
+
+/* A questionnaire axis replaces the PolitiScales one WHOLESALE, never averaged
+   with it: each coordinate keeps a single source, and the page says which.
+   `from` keeps where PolitiScales had put the profile, so the journey from
+   one instrument to the other can be drawn. */
+function withQuiz(p, c) {
+  const id = idOf(p);
+  const answers = overlay.answers[id] || SEED_ANSWERS[id];
+  /* an erased profile keeps an empty entry (see the erase button): no answers */
+  if (!answers || !Object.keys(answers).length) return c;
+  c.quiz = PolitiQuiz.score(answers, "economy");
+  c.soc = PolitiQuiz.score(answers, "society");
+  const ps = { x: c.x, y: c.y };
+  if (c.quiz.x !== null) { c.x = c.quiz.x; c.xSrc = "quiz"; }
+  if (c.soc.y !== null) { c.y = c.soc.y; c.ySrc = "quiz"; }
+  if (!c.native && (c.xSrc || c.ySrc)) {
+    c.from = ps;
+    c.psX = ps.x;
+    c.psY = ps.y;
+  }
   return c;
+}
+
+/* Readings of the compass. The same profiles and the same parties, seen along
+   two other dimensions: each reading picks what goes on each axis, for the
+   profiles and for the parties alike, so a profile is only ever compared with
+   parties measured on the same thing. A reading with no party counterpart
+   does not belong here — the class readings stay in their own panel.
+
+     politiskel     x from the questionnaire where answered, y from PolitiScales
+     politiscales   the original reading, PolitiScales alone, kept for reference
+     protectionism  x against CHES `protectionism`, which the two usual axes
+                    blur: LFI and the RN sit apart on y, together on this one
+     populist       listed, not available: it needs the institutions theme,
+                    and it is named for the theory it adopts
+
+   A profile with no value on a reading's axis is left off the chart and
+   keeps its row in the table, marked. */
+const VIEWS = [
+  { key: "politiskel" },
+  { key: "politiscales" },
+  { key: "protectionism" },
+  { key: "populist", planned: true }
+];
+const VIEW_KEY = "politicompass.view.v1";
+let view = VIEWS[0];
+
+/* Copy for the current reading, falling back on the default wording. */
+const V = () => Object.assign({}, L, L.views[view.key] || {});
+
+function project(p) {
+  const c = coords(p);
+  const v = view.key === "politiskel" ? c : Object.assign({}, c, { base: c, from: null });
+  if (view.key === "politiscales") {
+    v.x = c.native ? null : c.psX !== undefined ? c.psX : c.x;
+    v.y = c.native ? null : c.psY !== undefined ? c.psY : c.y;
+    v.xSrc = v.ySrc = null;
+  } else if (view.key === "protectionism") {
+    const y = c.quiz ? c.quiz.protectionism : null;
+    v.y = y === undefined ? null : y;
+    v.ySrc = null;   /* y is protectionism here: "Y from the questionnaire" would name the social axis */
+  }
+  /* no value on one axis, no place on the chart */
+  if (v.x === null || v.y === null) v.off = true;
+  return v;
+}
+
+function viewReferences() {
+  if (view.key !== "protectionism") return country.parties;
+  return country.parties.filter(r => r.prot !== undefined).map(r => ({ ...r, y: r.prot }));
+}
+
+/* The journey and the result screen always speak of the default reading. */
+function nearestBase(x, y) {
+  const refs = country.parties;
+  return PolitiModel.nearestReference(x, y, refs, PolitiModel.limitsFor(refs));
 }
 
 /* Nearest neighbour, replacing a cascade of thresholds that left gaps (the
@@ -1613,7 +2899,7 @@ const COUNTRY_KEY = "politicompass.country.v1";
 function setCountry(code) {
   const found = COUNTRIES.find(c => c.code === code);
   if (found) country = found;
-  REFERENCES = country.parties;
+  REFERENCES = viewReferences();
   LIMITS = PolitiModel.limitsFor(REFERENCES);
   /* `selection` holds an index into the previous table, which now points at
      another party or at nothing at all. */
@@ -1626,10 +2912,13 @@ function applyCountry() {
   $("legend-parties").textContent = L.legendParties(country.name);
   $("detail-hint").textContent = L.detailHint(REFERENCES.length);
 
-  const ches = REFERENCES.filter(r => r.src === "ches");
-  const est = REFERENCES.filter(r => r.src !== "ches");
+  /* The whole table, whatever the reading keeps: a reading that drops every
+     party (Italy on protectionism) must not make them read as estimates. */
+  const all = country.parties;
+  const ches = all.filter(r => r.src === "ches");
+  const est = all.filter(r => r.src !== "ches");
   $("method-refs").textContent =
-      !ches.length ? L.methodRefsEstimated(country.name, REFERENCES.length, country.why || "")
+      !ches.length ? L.methodRefsEstimated(country.name, all.length, country.why || "")
     : !est.length  ? L.methodRefsAll(country.name, ches.length)
     : L.methodRefsMixed(country.name, ches.length, est.length,
                         est.map(r => r.name).join(", "));
@@ -1637,6 +2926,7 @@ function applyCountry() {
   const gap = PolitiModel.widestEconGap(REFERENCES);
   $("method-gap").textContent = gap ? L.methodGap(gap.lo.name, gap.hi.name, gap.d) : "";
   $("method-tie").textContent = L.methodTie(LIMITS.tie);
+  applyView();
 }
 
 /* Distances to every reference, nearest first, with the wording added. */
@@ -1648,9 +2938,10 @@ function rankParties(c) {
 /* The mirror image: which profiles come closest to a given party. */
 function rankProfiles(r, computed) {
   return computed
-    .map(({ p, c }, i) => ({ name: p.alias, note: null, i,
+    .map(({ p, c }, i) => ({ name: p.alias, note: null, i, off: c.off,
                              d: Math.round(Math.hypot(c.x - r.x, c.y - r.y)),
                              dx: c.x - r.x, dy: c.y - r.y }))
+    .filter(o => !o.off)
     .sort((a, b) => a.d - b.d);
 }
 
@@ -1789,13 +3080,14 @@ function renderChrome() {
     grid.appendChild(el("line", { class: "grid-line", x1: 50, y1: toSvgY(v), x2: 550, y2: toSvgY(v) }));
   }
 
+  const W = V();
   const caps = [
-    { t: L.axisTop,    x: 300, y: 38,  anchor: "middle", cls: "axis-cap" },
-    { t: L.axisBottom, x: 300, y: 574, anchor: "middle", cls: "axis-cap" },
-    { t: L.quadTopLeft,     x:  60, y:  68, anchor: "start", cls: "quad-cap" },
-    { t: L.quadTopRight,    x: 540, y:  68, anchor: "end",   cls: "quad-cap" },
-    { t: L.quadBottomLeft,  x:  60, y: 538, anchor: "start", cls: "quad-cap" },
-    { t: L.quadBottomRight, x: 540, y: 538, anchor: "end",   cls: "quad-cap" },
+    { t: W.axisTop,    x: 300, y: 38,  anchor: "middle", cls: "axis-cap" },
+    { t: W.axisBottom, x: 300, y: 574, anchor: "middle", cls: "axis-cap" },
+    { t: W.quadTopLeft,     x:  60, y:  68, anchor: "start", cls: "quad-cap" },
+    { t: W.quadTopRight,    x: 540, y:  68, anchor: "end",   cls: "quad-cap" },
+    { t: W.quadBottomLeft,  x:  60, y: 538, anchor: "start", cls: "quad-cap" },
+    { t: W.quadBottomRight, x: 540, y: 538, anchor: "end",   cls: "quad-cap" },
     { t: "−100", x: 52,  y: 315, anchor: "start",  cls: "tick-cap" },
     { t: "−50",  x: 175, y: 315, anchor: "middle", cls: "tick-cap" },
     { t: "+50",  x: 425, y: 315, anchor: "middle", cls: "tick-cap" },
@@ -1808,8 +3100,8 @@ function renderChrome() {
   }
 
   const side = [
-    { t: L.axisLeft,  x: 22,  y: 300, rot: -90 },
-    { t: L.axisRight, x: 578, y: 300, rot: 90 }
+    { t: W.axisLeft,  x: 22,  y: 300, rot: -90 },
+    { t: W.axisRight, x: 578, y: 300, rot: 90 }
   ];
   for (const s of side) {
     const t = el("text", { class: "axis-cap", x: s.x, y: s.y, "text-anchor": "middle",
@@ -1848,7 +3140,8 @@ function render() {
   const showRefLabels = $("t-reflabels").checked;
   const showLabels    = $("t-labels").checked;
 
-  const computed = profiles.map(p => ({ p, c: coords(p) }));
+  const computed = profiles.map(p => ({ p, c: project(p) }));
+  const placed = computed.filter(r => !r.c.off);
 
   /* Background text (ticks, quadrant corners) occupies space just like a
      marker: without this a label would be laid on top of it. */
@@ -1864,15 +3157,15 @@ function render() {
 
   /* The group mean is drawn later but reserves its space here, otherwise a
      party label lands on top of it. */
-  if ($("t-centroid").checked && computed.length >= 2) {
-    const cx = toSvgX(computed.reduce((a, r) => a + r.c.x, 0) / computed.length);
-    const cy = toSvgY(computed.reduce((a, r) => a + r.c.y, 0) / computed.length);
+  if ($("t-centroid").checked && placed.length >= 2) {
+    const cx = toSvgX(placed.reduce((a, r) => a + r.c.x, 0) / placed.length);
+    const cy = toSvgY(placed.reduce((a, r) => a + r.c.y, 0) / placed.length);
     taken.push({ x0: cx - 13, x1: cx + 125, y0: cy - 13, y1: cy + 13 });
   }
 
   /* Every marker claims space first, profiles before parties: party labels
      give way to profile labels, not the other way round. */
-  for (const { c } of computed) {
+  for (const { c } of placed) {
     const x = toSvgX(c.x), y = toSvgY(c.y);
     taken.push({ x0: x - 10, x1: x + 10, y0: y - 10, y1: y + 10 });
   }
@@ -1887,7 +3180,7 @@ function render() {
   const ptW = showLabels ? measureWidths(ptTexts, "pt-label") : [];
   const ptPlacements = computed.map(({ c }, i) => {
     const x = toSvgX(c.x), y = toSvgY(c.y);
-    if (!showLabels) return null;
+    if (!showLabels || c.off) return null;
     /* A profile always keeps its label: it is the subject of the chart. */
     return placeLabel({ x, y, text: ptTexts[i], w: ptW[i], size: 10.5 }, taken)
         || CANDIDATES[0];
@@ -1941,6 +3234,11 @@ function render() {
     const hit = el("circle", { class: "hit", cx: x, cy: y, r: 14, tabindex: "0",
                                role: "button", "aria-label": p.alias });
     g.appendChild(hit);
+    if (c.from && $("t-trail").checked && (c.from.x !== c.x || c.from.y !== c.y)) {
+      const fx = toSvgX(c.from.x), fy = toSvgY(c.from.y);
+      g.appendChild(el("line", { class: "trail", x1: fx, y1: fy, x2: x, y2: y }));
+      g.appendChild(el("circle", { class: "trail-ghost", cx: fx, cy: fy, r: 4 }));
+    }
     const pick = () => select("profile", i);
     g.addEventListener("click", e => { e.stopPropagation(); pick(); });
     hit.addEventListener("keydown", e => {
@@ -1956,10 +3254,10 @@ function render() {
       t.textContent = p.alias.slice(0, 16);
       g.appendChild(t);
     }
-    ptsLayer.appendChild(g);
+    if (!c.off) ptsLayer.appendChild(g);
 
     /* textContent throughout: the alias is free input, never HTML. */
-    const nearest = nearestReference(c.x, c.y);
+    const nearest = c.off ? null : nearestReference(c.x, c.y);
     const tr = document.createElement("tr");
     tr.dataset.idx = String(i);
     if (selection && selection.kind === "profile" && selection.i === i) tr.classList.add("sel");
@@ -1980,24 +3278,45 @@ function render() {
     }
     tr.appendChild(tdAlias);
 
-    for (const v of [c.x, c.y, c.ecol]) {
+    /* project() nulls what a reading cannot place, so null is the only "—" */
+    [c.x, c.y, c.ecol].forEach((v, k) => {
       const td = document.createElement("td");
       td.className = "num";
-      td.textContent = signed(v);
+      td.textContent = v === null ? "—" : signed(v);
+      if (k === 0 && c.xSrc === "quiz") {
+        td.classList.add("quiz");
+        td.title = c.native ? L.fromQuizNative : L.fromQuiz(signed(c.psX));
+      }
+      if (k === 1 && c.ySrc === "quiz" && c.y !== null) {
+        td.classList.add("quiz");
+        td.title = c.native ? L.fromQuizNativeY : L.fromQuizY(signed(c.psY));
+      }
       tr.appendChild(td);
-    }
+    });
 
     const tdFam = document.createElement("td");
     tdFam.className = "fam";
+    if (!nearest) {
+      const tag = document.createElement("span");
+      tag.className = "tag";
+      tag.textContent = !c.off ? L.viewNoRefs
+        : c.native && !c.quiz ? L.nativeEmpty
+        : c.native && view.key === "politiskel" && c.x !== null ? L.nativeNoY
+        : c.native && view.key === "politiskel" && c.y !== null ? L.nativeNoX
+        : c.native && view.key === "politiskel" ? L.nativeNoXY
+        : L.viewOff;
+      tdFam.appendChild(tag);
+    } else {
     const tag = document.createElement("span");
     tag.className = "tag";
     tag.textContent = " · " + fitPhrase(nearest.d) + " (" + nearest.d + ")";
     if (nearest.d > LIMITS.far) tag.classList.add("far-note");
     tdFam.append(document.createTextNode(nearest.name), tag);
+    }
 
     /* A near-tie is shown rather than hidden behind the winner: the runner-up
        was already computed, and which of the two comes first is not robust. */
-    if (nearest.margin <= LIMITS.tie) {
+    if (nearest && nearest.margin <= LIMITS.tie) {
       const tie = document.createElement("span");
       tie.className = "tie";
       tie.textContent = L.tieWith(nearest.second.name, nearest.margin);
@@ -2027,6 +3346,7 @@ function render() {
       const id = idOf(p);
       if (overlay.added.some(q => idOf(q) === id)) {
         overlay.added = overlay.added.filter(q => idOf(q) !== id);
+        delete overlay.answers[id];   /* gone for good, so are its answers */
       } else if (!overlay.hidden.includes(id)) {
         overlay.hidden.push(id);   /* extracted: hide it, the file stays the reference */
       }
@@ -2050,8 +3370,9 @@ function render() {
     tbody.appendChild(tr);
   }
 
+  applyView();   /* its note counts the profiles left off, which answers change */
   renderStrips(computed);
-  renderCentroid(computed, annot);
+  renderCentroid(placed, annot);
   renderAnnotations(computed, annot);
   renderDetail(computed);
   ptsLayer.classList.toggle("dim", !!selection);
@@ -2317,7 +3638,7 @@ function renderAnnotations(computed, annot) {
   const origin = selection.kind === "profile"
     ? (computed[selection.i] ? computed[selection.i].c : null)
     : REFERENCES[selection.i];
-  if (!origin) return;
+  if (!origin || origin.off) return;
 
   const ox = toSvgX(origin.x), oy = toSvgY(origin.y);
   annot.appendChild(el("circle", { class: "sel-disc", cx: ox, cy: oy, r: 50 }));
@@ -2353,6 +3674,7 @@ function renderDetail(computed) {
     wrap.hidden = true;
     hint.hidden = false;
     $("detail-id").hidden = true;
+    $("detail-readings").hidden = true;
     title.textContent = L.distances;
     return;
   }
@@ -2361,7 +3683,8 @@ function renderDetail(computed) {
   const origin = isProfile ? computed[selection.i] : { p: REFERENCES[selection.i] };
   if (!origin) { selection = null; wrap.hidden = true; hint.hidden = false; return; }
 
-  const rows = isProfile ? rankParties(origin.c) : rankProfiles(REFERENCES[selection.i], computed);
+  const rows = isProfile ? (origin.c.off ? [] : rankParties(origin.c))
+                         : rankProfiles(REFERENCES[selection.i], computed);
   const label = isProfile ? origin.p.alias : REFERENCES[selection.i].name;
 
   title.replaceChildren(document.createTextNode(
@@ -2384,20 +3707,28 @@ function renderDetail(computed) {
     meta.className = "meta";
     const d = document.createElement("p");
     d.className = "d";
-    d.textContent = p.slogan ? p.slogan.join(" · ") : L.noMotto;
+    const native = !hasPolitiscales(p);
+    d.textContent = p.slogan ? p.slogan.join(" · ") : native ? L.nativeMotto : L.noMotto;
     if (!p.slogan) d.style.color = "var(--text-3)";
-    meta.append(d, conceptsEl(p));
+    meta.appendChild(d);
+    /* no PolitiScales answers, no PolitiScales concepts to compute */
+    if (!native) meta.appendChild(conceptsEl(p));
     card.appendChild(meta);
     card.hidden = false;
+    renderReadings(p, origin.c.base || origin.c);
   } else {
     card.hidden = true;
+    $("detail-readings").hidden = true;
   }
 
   if (!rows.length) {
     const tr = document.createElement("tr");
     const td = document.createElement("td");
     td.colSpan = 6; td.className = "empty";
-    td.textContent = L.nothingToCompare;
+    td.textContent = !(isProfile && origin.c.off) ? L.nothingToCompare
+      : origin.c.native && view.key === "politiskel"
+        ? L.nativeOffDetail([origin.c.x === null && "X", origin.c.y === null && "Y"].filter(Boolean))
+        : L.viewOffDetail;
     tr.appendChild(td); tbody.appendChild(tr);
     return;
   }
@@ -2447,6 +3778,681 @@ function renderDetail(computed) {
   });
 }
 
+/* What the questionnaire adds to a profile, as a block: the journey from its
+   PolitiScales position, then every reading beside the compass. Used by the
+   distance panel and by the questionnaire's result screen. */
+function readingsEl(c, keys) {
+  const box = document.createElement("div");
+  keys = keys || openThemes().map(t => t.key);
+  const pair = (x, y) => "(" + (x === null ? "—" : signed(x)) + ", " + (y === null ? "—" : signed(y)) + ")";
+
+  if (c.native && (c.x !== null || c.y !== null)) {
+    const j = document.createElement("p");
+    j.className = "journey";
+    j.textContent = L.journeyNative(pair(c.x, c.y));
+    box.appendChild(j);
+  }
+  if (c.from) {
+    const was = nearestBase(c.from.x, c.from.y);
+    const now = nearestBase(c.x, c.y);
+    const j = document.createElement("p");
+    j.className = "journey";
+    j.textContent = L.journey(pair(c.from.x, c.from.y), pair(c.x, c.y), was.name, now.name);
+    box.appendChild(j);
+  }
+
+  const show = v => (v === null ? L.readingNone : signed(v));
+  const lvl = PolitiQuiz.SCALES.salience.fr;
+  for (const k of keys) {
+    const q = scoreOf(c, k);
+    const theme = PolitiQuiz.THEMES.find(t => t.key === k);
+    const items = PolitiQuiz.askedItems(k);
+    const count = r => items.filter(i => i.reading === r).length;
+    const any = q && (Object.values(q.n).some(n => n > 0) || q.salience !== null || q.salienceAfter !== null);
+    if (!any) continue;
+
+    if (keys.length > 1) {
+      const h = document.createElement("h4");
+      h.className = "readings-theme";
+      h.textContent = L.themes[k].name;
+      box.appendChild(h);
+    }
+    const dl = document.createElement("dl");
+    const row = (label, value, note, sub) => {
+      const dt = document.createElement("dt");
+      dt.textContent = label;
+      if (sub) dt.style.paddingLeft = "12px";
+      const dd = document.createElement("dd");
+      dd.textContent = value;
+      if (note) {
+        const sm = document.createElement("small");
+        sm.textContent = " · " + note;
+        dd.appendChild(sm);
+      }
+      dl.append(dt, dd);
+    };
+    const axis = theme.axis;
+    row(L.readingAxis[axis], show(q[axis]),
+        L.answeredOf(q.n[axis], count(axis)) + " · " + L.readingNotes[axis]);
+    for (const d of theme.dims) row(L.dims[d], show(q.dims[d]), null, true);
+    if (k === "economy") {
+      row(L.readingProtectionism, show(q.protectionism),
+          L.answeredOf(q.n.protectionism, count("protectionism")) + " · " + L.readingNotes.protectionism);
+      row(L.readingClass, q.class === null && q.n.class ? L.readingClassIncomplete(q.n.class) : show(q.class),
+          q.class === null ? null : L.readingNotes.class);
+      row(L.readingConflict, show(q.conflict),
+          L.answeredOf(q.n.conflict, count("conflict")) + " · " + L.readingNotes.conflict);
+      row(L.readingLabour, show(q.labour),
+          L.answeredOf(q.n.labour, count("labour")) + " · " + L.readingNotes.labour);
+    }
+    box.appendChild(dl);
+
+    if (q.salience !== null || q.salienceAfter !== null) {
+      const sal = document.createElement("p");
+      sal.className = "hint";
+      sal.textContent = q.salience !== null && q.salienceAfter !== null
+        ? L.salienceMoved(lvl[q.salience], lvl[q.salienceAfter], q.salienceAfter - q.salience)
+        : L.salienceOf(lvl[q.salience !== null ? q.salience : q.salienceAfter]);
+      box.appendChild(sal);
+    }
+  }
+  return box;
+}
+
+function renderReadings(p, c) {
+  const box = $("detail-readings");
+  box.replaceChildren();
+  box.hidden = false;
+  box.className = c.quiz ? "readings" : "";
+  if (c.quiz) {
+    const h = document.createElement("h3");
+    h.textContent = L.readingsTitle;
+    box.append(h, readingsEl(c));
+  }
+  const btn = document.createElement("a");
+  btn.href = hubHref(idOf(p));
+  btn.className = "button " + (c.quiz ? "ghost" : "primary");
+  btn.textContent = c.quiz ? L.quizEdit : L.quizOpen;
+  const actions = document.createElement("div");
+  actions.className = "actions";
+  actions.style.margin = "0 0 14px";
+  actions.appendChild(btn);
+  if (Object.keys(answersOf(idOf(p))).length) actions.appendChild(exportButton(p, "ghost"));
+  box.appendChild(actions);
+}
+
+/* Downloads a profile's answers as the file tools/extract.js reads back from
+   politi-results/answers/. The format is versioned so that a later bank can
+   still tell an old file apart. */
+const slugOf = a => a.normalize("NFD").replace(/[\u0300-\u036f]/g, "").toLowerCase()
+  .replace(/[^a-z0-9]+/g, "-").replace(/^-|-$/g, "") || "profil";
+
+function exportAnswers(p) {
+  const data = { format: "politiskel-answers", version: 1, alias: p.alias,
+                 source: p.source || null, exported: new Date().toISOString(),
+                 answers: answersOf(idOf(p)) };
+  const blob = new Blob([JSON.stringify(data, null, 1) + "\n"], { type: "application/json" });
+  const a = document.createElement("a");
+  a.href = URL.createObjectURL(blob);
+  a.download = slugOf(p.alias) + "-reponses.json";
+  document.body.appendChild(a);
+  a.click();
+  a.remove();
+  setTimeout(() => URL.revokeObjectURL(a.href), 1000);
+}
+
+function exportButton(p, cls) {
+  const b = document.createElement("button");
+  b.type = "button";
+  b.className = cls;
+  b.textContent = L.exportAnswers;
+  b.title = L.exportHint;
+  b.addEventListener("click", () => exportAnswers(p));
+  return b;
+}
+
+/* ----------------------------------------------------------- questionnaire --- */
+
+/* The questionnaire is a page of its own inside this file, reached through
+   the address: #questionnaire/<profile id>. Same document rather than a second
+   HTML file, because the answers live in this page's localStorage, and
+   browsers do not all share that storage between two file:// pages.
+
+   Screens: an introduction, the salience question, one per item, salience
+   again, the result. Items come mixed, in a fixed order (see screensFor).
+   Salience comes first: asked after thirty questions on the economy, it
+   would measure how much the respondent had just been made to think about
+   it, not how much it weighs in their politics. It is asked once more at the
+   end, so the page can show whether answering moved it.
+   Items are mixed and carry no section heading, for the same reason: a
+   heading such as "class", or a run of items on one subject, would tell the
+   respondent what an item is for. Every answer is saved
+   the moment it is given, so leaving halfway loses nothing. */
+const QUIZ_ROUTE = "#questionnaire/";
+const quizItems = () => PolitiQuiz.ITEMS.filter(i => i.theme === "economy");
+const ALL = "all";      /* the complete questionnaire: every theme at once */
+const openThemes = () => PolitiQuiz.THEMES.filter(t => !t.planned);
+
+/* A flow is a list of screens: how much each of its themes matters, its items
+   mixed in the one fixed order politi-quiz.js defines, how much each theme
+   matters now. A theme's flow has one theme; the complete questionnaire has
+   them all, its items mixed across themes. Same questions, same keys, so a
+   theme answered on its own shows up as answered in it. */
+const flowThemes = key => (key === ALL ? openThemes().map(t => t.key) : [key]);
+/* a profile's score on one theme, as withQuiz() computed it */
+const scoreOf = (c, key) => (key === "economy" ? c.quiz : key === "society" ? c.soc : null);
+
+function screensFor(key) {
+  const keys = flowThemes(key);
+  const items = [].concat(...keys.map(PolitiQuiz.askedItems));
+  return keys.map(k => ({ kind: "salience", theme: k, after: false }))
+    .concat(PolitiQuiz.mixedOrder(items).map(item => ({ kind: "item", item })))
+    .concat(keys.map(k => ({ kind: "salience", theme: k, after: true })));
+}
+const screenKey = sc => sc.kind === "item" ? sc.item.id
+  : "salience." + sc.theme + (sc.after ? ".after" : "");
+/* { p, id, theme, step } while the questionnaire is shown; theme null = the
+   list of themes */
+let quiz = null;
+let quizAdvance = null;   /* pending auto-advance after an answer */
+
+function route() {
+  clearTimeout(quizAdvance);   /* an answer's auto-advance belongs to the page it was given on */
+  const h = location.hash;
+  if (h.startsWith(QUIZ_ROUTE)) {
+    /* #questionnaire/<id> lists the themes, #questionnaire/<id>/<theme> runs
+       one. The id is URI-encoded, so it holds no slash of its own. */
+    const [rawId, themeKey] = h.slice(QUIZ_ROUTE.length).split("/");
+    const id = decodeURIComponent(rawId);
+    const p = profiles.find(q => idOf(q) === id);
+    const theme = themeKey === ALL ? { key: ALL }
+      : PolitiQuiz.THEMES.find(t => t.key === themeKey && !t.planned);
+    if (p) {
+      const key = theme ? theme.key : null;
+      if (!quiz || quiz.id !== id || quiz.theme !== key) quiz = { p, id, theme: key, step: 0 };
+      $("view-main").hidden = true;
+      $("view-quiz").hidden = false;
+      if (key) renderQuiz(); else renderHub();
+      window.scrollTo(0, 0);
+      return;
+    }
+  }
+  const wasQuiz = quiz;
+  quiz = null;
+  $("view-quiz").hidden = true;
+  $("view-main").hidden = false;
+  if (wasQuiz) {
+    /* back on the compass, on the profile just completed */
+    const i = profiles.findIndex(q => idOf(q) === wasQuiz.id);
+    selection = i >= 0 ? { kind: "profile", i } : selection;
+    render();
+    $("detail-card").scrollIntoView({ block: "start" });
+  }
+}
+window.addEventListener("hashchange", route);
+
+/* This browser's answers first, then those imported with the page. */
+function answersOf(id) { return overlay.answers[id] || SEED_ANSWERS[id] || {}; }
+
+const hubHref = id => QUIZ_ROUTE + encodeURIComponent(id);
+const themeHref = (id, key) => hubHref(id) + "/" + key;
+
+/* The list of themes: what exists, what is coming, and how far this profile
+   has got in each. It is the questionnaire's front page, so that the economy
+   reads as a first theme rather than the whole test. */
+function renderHub() {
+  const root = $("view-quiz");
+  root.replaceChildren();
+  const saved = answersOf(quiz.id);
+
+  const top = document.createElement("div");
+  top.className = "quiz-top";
+  const back = document.createElement("a");
+  back.href = "#";
+  back.textContent = L.quizBack;
+  const who = document.createElement("span");
+  who.className = "who";
+  who.textContent = L.quizWho(quiz.p.alias);
+  top.append(back, who);
+  root.appendChild(top);
+
+  const card = document.createElement("section");
+  card.className = "quiz-card";
+  const eb = document.createElement("p");
+  eb.className = "eyebrow";
+  eb.textContent = L.hubEyebrow;
+  const h = document.createElement("h2");
+  h.textContent = hasPolitiscales(quiz.p) ? L.quizIntroTitle(quiz.p.alias) : L.nativeTitle(quiz.p.alias);
+  const lead = document.createElement("p");
+  lead.className = "lead";
+  lead.textContent = L.hubLead;
+  card.append(eb, h, lead);
+
+  const list = document.createElement("div");
+  list.className = "theme-list";
+  for (const t of [{ key: ALL }].concat(PolitiQuiz.THEMES)) {
+    const copy = t.key === ALL
+      ? { name: L.allName, desc: L.allDesc(openThemes().map(o => L.themes[o.key].name)) }
+      : L.themes[t.key];
+    const item = document.createElement("div");
+    item.className = "theme-card" + (t.planned ? " planned" : "") + (t.key === ALL ? " all" : "");
+    const name = document.createElement("h3");
+    name.textContent = copy.name;
+    const desc = document.createElement("p");
+    desc.textContent = copy.desc;
+    const status = document.createElement("span");
+    status.className = "status";
+    item.append(name, desc, status);
+    if (t.planned) {
+      status.textContent = L.hubPlanned;
+    } else {
+      const items = screensFor(t.key).filter(sc => sc.kind === "item").map(sc => sc.item);
+      const done = items.filter(i => saved[i.id] !== undefined).length;
+      status.textContent = L.hubProgress(done, items.length);
+      const go = document.createElement("a");
+      go.className = "button go " + (done === items.length ? "ghost" : "primary");
+      go.href = themeHref(quiz.id, t.key);
+      go.textContent = !done ? L.quizStart : done < items.length ? L.quizResume : L.quizReview;
+      item.appendChild(go);
+    }
+    list.appendChild(item);
+  }
+  card.appendChild(list);
+  root.appendChild(card);
+}
+
+function setAnswer(key, value) {
+  /* a first local edit starts from the imported answers, not from nothing */
+  const a = overlay.answers[quiz.id]
+    || (overlay.answers[quiz.id] = Object.assign({}, SEED_ANSWERS[quiz.id] || {}));
+  a[key] = value;
+  saveOverlay();
+}
+
+function goStep(step) {
+  clearTimeout(quizAdvance);
+  const last = screensFor(quiz.theme).length + 1;
+  quiz.step = Math.max(0, Math.min(last, step));
+  renderQuiz();
+  window.scrollTo(0, 0);
+}
+
+function renderQuiz() {
+  const root = $("view-quiz");
+  root.replaceChildren();
+  const screens = screensFor(quiz.theme);
+  const nQ = screens.length;
+  const step = quiz.step;
+  const saved = answersOf(quiz.id);
+
+  const top = document.createElement("div");
+  top.className = "quiz-top";
+  const back = document.createElement("a");
+  back.href = hubHref(quiz.id);
+  back.textContent = L.backToThemes;
+  top.appendChild(back);
+  if (step >= 1 && step <= nQ) {
+    const bar = document.createElement("div");
+    bar.className = "progress";
+    const fill = document.createElement("div");
+    fill.style.width = Math.round(100 * step / nQ) + "%";
+    bar.appendChild(fill);
+    const cnt = document.createElement("span");
+    cnt.className = "quiz-count";
+    cnt.textContent = L.quizCount(step, nQ);
+    top.append(bar, cnt);
+  }
+  const who = document.createElement("span");
+  who.className = "who";
+  who.textContent = L.quizWho(quiz.p.alias);
+  top.appendChild(who);
+  root.appendChild(top);
+
+  const card = document.createElement("section");
+  card.className = "quiz-card";
+  root.appendChild(card);
+  const nav = document.createElement("div");
+  nav.className = "quiz-nav";
+  root.appendChild(nav);
+  const button = (text, cls, onClick) => {
+    const b = document.createElement("button");
+    b.type = "button"; b.className = cls; b.textContent = text;
+    b.addEventListener("click", onClick);
+    return b;
+  };
+  const spacer = () => document.createElement("span");
+
+  if (step === 0) {
+    introScreen(card, screens);
+    const started = screens.some(sc => saved[screenKey(sc)] !== undefined);
+    nav.append(spacer(), button(started ? L.quizResume : L.quizStart, "primary", () => goStep(1)));
+    return;
+  }
+  if (step === nQ + 1) {
+    resultScreen(card, nav, button, screens);
+    return;
+  }
+
+  const sc = screens[step - 1];
+  if (sc.kind === "salience") {
+    /* The closing one is not pre-filled, and the first answer is not
+       recalled: shown it, most people repeat it to stay consistent, and
+       nothing would be measured. */
+    const src = document.createElement("p");
+    src.className = "q-src";
+    src.textContent = L.quizSalienceSrc;
+    const copy = L.themes[sc.theme];
+    if (quiz.theme === ALL) {
+      const eb = document.createElement("p");
+      eb.className = "eyebrow";
+      eb.textContent = L.themes[sc.theme].name;
+      card.appendChild(eb);
+    }
+    questionScreen(card, { key: screenKey(sc), scale: PolitiQuiz.SCALES.salience,
+                           text: sc.after ? copy.salienceAfter : copy.salience,
+                           source: src }, saved[screenKey(sc)]);
+  } else {
+    const item = sc.item;
+    questionScreen(card, {
+      key: item.id, scale: PolitiQuiz.SCALES[item.scale], text: item.fr, stem: item.stem,
+      left: item.left, right: item.right, note: item.note,
+      source: sourceLine(item.src, item.translated)
+    }, saved[item.id]);
+  }
+
+  nav.append(
+    button(L.quizPrev, "ghost", () => goStep(step - 1)),
+    button(L.quizSkip, "skip", () => goStep(step + 1)),
+    button(step === nQ ? L.quizSeeResult : L.quizNext, "primary", () => goStep(step + 1)));
+  const keys = document.createElement("p");
+  keys.className = "quiz-keys";
+  keys.textContent = L.quizKeys;
+  root.appendChild(keys);
+}
+
+function introScreen(card, screens) {
+  const native = !hasPolitiscales(quiz.p);
+  const all = quiz.theme === ALL;
+  const eb = document.createElement("p");
+  eb.className = "eyebrow";
+  eb.textContent = L.hubEyebrow + " · " + (all ? L.allName : L.themes[quiz.theme].name);
+  const h = document.createElement("h2");
+  h.textContent = native ? L.nativeTitle(quiz.p.alias) : L.quizIntroTitle(quiz.p.alias);
+  const lead = document.createElement("p");
+  lead.className = "lead";
+  lead.textContent = all ? L.allLead(openThemes().length, PolitiQuiz.THEMES.length)
+                   : native ? L.themes[quiz.theme].leadNative : L.themes[quiz.theme].lead;
+  const hint = document.createElement("p");
+  hint.className = "hint";
+  hint.textContent = L.quizHint;
+  const meta = document.createElement("p");
+  meta.className = "q-src";
+  meta.textContent = L.quizIntroMeta(screens.filter(sc => sc.kind === "item").length,
+                                     screens.filter(sc => sc.kind === "salience").length / 2);
+  card.append(eb, h, lead, hint, meta);
+}
+
+/* One question. A categorical scale is a column of full-width choices; a
+   bipolar one shows its two statements side by side over a numbered ladder,
+   numbered as the survey's card was (1-10, or 0-10). */
+function questionScreen(card, q, was) {
+  if (q.stem) {
+    const st = document.createElement("p");
+    st.className = "stem";
+    st.textContent = q.stem;
+    card.appendChild(st);
+  }
+  if (q.text) {
+    const h = document.createElement("h2");
+    h.textContent = q.text;
+    card.appendChild(h);
+  }
+  const group = document.createElement("div");
+  group.setAttribute("role", "radiogroup");
+  group.setAttribute("aria-label", q.text || (q.left + " / " + q.right));
+
+  const choice = (value, label, key, cls) => {
+    const lab = document.createElement("label");
+    lab.className = "choice" + (cls ? " " + cls : "");
+    const r = document.createElement("input");
+    r.type = "radio"; r.name = "q"; r.value = String(value);
+    if (was === value) r.checked = true;
+    r.addEventListener("change", () => {
+      setAnswer(q.key, value);
+      clearTimeout(quizAdvance);
+      /* route() cancels it on any navigation; the check covers the rest */
+      quizAdvance = setTimeout(() => { if (quiz && quiz.theme) goStep(quiz.step + 1); }, 260);
+    });
+    lab.appendChild(r);
+    if (key !== null) {
+      const k = document.createElement("span");
+      k.className = "key";
+      k.textContent = key;
+      lab.appendChild(k);
+    }
+    lab.appendChild(document.createTextNode(label));
+    lab.dataset.key = key === null ? "" : key;
+    return lab;
+  };
+
+  if (q.scale.bipolar) {
+    const first = q.scale.values.length === 11 ? 0 : 1;
+    const last = first + q.scale.values.length - 1;
+    const poles = document.createElement("div");
+    poles.className = "poles";
+    for (const [text, n, cls] of [[q.left, first, "pole"], [q.right, last, "pole r"]]) {
+      const d = document.createElement("div");
+      d.className = cls;
+      const sm = document.createElement("small");
+      sm.textContent = L.quizPoleFull(n);
+      d.append(sm, document.createTextNode(text));
+      poles.appendChild(d);
+    }
+    card.appendChild(poles);
+    const ladder = document.createElement("div");
+    ladder.className = "ladder";
+    q.scale.values.forEach((_, k) => {
+      const n = first + k;
+      const lab = choice(k, String(n), null);
+      lab.dataset.key = n === 10 ? "0" : String(n);   /* the 0 key stands for 10 on a 1-10 card */
+      if (first === 0 && n === 10) lab.dataset.key = "";
+      ladder.appendChild(lab);
+    });
+    group.appendChild(ladder);
+  } else {
+    const col = document.createElement("div");
+    col.className = "choices";
+    q.scale.fr.forEach((t, k) => col.appendChild(choice(k, t, String(k + 1))));
+    group.appendChild(col);
+  }
+  if (q.scale.dk) {
+    const col = document.createElement("div");
+    col.className = "choices";
+    col.appendChild(choice("dk", q.scale.dk, null, "dk"));
+    group.appendChild(col);
+  }
+  card.appendChild(group);
+
+  if (q.note) {
+    const n = document.createElement("p");
+    n.className = "q-note";
+    n.textContent = q.note;
+    card.appendChild(n);
+  }
+  card.appendChild(q.source);
+}
+
+function resultScreen(card, nav, button, screens) {
+  const c = coords(quiz.p);
+  const eb = document.createElement("p");
+  eb.className = "eyebrow";
+  eb.textContent = L.resultEyebrow(quiz.theme === ALL ? L.allName : L.themes[quiz.theme].name);
+  const h = document.createElement("h2");
+  h.textContent = c.native ? L.resultTitleNative : L.resultTitle;
+  card.append(eb, h);
+
+  const keys = flowThemes(quiz.theme);
+  const cs = getComputedStyle(card);
+  const inner = card.clientWidth - parseFloat(cs.paddingLeft) - parseFloat(cs.paddingRight);
+  for (const k of keys) {
+    const axis = PolitiQuiz.THEMES.find(t => t.key === k).axis;
+    const score = scoreOf(c, k);
+    if (keys.length > 1) {
+      const h3 = document.createElement("p");
+      h3.className = "eyebrow";
+      h3.textContent = L.themes[k].name;
+      card.appendChild(h3);
+    }
+    if (!score || score[axis] === null) {
+      const p = document.createElement("p");
+      p.className = "lead";
+      p.textContent = L.resultNoAxis(L.themes[k].name, c.native);
+      card.appendChild(p);
+    } else {
+      card.appendChild(journeyStrip(c, inner, axis));
+    }
+  }
+  if (c.quiz) {
+    const r = readingsEl(c, keys);
+    r.className = "readings";
+    r.style.borderTop = "none";
+    card.appendChild(r);
+  }
+
+  /* erases what this flow asked, not the answers to other themes */
+  const erase = button(L.quizErase, "skip", () => {
+    const a = Object.assign({}, answersOf(quiz.id));
+    for (const sc of screens) delete a[screenKey(sc)];
+    /* An empty local entry is kept when answers were imported: removing it
+       would bring the imported ones straight back. */
+    if (Object.keys(a).length || SEED_ANSWERS[quiz.id]) overlay.answers[quiz.id] = a;
+    else delete overlay.answers[quiz.id];
+    saveOverlay();
+    goStep(0);
+  });
+  const right = document.createElement("span");
+  right.style.display = "flex";
+  right.style.flexWrap = "wrap";
+  right.style.justifyContent = "flex-end";
+  right.style.gap = "10px";
+  const hint = document.createElement("p");
+  hint.className = "hint";
+  hint.style.marginTop = "14px";
+  hint.textContent = L.exportHint;
+  card.appendChild(hint);
+  right.append(exportButton(quiz.p, "ghost"),
+               button(L.quizReview, "ghost", () => goStep(1)),
+               button(L.otherThemes, "ghost", () => { location.hash = hubHref(quiz.id); }),
+               button(L.backToCompass, "primary", () => { location.hash = ""; }));
+  nav.append(erase, right);
+}
+
+/* The journey along one axis, against the reference parties: the axis a theme
+   replaced. Only the two nearest references are named, below the axis; the
+   rest keep their name in a tooltip. Labels that would collide are moved to a
+   second row. */
+function journeyStrip(c, width, axis) {
+  /* drawn at the card's real width, so its text keeps its size on a phone
+     instead of shrinking with a fixed viewBox */
+  const W = Math.round(Math.max(300, Math.min(700, width || 640)));
+  const H = 128, pad = 28, axisY = 70;
+  const sx = v => pad + (v + 100) / 200 * (W - 2 * pad);
+  const anchorAt = x => (x < pad + 60 ? "start" : x > W - pad - 60 ? "end" : "middle");
+  const start = c.from;
+  const svg = el("svg", { class: "journey-strip", viewBox: "0 0 " + W + " " + H, role: "img",
+                          "aria-label": (start ? L.resultWas + " " + signed(start[axis]) + " → " : "")
+                                        + L.resultNow + " " + signed(c[axis]) });
+  svg.appendChild(el("line", { class: "axis", x1: pad, y1: axisY, x2: W - pad, y2: axisY }));
+  const ends = L.resultEnds[axis];
+  for (const [v, t, anchor] of [[-100, ends[0], "start"], [100, ends[1], "end"]]) {
+    const e = el("text", { class: "end", x: sx(v), y: H - 4, "text-anchor": anchor });
+    e.textContent = t;
+    svg.appendChild(e);
+  }
+
+  /* The nearest reference is read on both axes when both are known; a
+     profile started here with only one axis answered is read on that one. */
+  const byAxis = v => country.parties.reduce((b, r) =>
+    (!b || Math.abs(r[axis] - v) < Math.abs(b[axis] - v) ? r : b), null);
+  const both = c.x !== null && c.y !== null;
+  const now = both ? nearestBase(c.x, c.y) : { ref: byAxis(c[axis]) };
+  const was = start ? nearestBase(start.x, start.y) : now;
+  for (const r of country.parties) {
+    const x = sx(r[axis]);
+    const g = el("g", {});
+    g.appendChild(el("path", { class: "ref",
+      d: "M " + x + " " + (axisY - 4) + " L " + (x + 4) + " " + axisY + " L " + x + " "
+         + (axisY + 4) + " L " + (x - 4) + " " + axisY + " Z" }));
+    const title = el("title", {});
+    title.textContent = r.name + " (" + signed(r[axis]) + ")";
+    g.appendChild(title);
+    svg.appendChild(g);
+  }
+  /* the two named references: a second row when they would overlap */
+  const named = [was.ref, now.ref].filter((r, i, a) => a.indexOf(r) === i);
+  const nameW = named.map(r => r.name.length * 5.6);
+  named.forEach((r, i) => {
+    const x = sx(r[axis]);
+    const clash = i === 1 && Math.abs(x - sx(named[0][axis])) < (nameW[0] + nameW[1]) / 2 + 10;
+    const t = el("text", { class: "ref-name", x, y: axisY + (clash ? 34 : 20),
+                           "text-anchor": anchorAt(x) });
+    t.textContent = r.name;
+    svg.appendChild(t);
+  });
+
+  const tx = sx(c[axis]), fx = start ? sx(start[axis]) : tx;
+  if (start && Math.abs(tx - fx) > 12) {
+    const dir = Math.sign(tx - fx);
+    svg.appendChild(el("path", { class: "arrow",
+      d: "M " + fx + " " + (axisY - 10) + " Q " + (fx + tx) / 2 + " " + (axisY - 40) + " "
+         + (tx - dir * 6) + " " + (axisY - 12) }));
+    svg.appendChild(el("path", { class: "head",
+      d: "M " + tx + " " + (axisY - 8) + " l " + (-dir * 9) + " -7 l " + (dir * 1) + " 10 Z" }));
+  }
+  if (start) svg.appendChild(el("circle", { class: "trail-ghost", cx: fx, cy: axisY, r: 6 }));
+  svg.appendChild(el("circle", { class: "dot", cx: tx, cy: axisY, r: 7 }));
+
+  /* captions above the axis: the new one lifted when the two are close */
+  const capW = el("text", { class: "cap was", x: fx, y: axisY - 16, "text-anchor": anchorAt(fx) });
+  capW.textContent = start ? L.resultWas + " " + signed(start[axis]) : "";
+  const capN = el("text", { class: "cap", x: tx, y: axisY - 16, "text-anchor": anchorAt(tx) });
+  capN.textContent = L.resultNow + " " + signed(c[axis]);
+  if (start && Math.abs(tx - fx) < 150) capN.setAttribute("y", axisY - 48);
+  if (W < 460) svg.style.maxWidth = W + "px";
+  svg.append(capW, capN);
+  return svg;
+}
+
+function sourceLine(src, translated) {
+  const p = document.createElement("p");
+  p.className = "q-src";
+  const a = document.createElement("a");
+  a.href = src.url; a.target = "_blank"; a.rel = "noopener";
+  a.textContent = [src.survey, src.wave, src.variable].filter(Boolean).join(" · ");
+  p.appendChild(a);
+  if (translated) {
+    const t = document.createElement("span");
+    t.className = "tr";
+    t.textContent = " · " + L.quizTranslated[translated];
+    p.appendChild(t);
+  }
+  return p;
+}
+
+/* Keyboard, on the questionnaire only: digits answer, arrows move. */
+document.addEventListener("keydown", e => {
+  /* inside a flow only: the list of themes has no steps to move through */
+  if (!quiz || !quiz.theme || e.altKey || e.ctrlKey || e.metaKey) return;
+  if (e.key === "ArrowRight" || (e.key === "Enter" && !e.target.closest("button, a"))) {
+    e.preventDefault(); goStep(quiz.step + 1);
+  } else if (e.key === "ArrowLeft") {
+    e.preventDefault(); goStep(quiz.step - 1);
+  } else if (/^[0-9]$/.test(e.key)) {
+    const lab = document.querySelector('#view-quiz .choice[data-key="' + e.key + '"]');
+    if (lab) { const r = lab.querySelector("input"); r.checked = true; r.dispatchEvent(new Event("change")); }
+  }
+});
+
 /* ---------------------------------------------------------------- survol --- */
 
 function wireHover(computed) {
@@ -2456,6 +4462,7 @@ function wireHover(computed) {
   const show = (idx, clientX, clientY) => {
     const { p, c } = computed[idx];
     const nearest = nearestReference(c.x, c.y);
+    const Vc = V();
 
     tip.replaceChildren();
     const b = document.createElement("b");
@@ -2465,9 +4472,9 @@ function wireHover(computed) {
     const dl = document.createElement("dl");
     const rows = [
       [L.tipEcon, signed(c.x)],
-      [L.tipSocial, signed(c.y)
-        + (c.y > 0 ? L.suffixAuthor : c.y < 0 ? L.suffixLibert : "")],
-      [L.tipEcol, signed(c.ecol)]
+      [Vc.tipSocial, signed(c.y)
+        + (c.y > 0 ? Vc.suffixAuthor : c.y < 0 ? Vc.suffixLibert : "")],
+      [L.tipEcol, c.ecol === null ? "—" : signed(c.ecol)]
     ];
     if (c.method) rows.push([L.tipMethod, c.method]);
     for (const [k, v] of rows) {
@@ -2491,7 +4498,7 @@ function wireHover(computed) {
 
     const near = document.createElement("p");
     near.className = "near";
-    near.textContent = (nearest.d > LIMITS.far
+    near.textContent = !nearest ? L.viewNoRefs : (nearest.d > LIMITS.far
       ? L.nearestFar + nearest.name + " (" + nearest.d + ")"
       : L.nearest + nearest.name + " (" + L.proximity + nearest.fit + ")")
       + (nearest.margin <= LIMITS.tie ? L.tieWith(nearest.second.name, nearest.margin) : "");
@@ -2646,13 +4653,21 @@ $("clear-btn").addEventListener("click", () => {
 });
 
 $("reset-btn").addEventListener("click", () => {
-  overlay = { hidden: [], added: [] };
+  /* "Show everything again" brings hidden profiles back; it is not an erase
+     button, so the answers of the profiles it keeps survive it. The profiles
+     it removes — every added one — take their answers with them, as a
+     deletion does: left behind, they would come back on a new profile that
+     happened to reuse the alias. */
+  const kept = new Set(SEED.map(idOf));
+  const answers = {};
+  for (const [id, a] of Object.entries(overlay.answers)) if (kept.has(id)) answers[id] = a;
+  overlay = { hidden: [], added: [], answers };
   saveOverlay();
   rebuild();
   render();
 });
 
-["t-refs", "t-reflabels", "t-labels", "t-centroid"].forEach(id =>
+["t-refs", "t-reflabels", "t-labels", "t-centroid", "t-trail"].forEach(id =>
   $(id).addEventListener("change", render)
 );
 
@@ -2789,6 +4804,83 @@ function applyLocale() {
 }
 applyLocale();
 
+/* A profile that starts here, with no PolitiScales result: an alias, then
+   straight to the list of themes. It lives in the overlay like a hand-typed
+   profile, so deleting it deletes its answers. */
+$("native-form").addEventListener("submit", e => {
+  e.preventDefault();
+  const alias = $("native-alias").value.trim();
+  const err = $("native-error");
+  err.hidden = true;
+  const fail = msg => { err.textContent = msg; err.hidden = false; };
+  if (!alias) return fail(L.errNoAlias);
+  if (profiles.some(p => p.alias.toLowerCase() === alias.toLowerCase()))
+    return fail(L.errDuplicate(alias));
+  const p = { alias, native: true };
+  overlay.added.push(p);
+  saveOverlay();
+  rebuild();
+  render();
+  $("native-alias").value = "";
+  location.hash = hubHref(idOf(p));
+});
+
+/* Reading picker. Changing reading changes both axes, the party table (only
+   the parties measured on the new axis), and so the thresholds, which are
+   derived from those parties' spacing. */
+function applyView() {
+  const W = V();
+  document.querySelector('#profiles-table th[data-i18n="colY"]').textContent = W.colY;
+  document.querySelector('#profiles-table th[data-i18n="colY"]').title = W.titleY;
+  const note = $("view-note");
+  const parts = [];
+  if (view.key === "politiscales") parts.push(L.viewNotePolitiscales);
+  if (view.key === "protectionism") {
+    const dropped = country.parties.length - REFERENCES.length;
+    if (country.protWhy) parts.push(L.viewNoteNoProt(country.protWhy));
+    else if (!REFERENCES.length) parts.push(L.viewNoteAllEstimated);
+    else if (dropped) parts.push(L.viewNoteDropped(dropped));
+    /* why each profile is off: never answered, skipped protectionism, or
+       answered protectionism but nothing that places it on x */
+    const offs = profiles.map(project).filter(c => c.off);
+    /* c.quiz exists as soon as any theme is answered, so ask the economy's own counts */
+    const econ = c => c.quiz && Object.values(c.quiz.n).some(n => n > 0);
+    const none = offs.filter(c => !econ(c)).length;
+    const noProt = offs.filter(c => econ(c) && c.y === null).length;
+    const noX = offs.filter(c => econ(c) && c.y !== null && c.x === null).length;
+    if (none) parts.push(L.viewNoteOff(none));
+    if (noProt) parts.push(L.viewNoteSkippedProt(noProt));
+    if (noX) parts.push(L.viewNoteNoX(noX));
+  }
+  note.textContent = parts.join(" ");
+  note.hidden = !parts.length;
+}
+
+(function () {
+  const sel = $("view");
+  for (const v of VIEWS) {
+    const o = document.createElement("option");
+    o.value = v.key;
+    o.textContent = L.views[v.key].name;
+    if (v.planned) o.disabled = true;
+    sel.appendChild(o);
+  }
+  let saved = null;
+  try { saved = localStorage.getItem(VIEW_KEY); } catch (_) { /* private browsing */ }
+  const found = VIEWS.find(v => v.key === saved && !v.planned);
+  if (found) view = found;
+  sel.value = view.key;
+  sel.addEventListener("change", () => {
+    view = VIEWS.find(v => v.key === sel.value) || VIEWS[0];
+    try { localStorage.setItem(VIEW_KEY, view.key); } catch (_) { /* quota, or private browsing */ }
+    selection = null;
+    setCountry(country.code);
+    applyCountry();
+    renderChrome();
+    render();
+  });
+})();
+
 /* Country picker. The labels that name the country or count its references are
    written from the data, so adding a party cannot leave a wrong figure in the
    copy — and a country change rewrites them all through applyCountry(). */
@@ -2825,6 +4917,7 @@ applyCountry();
 buildForm();
 renderChrome();
 render();
+route();   /* a reload on #questionnaire/... lands back on the questionnaire */
 </script>
 </body>
 </html>

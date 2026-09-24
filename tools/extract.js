@@ -16,20 +16,26 @@ const { execFileSync } = require("child_process");
 const { decodePNG } = require("./lib/png.js");
 const { encodePNG, cropScale } = require("./lib/png-encode.js");
 const X = require("./politi-dissect.js");
+const Q = require("./politi-quiz.js");
 
 const ROOT = path.join(__dirname, "..");
 const SRC = path.join(ROOT, "politi-results");
 const CACHE = path.join(SRC, ".extract-cache.json");
+/* Questionnaire answers exported from the page, one file per profile. They sit
+   beside the screenshots, so they are as local and as ignored by git. */
+const ANSWERS = path.join(SRC, "answers");
 const OUT = path.join(ROOT, "profiles-data.js");
 const PAGE = path.join(ROOT, "index.html");       /* generated, not committed */
 const TEMPLATE = path.join(ROOT, "template.html"); /* committed source, no data */
-/* The two files shared with the browser, each inlined into its own marked
-   block: the screenshot reader, and the compass model. */
+/* The files shared with the browser, each inlined into its own marked block:
+   the screenshot reader, the compass model, and the questionnaire. */
 const SHARED = [
   { file: path.join(__dirname, "politi-dissect.js"),
     start: "/* POLITI-EXTRACTOR:START */", end: "/* POLITI-EXTRACTOR:END */" },
   { file: path.join(__dirname, "politi-model.js"),
-    start: "/* POLITI-MODEL:START */", end: "/* POLITI-MODEL:END */" }
+    start: "/* POLITI-MODEL:START */", end: "/* POLITI-MODEL:END */" },
+  { file: path.join(__dirname, "politi-quiz.js"),
+    start: "/* POLITI-QUIZ:START */", end: "/* POLITI-QUIZ:END */" }
 ];
 
 /* Replaces the content between two markers, leaving the rest untouched. */
@@ -220,6 +226,97 @@ function existingProfileCount() {
   return Array.isArray(list) ? list.length : Infinity;
 }
 
+/* ------------------------------------------------------------ answers ---
+   A group answers on as many machines as it has members, and each browser
+   keeps its own answers. "Exporter mes réponses" on the page writes one file;
+   dropped in politi-results/answers/, it is folded into the page like a
+   screenshot, and read by tools/model-check.js.
+
+   Every key and value is checked against the item bank: an answer file is
+   input from someone else's machine, and a wrong index would score silently. */
+const SALIENCE = new Set(Q.THEMES.filter(t => !t.planned)
+  .flatMap(t => ["salience." + t.key, "salience." + t.key + ".after"]));
+
+function answerProblem(key, v) {
+  if (SALIENCE.has(key))
+    return Number.isInteger(v) && v >= 0 && v < Q.SCALES.salience.values.length ? null : "bad salience";
+  const item = Q.itemById(key);
+  if (!item || item.reserve) return "unknown item";
+  const scale = Q.SCALES[item.scale];
+  if (v === "dk") return scale.dk ? null : "no \"can't choose\" on this item";
+  return Number.isInteger(v) && v >= 0 && v < scale.values.length ? null : "out of range";
+}
+
+function readAnswers() {
+  if (!fs.existsSync(ANSWERS)) return [];
+  const out = [];
+  for (const file of fs.readdirSync(ANSWERS).filter(f => /\.json$/i.test(f)).sort()) {
+    let data;
+    try { data = JSON.parse(fs.readFileSync(path.join(ANSWERS, file), "utf8")); }
+    catch (e) { console.log("  ! answers/" + file + "  not JSON: " + e.message); continue; }
+    if (!data || data.format !== "politiskel-answers" || data.version !== 1
+        || typeof data.alias !== "string" || !data.alias.trim()
+        || !data.answers || typeof data.answers !== "object") {
+      console.log("  ! answers/" + file + "  not a Politiskel answers file (format, version 1)");
+      continue;
+    }
+    const answers = {}, bad = [];
+    for (const [k, v] of Object.entries(data.answers)) {
+      const why = answerProblem(k, v);
+      if (why) bad.push(k + " (" + why + ")"); else answers[k] = v;
+    }
+    /* when it was exported: the file's own stamp, else when it landed here */
+    const stamp = typeof data.exported === "string" && !isNaN(Date.parse(data.exported))
+      ? Date.parse(data.exported) : fs.statSync(path.join(ANSWERS, file)).mtimeMs;
+    out.push({ file, stamp, alias: data.alias.trim(),
+               source: typeof data.source === "string" ? data.source : null, answers });
+    console.log("  + answers/" + file.padEnd(28) + " " + data.alias.trim().padEnd(9)
+      + Object.keys(answers).length + " answers"
+      + (bad.length ? "   [skipped: " + bad.join(", ") + "]" : ""));
+  }
+  return out;
+}
+
+/* Decides, once and here, whose answers each file holds, so that the page and
+   tools/model-check.js see the same profiles.
+
+   - A file naming a screenshot that is here completes that profile.
+   - One that names none, or one that is not here, but whose alias is a
+     screenshot's, completes that profile too: someone who first answered on
+     their own copy without their capture is still the same person.
+   - Otherwise it is a questionnaire-only profile, known by its alias.
+   - Several files for the same profile — an export done twice arrives as
+     "alice-reponses (1).json" — keep the most recent; the others are named
+     and dropped, or the same person would count twice in every check. */
+function resolveAnswers(files, profiles) {
+  const byKey = new Map();
+  for (const a of files) {
+    let source = a.source && profiles.some(p => p.source === a.source) ? a.source : null;
+    if (!source) {
+      const same = profiles.find(p => p.alias.toLowerCase() === a.alias.toLowerCase());
+      if (same) {
+        console.log("  ? answers/" + a.file + ": " + (a.source ? a.source + " is not here; " : "")
+          + "matched to " + same.source + " by its alias");
+        source = same.source;
+      } else if (a.source) {
+        console.log("  ? answers/" + a.file + ": " + a.source
+          + " is not here — kept as a questionnaire-only profile");
+      }
+    }
+    const key = source || "alias:" + a.alias.toLowerCase();
+    const prev = byKey.get(key);
+    if (prev) {
+      const [keep, drop] = a.stamp >= prev.stamp ? [a, prev] : [prev, a];
+      console.log("  ? answers/" + drop.file + " and answers/" + keep.file
+        + " are the same profile — keeping the later, " + keep.file);
+      byKey.set(key, Object.assign({}, keep, { source }));
+    } else {
+      byKey.set(key, Object.assign({}, a, { source }));
+    }
+  }
+  return [...byKey.values()].map(a => ({ alias: a.alias, source: a.source, answers: a.answers }));
+}
+
 function main() {
   /* No screenshots is not an error: the page works without them — a profile
      can be dropped onto it or typed in by hand. Failing here left whoever
@@ -299,7 +396,9 @@ function main() {
   const banner = "/* Generated by tools/extract.js — do not edit by hand.\n"
     + "   Source: politi-results/  ·  " + profiles.length + " profile(s)\n"
     + "   Regenerate: node tools/extract.js */\n";
-  const dataJs = "window.POLITI_PROFILES = " + JSON.stringify(profiles, null, 1) + ";";
+  const answers = resolveAnswers(readAnswers(), profiles);
+  const dataJs = "window.POLITI_PROFILES = " + JSON.stringify(profiles, null, 1) + ";"
+    + "\nwindow.POLITI_ANSWERS = " + JSON.stringify(answers, null, 1) + ";";
   fs.writeFileSync(OUT, banner + dataJs + "\n");
 
   /* The extractor and the data are also copied INTO index.html. A file:// page
@@ -309,6 +408,7 @@ function main() {
   const injected = inject(profiles.length, dataJs);
 
   console.log("\n" + fresh + " extracted, " + reused + " cached, " + failed + " failed"
+    + (answers.length ? ", answers for " + answers.length + " profile(s)" : "")
     + "  →  " + path.relative(ROOT, OUT)
     + " (" + (fs.statSync(OUT).size / 1024).toFixed(1) + " KB)"
     + (injected ? "\n   index.html rebuilt (extractor + data inlined, "
