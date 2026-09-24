@@ -2650,6 +2650,7 @@ const LOCALES = {
     flagsPolitiscales: "PolitiScales quand il existe", flagsPolitiskel: "Politiskel pour tous",
     flagGeneratedAlt: a => "Drapeau Politiskel de " + a,
     manualEntry: "Saisir les pourcentages à la main",
+    flagInTriangle: "Dans le triangle — ", flagOnBand: "Sur la bande — ",
     flagEnlarge: "Agrandir", flagShrink: "Taille par défaut",
     flagFigureTitle: "Drapeau Politiskel — tiré des lectures, selon les conventions des drapeaux "
       + "politiques :",
@@ -4894,7 +4895,8 @@ const FLAG_ICONS = {
                orange: the centre · black, as structure: marked
                libertarianism
      layouts   the anarchist per-bend diagonal (black at the lower fly), the
-               revolutionary hoist triangle and star, a white field with a
+               revolutionary hoist triangle (its star, or the profile's fist
+               or Phrygian cap in its place), a white field with a
                gold border for order and tradition — or for monarchism, once a
                question measures it — the Nordic cross for order, a Y-shaped
                pall for multiculturalism, canton and stripes for
@@ -4923,6 +4925,8 @@ const FLAG_COLOURS = {
 const FLAG_LIGHT = new Set(["gold", "white", "pink", "orange", "sky"]);
 const FLAG_RAINBOW = ["#e40303", "#ff8c00", "#ffed00", "#008026", "#004dff", "#750787"];
 const FLAG_KEY = "politicompass.flags.v1";
+/* symbols of revolution, which may take the revolutionary triangle */
+const FLAG_REBEL = new Set(["fist", "phrygian", "anarchy"]);
 
 /* Readings a future theme will provide — the institutions theme will measure
    monarchism. Until then they are absent and what depends on them never
@@ -5061,6 +5065,7 @@ function politiskelFlag(c, p) {
   let places = [];   /* [{ x, y, size, bg }] — where the symbols go, first the main one */
   let drawn = [];    /* the meaningful colours shown, for the legend */
   let syms = t.syms.slice();
+  let layoutStar = false;   /* the revolution layout's own star, drawn for want of a symbol */
 
   if (layout === "diagonal") {
     const other = a === "white" ? "black" : a;
@@ -5073,10 +5078,14 @@ function politiskelFlag(c, p) {
     P.push('<rect width="150" height="100" fill="' + C(band) + '"/>',
            '<rect y="33.3" width="150" height="33.4" fill="' + C("white") + '"/>',
            '<polygon points="0,0 70,50 0,100" fill="' + C(tri) + '"/>');
-    /* the triangle keeps the revolution's star unless a symbol claims it */
-    const star = !syms.some(s => s.symbol === "star");
+    /* The layout already says revolution, so the triangle goes to the
+       profile's own revolutionary symbol when it has one — a star repeating
+       the triangle is then dropped — and keeps the star otherwise. */
+    const claim = syms.find(s => FLAG_REBEL.has(s.symbol)) || syms.find(s => s.symbol === "star");
+    const star = !claim;
     if (star) P.push(flagIcon("star", 24, 50, 26, "#ffffff"));
-    else syms = [syms.find(s => s.symbol === "star")].concat(syms.filter(s => s.symbol !== "star"));
+    else syms = [claim].concat(syms.filter(s => s !== claim && s.symbol !== "star"));
+    layoutStar = star;
     places = star ? [{ x: 108, y: 50, size: 30, bg: "white" }, { x: 132, y: 84, size: 18, bg: band }]
                   : [{ x: 24, y: 50, size: 26, bg: tri }, { x: 108, y: 50, size: 30, bg: "white" }];
     /* a black band chosen for want of a second colour is filler, not a reading */
@@ -5152,8 +5161,7 @@ function politiskelFlag(c, p) {
   const svg = '<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 150 100" width="150" height="100">'
     + P.join("") + "</svg>";
   return { url: "data:image/svg+xml;charset=utf-8," + encodeURIComponent(svg), layout,
-           legend: flagLegend(t, drawn, layout, shown, border, rainbow,
-                              !t.syms.some(s => s.symbol === "star")) };
+           legend: flagLegend(t, drawn, layout, shown, border, rainbow, layoutStar) };
 }
 
 /* One line per element, in the order the eye reads a flag. */
@@ -5163,7 +5171,11 @@ function flagLegend(t, drawn, layout, shown, border, rainbow, starOfLayout) {
   for (const k of drawn) lines.push(L.flagColourLines[k](strength(k), t));
   if (layout === "diagonal") lines.push(L.flagColourLines.black(Math.round(-t.y)));
   if (layout === "revolution" && starOfLayout) lines.push(L.flagRevolutionStar(Math.round(t.rev)));
-  shown.forEach((s, i) => lines.push((i ? L.flagSecond : "") + L.flagSymbolLines[s.symbol](s.v)));
+  /* In the revolution layout without its own star, the triangle holds the
+     first symbol and the white band the second, larger: say where, not "smaller". */
+  const inTriangle = layout === "revolution" && !starOfLayout;
+  shown.forEach((s, i) => lines.push((inTriangle ? (i ? L.flagOnBand : L.flagInTriangle) : i ? L.flagSecond : "")
+    + L.flagSymbolLines[s.symbol](s.v)));
   if (rainbow) lines.push(L.flagRainbow(Math.round(t.lgbt)));
   if (border) lines.push(L.flagBorder(Math.round(t.prot)));
   return lines;
