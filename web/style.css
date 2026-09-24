@@ -247,7 +247,12 @@
   tbody tr.on td { background: var(--series-1-soft); }
   td .swatch { display: inline-block; width: 9px; height: 9px; border-radius: 50%;
                background: var(--series-1); margin-right: 7px; vertical-align: -1px; }
-  td .fam { white-space: normal; }
+  /* the nearest-party cell wraps, so the alias column keeps room for the
+     three concepts instead of stacking them one word per line */
+  td.fam { white-space: normal; min-width: 11em; }
+  /* one line each: the party, how near, the runner-up — cut there rather
+     than wherever the width happens to fall */
+  td.fam .tag { display: block; }
   .tag { font-size: 0.7rem; color: var(--text-3); }
   /* The runner-up when the two are within a toss-up of each other. On its own
      line: it is secondary, and inline it pushed the table past its card. */
@@ -534,6 +539,12 @@
   .flag-drawn.large { width: 100%; max-width: 560px; }
   .flag-legend { margin: 8px 0 0; padding-left: 18px; font-size: 0.78rem; color: var(--text-2); }
   .flag-legend li { margin-bottom: 3px; }
+  #detail-readings { margin-top: 16px; padding-top: 14px; border-top: 1px solid var(--border); }
+  #detail-readings > .flag-figure:first-child { border-top: none; padding-top: 0; }
+  .manual { margin-top: 12px; }
+  .manual summary { cursor: pointer; font-size: 0.85rem; color: var(--text-2); padding: 4px 0; }
+  .manual summary:hover { color: var(--text); }
+  .manual[open] summary { margin-bottom: 8px; }
   .flag-figure .note { margin: 8px 0 0; font-size: 0.72rem; color: var(--text-3); }
 
   /* server mode: the site's tabs and pages */

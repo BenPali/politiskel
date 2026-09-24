@@ -315,6 +315,8 @@ function readCapture(file) {
          tesseract; in the browser we leave the field empty rather than invent
          something. Key concepts, on the other hand, are computed. */
       pendingCapture = { flag, source: file.name, values: { ...res.values } };
+      /* the read values land in the form, to be checked and submitted there */
+      $("manual-entry").open = true;
       const concepts = PolitiExtract.keyConcepts(res.values, 3)
         .map(x => L.pole[x.key]).join(" · ");
       captureFeedback("ok", L.captureOk(alias, concepts)

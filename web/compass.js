@@ -671,7 +671,7 @@ function render() {
     } else {
     const tag = document.createElement("span");
     tag.className = "tag";
-    tag.textContent = " · " + fitPhrase(nearest.d) + " (" + nearest.d + ")";
+    tag.textContent = fitPhrase(nearest.d) + " (" + nearest.d + ")";
     if (nearest.d > LIMITS.far) tag.classList.add("far-note");
     tdFam.append(document.createTextNode(nearest.name), tag);
     }
@@ -735,7 +735,7 @@ function render() {
   applyView();   /* its note counts the profiles left off, which answers change */
   renderStrips(computed);
   renderCentroid(placed, annot);
-  renderAnnotations(computed, annot);
+  renderAnnotations(computed, annot, taken);
   renderDetail(computed);
   ptsLayer.classList.toggle("dim", !!selection);
   refsLayer.classList.toggle("dim", !!selection);
@@ -993,9 +993,26 @@ function renderCentroid(computed, annot) {
   annot.appendChild(g);
 }
 
+/* Where a ring's figure goes: the top of the ring unless a label or a
+   tick already sits there, then the first free spot further round. The
+   figure was always drawn at the top, over whatever party was there. */
+function ringCapSpot(ox, oy, r, text, taken) {
+  const w = text.length * 5.5 + 2, h = 9;
+  for (const deg of [-90, -65, -115, -40, -140, -15, -165, 15, 165, 90]) {
+    const a = deg * Math.PI / 180;
+    const x = ox + (r + 5) * Math.cos(a), y = oy + (r + 5) * Math.sin(a) + 3;
+    const box = { x0: x - w / 2, x1: x + w / 2, y0: y - h * 0.8, y1: y + h * 0.3 };
+    if (box.x0 < 52 || box.x1 > 548 || box.y0 < 52 || box.y1 > 548) continue;
+    if (taken.some(t => overlaps(t, box))) continue;
+    taken.push(box);
+    return { x, y };
+  }
+  return { x: ox, y: oy - r - 3 };
+}
+
 /* Around the selection: the two proximity thresholds (derived, see SPACING)
    and a line to the three nearest neighbours. */
-function renderAnnotations(computed, annot) {
+function renderAnnotations(computed, annot, taken) {
   if (!selection) return;
   const origin = selection.kind === "profile"
     ? (computed[selection.i] ? computed[selection.i].c : null)
@@ -1006,7 +1023,8 @@ function renderAnnotations(computed, annot) {
   annot.appendChild(el("circle", { class: "sel-disc", cx: ox, cy: oy, r: 50 }));
   for (const [d, r] of [[LIMITS.near, LIMITS.near * 2.5], [LIMITS.far, LIMITS.far * 2.5]]) {
     annot.appendChild(el("circle", { class: "sel-ring", cx: ox, cy: oy, r }));
-    const t = el("text", { class: "sel-ring-cap", x: ox, y: oy - r - 3, "text-anchor": "middle" });
+    const spot = ringCapSpot(ox, oy, r, String(d), taken);
+    const t = el("text", { class: "sel-ring-cap", x: spot.x, y: spot.y, "text-anchor": "middle" });
     t.textContent = d;
     annot.appendChild(t);
   }

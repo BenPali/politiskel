@@ -254,7 +254,12 @@
   tbody tr.on td { background: var(--series-1-soft); }
   td .swatch { display: inline-block; width: 9px; height: 9px; border-radius: 50%;
                background: var(--series-1); margin-right: 7px; vertical-align: -1px; }
-  td .fam { white-space: normal; }
+  /* the nearest-party cell wraps, so the alias column keeps room for the
+     three concepts instead of stacking them one word per line */
+  td.fam { white-space: normal; min-width: 11em; }
+  /* one line each: the party, how near, the runner-up — cut there rather
+     than wherever the width happens to fall */
+  td.fam .tag { display: block; }
   .tag { font-size: 0.7rem; color: var(--text-3); }
   /* The runner-up when the two are within a toss-up of each other. On its own
      line: it is secondary, and inline it pushed the table past its card. */
@@ -541,6 +546,12 @@
   .flag-drawn.large { width: 100%; max-width: 560px; }
   .flag-legend { margin: 8px 0 0; padding-left: 18px; font-size: 0.78rem; color: var(--text-2); }
   .flag-legend li { margin-bottom: 3px; }
+  #detail-readings { margin-top: 16px; padding-top: 14px; border-top: 1px solid var(--border); }
+  #detail-readings > .flag-figure:first-child { border-top: none; padding-top: 0; }
+  .manual { margin-top: 12px; }
+  .manual summary { cursor: pointer; font-size: 0.85rem; color: var(--text-2); padding: 4px 0; }
+  .manual summary:hover { color: var(--text); }
+  .manual[open] summary { margin-bottom: 8px; }
   .flag-figure .note { margin: 8px 0 0; font-size: 0.72rem; color: var(--text-3); }
 
   /* server mode: the site's tabs and pages */
@@ -2293,7 +2304,6 @@ window.POLITI_PROFILES = [];
       <div class="card" id="detail-card">
         <h2 id="detail-title" data-i18n="distances"></h2>
         <div class="id-card" id="detail-id" hidden></div>
-        <div id="detail-readings" hidden></div>
         <p class="hint" id="detail-hint"></p>
         <div class="table-scroll" id="detail-wrap" hidden>
           <table id="detail-table">
@@ -2310,6 +2320,8 @@ window.POLITI_PROFILES = [];
             <tbody></tbody>
           </table>
         </div>
+        <!-- after the parties: the card's first question is "who is near" -->
+        <div id="detail-readings" hidden></div>
       </div>
     </div>
 
@@ -2344,6 +2356,8 @@ window.POLITI_PROFILES = [];
     </p>
     <div class="capture-ok" id="capture-ok" hidden></div>
 
+    <details class="manual" id="manual-entry">
+    <summary data-i18n="manualEntry"></summary>
     <p class="hint">
       Saisissez les pourcentages PolitiScales (0-100). Les deux pôles d'un même axe ne
       peuvent pas dépasser 100 % à eux deux — le reste est la part neutre.
@@ -2361,6 +2375,7 @@ window.POLITI_PROFILES = [];
         <button type="button" class="ghost" id="clear-btn" data-i18n="clear"></button>
       </div>
     </form>
+    </details>
   </div>
 
   </main>
@@ -2610,6 +2625,7 @@ const LOCALES = {
     optFlags: "Drapeaux",
     flagsPolitiscales: "PolitiScales quand il existe", flagsPolitiskel: "Politiskel pour tous",
     flagGeneratedAlt: a => "Drapeau Politiskel de " + a,
+    manualEntry: "Saisir les pourcentages à la main",
     flagEnlarge: "Agrandir", flagShrink: "Taille par défaut",
     flagFigureTitle: "Drapeau Politiskel — tiré des lectures, selon les conventions des drapeaux "
       + "politiques :",
@@ -3584,7 +3600,7 @@ function render() {
     } else {
     const tag = document.createElement("span");
     tag.className = "tag";
-    tag.textContent = " · " + fitPhrase(nearest.d) + " (" + nearest.d + ")";
+    tag.textContent = fitPhrase(nearest.d) + " (" + nearest.d + ")";
     if (nearest.d > LIMITS.far) tag.classList.add("far-note");
     tdFam.append(document.createTextNode(nearest.name), tag);
     }
@@ -3648,7 +3664,7 @@ function render() {
   applyView();   /* its note counts the profiles left off, which answers change */
   renderStrips(computed);
   renderCentroid(placed, annot);
-  renderAnnotations(computed, annot);
+  renderAnnotations(computed, annot, taken);
   renderDetail(computed);
   ptsLayer.classList.toggle("dim", !!selection);
   refsLayer.classList.toggle("dim", !!selection);
@@ -3906,9 +3922,26 @@ function renderCentroid(computed, annot) {
   annot.appendChild(g);
 }
 
+/* Where a ring's figure goes: the top of the ring unless a label or a
+   tick already sits there, then the first free spot further round. The
+   figure was always drawn at the top, over whatever party was there. */
+function ringCapSpot(ox, oy, r, text, taken) {
+  const w = text.length * 5.5 + 2, h = 9;
+  for (const deg of [-90, -65, -115, -40, -140, -15, -165, 15, 165, 90]) {
+    const a = deg * Math.PI / 180;
+    const x = ox + (r + 5) * Math.cos(a), y = oy + (r + 5) * Math.sin(a) + 3;
+    const box = { x0: x - w / 2, x1: x + w / 2, y0: y - h * 0.8, y1: y + h * 0.3 };
+    if (box.x0 < 52 || box.x1 > 548 || box.y0 < 52 || box.y1 > 548) continue;
+    if (taken.some(t => overlaps(t, box))) continue;
+    taken.push(box);
+    return { x, y };
+  }
+  return { x: ox, y: oy - r - 3 };
+}
+
 /* Around the selection: the two proximity thresholds (derived, see SPACING)
    and a line to the three nearest neighbours. */
-function renderAnnotations(computed, annot) {
+function renderAnnotations(computed, annot, taken) {
   if (!selection) return;
   const origin = selection.kind === "profile"
     ? (computed[selection.i] ? computed[selection.i].c : null)
@@ -3919,7 +3952,8 @@ function renderAnnotations(computed, annot) {
   annot.appendChild(el("circle", { class: "sel-disc", cx: ox, cy: oy, r: 50 }));
   for (const [d, r] of [[LIMITS.near, LIMITS.near * 2.5], [LIMITS.far, LIMITS.far * 2.5]]) {
     annot.appendChild(el("circle", { class: "sel-ring", cx: ox, cy: oy, r }));
-    const t = el("text", { class: "sel-ring-cap", x: ox, y: oy - r - 3, "text-anchor": "middle" });
+    const spot = ringCapSpot(ox, oy, r, String(d), taken);
+    const t = el("text", { class: "sel-ring-cap", x: spot.x, y: spot.y, "text-anchor": "middle" });
     t.textContent = d;
     annot.appendChild(t);
   }
@@ -5466,6 +5500,8 @@ function readCapture(file) {
          tesseract; in the browser we leave the field empty rather than invent
          something. Key concepts, on the other hand, are computed. */
       pendingCapture = { flag, source: file.name, values: { ...res.values } };
+      /* the read values land in the form, to be checked and submitted there */
+      $("manual-entry").open = true;
       const concepts = PolitiExtract.keyConcepts(res.values, 3)
         .map(x => L.pole[x.key]).join(" · ");
       captureFeedback("ok", L.captureOk(alias, concepts)
