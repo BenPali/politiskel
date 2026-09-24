@@ -329,7 +329,22 @@ function resolveAnswers(files, profiles) {
   return [...byKey.values()].map(a => ({ alias: a.alias, source: a.source, answers: a.answers }));
 }
 
+/* A screen asks one item, in a mixed order: an instruction that speaks of a
+   list ("les affirmations suivantes", "que je vais vous citer") promises
+   questions the next screen does not ask. politi-quiz.js gives each survey
+   stem a one-item version; this catches a new stem left without one. */
+function checkScreenStems() {
+  const LIST = /\b(suivant(e)?s|chacun(e)? de|chacun(e)? d'|je vais|cette carte|cette liste|une liste|un certain nombre|ces échelles|avec elles)\b/i;
+  const bad = Q.ITEMS.filter(i => !i.reserve && i.ask && LIST.test(i.ask));
+  for (const i of bad) console.log("  ! " + i.id + "  its screen instruction speaks of a list: « " + i.ask + " »");
+  if (bad.length) {
+    console.error(bad.length + " item(s) need a one-item instruction in SCREEN_STEMS (tools/politi-quiz.js) — aborting.");
+    process.exit(1);
+  }
+}
+
 function main() {
+  checkScreenStems();
   /* No screenshots is not an error: the page works without them — a profile
      can be dropped onto it or typed in by hand. Failing here left whoever
      just cloned the repository with no index.html at all, and no way to get

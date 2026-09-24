@@ -415,7 +415,9 @@ const LOCALES = {
     quizHint: "Chaque question est reprise telle quelle d'une grande enquête publique (ESS, ISSP, "
       + "EVS), dans sa version française officielle, avec sa source. Les exceptions sont "
       + "signalées : l'échelle de classe d'Erik Olin Wright n'existe pas en français, elle est "
-      + "traduite ici. Vous pouvez passer une question ; vos réponses restent dans ce navigateur.",
+      + "traduite ici. Seule la consigne est mise au singulier : l'enquête pose ses questions en "
+      + "série, ici chaque écran n'en pose qu'une. Vous pouvez passer une question ; vos réponses "
+      + "restent dans ce navigateur.",
     quizStart: "Commencer", quizResume: "Reprendre", quizPrev: "← Précédent",
     quizNext: "Suivant →", quizSkip: "Passer", quizSeeResult: "Voir le résultat →",
     quizErase: "Effacer mes réponses",

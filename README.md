@@ -136,7 +136,12 @@ No item is written for Politiskel. Each is quoted from a field-tested survey —
 the European Social Survey, the International Social Survey Programme, the
 European Values Study — in its official French questionnaire, and carries its
 source down to the variable. The one set that has no French version, Erik Olin
-Wright's class scale, is translated and flagged as such on every item.
+Wright's class scale, is translated and flagged as such on every item. Only
+the instruction above an item is adapted: a survey writes it for a grid asked
+in a row ("each of the following statements"), and here each screen asks one
+item in a mixed order, so the screen shows it in the singular. The official
+stem stays in the item bank as its provenance, and the build refuses an
+instruction that still speaks of a list.
 
 The economy theme asks 32 items and feeds five readings; the society theme
 asks 40 and feeds y.

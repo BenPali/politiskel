@@ -653,6 +653,51 @@
       fr: "…d'être né en France" }, NI23("Q01_A"))
   ];
 
+  /* What a screen shows above its question. A survey's stem introduces a
+     grid — "each of the following statements", "the things I am going to
+     read you", "using this card" — and here each screen asks one item, in a
+     mixed order: repeated as is, the stem promised a run of questions that
+     the next, unrelated screen broke. So `stem` keeps the official wording,
+     the item's provenance, which the source check compares; `ask` is what the
+     screen shows: the same instruction, for one item, with no interviewer or
+     card. The item's own wording is never touched. A stem missing here that
+     speaks of a list is caught by tools/extract.js. */
+  const AGREE_ONE = "Êtes-vous d'accord ou pas d'accord avec l'affirmation suivante ?";
+  const SCREEN_STEMS = new Map([
+    [SPEND_STEM, "Souhaiteriez-vous que le gouvernement dépense plus ou moins dans le domaine suivant ? "
+      + "N'oubliez pas que dépenser « beaucoup plus » peut entraîner une augmentation des impôts, taxes "
+      + "ou cotisations sociales."],
+    [OWNER_STEM, "Qui, d'après vous, devrait principalement gérer le service suivant, l'État ou le secteur privé ?"],
+    [ACTIONS_STEM, "Voici une action économique qu'un gouvernement peut mener. Y êtes-vous favorable ou défavorable ?"],
+    [IMMIG_STEM, "Il existe différentes opinions concernant les immigrés venus d'autres pays pour vivre en France. "
+      + "Êtes-vous d'accord ou pas d'accord avec l'affirmation suivante ?"],
+    [IMMIG_STEM_13, "Il existe différentes opinions concernant les immigrés venus d'autres pays pour vivre en France. "
+      + "Êtes-vous d'accord ou pas d'accord avec l'affirmation suivante ?"],
+    [REFUGEE_STEM, "Certaines personnes arrivent en France et demandent le statut de réfugié parce qu'elles "
+      + "craignent des persécutions dans leur propre pays. Êtes-vous d'accord ou pas d'accord avec la "
+      + "proposition suivante ?"],
+    [MINORITIES_STEM, "À propos des minorités en France : êtes-vous d'accord ou pas d'accord avec l'affirmation suivante ?"],
+    [EVS_SCALES_STEM, "Personnellement, où vous situez-vous sur cette échelle ?"],
+    [EVS_AGREE_STEM, AGREE_ONE],
+    [NI_AGREE_STEM, AGREE_ONE],
+    [NI13_AGREE_STEM, "Êtes-vous d'accord ou pas d'accord avec la proposition suivante ?"],
+    [EVS_OPINIONS_STEM, "Êtes-vous tout à fait d'accord, plutôt d'accord, plutôt pas d'accord ou pas d'accord "
+      + "du tout avec l'opinion suivante ?"],
+    [EVS_JUSTIF_STEM, "Pensez-vous que ce qui suit peut toujours se justifier, ne peut jamais se justifier, ou "
+      + "que c'est entre les deux ?"],
+    [PROTEST_STEM, "Il y a plusieurs façons de s'opposer à une décision gouvernementale que l'on désapprouve "
+      + "fortement. De votre point de vue, l'action suivante doit-elle être autorisée ou non autorisée ?"],
+    [ESS_B38_STEM, "Dans quelle mesure êtes-vous d'accord ou non avec la proposition suivante ?"],
+    [ESS_B33_STEM, "Dans quelle mesure êtes-vous d'accord ou non avec la phrase suivante ?"],
+    [FAM_STEM, "Dans quelle mesure êtes-vous d'accord ou pas d'accord avec la proposition suivante ?"],
+    [FAM_FR_STEM, "Êtes-vous tout à fait d'accord, plutôt d'accord, plutôt pas d'accord ou pas d'accord du "
+      + "tout avec la phrase suivante ?"],
+    [FAMILIES_STEM, "Les enfants grandissent dans différents types de familles. Dans quelle mesure êtes-vous "
+      + "d'accord ou pas d'accord avec l'affirmation suivante ?"],
+    ["Voici plusieurs affirmations : pouvez-vous me dire si vous êtes d'accord ou pas d'accord avec elles ?", AGREE_ONE]
+  ]);
+  for (const item of ITEMS) if (item.stem) item.ask = SCREEN_STEMS.get(item.stem) || item.stem;
+
   /* The economy is the first theme, not the only one. The others are listed
      so the page can say what is coming; each has its counterpart in CHES, so
      its readings will be comparable to the parties like x is. `planned`
@@ -683,9 +728,9 @@
      than a seeded shuffle: adding an item slots it in somewhere without
      moving any of the others, where a shuffle would deal the whole deck
      again. Items of a shared grid need no special care, since every screen
-     repeats the grid's stem; an item whose wording leans on the one before
-     it says so with `follows`, and the two travel as one block, placed by the
-     first one's hash. */
+     shows its instruction in the singular (`ask`, above); an item whose
+     wording leans on the one before it says so with `follows`, and the two
+     travel as one block, placed by the first one's hash. */
   function hashId(id) {
     let h = 0x811c9dc5;
     for (let k = 0; k < id.length; k++) {

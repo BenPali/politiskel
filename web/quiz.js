@@ -265,7 +265,7 @@ function renderQuiz() {
   } else {
     const item = sc.item;
     questionScreen(card, {
-      key: item.id, scale: PolitiQuiz.SCALES[item.scale], text: item.fr, stem: item.stem,
+      key: item.id, scale: PolitiQuiz.SCALES[item.scale], text: item.fr, stem: item.ask,
       left: item.left, right: item.right, note: item.note,
       source: sourceLine(item.src, item.translated)
     }, saved[item.id]);
