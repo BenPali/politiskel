@@ -39,6 +39,39 @@ journalctl -u politiskel -f                       # "listening on http://127.0.0
 
 The database is created and migrated on start.
 
+### Without root
+
+On a host where you have an account but no `sudo` — the proxy belongs to
+someone else — the service runs as a systemd *user* service, everything under
+your home directory:
+
+```
+mkdir -p ~/politiskel/data ~/politiskel/backups && chmod 700 ~/politiskel ~/politiskel/data ~/politiskel/backups
+# politiskel-server, template.html and a politiskel.env with absolute paths
+# under /home/<you>/politiskel go into ~/politiskel/
+mkdir -p ~/.config/systemd/user
+# politiskel.service, politiskel-backup.service and .timer: the deploy/ ones,
+# with User/Group and the hardening lines dropped and paths as %h/politiskel/…
+systemctl --user daemon-reload
+systemctl --user enable --now politiskel.service politiskel-backup.timer
+loginctl show-user $USER -p Linger     # must be yes, or the service stops at logout
+```
+
+`Linger=no` needs the host's `sudo loginctl enable-linger <you>` once. Ask the
+host which local port their proxy sends your name to, and set
+`POLITISKEL_ADDR` to it. Open the first account from the server itself
+before the name goes public — on a closed site the first account is the only
+one taken without an invitation:
+
+```
+ curl -s -X POST http://127.0.0.1:PORT/api/register -H 'Content-Type: application/json' \
+      -H 'Origin: http://127.0.0.1:PORT' -d '{"username":"…","password":"…","consent":true}'
+```
+
+(the leading space keeps the password out of the shell's history). Packing
+the files on a Mac, set `COPYFILE_DISABLE=1` before `tar`, or macOS adds
+`._*` files.
+
 ## 3. The reverse proxy
 
 - **nginx**: `deploy/nginx.conf` into `/etc/nginx/sites-available/`, enable
