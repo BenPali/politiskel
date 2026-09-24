@@ -610,6 +610,30 @@
                      margin-bottom: 10px; }
   .account .status { color: var(--text-3); font-size: 0.78rem; }
   .account .note { color: var(--text-3); font-size: 0.75rem; margin: 8px 0 0; max-width: 90ch; }
+  /* the compass's group header: which group, who is in it, where to go */
+  .group-head { padding: 16px 20px; }
+  .group-top { display: flex; flex-wrap: wrap; align-items: flex-end; justify-content: space-between;
+               gap: 12px 20px; }
+  .group-title { display: flex; flex-wrap: wrap; align-items: baseline; gap: 2px 10px; min-width: 0; }
+  .group-title .eyebrow { flex-basis: 100%; font-size: 0.68rem; font-weight: 600; letter-spacing: 0.07em;
+                          text-transform: uppercase; color: var(--text-3); }
+  .group-title h2 { margin: 0; font-size: 1.2rem; letter-spacing: -0.01em; }
+  .group-title .count { color: var(--text-3); font-size: 0.82rem; }
+  .group-actions { display: flex; flex-wrap: wrap; align-items: center; gap: 8px; }
+  .group-actions select { padding: 7px 10px; cursor: pointer; font-size: 0.82rem; }
+  .group-actions .ghost, .group-actions a.button.ghost { display: inline-flex; align-items: center; padding: 7px 12px;
+                         font-size: 0.82rem; line-height: 1.2; }
+  .group-head .status { margin: 10px 0 0; }
+  .group-members { display: flex; flex-wrap: wrap; gap: 6px; margin-top: 12px; padding-top: 12px;
+                   border-top: 1px solid var(--border); }
+  .group-members .member { display: inline-flex; align-items: center; gap: 7px; cursor: pointer;
+                           padding: 4px 11px 4px 5px; border-radius: 999px; font: inherit; font-size: 0.8rem;
+                           color: var(--text); background: var(--bg); border: 1px solid var(--border); }
+  .group-members .member:hover { border-color: var(--text-3); }
+  .group-members .member:focus-visible { outline: 2px solid var(--focus); outline-offset: 1px; }
+  .group-members .member.me { background: var(--series-1-soft); border-color: transparent; font-weight: 600; }
+  .group-members .member .flag { margin: 0; width: 22px; height: 13px; border-radius: 2px; }
+  .group-members .member .swatch { margin: 0 0 0 4px; }
   body.server-mode #native-form, body.server-mode #p-alias, body.server-mode label[for=p-alias],
   body.server-mode .drop-note code, body.server-mode #reset-btn,
   body.server-mode button.del { display: none; }
@@ -2697,6 +2721,11 @@ const LOCALES = {
       + "rejoints — et d'eux seuls.",
     loading: "Chargement…", you: "vous",
     groupShown: "Groupe affiché", manageGroups: "Gérer mes groupes →",
+    groupSwitch: "Changer de groupe…", manageGroupsShort: "Gérer les groupes",
+    inviteShort: "Inviter", memberShow: a => "Voir le profil de " + a,
+    groupAloneShort: "Seul votre profil est affiché.",
+    groupAloneLead: "Seul votre profil est affiché : créez un groupe, ou rejoignez celui d'un "
+      + "proche, pour vous comparer.",
     groupsLead: "Vos groupes, leurs membres et leur lien d'invitation. Un groupe ne se voit que "
       + "de l'intérieur : sans invitation, personne ne sait qu'il existe.",
     noGroups: "Vous n'êtes dans aucun groupe pour l'instant : créez-en un, ou rejoignez celui "
@@ -5952,20 +5981,58 @@ function renderGroupBar() {
   const box = $("account");
   box.replaceChildren();
   box.hidden = false;
+  box.className = "account group-head";
   const me = SERVER.me;
-  const select = h("select", { ariaLabel: L.groupLabel });
-  select.append(h("option", { value: "", textContent: L.groupNone }));
-  for (const g of me.groups) select.append(h("option", { value: String(g.id), textContent: g.name + " (" + g.members + ")" }));
-  select.value = SERVER.group ? String(SERVER.group.id) : "";
-  select.addEventListener("change", async () => {
-    await chooseGroup(select.value ? Number(select.value) : null);
+  const g = SERVER.group;
+
+  /* A menu rather than a picker: the group on show is the title, so the
+     select only lists where one can go, and snaps back to its prompt. */
+  const others = me.groups.filter(x => !g || x.id !== g.id);
+  const menu = h("select", { ariaLabel: L.groupSwitch });
+  menu.append(h("option", { value: "", textContent: L.groupSwitch, disabled: true, selected: true, hidden: true }));
+  for (const x of others) menu.append(h("option", { value: String(x.id), textContent: x.name + " (" + x.members + ")" }));
+  if (g) menu.append(h("option", { value: "alone", textContent: L.groupNone }));
+  menu.addEventListener("change", async () => {
+    const v = menu.value;
+    await chooseGroup(v === "alone" ? null : Number(v));
     await loadGroup();
     renderGroupBar();
   });
-  box.append(h("div", { className: "row" },
-    h("label", { className: "row" }, L.groupShown + " ", select),
-    h("a", { href: "/groupes", textContent: L.manageGroups }),
-    SERVER.status ? h("span", { className: "status", textContent: SERVER.status }) : null));
+
+  const actions = h("div", { className: "group-actions" },
+    menu.options.length > 1 ? menu : null);
+  if (g) {
+    const link = location.origin + "/rejoindre/" + g.invite;
+    const copy = h("button", { type: "button", className: "ghost", textContent: L.inviteShort, title: L.invite });
+    copy.addEventListener("click", async () => {
+      try { await navigator.clipboard.writeText(link); copy.textContent = L.inviteCopiedShort; }
+      catch (_) { prompt(L.invite, link); }
+    });
+    actions.append(copy);
+  }
+  actions.append(h("a", { href: "/groupes", className: "button ghost", textContent: L.manageGroupsShort }));
+
+  /* who is on the compass: a chip each, which selects that profile */
+  const members = h("div", { className: "group-members" });
+  profiles.forEach((p, i) => {
+    const chip = h("button", { type: "button", className: "member" + (p.me ? " me" : ""),
+                               title: L.memberShow(p.alias) });
+    chip.append(flagEl(p, ""), h("span", { textContent: p.alias + (p.me ? " (" + L.you + ")" : "") }));
+    chip.addEventListener("click", () => {
+      select("profile", i);
+      $("detail-card").scrollIntoView({ behavior: "smooth", block: "start" });
+    });
+    members.append(chip);
+  });
+
+  const title = h("div", { className: "group-title" },
+    h("span", { className: "eyebrow", textContent: L.groupShown }),
+    h("h2", { textContent: g ? g.name : L.groupNone }),
+    h("span", { className: "count", textContent: g ? L.memberCount(g.members)
+      : me.groups.length ? L.groupAloneShort : L.groupAloneLead }));
+  box.append(h("div", { className: "group-top" }, title, actions));
+  if (g) box.append(members);
+  if (SERVER.status) box.append(h("p", { className: "status", textContent: SERVER.status }));
 }
 
 function errorLine() {

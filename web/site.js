@@ -258,20 +258,58 @@ function renderGroupBar() {
   const box = $("account");
   box.replaceChildren();
   box.hidden = false;
+  box.className = "account group-head";
   const me = SERVER.me;
-  const select = h("select", { ariaLabel: L.groupLabel });
-  select.append(h("option", { value: "", textContent: L.groupNone }));
-  for (const g of me.groups) select.append(h("option", { value: String(g.id), textContent: g.name + " (" + g.members + ")" }));
-  select.value = SERVER.group ? String(SERVER.group.id) : "";
-  select.addEventListener("change", async () => {
-    await chooseGroup(select.value ? Number(select.value) : null);
+  const g = SERVER.group;
+
+  /* A menu rather than a picker: the group on show is the title, so the
+     select only lists where one can go, and snaps back to its prompt. */
+  const others = me.groups.filter(x => !g || x.id !== g.id);
+  const menu = h("select", { ariaLabel: L.groupSwitch });
+  menu.append(h("option", { value: "", textContent: L.groupSwitch, disabled: true, selected: true, hidden: true }));
+  for (const x of others) menu.append(h("option", { value: String(x.id), textContent: x.name + " (" + x.members + ")" }));
+  if (g) menu.append(h("option", { value: "alone", textContent: L.groupNone }));
+  menu.addEventListener("change", async () => {
+    const v = menu.value;
+    await chooseGroup(v === "alone" ? null : Number(v));
     await loadGroup();
     renderGroupBar();
   });
-  box.append(h("div", { className: "row" },
-    h("label", { className: "row" }, L.groupShown + " ", select),
-    h("a", { href: "/groupes", textContent: L.manageGroups }),
-    SERVER.status ? h("span", { className: "status", textContent: SERVER.status }) : null));
+
+  const actions = h("div", { className: "group-actions" },
+    menu.options.length > 1 ? menu : null);
+  if (g) {
+    const link = location.origin + "/rejoindre/" + g.invite;
+    const copy = h("button", { type: "button", className: "ghost", textContent: L.inviteShort, title: L.invite });
+    copy.addEventListener("click", async () => {
+      try { await navigator.clipboard.writeText(link); copy.textContent = L.inviteCopiedShort; }
+      catch (_) { prompt(L.invite, link); }
+    });
+    actions.append(copy);
+  }
+  actions.append(h("a", { href: "/groupes", className: "button ghost", textContent: L.manageGroupsShort }));
+
+  /* who is on the compass: a chip each, which selects that profile */
+  const members = h("div", { className: "group-members" });
+  profiles.forEach((p, i) => {
+    const chip = h("button", { type: "button", className: "member" + (p.me ? " me" : ""),
+                               title: L.memberShow(p.alias) });
+    chip.append(flagEl(p, ""), h("span", { textContent: p.alias + (p.me ? " (" + L.you + ")" : "") }));
+    chip.addEventListener("click", () => {
+      select("profile", i);
+      $("detail-card").scrollIntoView({ behavior: "smooth", block: "start" });
+    });
+    members.append(chip);
+  });
+
+  const title = h("div", { className: "group-title" },
+    h("span", { className: "eyebrow", textContent: L.groupShown }),
+    h("h2", { textContent: g ? g.name : L.groupNone }),
+    h("span", { className: "count", textContent: g ? L.memberCount(g.members)
+      : me.groups.length ? L.groupAloneShort : L.groupAloneLead }));
+  box.append(h("div", { className: "group-top" }, title, actions));
+  if (g) box.append(members);
+  if (SERVER.status) box.append(h("p", { className: "status", textContent: SERVER.status }));
 }
 
 function errorLine() {

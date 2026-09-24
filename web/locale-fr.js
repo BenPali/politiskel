@@ -253,6 +253,11 @@ const LOCALES = {
       + "rejoints — et d'eux seuls.",
     loading: "Chargement…", you: "vous",
     groupShown: "Groupe affiché", manageGroups: "Gérer mes groupes →",
+    groupSwitch: "Changer de groupe…", manageGroupsShort: "Gérer les groupes",
+    inviteShort: "Inviter", memberShow: a => "Voir le profil de " + a,
+    groupAloneShort: "Seul votre profil est affiché.",
+    groupAloneLead: "Seul votre profil est affiché : créez un groupe, ou rejoignez celui d'un "
+      + "proche, pour vous comparer.",
     groupsLead: "Vos groupes, leurs membres et leur lien d'invitation. Un groupe ne se voit que "
       + "de l'intérieur : sans invitation, personne ne sait qu'il existe.",
     noGroups: "Vous n'êtes dans aucun groupe pour l'instant : créez-en un, ou rejoignez celui "
