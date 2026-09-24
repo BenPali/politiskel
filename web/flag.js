@@ -159,10 +159,15 @@ function flagLayout(t) {
   return "pale";
 }
 
-function flagIcon(k, cx, cy, size, fill) {
+function flagIcon(k, cx, cy, size, fill, field) {
   const s = size / 512;
-  return FLAG_ICONS[k].map(d => '<path transform="translate(' + (cx - size / 2) + "," + (cy - size / 2)
-    + ") scale(" + s + ')" fill="' + fill + '" d="' + d + '"/>').join("");
+  return FLAG_ICONS[k].map(e => {
+    const d = typeof e === "string" ? e : e.d;
+    if (e.knock && !field) return "";   /* nothing to part the shapes with */
+    return '<path transform="translate(' + (cx - size / 2) + "," + (cy - size / 2) + ") scale(" + s + ')"'
+      + ' fill="' + (e.knock ? field : fill) + '"' + (e.rule ? ' fill-rule="' + e.rule + '"' : "")
+      + ' d="' + d + '"/>';
+  }).join("");
 }
 const inkOn = bg => (FLAG_LIGHT.has(bg) ? "#151515" : "#ffffff");
 
@@ -268,7 +273,7 @@ function politiskelFlag(c, p) {
   shown.forEach((s, i) => {
     const pl = places[i];
     const fg = s.symbol === "phrygian" && pl.bg === "white" ? C("red") : inkOn(pl.bg);
-    P.push(flagIcon(s.symbol, pl.x, pl.y, pl.size, fg));
+    P.push(flagIcon(s.symbol, pl.x, pl.y, pl.size, fg, C(pl.bg)));
   });
   if (cols[0] === "white" && layout === "pale") P.push('<rect x=".5" y=".5" width="149" height="99" fill="none" stroke="#c8c8c8"/>');
 

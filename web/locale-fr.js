@@ -226,7 +226,7 @@ const LOCALES = {
     flagSymbolLines: {
       fist: v => "Poing levé : une lecture de classe anticapitaliste (" + v + ").",
       swallow: v => "Hirondelle, l'oiseau en vol du libéralisme : le libre marché (" + v + ").",
-      liberty: v => "Colombe brisant ses chaînes : les libertés publiques, plus marquées que le reste de l'axe sociétal (" + v + ").",
+      liberty: v => "Chaîne brisée : les libertés publiques, plus marquées que le reste de l'axe sociétal (" + v + ").",
       shield: v => "Bouclier : l'ordre et la sécurité, plus marqués que le reste de l'axe sociétal (" + v + ").",
       globe: v => "Globe : le cosmopolitisme (" + v + ").",
       oak: v => "Feuille de chêne : l'enracinement national (" + v + ").",
