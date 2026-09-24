@@ -12,16 +12,16 @@
    colour and symbol, and a flag is the combination of its profile's
    strongest traits — colours filling the layout's fields in order, a main
    symbol and a second one elsewhere, and modifiers for intensity (the number
-   of stripes, a border for marked protectionism, the rainbow bar). An
-   ecologist anarchist and a productivist one share the diagonal and differ
-   in everything else.
+   of stripes, a border for marked protectionism, the rainbow bar). Two
+   profiles on the same layout differ in everything else.
 
      colours   red: economic left · gold: economic liberalism · blue: order ·
                purple: feminism · pink: LGBT rights · green: ecology ·
                steel: productivism · sky blue (the UN's): cosmopolitanism ·
-               orange: the centre · black, as structure: marked
-               libertarianism
-     layouts   the anarchist per-bend diagonal (black at the lower fly), the
+               orange: the centre · black, as structure: the rejection of
+               the state
+     layouts   the anarchist per-bend diagonal (black at the lower fly) —
+               once a question measures the rejection of the state — the
                revolutionary hoist triangle (its star, or the profile's fist
                or Phrygian cap in its place), a white field with a
                gold border for order and tradition — or for monarchism, once a
@@ -85,6 +85,12 @@ function flagTraits(c, p) {
   const ord = first(d.laworder, ps.pun);
   const rev = Math.max(has(cls) ? cls : -100, has(ps.rev) ? ps.rev : -100);
   const monarchy = futureReading(c, "monarchism");
+  /* Anarchism is the rejection of the state, which nothing measures yet: the
+     libertarian end of y is cultural liberalism (CHES's GAL), and a profile
+     can sit there while asking the state for more — regulation, public
+     services, redistribution. Until the institutions theme asks about the
+     state itself, the diagonal and the circled A are not drawn. */
+  const antistate = futureReading(c, "antistate");
   const stands = (v, axis) => v >= 80 || !has(axis) || v >= axis + 15;
 
   const T = [
@@ -117,7 +123,7 @@ function flagTraits(c, p) {
     { k: "centre",      s: has(x) && has(y) && Math.abs(x) < 25 && Math.abs(y) < 25
                              ? 60 - Math.max(Math.abs(x), Math.abs(y)) : null, min: 1, colour: "orange" },
     /* composites, which outrank the traits they combine */
-    { k: "anarchy",     s: neg(y),                      min: 80, symbol: "anarchy", bonus: 12 },
+    { k: "anarchy",     s: antistate,                   min: 80, symbol: "anarchy", bonus: 12 },
     { k: "phrygian",    s: has(y) && y <= -30 ? rev : null, min: 70, symbol: "phrygian", bonus: 12 },
     { k: "croix",       s: has(nat) && has(ord) ? Math.min(nat, ord) : null,
                              min: 60, symbol: "croix", bonus: 20, when: () => nat >= 70 },
@@ -143,7 +149,7 @@ function flagTraits(c, p) {
   }
   const trait = k => T.find(t => t.k === k) || null;
   return { x, y, traits: T, cols: cols.slice(0, 3), syms, trait,
-           intl: has(intl) ? intl : 0, rev, nat: has(nat) ? nat : 0, monarchy,
+           intl: has(intl) ? intl : 0, rev, nat: has(nat) ? nat : 0, monarchy, antistate,
            tradition: (trait("tradition") || {}).s || 0,
            multi: (trait("multicultural") || {}).s || 0, lgbt: (trait("lgbt") || {}).s || 0,
            prot: has(prot) ? prot : 0 };
@@ -152,7 +158,9 @@ function flagTraits(c, p) {
 function flagLayout(t) {
   const y = t.y === null ? 0 : t.y;
   if (t.monarchy !== null && t.monarchy >= 60) return "royal";
-  if (y <= -55) return "diagonal";
+  /* red and black, or black and gold for an anti-state economic liberal:
+     the field takes the profile's first colour either way */
+  if (t.antistate !== null && t.antistate >= 60 && y <= 0) return "diagonal";
   if (t.rev >= 70) return "revolution";
   if (y >= 60 && t.tradition >= 60) return "royal";
   if (y >= 34) return "nordic";
@@ -299,7 +307,7 @@ function flagLegend(t, drawn, layout, shown, border, rainbow, starOfLayout) {
   const lines = [L.flagLayouts[layout](t)];
   const strength = colour => Math.round(Math.max(...t.traits.filter(x => x.colour === colour).map(x => x.s), 0));
   for (const k of drawn) lines.push(L.flagColourLines[k](strength(k), t));
-  if (layout === "diagonal") lines.push(L.flagColourLines.black(Math.round(-t.y)));
+  if (layout === "diagonal") lines.push(L.flagColourLines.black(Math.round(t.antistate)));
   if (layout === "revolution" && starOfLayout) lines.push(L.flagRevolutionStar(Math.round(t.rev)));
   /* In the revolution layout without its own star, the triangle holds the
      first symbol and the white band the second: say where, not "smaller". */

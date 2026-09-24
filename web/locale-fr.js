@@ -193,7 +193,7 @@ const LOCALES = {
     flagCredit: "Symboles : game-icons.net (Lorc, Delapouite), licence CC BY 3.0.",
     flagLayouts: {
       diagonal: t => "Diagonale, noir en bas côté battant : la convention des drapeaux anarchistes, "
-        + "pour un profil nettement libertaire (Y " + signed(t.y) + ").",
+        + "pour un profil qui rejette l'État (" + Math.round(t.antistate) + ").",
       revolution: t => "Triangle de hampe et bandes : la famille des drapeaux révolutionnaires, "
         + "pour une lecture révolutionnaire ou de classe très marquée (" + signed(Math.round(t.rev)) + ").",
       royal: t => t.monarchy !== null && t.monarchy >= 60
@@ -221,7 +221,7 @@ const LOCALES = {
       sky: v => "Bleu ciel, celui des Nations unies : le cosmopolitisme (" + v + ").",
       orange: () => "Orange, la couleur des centristes : aucun axe ne penche nettement.",
       white: () => "Blanc : aucune lecture assez marquée pour une couleur.",
-      black: v => "Noir : le libertarisme, dans la tradition anarchiste (" + v + ").",
+      black: v => "Noir : le rejet de l'État, dans la tradition anarchiste (" + v + ").",
       steel: v => "Acier : le productivisme, d'après PolitiScales (" + v + ")."
     },
     flagSecond: "Et, plus petit — ",
@@ -246,7 +246,7 @@ const LOCALES = {
       venus: v => "Symbole ♀ : le féminisme (" + v + ").",
       handshake: v => "Poignée de mains : le réformisme (" + v + ").",
       factory: v => "Usine : le productivisme (" + v + ").",
-      anarchy: v => "A cerclé : un libertarisme radical (" + v + ").",
+      anarchy: v => "A cerclé : un rejet radical de l'État (" + v + ").",
       phrygian: v => "Bonnet phrygien : la révolution et la liberté (" + v + ").",
       croix: v => "Croix de guerre : le patriotisme martial, nation et ordre ensemble (" + v + ").",
       crown: v => "Couronne : le monarchisme (" + v + ").",
