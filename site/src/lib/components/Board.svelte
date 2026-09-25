@@ -23,10 +23,9 @@
 	const notes = $derived(viewNotes(board.view, country, refs, computed));
 	const selectedId = $derived(selected?.kind === 'profile' ? board.members[selected.i]?.id : null);
 
+	/* the design's three, and the choice of flags */
 	const toggles = [
-		['refs', L.optRefs],
 		['refLabels', L.optRefLabels],
-		['labels', L.optLabels],
 		['centroid', L.optMean],
 		['trail', L.optTrail]
 	];
@@ -50,7 +49,7 @@
 			<Compass {computed} {refs} {limits} viewKey={board.view} show={board.show} {selected} {onpick} />
 			<div class="legend">
 				<span><svg width="14" height="14" aria-hidden="true"><circle cx="7" cy="7" r="5.5" fill="var(--dot)" /></svg>{L.legendProfilesN(computed.filter((r) => !r.c.off).length)}</span>
-				<span><svg width="14" height="14" aria-hidden="true"><path d="M7,1.5 L12.5,7 L7,12.5 L1.5,7 Z" fill="var(--surface)" stroke="var(--ref)" stroke-width="1.5" /></svg>{L.legendParties(country.name)}</span>
+				<span><svg width="14" height="14" aria-hidden="true"><path d="M7,1.5 L12.5,7 L7,12.5 L1.5,7 Z" fill="var(--surface)" stroke="var(--ref)" stroke-width="1.5" /></svg>{L.legendParties(country.name, refs.filter((r) => r.src !== 'ches').length)}</span>
 			</div>
 			<div class="toggles">
 				{#each toggles as [k, label] (k)}

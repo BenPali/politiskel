@@ -1,81 +1,117 @@
-<!-- The journey along one axis, against the reference parties: where
-     PolitiScales had put the profile and where the questionnaire puts it.
-     Only the two nearest parties are named; the rest keep their name in a
-     tooltip. Drawn at its container's width, so its text keeps its size. -->
+<!-- The journey along one axis, after the design: a close-up of the axis
+     around it, the parties within as diamonds, where PolitiScales had put
+     the profile (a hollow ring) and the questionnaire's position sliding in
+     from there; then a drop runs the way again, on a loop, unless motion is
+     reduced. A profile without PolitiScales simply lands. -->
 <script>
+	import { onMount } from 'svelte';
 	import { L } from '$lib/i18n/fr.js';
 	import { signed } from '$lib/format.js';
-	import { nearestBase } from '$lib/compass/model.js';
 
 	let { c, axis, country } = $props();
-	let width = $state(640);
 
-	const W = $derived(Math.round(Math.max(300, Math.min(700, width))));
-	const H = 128, pad = 28, axisY = 70;
-	const sx = (v) => pad + ((v + 100) / 200) * (W - 2 * pad);
-	const anchorAt = (x) => (x < pad + 60 ? 'start' : x > W - pad - 60 ? 'end' : 'middle');
+	const now = $derived(c[axis]);
+	const was = $derived(c.from ? c.from[axis] : null);
+	/* the close-up: 15 points of margin around both positions, on fives */
+	const lo = $derived(Math.max(-100, Math.floor((Math.min(now, was ?? now) - 15) / 5) * 5));
+	const hi = $derived(Math.min(100, Math.ceil((Math.max(now, was ?? now) + 15) / 5) * 5));
+	const pct = (v) => ((v - lo) / (hi - lo)) * 100;
 
-	const g = $derived.by(() => {
-		const start = c.from;
-		const byAxis = (v) => country.parties.reduce((b, r) => (!b || Math.abs(r[axis] - v) < Math.abs(b[axis] - v) ? r : b), null);
-		const both = c.x !== null && c.y !== null;
-		const now = both ? nearestBase(c.x, c.y, country) : { ref: byAxis(c[axis]) };
-		const was = start ? nearestBase(start.x, start.y, country) : now;
-		const named = [was.ref, now.ref].filter((r, i, a) => r && a.indexOf(r) === i);
-		const nameW = named.map((r) => r.name.length * 5.6);
-		const names = named.map((r, i) => {
-			const x = sx(r[axis]);
-			const clash = i === 1 && Math.abs(x - sx(named[0][axis])) < (nameW[0] + nameW[1]) / 2 + 10;
-			return { x, y: axisY + (clash ? 34 : 20), name: r.name, anchor: anchorAt(x) };
+	/* parties inside the close-up, on two rows so their names do not collide */
+	const parties = $derived.by(() => {
+		const inside = country.parties.filter((r) => r[axis] > lo && r[axis] < hi).sort((a, b) => a[axis] - b[axis]);
+		const lastLeft = [-Infinity, -Infinity];
+		return inside.map((r) => {
+			const left = pct(r[axis]);
+			const row = left - lastLeft[0] >= 14 ? 0 : left - lastLeft[1] >= 14 ? 1 : null;
+			if (row !== null) lastLeft[row] = left;
+			return { name: r.name, left, top: row === 1 ? 74 : 56, named: row !== null };
 		});
-		const tx = sx(c[axis]), fx = start ? sx(start[axis]) : tx;
-		const dir = Math.sign(tx - fx);
-		return {
-			start, tx, fx, names,
-			arrow: start && Math.abs(tx - fx) > 12
-				? { d: `M ${fx} ${axisY - 10} Q ${(fx + tx) / 2} ${axisY - 40} ${tx - dir * 6} ${axisY - 12}`,
-					head: `M ${tx} ${axisY - 8} l ${-dir * 9} -7 l ${dir * 1} 10 Z` }
-				: null,
-			nowY: start && Math.abs(tx - fx) < 150 ? axisY - 48 : axisY - 16
-		};
 	});
-	const ends = $derived(L.resultEnds[axis]);
+
+	/* first the old place, then the move; the drop follows once it landed */
+	let moved = $state(false);
+	onMount(() => {
+		const t = setTimeout(() => (moved = true), 380);
+		return () => clearTimeout(t);
+	});
+	const pos = $derived(was === null || moved ? pct(now) : pct(was));
+	const from = $derived(was === null ? null : pct(was));
+	const rightward = $derived(was === null || now >= was);
+	/* a caption sits away from the other point, unless that would push it off the track */
+	const side = (p, away) => (p < 25 ? 'right' : p > 75 ? 'left' : away);
+	const nowSide = $derived(side(pct(now), rightward ? 'right' : 'left'));
+	const wasSide = $derived(was === null ? 'left' : side(pct(was), rightward ? 'left' : 'right'));
 </script>
 
-<div bind:clientWidth={width}>
-	<svg class="journey-strip" viewBox="0 0 {W} {H}" role="img"
-		aria-label={(g.start ? L.resultWas + ' ' + signed(g.start[axis]) + ' → ' : '') + L.resultNow + ' ' + signed(c[axis])}>
-		<line class="axis" x1={pad} y1={axisY} x2={W - pad} y2={axisY} />
-		<text class="end" x={sx(-100)} y={H - 4} text-anchor="start">{ends[0]}</text>
-		<text class="end" x={sx(100)} y={H - 4} text-anchor="end">{ends[1]}</text>
-		{#each country.parties as r}
-			{@const x = sx(r[axis])}
-			<g>
-				<path class="ref" d="M {x} {axisY - 4} L {x + 4} {axisY} L {x} {axisY + 4} L {x - 4} {axisY} Z" />
-				<title>{r.name} ({signed(r[axis])})</title>
-			</g>
+<section class="journey" aria-label={L.journeyAria(L.readingAxis[axis])}>
+	<h2>{L.readingAxis[axis]} <span>· {L.journeyZoom(signed(lo), signed(hi))}</span></h2>
+	<div class="track">
+		<div class="rail"></div>
+		{#if lo < 0 && hi > 0}<div class="zero" style="left: {pct(0)}%"></div>{/if}
+		{#each parties as p (p.name)}
+			<div class="ref" style="left: {p.left}%" title={p.name}></div>
+			{#if p.named}<div class="ref-name" style="left: {p.left}%; top: {p.top}px">{p.name}</div>{/if}
 		{/each}
-		{#each g.names as n}
-			<text class="ref-name" x={n.x} y={n.y} text-anchor={n.anchor}>{n.name}</text>
-		{/each}
-		{#if g.arrow}
-			<path class="arrow" d={g.arrow.d} />
-			<path class="head" d={g.arrow.head} />
+		{#if from !== null}
+			<div class="trail" class:on={moved} style="left: {Math.min(from, pct(now))}%; width: {Math.abs(pct(now) - from)}%; transform-origin: {rightward ? 'left' : 'right'} center">
+				<div class="line"></div>
+				{#if moved}
+					<div class="flow" style:transform={rightward ? null : 'scaleX(-1)'}><div class="drop-move"><div class="drop"></div></div></div>
+				{/if}
+			</div>
+			<div class="ghost" style="left: {from}%"></div>
+			<div class="ghost-cap" style="left: {from}%" class:right={wasSide === 'right'}>{L.journeyWas(signed(was))}</div>
 		{/if}
-		{#if g.start}<circle class="trail-ghost" cx={g.fx} cy={axisY} r="6" />{/if}
-		<circle class="dot" cx={g.tx} cy={axisY} r="7" />
-		{#if g.start}
-			<text class="cap was" x={g.fx} y={axisY - 16} text-anchor={anchorAt(g.fx)}>{L.resultWas} {signed(g.start[axis])}</text>
-		{/if}
-		<text class="cap" x={g.tx} y={g.nowY} text-anchor={anchorAt(g.tx)}>{L.resultNow} {signed(c[axis])}</text>
-	</svg>
-</div>
+		<div class="mover" style="transform: translateX({pos}%)">
+			{#if moved && from !== null}<div class="merge"></div>{/if}
+			<div class="dot"></div>
+			<div class="cap" class:left={nowSide === 'left'}>{L.journeyNow(signed(now))}</div>
+		</div>
+		<div class="end l">◄ {signed(lo)}</div>
+		<div class="end r">{signed(hi)} ►</div>
+	</div>
+</section>
 
 <style>
-	/* the new position slides in from the old one */
-	.dot { animation: land 0.4s ease-out both; }
-	.arrow { stroke-dasharray: 400; animation: draw 0.5s ease-out both; }
-	@keyframes land { from { opacity: 0; } to { opacity: 1; } }
-	@keyframes draw { from { stroke-dashoffset: 400; } to { stroke-dashoffset: 0; } }
-	@media (prefers-reduced-motion: reduce) { .dot, .arrow { animation: none; } }
+	.journey { background: var(--surface); border: 1px solid var(--border); border-radius: var(--r-lg); padding: 20px 22px 16px; box-shadow: var(--shadow-1); }
+	h2 { font-family: var(--font-sans); font-size: 15px; font-weight: 650; margin: 0; }
+	h2 span { font-weight: 400; color: var(--text-3); }
+	.track { position: relative; height: 118px; margin: 6px 8px 0; }
+	.rail { position: absolute; left: 0; right: 0; top: 44px; height: 2px; border-radius: 1px; background: var(--axis); }
+	.zero { position: absolute; top: 36px; width: 2px; height: 18px; margin-left: -1px; background: var(--axis); }
+	.ref { position: absolute; top: 40px; width: 10px; height: 10px; margin-left: -5px; transform: rotate(45deg); background: var(--surface); border: 1.6px solid var(--ref); }
+	.ref-name { position: absolute; transform: translateX(-50%); font-size: 12px; color: var(--text-3); white-space: nowrap; }
+	.trail { position: absolute; top: 43px; height: 4px; transform: scaleX(0); opacity: 0;
+		transition: transform var(--dur-deliberate) var(--ease-move), opacity var(--dur-instant) var(--ease-out); }
+	.trail.on { transform: scaleX(1); opacity: 1; }
+	.line { position: absolute; inset: 0; border-radius: 2px; background: var(--accent); opacity: .45; }
+	.flow, .drop-move { position: absolute; inset: 0; }
+	.drop-move { animation: drop-move 1800ms cubic-bezier(.45, .05, .3, 1) var(--dur-deliberate) infinite both; }
+	.drop { position: absolute; left: -7px; top: -5px; width: 14px; height: 14px; border-radius: 50%; background: var(--dot-me);
+		animation: drop-shape 1800ms linear var(--dur-deliberate) infinite both; }
+	.ghost { position: absolute; top: 36px; width: 18px; height: 18px; margin-left: -9px; border-radius: 50%; border: 2px solid var(--text-3);
+		background: var(--surface); box-sizing: border-box; }
+	.ghost-cap { position: absolute; top: 6px; transform: translateX(-100%); margin-left: -4px; font-size: 12.5px; color: var(--text-2); white-space: nowrap; }
+	.ghost-cap.right { transform: none; margin-left: 6px; }
+	.mover { position: absolute; inset: 0; transition: transform var(--dur-deliberate) var(--ease-move); pointer-events: none; }
+	.dot { position: absolute; left: 0; top: 35px; width: 20px; height: 20px; margin-left: -10px; border-radius: 50%; background: var(--dot-me);
+		animation: land var(--dur-base) var(--ease-settle) both; }
+	.merge { position: absolute; left: -10px; top: 35px; width: 20px; height: 20px; border-radius: 50%; background: var(--dot-me);
+		animation: merge 1800ms var(--ease-out) var(--dur-deliberate) infinite both; }
+	.cap { position: absolute; left: 0; top: 4px; margin-left: 6px; font-size: 13.5px; font-weight: 650; color: var(--text); white-space: nowrap; }
+	.cap.left { margin-left: 0; transform: translateX(calc(-100% - 6px)); }
+	.end { position: absolute; bottom: 0; font-size: 12px; color: var(--text-3); }
+	.end.l { left: 0; }
+	.end.r { right: 0; }
+	@keyframes land { from { opacity: 0; transform: scale(.4); } }
+	@keyframes drop-move { 0% { transform: translateX(0); } 72%, 100% { transform: translateX(100%); } }
+	@keyframes drop-shape {
+		0% { opacity: 0; transform: scale(.3); } 10% { opacity: 1; transform: scale(1); } 40% { opacity: 1; transform: scale(1.7, .75); }
+		64% { opacity: 1; transform: scale(1.1); } 72%, 100% { opacity: 0; transform: scale(.35); }
+	}
+	@keyframes merge { 0%, 68% { opacity: 0; transform: scale(1); } 74% { opacity: .55; transform: scale(1.05); } 100% { opacity: 0; transform: scale(1.9); } }
+	/* the loop is decoration: gone when motion is reduced, here or by the system */
+	@media (prefers-reduced-motion: reduce) { .flow, .merge { display: none; } }
+	:global([data-motion='reduce']) .flow, :global([data-motion='reduce']) .merge { display: none; }
 </style>

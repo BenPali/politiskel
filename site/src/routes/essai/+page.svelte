@@ -24,7 +24,7 @@
 	const themes = PolitiQuiz.THEMES.filter((t) => !t.planned).map((t) => ({
 		key: t.key,
 		name: L.themes[t.key].name,
-		count: screensFor(t.key).filter((sc) => sc.kind === 'item').length
+		count: screensFor(t.key).length
 	}));
 
 	function start(key) {

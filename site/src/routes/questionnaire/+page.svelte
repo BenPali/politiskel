@@ -5,7 +5,7 @@
 	import { L } from '$lib/i18n/fr.js';
 	import { session } from '$lib/session.svelte.js';
 	import { PolitiQuiz } from '$lib/model.js';
-	import { ALL, openThemes, screensFor } from '$lib/quiz/flow.js';
+	import { ALL, openThemes, progressOf } from '$lib/quiz/flow.js';
 	import { mine, startMine } from '$lib/quiz/answers.svelte.js';
 	import SignedIn from '$lib/components/SignedIn.svelte';
 
@@ -16,9 +16,7 @@
 	const cards = $derived(
 		[{ key: ALL }, ...PolitiQuiz.THEMES.filter((t) => !t.planned)].map((t) => {
 			const copy = t.key === ALL ? { name: L.allName, desc: L.allDesc(openThemes().map((o) => L.themes[o.key].name)) } : L.themes[t.key];
-			const items = screensFor(t.key).filter((sc) => sc.kind === 'item');
-			const done = items.filter((sc) => mine.answers[sc.item.id] !== undefined).length;
-			return { key: t.key, copy, done, total: items.length };
+			return { key: t.key, copy, ...progressOf(t.key, mine.answers) };
 		})
 	);
 	const planned = $derived(PolitiQuiz.THEMES.filter((t) => t.planned).map((t) => ({ key: t.key, copy: L.themes[t.key] })));

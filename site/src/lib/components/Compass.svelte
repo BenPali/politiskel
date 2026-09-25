@@ -1,12 +1,15 @@
-<!-- The compass: a 600-unit square, the parties as diamonds, the members as
-     dots, every label at a free spot, and around a selection the two
-     proximity rings and lines to its three nearest neighbours. It computes
-     its geometry in one pass and draws the result. -->
+<!-- The compass, after the design: a 600-unit square whose plane runs from
+     44 to 556, the parties as diamonds, the members as dots, every label at
+     a free spot. Around a selection, the two proximity rings, "proche" and
+     "modérée"; the rest recedes. Marks are groups moved by a transform, so
+     a change of reading glides them to their new place one after the other;
+     on arrival they grow in, and the labels come once they have landed. -->
 <script>
+	import { onMount } from 'svelte';
 	import { L } from '$lib/i18n/fr.js';
 	import { signed } from '$lib/format.js';
-	import { copyOf, toSvgX, toSvgY, noteOf, rankParties, rankProfiles, nearestReference } from '$lib/compass/model.js';
-	import { CANDIDATES, placeLabel, ringCapSpot, textWidth } from '$lib/compass/labels.js';
+	import { copyOf, noteOf, rankParties, rankProfiles, nearestReference } from '$lib/compass/model.js';
+	import { textWidth } from '$lib/compass/labels.js';
 	import { PolitiExtract } from '$lib/model.js';
 
 	/** @type {{ computed: {p:any,c:any}[], refs: any[], limits: any, viewKey: string, show: any,
@@ -14,75 +17,126 @@
 	let { computed, refs, limits, viewKey, show, selected = null, onpick } = $props();
 
 	const W = $derived(copyOf(viewKey));
-	const grid = [-75, -50, -25, 25, 50, 75, -100, 100];
+	/* one point of the −100…+100 scale is 2.56 units: the plane is 512 wide */
+	const S = 2.56;
+	const clamp = (v) => Math.max(50, Math.min(550, v));
+	const X = (v) => clamp(300 + v * S);
+	const Y = (v) => clamp(300 - v * S);
+	/* text sizes in units, for the design's pixel sizes at the chart's usual width */
+	const K = 600 / 548;
+	const F = { cap: 12 * K, quad: 12.5 * K, tick: 11.5 * K, member: 14 * K, ref: 12 * K };
+	const grid = [-75, -50, -25, 25, 50, 75];
+
+	/* The design's placement: eight spots around a mark, the first free one
+	   wins; a mark's own box and every label placed so far are taken. */
+	function place(taken, cx, cy, text, size, weight, gap, always = false) {
+		const w = textWidth(text, size, weight) + 2, h = size;
+		const spots = [[gap, 0, 'start'], [-gap, 0, 'end'], [0, -gap - h / 2, 'middle'], [0, gap + h / 2, 'middle'],
+			[gap * 0.75, -gap * 0.75 - h / 3, 'start'], [-gap * 0.75, -gap * 0.75 - h / 3, 'end'],
+			[gap * 0.75, gap * 0.75 + h / 3, 'start'], [-gap * 0.75, gap * 0.75 + h / 3, 'end']];
+		for (const [dx, dy, anchor] of spots) {
+			const x1 = anchor === 'start' ? cx + dx : anchor === 'end' ? cx + dx - w : cx + dx - w / 2;
+			const r = { x1, x2: x1 + w, y1: cy + dy - h / 2, y2: cy + dy + h / 2 };
+			if (r.x1 < 46 || r.x2 > 554 || r.y1 < 46 || r.y2 > 554) continue;
+			if (taken.some((o) => r.x1 < o.x2 && r.x2 > o.x1 && r.y1 < o.y2 && r.y2 > o.y1)) continue;
+			taken.push(r);
+			/* the text's baseline sits a third of its size below the box's middle */
+			return { dx, dy: dy + h * 0.34, anchor };
+		}
+		if (!always) return null;
+		/* a member keeps a label even with no free spot: above its dot, or
+		   below when it sits at the top, and inward from a side */
+		const up = cy > 90;
+		const anchor = cx < 120 ? 'start' : cx > 480 ? 'end' : 'middle';
+		const dx = anchor === 'start' ? -6 : anchor === 'end' ? 6 : 0;
+		return { dx, dy: (up ? -gap - h / 2 : gap + h / 2) + h * 0.34, anchor };
+	}
 
 	const geo = $derived.by(() => {
+		const taken = [];
+		const box = (x, y, w, h) => taken.push({ x1: x, x2: x + w, y1: y, y2: y + h });
+		/* the side captions at the ends of the horizontal axis, and the quadrant names */
+		box(50, 300 - 18 * K, textWidth(W.axisLeft, F.cap, 650), 16 * K);
+		box(550 - textWidth(W.axisRight, F.cap, 650), 300 - 18 * K, textWidth(W.axisRight, F.cap, 650), 16 * K);
+		const quads = [[56, 64, 'start', W.quadTopLeft], [544, 64, 'end', W.quadTopRight], [56, 538, 'start', W.quadBottomLeft], [544, 538, 'end', W.quadBottomRight]]
+			.map(([x, y, anchor, text]) => {
+				const w = textWidth(text, F.quad);
+				box(anchor === 'start' ? x : x - w, y - F.quad * 0.6, w, F.quad * 1.2);
+				return { x, y, anchor, text };
+			});
+
 		const placed = computed.map((r, i) => ({ ...r, i })).filter((r) => !r.c.off);
-		const qw = [W.quadTopLeft, W.quadTopRight, W.quadBottomLeft, W.quadBottomRight].map((t) => textWidth(t, 12.5));
-		const taken = [
-			{ x0: 46, x1: 90, y0: 306, y1: 318 }, { x0: 160, x1: 190, y0: 306, y1: 318 },
-			{ x0: 410, x1: 440, y0: 306, y1: 318 }, { x0: 510, x1: 554, y0: 306, y1: 318 },
-			{ x0: 56, x1: 64 + qw[0], y0: 56, y1: 74 }, { x0: 536 - qw[1], x1: 544, y0: 56, y1: 74 },
-			{ x0: 56, x1: 64 + qw[2], y0: 526, y1: 544 }, { x0: 536 - qw[3], x1: 544, y0: 526, y1: 544 },
-			{ x0: 50, x1: 64, y0: 293, y1: 307 }, { x0: 536, x1: 550, y0: 293, y1: 307 },
-			{ x0: 293, x1: 307, y0: 50, y1: 64 }, { x0: 293, x1: 307, y0: 536, y1: 550 }
-		];
+		const sel = selected?.kind === 'profile' ? placed.find((r) => r.i === selected.i) : null;
+		const selRef = selected?.kind === 'party' ? refs[selected.i] : null;
+		/* what the selection comes close to: its two nearest parties, or a party's two nearest members */
+		const nearParties = sel ? rankParties(sel.c, refs).slice(0, 2).map((o) => o.name) : selRef ? [selRef.name] : [];
+		const nearMembers = selRef ? rankProfiles(selRef, computed).slice(0, 2).map((o) => o.i) : [];
+
+		for (const { c } of placed) box(X(c.x) - 10, Y(c.y) - 10, 20, 20);
 		let centroid = null;
 		if (show.centroid && placed.length >= 2) {
 			const mx = placed.reduce((a, r) => a + r.c.x, 0) / placed.length;
 			const my = placed.reduce((a, r) => a + r.c.y, 0) / placed.length;
-			centroid = { x: toSvgX(mx), y: toSvgY(my), text: L.mean(signed(Math.round(mx)), signed(Math.round(my))) };
-			taken.push({ x0: centroid.x - 13, x1: centroid.x + 125, y0: centroid.y - 13, y1: centroid.y + 13 });
+			centroid = { x: X(mx), y: Y(my), title: L.mean(signed(Math.round(mx)), signed(Math.round(my))) };
+			box(centroid.x - 12, centroid.y - 26, 152, 38);
 		}
-		/* markers claim space first, members before parties */
-		for (const { c } of placed) {
-			const x = toSvgX(c.x), y = toSvgY(c.y);
-			taken.push({ x0: x - 10, x1: x + 10, y0: y - 10, y1: y + 10 });
-		}
-		if (show.refs)
-			for (const r of refs) {
-				const x = toSvgX(r.x), y = toSvgY(r.y);
-				taken.push({ x0: x - 7, x1: x + 7, y0: y - 7, y1: y + 7 });
-			}
+		/* members claim their label spot first: they are the chart's subject */
 		const pts = placed.map(({ p, c, i }) => {
-			const x = toSvgX(c.x), y = toSvgY(c.y);
+			const x = X(c.x), y = Y(c.y);
 			const text = p.alias.slice(0, 16);
-			/* a member always keeps a label: they are the chart's subject */
-			const place = show.labels ? placeLabel({ x, y, w: textWidth(text, 14.5, 650), size: 14.5 }, taken) || CANDIDATES[0] : null;
-			const trail = show.trail && c.from && (c.from.x !== c.x || c.from.y !== c.y) ? { x: toSvgX(c.from.x), y: toSvgY(c.from.y) } : null;
-			return { i, x, y, text, place, trail, alias: p.alias, me: !!p.me };
+			const isSel = sel && sel.i === i;
+			return {
+				i, x, y, text, alias: p.alias, me: !!p.me, isSel,
+				dim: (sel && !isSel) || (selRef && !nearMembers.includes(i)),
+				place: place(taken, x, y, text, F.member, 650, 14, true),
+				trail: show.trail && c.from && (c.from.x !== c.x || c.from.y !== c.y) ? { x: X(c.from.x), y: Y(c.from.y) } : null,
+				aria: p.alias + ' : X ' + signed(c.x) + ', Y ' + signed(c.y)
+			};
 		});
-		const parties = show.refs
-			? refs.map((r, ri) => {
-					const x = toSvgX(r.x), y = toSvgY(r.y);
-					/* no free spot: no label, rather than one over a member's */
-					const place = show.refLabels ? placeLabel({ x, y, w: textWidth(r.name, 12.5), size: 12.5 }, taken) : null;
-					return { ri, x, y, name: r.name, title: r.name + ' — ' + noteOf(r), place };
-				})
-			: [];
-		let annot = null;
-		const origin = selected
-			? selected.kind === 'profile'
-				? computed[selected.i] && !computed[selected.i].c.off ? computed[selected.i].c : null
-				: refs[selected.i]
-			: null;
-		if (origin) {
-			const ox = toSvgX(origin.x), oy = toSvgY(origin.y);
-			const rings = [limits.near, limits.far].map((d) => {
-				const r = d * 2.5;
-				return { r, d, spot: ringCapSpot(ox, oy, r, String(d), taken) };
-			});
-			const near = (
-				selected.kind === 'profile'
-					? rankParties(origin, refs).map((o) => refs.find((r) => r.name === o.name))
-					: rankProfiles(origin, computed).map((o) => computed[o.i].c)
-			)
-				.slice(0, 3)
-				.filter(Boolean)
-				.map((n) => ({ x: toSvgX(n.x), y: toSvgY(n.y) }));
-			annot = { ox, oy, rings, near };
+		for (const r of refs) box(X(r.x) - 8, Y(r.y) - 8, 16, 16);
+		/* near parties first, so a crowded chart names the ones that matter */
+		const order = refs.map((r, ri) => ri).sort((a, b) => nearParties.includes(refs[b].name) - nearParties.includes(refs[a].name));
+		const parties = [];
+		for (const ri of order) {
+			const r = refs[ri];
+			const x = X(r.x), y = Y(r.y);
+			const near = nearParties.includes(r.name);
+			parties[ri] = {
+				ri, x, y, name: r.name, title: r.name + ' — ' + noteOf(r), near,
+				dim: (sel || selRef) && !near,
+				place: show.refLabels || near ? place(taken, x, y, r.name, F.ref, near ? 650 : 500, 11) : null
+			};
 		}
-		return { pts, parties, centroid, annot };
+		const origin = sel ? { x: X(sel.c.x), y: Y(sel.c.y) } : selRef ? { x: X(selRef.x), y: Y(selRef.y) } : null;
+		return { quads, pts, parties, centroid, origin };
+	});
+
+	/* The entrance, then the labels; on a change of reading the labels go,
+	   the marks glide, the labels come back placed for the new layout. */
+	const still = () =>
+		typeof window === 'undefined' ||
+		document.documentElement.dataset.motion === 'reduce' ||
+		matchMedia('(prefers-reduced-motion: reduce)').matches;
+	let appeared = $state(false);
+	let labelsOn = $state(false);
+	let labelTimer = null;
+	function labelsAfter(ms) {
+		clearTimeout(labelTimer);
+		if (still()) return (labelsOn = true);
+		labelsOn = false;
+		labelTimer = setTimeout(() => (labelsOn = true), ms);
+	}
+	onMount(() => {
+		requestAnimationFrame(() => (appeared = true));
+		labelsAfter(640);
+		return () => clearTimeout(labelTimer);
+	});
+	let lastView = viewKey;
+	$effect(() => {
+		if (viewKey !== lastView) {
+			lastView = viewKey;
+			labelsAfter(560);
+		}
 	});
 
 	/* the hover card */
@@ -90,10 +144,10 @@
 	function showTip(i, ev) {
 		const { p, c } = computed[i];
 		const n = nearestReference(c.x, c.y, refs, limits);
-		const box = ev.currentTarget.closest('.plot').getBoundingClientRect();
+		const b = ev.currentTarget.closest('.plot').getBoundingClientRect();
 		tip = {
-			left: Math.min(ev.clientX - box.left + 14, box.width - 230),
-			top: ev.clientY - box.top + 14,
+			left: Math.min(ev.clientX - b.left + 14, b.width - 230),
+			top: ev.clientY - b.top + 14,
 			alias: p.alias,
 			rows: [
 				[L.tipEcon, signed(c.x)],
@@ -117,93 +171,110 @@
 </script>
 
 <div class="plot">
-	<svg id="compass" viewBox="0 0 600 600" role="img" aria-label={L.compassAria}>
-		<rect class="plot-frame" x="50" y="50" width="500" height="500" rx="4" />
-		<g>
-			{#each grid as v}
-				<line class="grid-line" x1={toSvgX(v)} y1="50" x2={toSvgX(v)} y2="550" />
-				<line class="grid-line" x1="50" y1={toSvgY(v)} x2="550" y2={toSvgY(v)} />
-			{/each}
-			<line class="axis-line" x1="50" y1="300" x2="550" y2="300" />
-			<line class="axis-line" x1="300" y1="50" x2="300" y2="550" />
-		</g>
-		<g>
-			<text class="axis-cap" x="300" y="38" text-anchor="middle">{W.axisTop}</text>
-			<text class="axis-cap" x="300" y="574" text-anchor="middle">{W.axisBottom}</text>
-			<text class="quad-cap" x="60" y="68">{W.quadTopLeft}</text>
-			<text class="quad-cap" x="540" y="68" text-anchor="end">{W.quadTopRight}</text>
-			<text class="quad-cap" x="60" y="538">{W.quadBottomLeft}</text>
-			<text class="quad-cap" x="540" y="538" text-anchor="end">{W.quadBottomRight}</text>
-			<text class="tick-cap" x="52" y="315">−100</text>
-			<text class="tick-cap" x="175" y="315" text-anchor="middle">−50</text>
-			<text class="tick-cap" x="425" y="315" text-anchor="middle">+50</text>
-			<text class="tick-cap" x="548" y="315" text-anchor="end">+100</text>
-			<text class="axis-cap" x="22" y="300" text-anchor="middle" transform="rotate(-90 22 300)">{W.axisLeft}</text>
-			<text class="axis-cap" x="578" y="300" text-anchor="middle" transform="rotate(90 578 300)">{W.axisRight}</text>
-			<path class="axis-head" d="M 52 300 L 62 295 L 62 305 Z" />
-			<path class="axis-head" d="M 548 300 L 538 295 L 538 305 Z" />
-			<path class="axis-head" d="M 300 52 L 295 62 L 305 62 Z" />
-			<path class="axis-head" d="M 300 548 L 295 538 L 305 538 Z" />
-		</g>
+	<svg id="compass" class:appeared viewBox="0 0 600 600" role="img" aria-label={L.compassAria}>
+		<rect class="plane" x="44" y="44" width="512" height="512" rx="12" />
+		{#each grid as v}
+			<line class="grid-line" x1={300 + v * S} y1="44" x2={300 + v * S} y2="556" />
+			<line class="grid-line" x1="44" y1={300 - v * S} x2="556" y2={300 - v * S} />
+		{/each}
+		<line class="axis-line" x1="44" y1="300" x2="556" y2="300" />
+		<line class="axis-line" x1="300" y1="44" x2="300" y2="556" />
 
-		{#if geo.annot}
-			{@const a = geo.annot}
-			<g class="annot">
-				<circle class="sel-disc" cx={a.ox} cy={a.oy} r="50" />
-				{#each a.rings as ring}
-					<circle class="sel-ring" cx={a.ox} cy={a.oy} r={ring.r} />
-					<text class="sel-ring-cap" x={ring.spot.x} y={ring.spot.y} text-anchor="middle">{ring.d}</text>
-				{/each}
-				{#each a.near as n}
-					<line class="link-line" x1={a.ox} y1={a.oy} x2={n.x} y2={n.y} />
-				{/each}
-			</g>
-		{/if}
+		<text class="cap" x="300" y="26" text-anchor="middle" font-size={F.cap}>{W.axisTop}</text>
+		<text class="cap" x="300" y="582" text-anchor="middle" font-size={F.cap}>{W.axisBottom}</text>
+		<text class="cap" x="52" y={300 - 8 * K} font-size={F.cap}>{W.axisLeft}</text>
+		<text class="cap" x="548" y={300 - 8 * K} text-anchor="end" font-size={F.cap}>{W.axisRight}</text>
+		{#each geo.quads as q}
+			<text class="quad" x={q.x} y={q.y + F.quad * 0.34} text-anchor={q.anchor} font-size={F.quad}>{q.text}</text>
+		{/each}
+		{#each [-50, 50] as v}
+			<text class="tick" x={300 + v * S} y={314 + F.tick * 0.34} text-anchor="middle" font-size={F.tick}>{signed(v)}</text>
+			<text class="tick" x="307" y={300 - v * S + F.tick * 0.34} font-size={F.tick}>{signed(v)}</text>
+		{/each}
 
-		<g id="refs-layer" class:dim={!!selected}>
-			{#each geo.parties as r (r.ri)}
-				<g class:sel={selected?.kind === 'party' && selected.i === r.ri}
-					onclick={() => onpick('party', r.ri)} role="presentation">
-					<circle class="ref-hit" cx={r.x} cy={r.y} r="13" tabindex="0" role="button" aria-label={L.partyAria(r.name)}
-						onkeydown={key(() => onpick('party', r.ri))} />
-					<path class="ref-mark" d="M {r.x} {r.y - 5.5} L {r.x + 5.5} {r.y} L {r.x} {r.y + 5.5} L {r.x - 5.5} {r.y} Z" />
-					<title>{r.title}</title>
-					{#if r.place}
-						<text class="ref-label" x={r.x + r.place.dx} y={r.y + r.place.dy} text-anchor={r.place.anchor}>{r.name}</text>
-					{/if}
+		<!-- trails: from where PolitiScales had put a member to where the questionnaire does -->
+		{#each geo.pts as pt (pt.i)}
+			{#if pt.trail}
+				<g class="trail" class:on={appeared} class:faint={geo.origin && !pt.isSel}>
+					<line x1={pt.trail.x} y1={pt.trail.y} x2={pt.x} y2={pt.y} />
+					<circle cx={pt.trail.x} cy={pt.trail.y} r="6" />
 				</g>
-			{/each}
-		</g>
+			{/if}
+		{/each}
 
-		<g id="points-layer" class:dim={!!selected}>
-			{#each geo.pts as pt (pt.i)}
-				<g class:sel={selected?.kind === 'profile' && selected.i === pt.i} class:me={pt.me}
-					onclick={() => onpick('profile', pt.i)} role="presentation"
-					onmouseenter={(e) => showTip(pt.i, e)} onmousemove={(e) => showTip(pt.i, e)} onmouseleave={() => (tip = null)}>
-					<circle class="hit" cx={pt.x} cy={pt.y} r="14" tabindex="0" role="button" aria-label={pt.alias}
-						onkeydown={key(() => onpick('profile', pt.i))} />
-					{#if pt.trail}
-						<line class="trail" x1={pt.trail.x} y1={pt.trail.y} x2={pt.x} y2={pt.y} />
-						<circle class="trail-ghost" cx={pt.trail.x} cy={pt.trail.y} r="4" />
-					{/if}
-					<circle class="pt-ring" cx={pt.x} cy={pt.y} r="7" />
-					<circle class="pt-dot" cx={pt.x} cy={pt.y} r="7" />
-					{#if pt.place}
-						<text class="pt-label" x={pt.x + pt.place.dx} y={pt.y + pt.place.dy} text-anchor={pt.place.anchor}>{pt.text}</text>
-					{/if}
+		<g id="refs-layer">
+			{#each geo.parties as r (r.ri)}
+				<g class="mark" style="transform: translate({r.x}px, {r.y}px); --i: {r.ri}" onclick={() => onpick('party', r.ri)} role="presentation">
+					<g class="ref-in" class:dim={r.dim}>
+						<circle class="hit" r="13" tabindex="0" role="button" aria-label={L.partyAria(r.name)} onkeydown={key(() => onpick('party', r.ri))} />
+						<path class="ref-mark" class:near={r.near} d="M0,-7 L7,0 L0,7 L-7,0 Z" />
+						<title>{r.title}</title>
+					</g>
 				</g>
 			{/each}
 		</g>
 
 		{#if geo.centroid}
 			{@const m = geo.centroid}
-			<g>
-				<circle class="centroid" cx={m.x} cy={m.y} r="8" />
-				<line class="centroid" x1={m.x - 12} y1={m.y} x2={m.x + 12} y2={m.y} />
-				<line class="centroid" x1={m.x} y1={m.y - 12} x2={m.x} y2={m.y + 12} />
-				<text class="centroid-cap" x={m.x + 15} y={m.y + 3.5}>{m.text}</text>
+			<g class="mark" style="transform: translate({m.x}px, {m.y}px)">
+				<g class="mean" class:on={appeared}>
+					<title>{m.title}</title>
+					<path d="M-8,0 H8 M0,-8 V8" />
+					<circle r="11" />
+					<text x="14" y="-12" font-size="13">{L.optMean}</text>
+				</g>
 			</g>
 		{/if}
+
+		<g id="points-layer">
+			{#each geo.pts as pt (pt.i)}
+				<g class="mark" style="transform: translate({pt.x}px, {pt.y}px); --i: {pt.i}"
+					onmouseenter={(e) => showTip(pt.i, e)} onmousemove={(e) => showTip(pt.i, e)} onmouseleave={() => (tip = null)}
+					onclick={() => onpick('profile', pt.i)} role="presentation">
+					<g class="pt-in" class:dim={pt.dim}>
+						<g class="rings" class:on={pt.isSel}>
+							<circle class="ring far" r={limits.far * S} />
+							<circle class="ring near" r={limits.near * S} />
+							<text class="ring-cap" y={-limits.near * S - 5} text-anchor="middle">{L.fit.near}</text>
+							<text class="ring-cap" y={-limits.far * S - 5} text-anchor="middle">{L.fit.moderate}</text>
+						</g>
+						<circle class="hit" r="16" tabindex="0" role="button" aria-label={pt.aria} aria-pressed={pt.isSel}
+							onkeydown={key(() => onpick('profile', pt.i))} />
+						<circle class="focus" r="15" class:on={pt.isSel} />
+						<circle class="dot" class:me={pt.me} r={pt.isSel ? 9.5 : 8} />
+					</g>
+				</g>
+			{/each}
+		</g>
+
+		{#if geo.origin && selected?.kind === 'party'}
+			<g class="mark" style="transform: translate({geo.origin.x}px, {geo.origin.y}px)">
+				{#key selected.i}
+					<g class="rings on">
+						<circle class="ring far" r={limits.far * S} />
+						<circle class="ring near" r={limits.near * S} />
+						<text class="ring-cap" y={-limits.near * S - 5} text-anchor="middle">{L.fit.near}</text>
+						<text class="ring-cap" y={-limits.far * S - 5} text-anchor="middle">{L.fit.moderate}</text>
+					</g>
+				{/key}
+			</g>
+		{/if}
+
+		<!-- labels last, over every mark; they move with their mark -->
+		<g class="labels" class:on={labelsOn} aria-hidden="true">
+			{#each geo.parties as r (r.ri)}
+				{#if r.place}
+					<text class="ref-label mark" class:near={r.near} class:dim={r.dim} style="transform: translate({r.x}px, {r.y}px); --i: {r.ri}"
+						x={r.place.dx} y={r.place.dy} text-anchor={r.place.anchor} font-size={F.ref}>{r.name}</text>
+				{/if}
+			{/each}
+			{#each geo.pts as pt (pt.i)}
+				{#if pt.place}
+					<text class="pt-label mark" class:dim={pt.dim} style="transform: translate({pt.x}px, {pt.y}px); --i: {pt.i}"
+						x={pt.place.dx} y={pt.place.dy} text-anchor={pt.place.anchor} font-size={F.member}>{pt.text}</text>
+				{/if}
+			{/each}
+		</g>
 	</svg>
 
 	{#if tip}
@@ -221,4 +292,60 @@
 <style>
 	.plot { position: relative; }
 	.tip { position: absolute; pointer-events: none; z-index: 5; }
+	svg { width: 100%; height: auto; display: block; font-family: var(--font-sans); overflow: visible; }
+	.plane { fill: var(--quad); }
+	.grid-line { stroke: var(--grid); stroke-width: 1; }
+	.axis-line { stroke: var(--axis); stroke-width: 1.6; }
+	.cap { fill: var(--text-2); font-weight: 650; letter-spacing: .05em; }
+	.quad { fill: var(--text-3); font-style: italic; }
+	.tick { fill: var(--text-3); font-variant-numeric: tabular-nums; }
+
+	/* marks glide to a new place, one after the other */
+	.mark { transition: transform var(--dur-deliberate) var(--ease-move) calc(var(--stagger) * var(--i, 0)); }
+	.hit { fill: transparent; cursor: pointer; outline: none; }
+	.pt-in { opacity: 0; transform: scale(.4); cursor: pointer;
+		transition: opacity var(--dur-base) var(--ease-out) calc(var(--stagger) * var(--i, 0) + 180ms),
+			transform var(--dur-base) var(--ease-settle) calc(var(--stagger) * var(--i, 0) + 180ms); }
+	.ref-in { opacity: 0; transition: opacity var(--dur-base) var(--ease-out); }
+	.appeared .pt-in { opacity: 1; transform: none; }
+	.appeared .ref-in { opacity: 1; }
+	.appeared .pt-in.dim { opacity: .3; }
+	.appeared .ref-in.dim { opacity: .35; }
+
+	.ref-mark { fill: var(--surface); stroke: var(--ref); stroke-width: 1.6; transition: stroke var(--dur-instant); }
+	.ref-mark.near { stroke: var(--text); stroke-width: 2.4; }
+	.ref-in:hover .ref-mark, .hit:focus-visible + .ref-mark { stroke: var(--text); }
+
+	.dot { fill: var(--dot); stroke: var(--surface); stroke-width: 3; transition: r var(--dur-instant) var(--ease-out); }
+	.dot.me { fill: var(--dot-me); }
+	.focus { fill: none; stroke: var(--focus); stroke-width: 2.2; opacity: 0; transition: opacity var(--dur-instant); }
+	.focus.on, .hit:focus-visible + .focus { opacity: 1; }
+
+	.rings { opacity: 0; transform: scale(.85); pointer-events: none;
+		transition: opacity var(--dur-base) var(--ease-out), transform var(--dur-base) var(--ease-out); }
+	.rings.on { opacity: 1; transform: none; }
+	.ring.far { fill: var(--accent); fill-opacity: .05; stroke: var(--accent); stroke-opacity: .45; stroke-dasharray: 3 5; }
+	.ring.near { fill: var(--accent); fill-opacity: .07; stroke: var(--accent); stroke-opacity: .6; }
+	.ring-cap { font-size: 12.5px; fill: var(--accent-ink); stroke: var(--quad); stroke-width: 3; paint-order: stroke; }
+
+	.trail { opacity: 0; transition: opacity var(--dur-base) var(--ease-out); }
+	.trail.on { opacity: 1; }
+	.trail.faint { opacity: .25; }
+	.trail line { stroke: var(--text-3); stroke-width: 1.4; stroke-dasharray: 4 4; }
+	.trail circle { fill: var(--surface); stroke: var(--text-3); stroke-width: 1.4; }
+
+	.mean { opacity: 0; transition: opacity var(--dur-base) var(--ease-out); }
+	.mean.on { opacity: 1; }
+	.mean path { stroke: var(--text-2); stroke-width: 2.2; stroke-linecap: round; }
+	.mean circle { fill: none; stroke: var(--text-2); stroke-width: 1.4; }
+	.mean text { fill: var(--text-2); font-weight: 650; stroke: var(--quad); stroke-width: 3.5; paint-order: stroke; }
+
+	/* labels fade in once the marks have landed */
+	.labels { opacity: 0; transition: opacity var(--dur-base) var(--ease-out); pointer-events: none; }
+	.labels.on { opacity: 1; }
+	.pt-label { fill: var(--text); font-weight: 650; stroke: var(--quad); stroke-width: 4; paint-order: stroke; stroke-linejoin: round; }
+	.ref-label { fill: var(--text-2); font-weight: 500; stroke: var(--quad); stroke-width: 4; paint-order: stroke; stroke-linejoin: round; }
+	.ref-label.near { fill: var(--text); font-weight: 650; }
+	.pt-label.dim { opacity: .3; }
+	.ref-label.dim { opacity: .35; }
 </style>

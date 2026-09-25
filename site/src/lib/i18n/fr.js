@@ -104,7 +104,7 @@ export const LOCALES = {
     optLabels: "Étiquettes des profils",
     optMean: "Moyenne du groupe", optMeanWhere: "(carte et axes)",
     chartTitle: "Positions calculées",
-    legendProfiles: "Profils", legendParties: c => "Partis — " + c + " (repères)",
+    legendProfiles: "Profils", legendParties: (c, est) => "Partis — " + c + " (CHES 2024" + (est ? ", " + est + " estimé" + (est > 1 ? "s" : "") : "") + ")",
     partyAria: n => "Parti " + n,
     /* Written from the tables rather than by hand: the previous copy claimed
        "dix des quatorze partis" against a list that held fifteen. */
@@ -676,6 +676,14 @@ export const LOCALES = {
     resultNoAxis: (theme, native) => "Aucune réponse au thème " + theme
       + (native ? " pour l'instant." : " : cet axe reste celui de PolitiScales."),
     resultWas: "PolitiScales", resultNow: "Politiskel",
+    journeyAria: a => "Trajet sur l'axe " + a, journeyZoom: (lo, hi) => "vue rapprochée, de " + lo + " à " + hi,
+    journeyWas: v => "PolitiScales " + v, journeyNow: v => "Questionnaire " + v,
+    resultCount: (t, n, m) => t + " · " + n + " / " + m + " réponses",
+    resultLead: { x: "Vos réponses remplacent l'axe économique de PolitiScales, qui ne posait rien sur la redistribution. Votre point se déplace sur la boussole.",
+                  y: "Vos réponses remplacent l'axe sociétal de PolitiScales, question par question tirées des enquêtes publiques. Votre point se déplace sur la boussole." },
+    resultLeadNative: "Vos réponses placent votre point sur cet axe de la boussole.",
+    resultWasPs: v => "était " + v + " avec PolitiScales", resultNativeNote: "mesuré par le questionnaire",
+    nextTheme: n => "Thème suivant : " + n, dimNote: "sous-dimension du CHES",
     resultEnds: { x: ["gauche", "droite"], y: ["ouverture", "tradition"] },
     backToCompass: "Voir sur la boussole", quizReview: "Revoir mes réponses",
     quizSourceLabel: "Source : ",

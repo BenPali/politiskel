@@ -10,7 +10,7 @@
 	import { PALETTES, MODES, MOTIONS, readDisplay, applyDisplay } from '$lib/theme.js';
 	import { PolitiQuiz } from '$lib/model.js';
 	import { hasPolitiscales, fromMember } from '$lib/compass/model.js';
-	import { screensFor } from '$lib/quiz/flow.js';
+	import { progressOf } from '$lib/quiz/flow.js';
 	import SignedIn from '$lib/components/SignedIn.svelte';
 	import CaptureImport from '$lib/components/CaptureImport.svelte';
 	import { board } from '$lib/compass/board.svelte.js';
@@ -33,9 +33,7 @@
 	const themes = $derived(
 		session.me
 			? PolitiQuiz.THEMES.filter((t) => !t.planned).map((t) => {
-					const items = screensFor(t.key).filter((sc) => sc.kind === 'item');
-					const answers = session.me.profile.answers || {};
-					return { key: t.key, name: L.themes[t.key].name, done: items.filter((sc) => answers[sc.item.id] !== undefined).length, total: items.length };
+					return { key: t.key, name: L.themes[t.key].name, ...progressOf(t.key, session.me.profile.answers || {}) };
 				})
 			: []
 	);

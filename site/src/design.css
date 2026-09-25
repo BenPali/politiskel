@@ -132,36 +132,7 @@ td.bar-cell { position: relative; }
 .error { background: var(--danger-soft); color: var(--danger); border: 1px solid var(--danger);
          padding: 12px 14px; border-radius: var(--r-md); font-weight: 550; }
 
-/* —— the compass —— */
-svg#compass .plot-frame { fill: var(--quad); stroke: var(--border); }
-svg#compass .grid-line { stroke: var(--grid); }
-svg#compass .axis-line { stroke: var(--axis); }
-svg#compass .axis-head { fill: var(--axis); }
-svg#compass .axis-cap { font-family: var(--font-sans); fill: var(--text-2); }
-svg#compass .pt-dot { fill: var(--dot); }
-svg#compass g.sel .pt-dot { fill: var(--dot-me); }
-svg#compass .pt-label { font-family: var(--font-sans); fill: var(--text); }
-svg#compass .ref-mark { stroke: var(--ref); fill: var(--surface); }
-svg#compass .ref-label { font-family: var(--font-sans); fill: var(--text-3); }
-svg#compass .sel-ring { stroke: var(--accent); }
-svg#compass .sel-disc { fill: var(--accent-soft); opacity: .5; }
-svg#compass .link-line { stroke: var(--accent); }
-svg#compass .trail { stroke: var(--accent); }
-/* label sizes in viewBox units: the chart draws at about 500px of 600, so
-   these read as 11 to 12px on screen, as in the design */
-svg#compass .axis-cap { font-size: 13px; font-weight: 650; letter-spacing: .05em; }
-svg#compass .quad-cap { font-size: 12.5px; font-style: italic; letter-spacing: 0; }
-svg#compass .tick-cap { font-size: 12px; }
-svg#compass .ref-label { font-size: 12.5px; stroke: var(--quad); }
-svg#compass .pt-label { font-size: 14.5px; font-weight: 650; stroke: var(--quad); }
-svg#compass .sel-ring-cap { font-size: 12px; fill: var(--accent-ink); opacity: 1; stroke: var(--quad); }
-svg#compass .centroid-cap { font-size: 12.5px; stroke: var(--quad); }
-svg#compass g.me .pt-dot { fill: var(--dot-me); }
-svg#compass g.sel .pt-ring { stroke: var(--focus); }
-svg#compass .sel-ring { stroke-width: 1.2; opacity: .6; }
-svg#compass .sel-disc { fill: var(--accent); opacity: .06; }
-/* a point arrives in place on a change of reading */
-svg#compass .pt-dot, svg#compass .pt-ring { transition: cx var(--dur-deliberate) var(--ease-move), cy var(--dur-deliberate) var(--ease-move); }
+/* —— the compass: its own styles, in Compass.svelte —— */
 .tip { background: var(--surface); color: var(--text); border: 1px solid var(--border); border-radius: var(--r-md);
        box-shadow: var(--shadow-3); padding: 12px 14px; font-size: var(--fs-sm); }
 .journey-strip .dot { fill: var(--dot-me); }

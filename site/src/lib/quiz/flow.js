@@ -22,3 +22,11 @@ export function screensFor(key) {
 export const screenKey = (sc) => (sc.kind === 'item' ? sc.item.id : 'salience.' + sc.theme + (sc.after ? '.after' : ''));
 
 export const scoreOf = (c, key) => (key === 'economy' ? c.quiz : key === 'society' ? c.soc : null);
+
+/* How far a flow has got: every screen that asks something counts, the
+   importance questions as much as the survey items — the reader answers
+   both, and a count that skipped one kind looked wrong. */
+export function progressOf(key, answers) {
+	const screens = screensFor(key);
+	return { done: screens.filter((sc) => answers[screenKey(sc)] !== undefined).length, total: screens.length };
+}
