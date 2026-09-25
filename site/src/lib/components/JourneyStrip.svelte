@@ -44,66 +44,66 @@
 	const wasSide = $derived(was === null ? 'left' : side(pct(was), rightward ? 'left' : 'right'));
 </script>
 
-<section class="journey" aria-label={L.journeyAria(L.readingAxis[axis])}>
+<section class="jr-journey" aria-label={L.journeyAria(L.readingAxis[axis])}>
 	<h2>{L.readingAxis[axis]} <span>· {L.journeyZoom(signed(lo), signed(hi))}</span></h2>
-	<div class="track">
-		<div class="rail"></div>
-		{#if lo < 0 && hi > 0}<div class="zero" style="left: {pct(0)}%"></div>{/if}
+	<div class="jr-track">
+		<div class="jr-rail"></div>
+		{#if lo < 0 && hi > 0}<div class="jr-zero" style="left: {pct(0)}%"></div>{/if}
 		{#each parties as p (p.name)}
-			<div class="ref" style="left: {p.left}%" title={p.name}></div>
-			{#if p.named}<div class="ref-name" style="left: {p.left}%; top: {p.top}px">{p.name}</div>{/if}
+			<div class="jr-ref" style="left: {p.left}%" title={p.name}></div>
+			{#if p.named}<div class="jr-ref-name" style="left: {p.left}%; top: {p.top}px">{p.name}</div>{/if}
 		{/each}
 		{#if from !== null}
-			<div class="trail" class:on={moved} style="left: {Math.min(from, pct(now))}%; width: {Math.abs(pct(now) - from)}%; transform-origin: {rightward ? 'left' : 'right'} center">
-				<div class="line"></div>
+			<div class="jr-trail" class:on={moved} style="left: {Math.min(from, pct(now))}%; width: {Math.abs(pct(now) - from)}%; transform-origin: {rightward ? 'left' : 'right'} center">
+				<div class="jr-line"></div>
 				{#if moved}
-					<div class="flow" style:transform={rightward ? null : 'scaleX(-1)'}><div class="drop-move"><div class="drop"></div></div></div>
+					<div class="jr-flow" style:transform={rightward ? null : 'scaleX(-1)'}><div class="jr-drop-move"><div class="jr-drop"></div></div></div>
 				{/if}
 			</div>
-			<div class="ghost" style="left: {from}%"></div>
-			<div class="ghost-cap" style="left: {from}%" class:right={wasSide === 'right'}>{L.journeyWas(signed(was))}</div>
+			<div class="jr-ghost" style="left: {from}%"></div>
+			<div class="jr-ghost-cap" style="left: {from}%" class:right={wasSide === 'right'}>{L.journeyWas(signed(was))}</div>
 		{/if}
-		<div class="mover" style="transform: translateX({pos}%)">
-			{#if moved && from !== null}<div class="merge"></div>{/if}
-			<div class="dot"></div>
-			<div class="cap" class:left={nowSide === 'left'}>{L.journeyNow(signed(now))}</div>
+		<div class="jr-mover" style="transform: translateX({pos}%)">
+			{#if moved && from !== null}<div class="jr-merge"></div>{/if}
+			<div class="jr-dot"></div>
+			<div class="jr-cap" class:left={nowSide === 'left'}>{L.journeyNow(signed(now))}</div>
 		</div>
-		<div class="end l">◄ {signed(lo)}</div>
-		<div class="end r">{signed(hi)} ►</div>
+		<div class="jr-end l">◄ {signed(lo)}</div>
+		<div class="jr-end r">{signed(hi)} ►</div>
 	</div>
 </section>
 
 <style>
-	.journey { background: var(--surface); border: 1px solid var(--border); border-radius: var(--r-lg); padding: 20px 22px 16px; box-shadow: var(--shadow-1); }
+	.jr-journey { background: var(--surface); border: 1px solid var(--border); border-radius: var(--r-lg); padding: 20px 22px 16px; box-shadow: var(--shadow-1); }
 	h2 { font-family: var(--font-sans); font-size: 15px; font-weight: 650; margin: 0; }
 	h2 span { font-weight: 400; color: var(--text-3); }
-	.track { position: relative; height: 118px; margin: 6px 8px 0; }
-	.rail { position: absolute; left: 0; right: 0; top: 44px; height: 2px; border-radius: 1px; background: var(--axis); }
-	.zero { position: absolute; top: 36px; width: 2px; height: 18px; margin-left: -1px; background: var(--axis); }
-	.ref { position: absolute; top: 40px; width: 10px; height: 10px; margin-left: -5px; transform: rotate(45deg); background: var(--surface); border: 1.6px solid var(--ref); }
-	.ref-name { position: absolute; transform: translateX(-50%); font-size: 12px; color: var(--text-3); white-space: nowrap; }
-	.trail { position: absolute; top: 43px; height: 4px; transform: scaleX(0); opacity: 0;
+	.jr-track { position: relative; height: 118px; margin: 6px 8px 0; }
+	.jr-rail { position: absolute; left: 0; right: 0; top: 44px; height: 2px; border-radius: 1px; background: var(--axis); }
+	.jr-zero { position: absolute; top: 36px; width: 2px; height: 18px; margin-left: -1px; background: var(--axis); }
+	.jr-ref { position: absolute; top: 40px; width: 10px; height: 10px; margin-left: -5px; transform: rotate(45deg); background: var(--surface); border: 1.6px solid var(--ref); }
+	.jr-ref-name { position: absolute; transform: translateX(-50%); font-size: 12px; color: var(--text-3); white-space: nowrap; }
+	.jr-trail { position: absolute; top: 43px; height: 4px; transform: scaleX(0); opacity: 0;
 		transition: transform var(--dur-deliberate) var(--ease-move), opacity var(--dur-instant) var(--ease-out); }
-	.trail.on { transform: scaleX(1); opacity: 1; }
-	.line { position: absolute; inset: 0; border-radius: 2px; background: var(--accent); opacity: .45; }
-	.flow, .drop-move { position: absolute; inset: 0; }
-	.drop-move { animation: drop-move 1800ms cubic-bezier(.45, .05, .3, 1) var(--dur-deliberate) infinite both; }
-	.drop { position: absolute; left: -7px; top: -5px; width: 14px; height: 14px; border-radius: 50%; background: var(--dot-me);
+	.jr-trail.on { transform: scaleX(1); opacity: 1; }
+	.jr-line { position: absolute; inset: 0; border-radius: 2px; background: var(--accent); opacity: .45; }
+	.jr-flow, .jr-drop-move { position: absolute; inset: 0; }
+	.jr-drop-move { animation: drop-move 1800ms cubic-bezier(.45, .05, .3, 1) var(--dur-deliberate) infinite both; }
+	.jr-drop { position: absolute; left: -7px; top: -5px; width: 14px; height: 14px; border-radius: 50%; background: var(--dot-me);
 		animation: drop-shape 1800ms linear var(--dur-deliberate) infinite both; }
-	.ghost { position: absolute; top: 36px; width: 18px; height: 18px; margin-left: -9px; border-radius: 50%; border: 2px solid var(--text-3);
+	.jr-ghost { position: absolute; top: 36px; width: 18px; height: 18px; margin-left: -9px; border-radius: 50%; border: 2px solid var(--text-3);
 		background: var(--surface); box-sizing: border-box; }
-	.ghost-cap { position: absolute; top: 6px; transform: translateX(-100%); margin-left: -4px; font-size: 12.5px; color: var(--text-2); white-space: nowrap; }
-	.ghost-cap.right { transform: none; margin-left: 6px; }
-	.mover { position: absolute; inset: 0; transition: transform var(--dur-deliberate) var(--ease-move); pointer-events: none; }
-	.dot { position: absolute; left: 0; top: 35px; width: 20px; height: 20px; margin-left: -10px; border-radius: 50%; background: var(--dot-me);
+	.jr-ghost-cap { position: absolute; top: 6px; transform: translateX(-100%); margin-left: -4px; font-size: 12.5px; color: var(--text-2); white-space: nowrap; }
+	.jr-ghost-cap.right { transform: none; margin-left: 6px; }
+	.jr-mover { position: absolute; inset: 0; transition: transform var(--dur-deliberate) var(--ease-move); pointer-events: none; }
+	.jr-dot { position: absolute; left: 0; top: 35px; width: 20px; height: 20px; margin-left: -10px; border-radius: 50%; background: var(--dot-me);
 		animation: land var(--dur-base) var(--ease-settle) both; }
-	.merge { position: absolute; left: -10px; top: 35px; width: 20px; height: 20px; border-radius: 50%; background: var(--dot-me);
+	.jr-merge { position: absolute; left: -10px; top: 35px; width: 20px; height: 20px; border-radius: 50%; background: var(--dot-me);
 		animation: merge 1800ms var(--ease-out) var(--dur-deliberate) infinite both; }
-	.cap { position: absolute; left: 0; top: 4px; margin-left: 6px; font-size: 13.5px; font-weight: 650; color: var(--text); white-space: nowrap; }
-	.cap.left { margin-left: 0; transform: translateX(calc(-100% - 6px)); }
-	.end { position: absolute; bottom: 0; font-size: 12px; color: var(--text-3); }
-	.end.l { left: 0; }
-	.end.r { right: 0; }
+	.jr-cap { position: absolute; left: 0; top: 4px; margin-left: 6px; font-size: 13.5px; font-weight: 650; color: var(--text); white-space: nowrap; }
+	.jr-cap.left { margin-left: 0; transform: translateX(calc(-100% - 6px)); }
+	.jr-end { position: absolute; bottom: 0; font-size: 12px; color: var(--text-3); }
+	.jr-end.l { left: 0; }
+	.jr-end.r { right: 0; }
 	@keyframes land { from { opacity: 0; transform: scale(.4); } }
 	@keyframes drop-move { 0% { transform: translateX(0); } 72%, 100% { transform: translateX(100%); } }
 	@keyframes drop-shape {
@@ -112,6 +112,6 @@
 	}
 	@keyframes merge { 0%, 68% { opacity: 0; transform: scale(1); } 74% { opacity: .55; transform: scale(1.05); } 100% { opacity: 0; transform: scale(1.9); } }
 	/* the loop is decoration: gone when motion is reduced, here or by the system */
-	@media (prefers-reduced-motion: reduce) { .flow, .merge { display: none; } }
-	:global([data-motion='reduce']) .flow, :global([data-motion='reduce']) .merge { display: none; }
+	@media (prefers-reduced-motion: reduce) { .jr-flow, .jr-merge { display: none; } }
+	:global([data-motion='reduce']) .jr-flow, :global([data-motion='reduce']) .jr-merge { display: none; }
 </style>

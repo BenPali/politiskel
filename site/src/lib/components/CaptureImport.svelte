@@ -97,7 +97,7 @@
 </script>
 
 <div class="capture">
-	<label class="drop" class:over ondragenter={(e) => { e.preventDefault(); over = true; }} ondragover={(e) => { e.preventDefault(); over = true; }}
+	<label class="dropzone" class:over ondragenter={(e) => { e.preventDefault(); over = true; }} ondragover={(e) => { e.preventDefault(); over = true; }}
 		ondragleave={() => (over = false)} ondrop={dropped}>
 		<svg width="28" height="28" viewBox="0 0 28 28" aria-hidden="true"><rect x="3" y="5" width="22" height="18" rx="3" fill="none" stroke="currentColor" stroke-width="2.2" /><circle cx="10" cy="11.5" r="2.4" fill="currentColor" /><path d="M5 21l6-6 4 4 3-3 5 5" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linejoin="round" /></svg>
 		<strong>{L.dropTitleShort}</strong>
@@ -129,15 +129,15 @@
 </div>
 
 <style>
-	.drop { position: relative; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 6px; text-align: center;
+	.dropzone { position: relative; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 6px; text-align: center;
 		min-height: 150px; padding: 20px; border-radius: var(--r-lg); border: 2px dashed var(--border-strong); background: var(--surface-2);
 		color: var(--text-2); cursor: pointer; transition: border-color var(--dur-instant), background-color var(--dur-instant); }
-	.drop:hover, .drop.over { border-color: var(--accent); background: var(--accent-soft); }
-	.drop svg { color: var(--accent); }
-	.drop strong { color: var(--text); font-size: 15.5px; }
-	.drop span { font-size: 13.5px; color: var(--text-3); }
-	.drop input { position: absolute; inset: 0; opacity: 0; cursor: pointer; }
-	.drop:focus-within { box-shadow: var(--focus-ring); }
+	.dropzone:hover, .dropzone.over { border-color: var(--accent); background: var(--accent-soft); }
+	.dropzone svg { color: var(--accent); }
+	.dropzone strong { color: var(--text); font-size: 15.5px; }
+	.dropzone span { font-size: 13.5px; color: var(--text-3); }
+	.dropzone input { position: absolute; inset: 0; opacity: 0; cursor: pointer; }
+	.dropzone:focus-within { box-shadow: var(--focus-ring); }
 	.status, .error { margin: 12px 0 0; display: flex; align-items: center; gap: 10px; }
 	details { margin-top: 14px; }
 	summary { cursor: pointer; color: var(--accent-ink); font-weight: 650; min-height: 44px; display: flex; align-items: center; }

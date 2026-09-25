@@ -184,7 +184,7 @@
 								<p class="lead">{L.resultNoAxis(r.name, c.native)}</p>
 							{:else}
 								<JourneyStrip {c} axis={r.axis} {country} />
-								<div class="readings">
+								<div class="result-cards">
 									{#each r.cards as card, i (card.label)}
 										<div class="reading" style="--i: {i + 1}">
 											<div class="l">{card.label}</div>
@@ -239,7 +239,7 @@
 		margin: 8px 0 10px; text-wrap: balance; }
 	.result .lead { margin: 0; font-size: var(--fs-lg); color: var(--text-2); max-width: 58ch; }
 	.theme-h { font-family: var(--font-display); font-size: 22px; font-weight: 600; margin: 12px 0 0; }
-	.readings { display: grid; grid-template-columns: repeat(auto-fit, minmax(150px, 1fr)); gap: 10px; }
+	.result-cards { display: grid; grid-template-columns: repeat(auto-fit, minmax(150px, 1fr)); gap: 10px; }
 	.reading { padding: 14px 16px; border-radius: var(--r-md); background: var(--surface); border: 1px solid var(--border);
 		animation: card-in var(--dur-base) var(--ease-out) both; animation-delay: calc(var(--stagger) * var(--i) + 120ms); }
 	@keyframes card-in { from { opacity: 0; transform: translateY(8px); } }

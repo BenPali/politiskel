@@ -29,26 +29,17 @@
   p.subtitle { color: var(--text-2); margin: 0 0 20px; max-width: 70ch; }
 
   /* ------------------------------------------------------- site header --- */
-  .masthead {
-    display: flex; align-items: center; justify-content: space-between;
-    flex-wrap: wrap; gap: 14px 24px; padding: 0 0 18px; margin-bottom: 20px;
-    border-bottom: 1px solid var(--border);
-  }
+  
   .brand { display: flex; align-items: center; gap: 13px; min-width: 0; }
   .brand .mark { flex: none; }
   .brand h1 { font-size: 1.32rem; margin: 0; letter-spacing: -0.015em; }
   .brand .tag { font-size: 0.83rem; color: var(--text-2); margin: 1px 0 0; }
-  .masthead nav { display: flex; align-items: center; gap: 6px; flex-wrap: wrap; }
-  .masthead nav a {
-    display: inline-flex; align-items: center; gap: 6px;
-    font-size: 0.82rem; color: var(--text-2); text-decoration: none;
-    padding: 6px 11px; border: 1px solid var(--border); border-radius: 7px;
-  }
-  .masthead nav a:hover { color: var(--text); border-color: var(--text-3); }
-  .masthead nav a svg { flex: none; }
-  .theme-pick { display: inline-flex; align-items: center; gap: 6px; font-size: 0.82rem; color: var(--text-2); }
-  .theme-pick select { font: inherit; padding: 5px 8px; border-radius: 7px; border: 1px solid var(--border);
-                       background: var(--surface); color: var(--text); cursor: pointer; }
+  
+  
+  
+  
+  
+  
 
   /* ----------------------------------------------------------- pied de page --- */
   footer.site {
@@ -72,24 +63,13 @@
     margin-top: 22px; padding-top: 14px; border-top: 1px solid var(--border);
     font-size: 0.78rem; color: var(--text-3);
   }
-  @media (max-width: 560px) {
-    .masthead { flex-direction: column; align-items: flex-start; }
-  }
+  
 
-  .controls {
-    display: flex; flex-wrap: wrap; gap: 8px 18px; align-items: center;
-    margin-bottom: 16px; padding: 10px 14px;
-    background: var(--surface); border: 1px solid var(--border); border-radius: 10px;
-  }
-  .controls label { display: inline-flex; align-items: center; gap: 7px;
-                    font-size: 0.85rem; color: var(--text-2); cursor: pointer; }
-  .controls input[type=checkbox] { accent-color: var(--series-1); width: 15px; height: 15px; }
-  .controls select {
-    padding: 5px 8px; font: inherit; font-size: 0.85rem; cursor: pointer;
-    background: var(--bg); color: var(--text);
-    border: 1px solid var(--border); border-radius: 6px;
-  }
-  .controls select:focus-visible { outline: 2px solid var(--focus); outline-offset: 1px; }
+  
+  
+  
+  
+  
   /* the country decides what everything else is compared against, where the
      rest of the row only toggles what is drawn: a rule keeps the two apart
      without the stretch of empty bar that pushing them to opposite ends left */
@@ -129,7 +109,7 @@
   tbody tr { cursor: pointer; }
   tbody tr.sel td { background: var(--series-1-soft); }
   #detail-table td, #detail-table th { padding: 5px 8px; }
-  #detail-table tr.self td { background: var(--series-1-soft); }
+  
   .bar-cell { width: 100%; min-width: 90px; padding-right: 0 !important; }
   .bar { height: 7px; border-radius: 0 3px 3px 0; background: var(--series-1);
          min-width: 2px; opacity: 0.85; }
@@ -172,7 +152,7 @@
                background: var(--series-1); margin-right: 7px; vertical-align: -1px; }
   /* the nearest-party cell wraps, so the alias column keeps room for the
      three concepts instead of stacking them one word per line */
-  td.fam { white-space: normal; min-width: 11em; }
+  
   /* one line each: the party, how near, the runner-up — cut there rather
      than wherever the width happens to fall */
   td.fam .tag { display: block; }
@@ -182,13 +162,11 @@
   .tie { display: block; font-size: 0.7rem; color: var(--text-3); font-style: italic; }
 
   /* per-axis strips: one row per PolitiScales axis, every profile on it */
-  .strip { display: grid; grid-template-columns: minmax(0, 17ch) 1fr minmax(0, 17ch) 4.5ch;
-           align-items: center; gap: 14px; padding: 8px 0; }
-  .strip + .strip { border-top: 1px solid var(--border); }
+  
+  
   .strip .pole { font-size: 0.78rem; color: var(--text-2); }
   .strip .pole.r { text-align: right; }
-  .strip .sd { font-size: 0.72rem; color: var(--text-3); text-align: right;
-               font-variant-numeric: tabular-nums; }
+  
   /* Tall enough to separate ten dots on one axis: at 26px a group of that size
      read as a single smear. */
   .track { position: relative; height: 34px; }
@@ -220,19 +198,13 @@
      a reading in its own right, and squeezed into the chart column its tracks
      were too short to tell ten profiles apart. */
   #strips-card { position: relative; margin-top: 20px; }
-  #strips-card .strip { padding: 11px 0; }
+  
   #strips-card .strip .pole { font-size: 0.84rem; }
   /* the form is input, not a reading: it closes the page and keeps a readable
      line length instead of stretching across it */
-  .add-card { max-width: 760px; }
-  .tip-strip {
-    position: absolute; z-index: 8;
-    background: var(--surface); border: 1px solid var(--border); border-radius: 8px;
-    padding: 10px 12px; min-width: 210px; max-width: 280px;
-    box-shadow: 0 4px 16px rgba(0,0,0,0.13);
-    font-size: 0.78rem; line-height: 1.5; color: var(--text-2);
-  }
-  .tip-strip[hidden] { display: none !important; }
+  
+  
+  
   .track .pt.multi { box-shadow: 0 0 0 2px var(--surface), 0 0 0 4px var(--series-1-soft); }
   .tip-strip .row {
     display: block; width: 100%; text-align: left; background: none; border: none;
@@ -247,26 +219,21 @@
                          font-variant-numeric: tabular-nums; font-size: 0.8rem; }
   .tip-strip .row .det { color: var(--text-3); font-size: 0.72rem; margin-top: 2px; }
   .tip-strip .more { color: var(--text-3); font-size: 0.72rem; margin: 2px 0 6px; }
-  .tip-strip b { display: block; color: var(--text); font-size: 0.86rem; margin-bottom: 2px; }
+  
   .tip-strip .ax { color: var(--text-3); margin-bottom: 7px; }
-  .tip-strip .seg { display: flex; height: 9px; border-radius: 3px; overflow: hidden;
-                    margin: 7px 0 5px; background: var(--bg); }
-  .tip-strip .seg i { display: block; }
+  
+  
   .tip-strip .seg .l { background: var(--series-1); }
   .tip-strip .seg .n { background: var(--border); }
   .tip-strip .seg .r { background: var(--series-1); opacity: 0.45; }
-  .tip-strip dl { display: grid; grid-template-columns: auto 1fr; gap: 1px 10px; margin: 0; }
-  .tip-strip dt { color: var(--text-3); }
-  .tip-strip dd { margin: 0; color: var(--text); font-weight: 600;
-                  font-variant-numeric: tabular-nums; text-align: right; }
-  .strip-head { display: grid; grid-template-columns: minmax(0, 17ch) 1fr minmax(0, 17ch) 4.5ch;
-                gap: 14px; font-size: 0.7rem; text-transform: uppercase;
-                letter-spacing: 0.05em; color: var(--text-3); padding-bottom: 8px;
-                border-bottom: 1px solid var(--border); }
+  
+  
+  
+  
   .strip-head .c { text-align: center; }
   .strip-head .r { text-align: right; }
   @media (max-width: 720px) {
-    .strip, .strip-head { grid-template-columns: 1fr; gap: 4px; }
+    
     .strip .pole.r, .strip .sd, .strip-head .r, .strip-head .c { text-align: left; }
   }
 
@@ -277,9 +244,8 @@
     border: 1px solid var(--border); background: var(--bg);
   }
   .flag.lg { width: 68px; height: 38px; margin: 0; vertical-align: middle; }
-  .devise { color: var(--text-3); font-size: 0.76rem; margin-left: 34px;
-            white-space: normal; }
-  .who-cell { line-height: 1.35; }
+  
+  
   .devise.none { color: var(--text-3); font-style: italic; }
   .concepts { display: flex; flex-wrap: wrap; gap: 5px; margin: 0; padding: 0; list-style: none; }
   .concepts li {
@@ -288,7 +254,7 @@
   }
   .concepts li b { color: var(--text); font-weight: 600; }
   .concepts li i { font-style: normal; color: var(--text-3); }
-  .id-card { display: flex; gap: 14px; align-items: flex-start; margin-bottom: 14px; }
+  
   .id-card .meta { min-width: 0; }
   .id-card .meta .d { font-size: 0.9rem; color: var(--text); margin: 0 0 7px; }
 
@@ -302,32 +268,21 @@
   .drop:hover, .drop.over { border-color: var(--series-1); background: var(--series-1-soft); }
   .drop strong { display: block; color: var(--text); margin-bottom: 3px; }
   .drop input[type=file] { display: none; }
-  .drop-note { font-size: 0.75rem; color: var(--text-3); margin: 9px 0 0; }
-  .capture-ok {
-    display: flex; gap: 12px; align-items: center; margin-top: 12px;
-    padding: 10px 12px; border-radius: 8px; border: 1px solid var(--border);
-    background: var(--bg); font-size: 0.82rem;
-  }
-  .capture-ok[hidden] { display: none !important; }
+  
+  
+  
   .capture-ok .who { color: var(--text); font-weight: 600; }
-  .del {
-    background: none; border: none; color: var(--text-3); cursor: pointer;
-    font-size: 1rem; line-height: 1; padding: 2px 6px; border-radius: 4px; margin: 0;
-  }
-  .del:hover { background: var(--border); color: var(--text); }
+  
+  
   .empty { color: var(--text-3); padding: 16px 10px; }
 
   fieldset { border: none; padding: 0; margin: 0 0 10px; }
-  .axis-row {
-    display: grid; grid-template-columns: 1fr 64px 64px; gap: 10px;
-    align-items: center; padding: 7px 0; border-bottom: 1px solid var(--border);
-  }
-  .axis-row:last-of-type { border-bottom: none; }
+  
+  
   .axis-row .poles { font-size: 0.8rem; color: var(--text-2); min-width: 0; }
   .axis-row .poles em { font-style: normal; color: var(--text); }
   .axis-row.over .poles { color: var(--warn); }
-  .axis-row .col-head { font-size: 0.68rem; text-transform: uppercase;
-                        letter-spacing: 0.05em; color: var(--text-3); text-align: center; }
+  
   input[type=text], input[type=number] {
     width: 100%; padding: 6px 8px; font: inherit; font-size: 0.85rem;
     background: var(--bg); color: var(--text);
@@ -433,65 +388,56 @@
                     font: inherit; font-size: 0.85rem; }
   .quiz-nav .skip:hover { color: var(--text); }
   .quiz-keys { text-align: center; font-size: 0.72rem; color: var(--text-3); margin-top: 14px; }
-  .theme-list { display: grid; gap: 10px; margin-top: 6px; }
-  .theme-card { display: grid; grid-template-columns: 1fr auto; gap: 6px 18px; align-items: center;
-                border: 1px solid var(--border); border-radius: 12px; padding: 16px 18px;
-                background: var(--bg); }
-  .theme-card h3 { margin: 0; font-size: 1.05rem; font-weight: 600; color: var(--text);
-                   text-transform: none; letter-spacing: 0; }
-  .theme-card p { margin: 0; font-size: 0.84rem; color: var(--text-2); grid-column: 1; }
+  
+  
+  
+  
   .theme-card .status { font-size: 0.75rem; color: var(--text-3); grid-column: 1; }
   .theme-card .go { grid-column: 2; grid-row: 1 / span 3; }
   .theme-card.planned { background: none; border-style: dashed; }
   .theme-card.all { border-color: var(--series-1); background: var(--surface); }
   /* the Politiskel flag's figure in the distance panel */
-  .flag-figure { border-top: 1px solid var(--border); margin: 0 0 14px; padding-top: 12px; }
+  
   .flag-figure .hint { margin: 0; }
-  .flag-figure-head { display: flex; justify-content: space-between; align-items: center; gap: 12px;
-                      margin-bottom: 10px; }
-  .flag-figure .flag-size { padding: 5px 10px; font-size: 0.78rem; flex: none; }
-  .flag-drawn { display: block; width: 200px; max-width: 100%; height: auto; border-radius: 3px;
-                box-shadow: 0 0 0 1px var(--border); transition: width 0.2s; }
+  
+  
+  
   .flag-drawn.large { width: 100%; max-width: 560px; }
-  .flag-legend { margin: 8px 0 0; padding-left: 18px; font-size: 0.78rem; color: var(--text-2); }
-  .flag-legend li { margin-bottom: 3px; }
+  
+  
   #detail-readings { margin-top: 16px; padding-top: 14px; border-top: 1px solid var(--border); }
-  #detail-readings > .flag-figure:first-child { border-top: none; padding-top: 0; }
-  .manual { margin-top: 12px; }
-  .manual summary { cursor: pointer; font-size: 0.85rem; color: var(--text-2); padding: 4px 0; }
-  .manual summary:hover { color: var(--text); }
-  .manual[open] summary { margin-bottom: 8px; }
+  
+  
+  
+  
+  
   .flag-figure .note { margin: 8px 0 0; font-size: 0.72rem; color: var(--text-3); }
 
-  .site-view { max-width: 820px; margin: 0 auto 40px; }
-  .site-view h2 { font-size: 1.25rem; margin: 0 0 6px; }
+  
+  
   .site-view .lead { margin-bottom: 18px; }
   .site-view section.card { margin-bottom: 16px; }
-  .site-view h3 { font-size: 0.95rem; margin: 0 0 10px; }
+  
   .site-view form .row, .site-view .row { display: flex; flex-wrap: wrap; gap: 8px 12px; align-items: center; }
-  .site-view input[type=text], .site-view input[type=password] {
-    font: inherit; padding: 8px 11px; border: 1px solid var(--border); border-radius: 7px;
-    background: var(--bg); color: var(--text); min-width: 14em; }
+  
   .site-view .consent { display: flex; gap: 8px; align-items: flex-start; color: var(--text-2);
                         margin: 12px 0; font-size: 0.85rem; }
   .site-view .note { color: var(--text-3); font-size: 0.78rem; margin: 10px 0 0; }
   .site-view .status { color: var(--text-2); font-size: 0.85rem; margin: 0 0 12px; }
-  .login-card { max-width: 460px; margin: 30px auto; }
-  .login-card .switch { display: flex; gap: 0; margin-bottom: 18px; border: 1px solid var(--border);
-                        border-radius: 8px; overflow: hidden; }
-  .login-card .switch button { flex: 1; background: none; border: none; padding: 9px; font: inherit;
-                               color: var(--text-2); cursor: pointer; }
+  
+  
+  
   .login-card .switch button.on { background: var(--series-1-soft); color: var(--text); font-weight: 600; }
-  .login-card form > * + * { margin-top: 10px; }
-  .login-card input[type=text], .login-card input[type=password] { width: 100%; box-sizing: border-box; }
+  
+  
   .group-card .members { color: var(--text-2); font-size: 0.85rem; margin: 4px 0 12px; }
   .group-card .link { font-family: ui-monospace, monospace; font-size: 0.75rem; color: var(--text-3);
                       word-break: break-all; margin: 8px 0 0; }
-  .invite-card { border-color: var(--series-1); }
-  .profile-summary { display: grid; grid-template-columns: auto 1fr; gap: 6px 16px; font-size: 0.9rem; }
-  .profile-summary dt { color: var(--text-2); }
-  .profile-summary dd { margin: 0; }
-  body.server-mode .add-card { max-width: none; }
+  
+  
+  
+  
+  
   /* server mode: the group bar, and what a local page has that a group's does not */
   .account { background: var(--surface); border: 1px solid var(--border); border-radius: 12px;
              padding: 14px 18px; margin: 0 0 18px; font-size: 0.85rem; }
@@ -511,35 +457,32 @@
                      margin-bottom: 10px; }
   .account .status { color: var(--text-3); font-size: 0.78rem; }
   .account .note { color: var(--text-3); font-size: 0.75rem; margin: 8px 0 0; max-width: 90ch; }
-  .guest-bar { display: flex; flex-wrap: wrap; align-items: center; justify-content: space-between; gap: 10px 20px; }
-  .guest-bar p { margin: 0; color: var(--text-2); }
-  .guest-offer { max-width: 460px; margin: 18px auto 0; text-align: center; }
+  
+  
+  
   .guest-offer .note { color: var(--text-3); font-size: 0.8rem; margin: 8px 0 0; }
-  .owner-tools { margin-top: 12px; border-top: 1px solid var(--border); padding-top: 10px; }
-  .owner-tools summary { cursor: pointer; color: var(--text-2); font-size: 0.85rem; }
+  
+  
   .owner-tools .actions { margin: 10px 0; }
-  .member-rows { list-style: none; margin: 0; padding: 0; }
-  .member-rows li { display: flex; justify-content: space-between; align-items: center; gap: 12px;
-                    padding: 6px 0; border-bottom: 1px solid var(--border); font-size: 0.85rem; }
+  
+  
   .member-rows .actions { display: inline-flex; gap: 6px; margin: 0; }
-  .member-rows button, .owner-tools button { padding: 5px 10px; font-size: 0.8rem; }
+  
   button.danger { color: var(--warn); border-color: var(--warn); }
   /* the compass's group header: which group, who is in it, where to go */
-  .group-head { padding: 16px 20px; }
-  .group-top { display: flex; flex-wrap: wrap; align-items: flex-end; justify-content: space-between;
-               gap: 12px 20px; }
-  .group-title { display: flex; flex-wrap: wrap; align-items: baseline; gap: 2px 10px; min-width: 0; }
+  
+  
+  
   .group-title .eyebrow { flex-basis: 100%; font-size: 0.68rem; font-weight: 600; letter-spacing: 0.07em;
                           text-transform: uppercase; color: var(--text-3); }
-  .group-title h2 { margin: 0; font-size: 1.2rem; letter-spacing: -0.01em; }
+  
   .group-title .count { color: var(--text-3); font-size: 0.82rem; }
-  .group-actions { display: flex; flex-wrap: wrap; align-items: center; gap: 8px; }
-  .group-actions select { padding: 7px 10px; cursor: pointer; font-size: 0.82rem; }
+  
+  
   .group-actions .ghost, .group-actions a.button.ghost { display: inline-flex; align-items: center; padding: 7px 12px;
                          font-size: 0.82rem; line-height: 1.2; }
   .group-head .status { margin: 10px 0 0; }
-  .group-members { display: flex; flex-wrap: wrap; gap: 6px; margin-top: 12px; padding-top: 12px;
-                   border-top: 1px solid var(--border); }
+  
   .group-members .member { display: inline-flex; align-items: center; gap: 7px; cursor: pointer;
                            padding: 4px 11px 4px 5px; border-radius: 999px; font: inherit; font-size: 0.8rem;
                            color: var(--text); background: var(--bg); border: 1px solid var(--border); }
@@ -548,30 +491,25 @@
   .group-members .member.me { background: var(--series-1-soft); border-color: transparent; font-weight: 600; }
   .group-members .member .flag { margin: 0; width: 22px; height: 13px; border-radius: 2px; }
   .group-members .member .swatch { margin: 0 0 0 4px; }
-  body.server-mode #native-form, body.server-mode #p-alias, body.server-mode label[for=p-alias],
-  body.server-mode .drop-note code, body.server-mode #reset-btn,
-  body.server-mode button.del { display: none; }
-  .start-native { display: flex; flex-wrap: wrap; gap: 8px 10px; align-items: center;
-                  margin: -6px 0 20px; font-size: 0.85rem; color: var(--text-2); }
-  .start-native input { font: inherit; padding: 7px 10px; border: 1px solid var(--border);
-                        border-radius: 7px; background: var(--surface); color: var(--text);
-                        width: 11em; }
+  
+  
+  
   .start-native button.primary { padding: 7px 14px; }
   .start-native .error { margin: 0; flex-basis: 100%; }
   .theme-card.planned h3, .theme-card.planned p { color: var(--text-3); }
   @media (max-width: 640px) {
-    .theme-card { grid-template-columns: 1fr; }
+    
     .theme-card .go { grid-column: 1; grid-row: auto; justify-self: start; margin-top: 6px; }
   }
-  .journey-strip { width: 100%; height: auto; margin: 4px 0 18px; overflow: visible; }
+  
   .journey-strip .axis { stroke: var(--axis); stroke-width: 1; }
   .journey-strip .ref { fill: var(--surface); stroke: var(--ref-ink); stroke-width: 1; }
-  .journey-strip .ref-name { font-size: 10px; fill: var(--text-3); }
+  
   .journey-strip .end { font-size: 10px; fill: var(--text-3); }
   .journey-strip .cap { font-size: 11px; font-weight: 600; fill: var(--text); }
   .journey-strip .cap.was { fill: var(--text-2); font-weight: 400; }
   .journey-strip .dot { fill: var(--series-1); }
-  .journey-strip .arrow { stroke: var(--series-1); stroke-width: 1.5; fill: none; }
+  
   .journey-strip .head { fill: var(--series-1); }
 
   details.method { margin-top: 20px; }
