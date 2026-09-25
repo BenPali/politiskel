@@ -8,13 +8,18 @@
 	import { L } from '$lib/i18n/fr.js';
 	import { session } from '$lib/session.svelte.js';
 	import { PALETTES, MODES, readDisplay, applyDisplay } from '$lib/theme.js';
+	import { readGuest } from '$lib/quiz/answers.svelte.js';
 
 	let display = $state({ palette: 'classique', mode: 'auto', motion: 'full' });
 	let pickerOpen = $state(false);
 	let menuOpen = $state(false);
 
+	/* a visitor with a trial profile gets its pages among the sections */
+	let trial = $state(false);
+
 	onMount(() => (display = readDisplay()));
 	afterNavigate(() => {
+		trial = readGuest() !== null;
 		menuOpen = false;
 		pickerOpen = false;
 	});
@@ -31,7 +36,14 @@
 					{ href: '/groupes', label: L.tabGroups },
 					{ href: '/methode', label: L.navMethod }
 				]
-			: [
+			: trial
+				? [
+						{ href: '/boussole', label: L.tabCompass },
+						{ href: '/questionnaire', label: L.tabQuiz },
+						{ href: '/essai', label: L.navTry },
+						{ href: '/methode', label: L.navMethod }
+					]
+				: [
 					{ href: '/essai', label: L.navTry },
 					{ href: '/methode', label: L.navMethod },
 					{ href: '/drapeaux', label: L.navFlags }
