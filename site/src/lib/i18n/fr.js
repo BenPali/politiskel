@@ -374,6 +374,7 @@ export const LOCALES = {
     saved: "Enregistré.", addTitleServer: "Mon résultat PolitiScales",
     apiErrors: {
       default: "Le serveur n'a pas pu traiter la demande.",
+      cross_origin: "Le serveur a refusé une demande qui ne venait pas de son propre site.",
       network: "Pas de connexion au serveur : ce qui n'a pas pu partir sera renvoyé.",
       flag_too_large: "Le drapeau de la capture est trop lourd pour être enregistré.",
       flag_not_png: "Le drapeau de la capture n'est pas une image PNG valide.",

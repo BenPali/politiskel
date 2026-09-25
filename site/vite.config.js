@@ -17,7 +17,9 @@ export default defineConfig({
 	server: {
 		// the model and the questionnaire live in ../tools, shared with Node
 		fs: { allow: ['..'] },
-		// in development, the API is the local Rust server
-		proxy: { '/api': 'http://127.0.0.1:8080' }
+		// in development, the API is the local Rust server. The Host header
+		// is kept (changeOrigin false; the string shorthand sets it true):
+		// the server refuses a write whose Origin does not match its Host.
+		proxy: { '/api': { target: 'http://127.0.0.1:8080', changeOrigin: false } }
 	}
 });
