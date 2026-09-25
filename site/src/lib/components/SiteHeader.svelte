@@ -9,6 +9,7 @@
 	import { session } from '$lib/session.svelte.js';
 	import { PALETTES, MODES, readDisplay, applyDisplay } from '$lib/theme.js';
 	import { readGuest } from '$lib/quiz/answers.svelte.js';
+	import { waitingRequests } from '$lib/notify.svelte.js';
 
 	let display = $state({ palette: 'classique', mode: 'auto', motion: 'full' });
 	let pickerOpen = $state(false);
@@ -44,7 +45,7 @@
 			? [
 					{ href: '/boussole', label: L.tabCompass },
 					{ href: '/questionnaire', label: L.tabQuiz },
-					{ href: '/groupes', label: L.tabGroups },
+					{ href: '/groupes', label: L.tabGroups, count: waitingRequests() },
 					{ href: '/methode', label: L.navMethod }
 				]
 			: trial
@@ -81,7 +82,7 @@
 
 	<nav class="sections" class:open={menuOpen} aria-label={L.navMain}>
 		{#each tabs as t (t.href)}
-			<a href={t.href} aria-current={here(t.href) ? 'page' : undefined}>{t.label}<span class="bar"></span></a>
+			<a href={t.href} aria-current={here(t.href) ? 'page' : undefined}>{t.label}{#if t.count}<span class="count" title={L.requestsWaiting(t.count)} aria-label={L.requestsWaiting(t.count)}>{t.count}</span>{/if}<span class="bar"></span></a>
 		{/each}
 	</nav>
 
@@ -145,6 +146,9 @@
 		transition: opacity var(--dur-base) var(--ease-out), transform var(--dur-base) var(--ease-out);
 	}
 	.sections a[aria-current='page'] .bar { opacity: 1; transform: scaleX(1); }
+	.count { margin-left: 6px; min-width: 18px; height: 18px; padding: 0 5px; border-radius: 9px; box-sizing: border-box;
+		display: inline-grid; place-items: center; background: var(--accent-strong); color: var(--on-accent);
+		font-size: 11.5px; font-weight: 700; font-variant-numeric: tabular-nums; animation: pop var(--dur-base) var(--ease-settle) both; }
 	.end { display: flex; align-items: center; gap: var(--sp-2); }
 	.icon { width: var(--tap); padding: 0; background: transparent; border-color: transparent; color: var(--text-2); }
 	.icon:hover { background: var(--surface-2); }

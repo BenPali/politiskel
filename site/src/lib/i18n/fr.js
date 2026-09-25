@@ -715,6 +715,8 @@ export const LOCALES = {
     quizStart: "Commencer", quizResume: "Reprendre", quizPrev: "← Précédent",
     quizNext: "Suivant →", quizSkip: "Passer", quizSeeResult: "Voir le résultat →",
     toastClose: "Fermer",
+    requestsNew: (g, n) => (n > 1 ? n + " nouvelles demandes" : "Nouvelle demande") + " pour rejoindre « " + g + " ».",
+    requestsSee: "Voir", requestsWaiting: n => n + " demande" + (n > 1 ? "s" : "") + " en attente",
     saveRetrying: "Réponse pas encore enregistrée : pas de connexion. Nouvel essai dans quelques secondes.",
     quizErase: "Effacer mes réponses", seeResult: "Voir le résultat",
     eraseAllTitle: "Effacer toutes mes réponses",

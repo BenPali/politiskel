@@ -38,6 +38,7 @@
 		<div class="toast" class:error={t.kind === 'error'} role={t.kind === 'error' ? 'alert' : 'status'}
 			onpointerenter={() => hold(t)} onpointerleave={() => release(t)}>
 			<span class="text">{t.text}</span>
+			{#if t.action}<a class="act" href={t.action.href} onclick={() => dismiss(t.id)}>{t.action.label}</a>{/if}
 			<button type="button" class="close" aria-label={L.toastClose} onclick={() => dismiss(t.id)}>
 				<svg width="12" height="12" viewBox="0 0 12 12" aria-hidden="true"><path d="M2 2l8 8M10 2l-8 8" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" /></svg>
 			</button>
@@ -55,6 +56,7 @@
 		animation: toast-in var(--dur-base) var(--ease-out) both; }
 	.toast.error { background: var(--danger); color: var(--on-danger); }
 	.text { min-width: 0; }
+	.act { flex: none; color: inherit; font-weight: 650; text-decoration: underline; text-underline-offset: 3px; }
 	.close { flex: none; width: 26px; height: 26px; min-height: 26px; padding: 0; border: 0; border-radius: 50%;
 		background: transparent; color: inherit; opacity: .7; display: grid; place-items: center; }
 	.close:hover { opacity: 1; background: color-mix(in srgb, currentColor 14%, transparent); }

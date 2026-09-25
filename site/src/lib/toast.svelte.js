@@ -6,11 +6,12 @@
 export const toasts = $state({ list: [] });
 let next = 1;
 
-/** kind: 'info' | 'error'; ms: how long it stays (0: until closed) */
-export function toast(text, { kind = 'info', ms = kind === 'error' ? 0 : 4500 } = {}) {
+/** kind: 'info' | 'error'; ms: how long it stays (0: until closed);
+    action: { label, href }, a link the message offers */
+export function toast(text, { kind = 'info', ms = kind === 'error' ? 0 : 4500, action = null } = {}) {
 	if (!text) return;
 	const id = next++;
-	toasts.list = [...toasts.list.filter((t) => t.text !== text), { id, text, kind, ms }].slice(-3);
+	toasts.list = [...toasts.list.filter((t) => t.text !== text), { id, text, kind, ms, action }].slice(-3);
 	return id;
 }
 

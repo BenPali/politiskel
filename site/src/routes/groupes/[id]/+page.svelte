@@ -13,6 +13,7 @@
 	import { board, showGroup } from '$lib/compass/board.svelte.js';
 	import { fromMember, hasPolitiscales } from '$lib/compass/model.js';
 	import { toast } from '$lib/toast.svelte.js';
+	import { announce } from '$lib/notify.svelte.js';
 	import SignedIn from '$lib/components/SignedIn.svelte';
 	import MemberFlag from '$lib/components/MemberFlag.svelte';
 
@@ -41,6 +42,8 @@
 	async function loadRequests() {
 		const r = await api('GET', '/api/groups/' + id + '/requests');
 		waiting = r.ok ? r.data : [];
+		/* looked at: these requests are no longer news */
+		announce();
 	}
 	$effect(() => {
 		if (g?.owner) loadRequests();
