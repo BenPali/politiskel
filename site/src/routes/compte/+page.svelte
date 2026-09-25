@@ -127,7 +127,7 @@
 					<p class="note">{L.displayLead}</p>
 					<div class="palettes" role="radiogroup" aria-label={L.displayPalette}>
 						{#each PALETTES as p (p)}
-							<button type="button" role="radio" aria-checked={display.palette === p} data-theme={p} onclick={() => set('palette', p)}>
+							<button type="button" role="radio" aria-checked={display.palette === p} data-theme={p} data-mode={display.mode} onclick={() => set('palette', p)}>
 								<span class="swatch" aria-hidden="true"><span></span></span>
 								<span class="txt"><b>{L.palettes[p]}</b><small>{L.paletteHints[p]}</small></span>
 							</button>
@@ -204,13 +204,14 @@
 	.bar span { display: block; height: 100%; background: var(--accent); transform-origin: left; }
 	.actions { display: flex; flex-wrap: wrap; gap: 10px; }
 	.palettes { display: grid; grid-template-columns: repeat(auto-fill, minmax(190px, 1fr)); gap: 8px; margin-bottom: 18px; }
-	.palettes button { justify-content: flex-start; gap: 12px; min-height: 56px; padding: 8px 12px; text-align: left;
+	.palettes button { justify-content: flex-start; gap: 12px; min-height: 56px; padding: 8px 12px; text-align: left; white-space: normal; min-width: 0;
 		background: var(--surface); color: var(--text); border: 1px solid var(--border); border-radius: var(--r-md); }
 	.palettes button[aria-checked='true'] { border-color: var(--accent-strong); box-shadow: inset 0 0 0 1px var(--accent-strong); }
 	/* each swatch shows its own palette: data-theme on the button scopes the tokens */
 	.swatch { flex: none; width: 34px; height: 34px; border-radius: 50%; background: var(--bg); box-shadow: 0 0 0 1px var(--border-strong);
 		display: grid; place-items: center; }
 	.swatch span { width: 14px; height: 14px; border-radius: 50%; background: var(--accent); }
+	.txt { min-width: 0; }
 	.txt b { display: block; font-size: 14.5px; }
 	.txt small { display: block; font-size: 12.5px; color: var(--text-3); font-weight: 400; }
 	.eyebrow { margin: 0 0 8px; }

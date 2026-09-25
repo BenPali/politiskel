@@ -95,7 +95,7 @@
 					<p class="eyebrow">{L.displayPalette}</p>
 					<div class="swatches">
 						{#each PALETTES as p (p)}
-							<button type="button" class="swatch-btn" data-theme={p} aria-pressed={display.palette === p} onclick={() => set('palette', p)}>
+							<button type="button" class="swatch-btn" data-theme={p} data-mode={display.mode} aria-pressed={display.palette === p} onclick={() => set('palette', p)}>
 								<span class="chip"></span>{L.palettes[p]}
 							</button>
 						{/each}

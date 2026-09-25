@@ -19,11 +19,25 @@ export function readDisplay() {
 	return { palette: 'classique', mode: 'auto', motion: 'full' };
 }
 
+/* The change itself, crossfaded across the whole page where the browser can
+   (a view transition), and otherwise by easing the colours for a moment.
+   Neither when motion is reduced, by the setting or the system. */
 export function applyDisplay(d) {
-	document.documentElement.dataset.theme = d.palette;
-	document.documentElement.dataset.mode = d.mode;
-	if (d.motion === 'reduce') document.documentElement.dataset.motion = 'reduce';
-	else delete document.documentElement.dataset.motion;
+	const html = document.documentElement;
+	const set = () => {
+		html.dataset.theme = d.palette;
+		html.dataset.mode = d.mode;
+		if (d.motion === 'reduce') html.dataset.motion = 'reduce';
+		else delete html.dataset.motion;
+	};
+	const still = d.motion === 'reduce' || matchMedia('(prefers-reduced-motion: reduce)').matches;
+	if (still) set();
+	else if (document.startViewTransition) document.startViewTransition(set);
+	else {
+		html.classList.add('theme-fading');
+		set();
+		setTimeout(() => html.classList.remove('theme-fading'), 420);
+	}
 	try {
 		localStorage.setItem(KEY, JSON.stringify(d));
 	} catch {
