@@ -130,17 +130,24 @@ Hand it over privately; they change it from their account page.
 
 ## 7. Updating
 
-Back up, replace the binary and the site, restart:
+Back up under a name of its own — the daily backup may already have run,
+and a backup never overwrites — then replace the binary and the site, and
+restart:
 
 ```
-sudo systemctl start politiskel-backup
+sudo -u politiskel POLITISKEL_DB=/var/lib/politiskel/politiskel.db \
+    /opt/politiskel/politiskel-server backup /var/backups/politiskel/politiskel-$(date +%F-%H%M).db
 sudo install -m 755 politiskel-server /opt/politiskel/
 sudo rm -rf /opt/politiskel/site && sudo cp -r site/build /opt/politiskel/site
 sudo systemctl restart politiskel
 ```
 
-The site's files are read on each request, so replacing them alone needs no
-restart; the binary does. New database migrations run on their own.
+`install` replaces the binary with a new file, which works while the old one
+runs; a plain `cp` over a running binary fails with "Text file busy" — copy
+beside it and `mv` over it instead. The site's files are read on each
+request, so replacing them alone needs no restart; the binary does. New
+database migrations run on their own. Packing on a Mac, `tar --no-xattrs`
+keeps macOS's metadata out of the archive.
 
 ## 8. The legal side
 
