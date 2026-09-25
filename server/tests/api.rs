@@ -580,6 +580,11 @@ async fn a_built_site_is_served_page_by_page() {
     let (_, body, cache) = get("/_app/immutable/app.1a2b.js").await;
     assert_eq!((body.as_str(), cache.as_deref()), ("js", Some("public, max-age=31536000, immutable")));
     assert_eq!(get("/robots.txt").await.1, "robots");
+    // a missing file is a 404, not the fallback page
+    assert_eq!(get("/favicon.ico").await.0, StatusCode::NOT_FOUND);
+    assert_eq!(get("/_app/immutable/gone.js").await.0, StatusCode::NOT_FOUND);
+    // but a member whose name holds a dot is still an address
+    assert_eq!(get("/boussole/jean.dupont").await.1, "fallback");
     // no hidden file, no way out of the directory, and the API keeps its 404s
     assert_eq!(get("/.secret").await.0, StatusCode::NOT_FOUND);
     assert_eq!(get("/_app/../.secret").await.0, StatusCode::NOT_FOUND);

@@ -28,6 +28,17 @@ pub(crate) async fn site_page(State(state): State<AppState>, req: Request<axum::
         vec![rel.to_string(), format!("{rel}.html"), format!("{rel}/index.html")]
     };
     let found = candidates.into_iter().map(|c| dir.join(c)).find(|p| p.is_file());
+    // A missing file — /favicon.ico, a stale /_app/ script — is a 404: the
+    // fallback page is for addresses, and a browser asking for an icon must
+    // not be handed HTML. Only where files live (the root and /_app/), and
+    // only for file types, since a member's name may hold a dot.
+    const FILES: [&str; 16] = ["ico", "png", "svg", "jpg", "jpeg", "webp", "gif", "js", "css", "map",
+                               "json", "webmanifest", "woff", "woff2", "txt", "xml"];
+    let where_files = !rel.contains('/') || rel.starts_with("_app/");
+    let is_file = rel.rsplit_once('.').is_some_and(|(_, ext)| FILES.contains(&ext.to_ascii_lowercase().as_str()));
+    if found.is_none() && where_files && is_file {
+        return ApiError(StatusCode::NOT_FOUND, "not_found").into_response();
+    }
     let file = found.unwrap_or_else(|| dir.join("200.html"));
     let html = file.extension().is_some_and(|e| e == "html");
     let mut res = match ServeFile::new(&file).oneshot(req).await {
