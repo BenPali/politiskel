@@ -35,7 +35,7 @@
 	}
 </script>
 
-<section class="group-board card" aria-label={L.groupLabel}>
+<section class="group-board card" data-tour="group" aria-label={L.groupLabel}>
 	<div class="top">
 		<div class="title">
 			{#if session.me}

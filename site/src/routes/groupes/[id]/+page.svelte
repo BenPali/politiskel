@@ -21,7 +21,6 @@
 	const g = $derived(session.me ? session.me.groups.find((x) => x.id === id) || null : null);
 
 	let members = $state(null);
-	let error = $state('');
 	/** the action waiting for a second yes: { kind, name? } */
 	let asking = $state(null);
 	let copied = $state(false);
@@ -31,7 +30,7 @@
 	async function load() {
 		const r = await api('GET', '/api/groups/' + id + '/profiles');
 		members = r.ok ? r.data.map((m) => ({ p: fromMember(m), answered: !!m.answers && Object.keys(m.answers).length > 0 })) : [];
-		if (!r.ok) error = apiError(r);
+		if (!r.ok) toast(apiError(r), { kind: 'error' });
 	}
 	$effect(() => {
 		if (session.me && g) load();
@@ -73,10 +72,9 @@
 
 	/* every change: the call, then the session and the board afresh */
 	async function run(method, path, body, after) {
-		error = '';
 		const r = await api(method, path, body);
 		asking = null;
-		if (!r.ok) return (error = apiError(r));
+		if (!r.ok) return toast(apiError(r), { kind: 'error' });
 		board.loaded = false;
 		await refresh();
 		after?.(r);
@@ -108,7 +106,6 @@
 				</div>
 				<button type="button" class="primary" onclick={compass}>{L.seeOnCompass}</button>
 			</div>
-			{#if error}<p class="error" role="alert">{error}</p>{/if}
 
 			<div class="cols">
 				<section class="card">
@@ -271,6 +268,6 @@
 	.requests button { min-height: 38px; }
 	.danger-zone { margin-top: 20px; padding-top: 16px; border-top: 1px solid var(--border); }
 	.danger-zone p { margin: 0 0 12px; font-size: 14px; color: var(--text-2); }
-	.status, .error { margin-bottom: 16px; }
+	.status { margin-bottom: 16px; }
 	@media (max-width: 860px) { .cols { grid-template-columns: 1fr; } }
 </style>

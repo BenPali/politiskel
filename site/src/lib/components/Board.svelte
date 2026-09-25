@@ -41,7 +41,7 @@
 	<p class="status">{L.loadingPage}</p>
 {:else}
 	<div class="layout">
-		<section class="card chart" aria-label={L.chartTitle}>
+		<section class="card chart" data-tour="compass" aria-label={L.chartTitle}>
 			<div class="chart-head">
 				<h2>{L.chartTitle}</h2>
 				<span>{L.views[board.view].name}</span>

@@ -41,7 +41,7 @@
 			<svg width="20" height="20" viewBox="0 0 20 20" aria-hidden="true"><rect x="3" y="2.5" width="14" height="15" rx="2.5" fill="none" stroke="currentColor" stroke-width="1.8" /><rect x="6" y="6.5" width="8" height="1.8" rx=".9" fill="currentColor" /><rect x="6" y="10" width="8" height="1.8" rx=".9" fill="currentColor" /><rect x="6" y="13.5" width="5" height="1.8" rx=".9" fill="currentColor" /></svg>
 			<span>{L.hubSources} <a href="/methode">{L.hubMethod}</a></span>
 		</div>
-		<div class="themes">
+		<div class="themes" data-tour="themes">
 			{#each cards as t (t.key)}
 				<article class="theme">
 					<div class="text">

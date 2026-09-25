@@ -3,6 +3,7 @@
 <script>
 	import { goto } from '$app/navigation';
 	import { L } from '$lib/i18n/fr.js';
+	import { toast } from '$lib/toast.svelte.js';
 	import { api, apiError } from '$lib/api.js';
 	import { session, refresh } from '$lib/session.svelte.js';
 	import { pendingInvite } from '$lib/invite.js';
@@ -11,7 +12,6 @@
 	let username = $state('');
 	let password = $state('');
 	let consent = $state(false);
-	let error = $state('');
 	let busy = $state(false);
 	let invite = $state(null);
 
@@ -24,11 +24,11 @@
 
 	async function submit(e) {
 		e.preventDefault();
-		if (!consent) return (error = L.apiErrors.consent_required);
+		if (!consent) return toast(L.apiErrors.consent_required, { kind: 'error' });
 		busy = true;
 		const r = await api('POST', '/api/register', { username, password, consent: true, invite: invite || undefined });
 		busy = false;
-		if (!r.ok) return (error = apiError(r));
+		if (!r.ok) return toast(apiError(r), { kind: 'error' });
 		/* a trial profile in this browser becomes the new account's */
 		const g = readGuest();
 		if (g && (g.politiscales || Object.keys(g.answers).length)) {
@@ -56,7 +56,6 @@
 			<input type="password" placeholder={L.passwordNew} autocomplete="new-password" required bind:value={password} />
 			<label class="consent"><input type="checkbox" bind:checked={consent} /><span>{L.consent}</span></label>
 			<button type="submit" class="primary" disabled={busy || !consent}>{L.register}</button>
-			{#if error}<p class="error">{error}</p>{/if}
 			<p class="note">{L.serverNote}</p>
 		</form>
 	{/if}

@@ -15,13 +15,12 @@
 	import CaptureImport from '$lib/components/CaptureImport.svelte';
 	import { startMine, eraseAll } from '$lib/quiz/answers.svelte.js';
 	import { toast } from '$lib/toast.svelte.js';
+	import { startTour } from '$lib/tour.svelte.js';
 	import { board } from '$lib/compass/board.svelte.js';
 
 	let current = $state('');
 	let next = $state('');
-	let pwError = $state('');
 	let delPassword = $state('');
-	let delError = $state('');
 	let deleting = $state(false);
 	let display = $state({ palette: 'classique', mode: 'auto', motion: 'full' });
 	onMount(() => (display = readDisplay()));
@@ -72,8 +71,7 @@
 	async function changePassword(e) {
 		e.preventDefault();
 		const r = await api('POST', '/api/me/password', { current, new: next });
-		if (!r.ok) return (pwError = r.data?.error === 'bad_credentials' ? L.passwordWrong : apiError(r));
-		pwError = '';
+		if (!r.ok) return toast(r.data?.error === 'bad_credentials' ? L.passwordWrong : apiError(r), { kind: 'error' });
 		current = next = '';
 		toast(L.passwordChanged);
 	}
@@ -88,7 +86,7 @@
 	async function deleteAccount() {
 		const r = await api('DELETE', '/api/me', { password: delPassword });
 		deleting = false;
-		if (!r.ok) return (delError = apiError(r));
+		if (!r.ok) return toast(apiError(r), { kind: 'error' });
 		await refresh();
 		goto('/');
 	}
@@ -165,6 +163,12 @@
 
 			<div class="col">
 				<section class="card">
+					<h2>{L.tour.restart}</h2>
+					<p class="note">{L.tour.restartLead}</p>
+					<button type="button" class="ghost" onclick={startTour}>{L.tour.restart}</button>
+				</section>
+
+				<section class="card">
 					<h2>{L.myData}</h2>
 					<p class="note">{L.exportLead}</p>
 					<button type="button" class="ghost" onclick={exportAll}>{L.exportAccount}</button>
@@ -175,7 +179,6 @@
 					<form onsubmit={changePassword}>
 						<label>{L.passwordCurrent}<input type="password" autocomplete="current-password" required bind:value={current} /></label>
 						<label>{L.passwordNewLabel}<input type="password" autocomplete="new-password" minlength="10" required bind:value={next} /><small>{L.passwordHint}</small></label>
-						{#if pwError}<p class="error">{pwError}</p>{/if}
 						<div class="actions">
 							<button type="submit" class="primary">{L.passwordChange}</button>
 							<button type="button" class="ghost" onclick={endOthers}>{L.signOutOthers}</button>
@@ -188,7 +191,6 @@
 					<p class="note">{L.deleteWarn}</p>
 					<form onsubmit={askDelete}>
 						<label>{L.password}<input type="password" autocomplete="current-password" required bind:value={delPassword} /></label>
-						{#if delError}<p class="error">{delError}</p>{/if}
 						<button type="submit" class="ghost warn">{L.deleteForever}</button>
 					</form>
 					{#if deleting}

@@ -4,6 +4,7 @@
      sentence, or to nothing when it went through. -->
 <script>
 	import { L } from '$lib/i18n/fr.js';
+	import { toast } from '$lib/toast.svelte.js';
 	import { AXES } from '$lib/compass/model.js';
 	import { PolitiExtract } from '$lib/model.js';
 
@@ -16,8 +17,6 @@
 	let open = $state(false);
 	let over = $state(false);
 	let feedback = $state(null);
-	let error = $state('');
-	let saved = $state('');
 	let busy = $state(false);
 
 	const num = (v) => (v === '' || v === null || v === undefined ? 0 : Number(v));
@@ -26,10 +25,10 @@
 	function read(file) {
 		feedback = null;
 		const fr = new FileReader();
-		fr.onerror = () => (feedback = { ok: false, text: L.errUnreadable });
+		fr.onerror = () => toast(L.errUnreadable, { kind: 'error' });
 		fr.onload = () => {
 			const img = new Image();
-			img.onerror = () => (feedback = { ok: false, text: L.errNotImage });
+			img.onerror = () => toast(L.errNotImage, { kind: 'error' });
 			img.onload = () => {
 				const c = document.createElement('canvas');
 				c.width = img.naturalWidth;
@@ -40,14 +39,14 @@
 				try {
 					data = ctx.getImageData(0, 0, c.width, c.height);
 				} catch {
-					return (feedback = { ok: false, text: L.errPixels });
+					return toast(L.errPixels, { kind: 'error' });
 				}
 				try {
 					res = PolitiExtract.extract(data);
 				} catch (e) {
-					return (feedback = { ok: false, text: L.errExtract(e.message) });
+					return toast(L.errExtract(e.message), { kind: 'error' });
 				}
-				if (!res.ok) return (feedback = { ok: false, text: L.errUnrecognised(res.warnings.join(' ; ')) });
+				if (!res.ok) return toast(L.errUnrecognised(res.warnings.join(' ; ')), { kind: 'error' });
 				/* the flag, re-cropped from the canvas */
 				flag = null;
 				const g = res.geometry;
@@ -85,14 +84,13 @@
 
 	async function save(e) {
 		e.preventDefault();
-		error = saved = '';
-		if (overAxes.length) return (error = L.errOverHundred(overAxes.map((a) => L.pole[a.neg[0]] + ' / ' + L.pole[a.pos[0]]).join(', ')));
+		if (overAxes.length) return toast(L.errOverHundred(overAxes.map((a) => L.pole[a.neg[0]] + ' / ' + L.pole[a.pos[0]]).join(', ')), { kind: 'error' });
 		const politiscales = Object.fromEntries(Object.entries(values).map(([k, v]) => [k, Math.max(0, Math.min(100, Math.round(num(v))))]));
 		busy = true;
 		const err = await onsave({ politiscales, flag });
 		busy = false;
-		if (err) error = err;
-		else saved = L.captureSaved;
+		if (err) toast(err, { kind: 'error' });
+		else toast(L.captureSaved);
 	}
 </script>
 
@@ -121,8 +119,6 @@
 					</div>
 				{/each}
 			</div>
-			{#if error}<p class="error" role="alert">{error}</p>{/if}
-			{#if saved}<p class="status" role="status">{saved}</p>{/if}
 			<button type="submit" class="primary" disabled={busy}>{L.captureSave}</button>
 		</form>
 	</details>

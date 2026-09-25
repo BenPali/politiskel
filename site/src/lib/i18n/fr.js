@@ -719,6 +719,22 @@ export const LOCALES = {
     quizStart: "Commencer", quizResume: "Reprendre", quizPrev: "← Précédent",
     quizNext: "Suivant →", quizSkip: "Passer", quizSeeResult: "Voir le résultat →",
     toastClose: "Fermer",
+    tour: {
+      count: (i, n) => "Visite · " + i + " / " + n,
+      next: "Suivant", prev: "Précédent", skip: "Passer la visite", done: "C'est parti", close: "Fermer",
+      restart: "Revoir la visite guidée", restartLead: "Un tour du site en quelques étapes : la boussole, le questionnaire, les groupes, l'affichage.",
+      steps: {
+        welcome: { title: "Bienvenue sur Politiskel", text: "En quelques étapes : où se trouve chaque chose, et comment on s'en sert. Vous pouvez passer la visite à tout moment, et la revoir depuis votre compte." },
+        group: { title: "Votre groupe", text: "Le groupe affiché, ses membres, et les trois choix qui cadrent la boussole : le groupe, le pays de référence, la lecture. Inviter copie le lien du groupe." },
+        compass: { title: "La boussole", text: "Chaque point est un membre, chaque losange un parti placé par les experts du CHES. Changez de lecture : les points se déplacent.", hint: "Cliquez un point pour le suivre" },
+        profiles: { title: "Les profils", text: "Les positions de chacun et le repère le plus proche — une proximité, pas une appartenance. La fiche d'un profil détaille ses lectures et son drapeau." },
+        themes: { title: "Le questionnaire", text: "Des questions tirées des grandes enquêtes publiques, par thèmes, dans l'ordre que vous voulez. Chaque thème remplace un axe de PolitiScales ; vos réponses s'enregistrent en passant à la suivante." },
+        groups: { title: "Vos groupes", text: "Créez un groupe et partagez son lien, ou rejoignez-en un. Un groupe peut aussi apparaître dans l'annuaire, où l'on demande à entrer." },
+        display: { title: "L'affichage", text: "Neuf palettes, chacune en clair, en sombre ou selon le système. Les animations se réduisent depuis votre compte." },
+        account: { title: "Votre compte", text: "Votre résultat PolitiScales, l'export de toutes vos données, le mot de passe, et la suppression du compte, qui efface tout." },
+        end: { title: "À vous de jouer", text: "Commencez par un thème du questionnaire : votre point apparaîtra sur la boussole de vos groupes." }
+      }
+    },
     requestsNew: (g, n) => (n > 1 ? n + " nouvelles demandes" : "Nouvelle demande") + " pour rejoindre « " + g + " ».",
     requestsSee: "Voir", requestsWaiting: n => n + " demande" + (n > 1 ? "s" : "") + " en attente",
     saveRetrying: "Réponse pas encore enregistrée : pas de connexion. Nouvel essai dans quelques secondes.",

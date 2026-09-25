@@ -10,6 +10,7 @@
 	import SiteHeader from '$lib/components/SiteHeader.svelte';
 	import SiteFooter from '$lib/components/SiteFooter.svelte';
 	import Toasts from '$lib/components/Toasts.svelte';
+	import Tour from '$lib/components/Tour.svelte';
 	import { announce, watchRequests } from '$lib/notify.svelte.js';
 	import { readPrefs } from '$lib/compass/board.svelte.js';
 
@@ -32,3 +33,4 @@
 </main>
 <SiteFooter />
 <Toasts />
+<Tour />

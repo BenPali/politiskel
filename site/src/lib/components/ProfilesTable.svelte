@@ -24,7 +24,7 @@
 	const target = $derived(computed.find(({ p }) => p.id === selectedId)?.p || computed.find(({ p }) => p.me)?.p || null);
 </script>
 
-<section class="card profiles" aria-label={L.profilesTitle}>
+<section class="card profiles" data-tour="profiles" aria-label={L.profilesTitle}>
 	<h2>{session.me ? L.profilesTitle : L.guestHeader}</h2>
 	<p class="lead">{session.me ? L.profilesHint : L.guestHeaderLead}</p>
 	<div class="table-scroll">

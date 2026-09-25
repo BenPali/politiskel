@@ -33,7 +33,7 @@
 
 	async function accept() {
 		const r = await api('POST', '/api/groups/join', { code });
-		if (!r.ok) return (error = apiError(r));
+		if (!r.ok) return toast(apiError(r), { kind: 'error' });
 		keepInvite(null);
 		await refresh();
 		toast(L.joined(r.data.name));

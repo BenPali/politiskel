@@ -87,7 +87,7 @@
 	</nav>
 
 	<div class="end">
-		<div class="picker" bind:this={pickerEl}>
+		<div class="picker" data-tour="display" bind:this={pickerEl}>
 			<button type="button" class="icon" aria-label={L.themeLabel} aria-expanded={pickerOpen} onclick={() => { display = readDisplay(); pickerOpen = !pickerOpen; }}>
 				<svg width="20" height="20" viewBox="0 0 20 20" aria-hidden="true"><circle cx="10" cy="10" r="7.5" fill="none" stroke="currentColor" stroke-width="1.8" /><path d="M10 2.5 A7.5 7.5 0 0 1 10 17.5 Z" fill="currentColor" /></svg>
 			</button>
@@ -111,7 +111,7 @@
 			{/if}
 		</div>
 		{#if session.me}
-			<a class="me" href="/compte" aria-current={here('/compte') ? 'page' : undefined}>
+			<a class="me" data-tour="account" href="/compte" aria-current={here('/compte') ? 'page' : undefined}>
 				<span class="avatar">{session.me.username.slice(0, 1).toUpperCase()}</span><span class="who">{session.me.username}</span>
 			</a>
 		{:else if session.ready}

@@ -95,7 +95,7 @@
 				<h1>{L.groupsTitle}</h1>
 				<p class="lead">{L.groupsLeadShort}</p>
 			</div>
-			<div class="top-actions">
+			<div class="top-actions" data-tour="groups">
 				<button type="button" class={panel === 'create' ? 'primary' : 'ghost'} aria-expanded={panel === 'create'}
 					onclick={() => (panel = panel === 'create' ? null : 'create')}>
 					<svg width="16" height="16" viewBox="0 0 16 16" aria-hidden="true"><path d="M8 3v10M3 8h10" stroke="currentColor" stroke-width="2" stroke-linecap="round" /></svg>
