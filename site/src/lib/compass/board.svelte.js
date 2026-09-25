@@ -6,6 +6,7 @@
 import { api } from '$lib/api.js';
 import { session } from '$lib/session.svelte.js';
 import { COUNTRIES, VIEWS, fromMember } from '$lib/compass/model.js';
+import { guestMember } from '$lib/quiz/answers.svelte.js';
 
 const KEYS = {
 	country: 'politicompass.country.v1',
@@ -40,6 +41,8 @@ export const board = $state({
 	groupId: null,
 	members: [],
 	loaded: false,
+	/** whose board was loaded: a username, or null for a guest */
+	who: null,
 	prefsRead: false
 });
 
@@ -93,8 +96,11 @@ export function showGroup(id) {
 let starting = false;
 export async function ensureBoard() {
 	readPrefs();
-	if (board.loaded || starting || !session.me) return;
+	const who = session.me ? session.me.username : null;
+	/* loaded for someone else — signed in or out since — counts as not loaded */
+	if ((board.loaded && board.who === who) || starting || !session.ready) return;
 	starting = true;
+	board.who = who;
 	chooseGroup();
 	await loadMembers();
 	starting = false;
@@ -105,7 +111,9 @@ let seq = 0;
 export async function loadMembers() {
 	const mine = ++seq;
 	if (!session.me) {
-		board.members = [];
+		/* a guest sees their own trial profile, alone */
+		const g = guestMember();
+		board.members = g ? [fromMember(g)] : [];
 		board.loaded = true;
 		return;
 	}

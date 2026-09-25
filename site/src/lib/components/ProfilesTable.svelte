@@ -8,6 +8,7 @@
 	import { signed } from '$lib/format.js';
 	import { copyOf, nearestReference, fitPhrase, offReason } from '$lib/compass/model.js';
 	import MemberFlag from '$lib/components/MemberFlag.svelte';
+	import { session } from '$lib/session.svelte.js';
 
 	let { computed, refs, limits, viewKey, selectedId = null, onpick } = $props();
 	const W = $derived(copyOf(viewKey));
@@ -24,8 +25,8 @@
 </script>
 
 <section class="card profiles" aria-label={L.profilesTitle}>
-	<h2>{L.profilesTitle}</h2>
-	<p class="lead">{L.profilesHint}</p>
+	<h2>{session.me ? L.profilesTitle : L.guestHeader}</h2>
+	<p class="lead">{session.me ? L.profilesHint : L.guestHeaderLead}</p>
 	<div class="table-scroll">
 		<table id="profiles-table">
 			<thead>

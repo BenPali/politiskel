@@ -38,14 +38,20 @@
 <section class="group-board card" aria-label={L.groupLabel}>
 	<div class="top">
 		<div class="title">
-			<p class="eyebrow">
-				{#if g}{L.groupEyebrow(g.members, g.owner)}{:else}{L.groupNone}{/if}
-				<a href={g ? '/groupes/' + g.id : '/groupes'}>{L.manageGroupsShort}</a>
-			</p>
-			<h1>{g ? g.name : session.me.groups.length ? L.groupAloneShort : L.groupAloneLead}</h1>
+			{#if session.me}
+				<p class="eyebrow">
+					{#if g}{L.groupEyebrow(g.members, g.owner)}{:else}{L.groupNone}{/if}
+					<a href={g ? '/groupes/' + g.id : '/groupes'}>{L.manageGroupsShort}</a>
+				</p>
+				<h1>{g ? g.name : session.me.groups.length ? L.groupAloneShort : L.groupAloneLead}</h1>
+			{:else}
+				<p class="eyebrow">{L.guestEyebrow} <a href="/inscription">{L.navSignUp}</a></p>
+				<h1>{L.guestHeader}</h1>
+				<p class="guest-lead">{L.guestHeaderLead}</p>
+			{/if}
 		</div>
 		<div class="frame">
-			{#if session.me.groups.length}
+			{#if session.me?.groups.length}
 				<label>{L.groupLabel}
 					<select disabled={busy} value={g ? String(g.id) : 'alone'} onchange={switchTo}>
 						{#each session.me.groups as x (x.id)}<option value={String(x.id)}>{x.name} ({x.members})</option>{/each}
@@ -86,6 +92,7 @@
 	.title { flex: 1 1 auto; min-width: 0; }
 	.eyebrow { margin: 0; display: flex; gap: 12px; align-items: baseline; }
 	.eyebrow a { text-transform: none; letter-spacing: 0; font-weight: 600; font-size: 13px; color: var(--accent-ink); }
+	.guest-lead { margin: 6px 0 0; color: var(--text-2); font-size: 14.5px; }
 	h1 { font-family: var(--font-display); font-size: 30px; font-weight: 600; letter-spacing: -0.015em; margin: 4px 0 0; line-height: 1.15; }
 	.frame { display: flex; flex: none; align-items: flex-end; gap: 12px; }
 	.frame label { display: flex; flex-direction: column; gap: 6px; font-size: 13px; font-weight: 650; color: var(--text-2); }

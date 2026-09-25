@@ -31,7 +31,7 @@
 
 <svelte:head><title>{L.tabCompass} · Politiskel</title></svelte:head>
 
-<SignedIn>
+<SignedIn guest>
 	<Board {selected} {onpick}>
 		{#snippet aside({ computed, refs, limits })}
 			<ProfilesTable {computed} {refs} {limits} viewKey={board.view} {selectedId} onpick={(i) => onpick('profile', i)} />

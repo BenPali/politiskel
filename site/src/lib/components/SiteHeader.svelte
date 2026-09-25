@@ -9,7 +9,7 @@
 	import { session } from '$lib/session.svelte.js';
 	import { PALETTES, MODES, readDisplay, applyDisplay } from '$lib/theme.js';
 
-	let display = $state({ palette: 'classique', mode: 'auto' });
+	let display = $state({ palette: 'classique', mode: 'auto', motion: 'full' });
 	let pickerOpen = $state(false);
 	let menuOpen = $state(false);
 
@@ -62,7 +62,7 @@
 
 	<div class="end">
 		<div class="picker">
-			<button type="button" class="icon" aria-label={L.themeLabel} aria-expanded={pickerOpen} onclick={() => (pickerOpen = !pickerOpen)}>
+			<button type="button" class="icon" aria-label={L.themeLabel} aria-expanded={pickerOpen} onclick={() => { display = readDisplay(); pickerOpen = !pickerOpen; }}>
 				<svg width="20" height="20" viewBox="0 0 20 20" aria-hidden="true"><circle cx="10" cy="10" r="7.5" fill="none" stroke="currentColor" stroke-width="1.8" /><path d="M10 2.5 A7.5 7.5 0 0 1 10 17.5 Z" fill="currentColor" /></svg>
 			</button>
 			{#if pickerOpen}

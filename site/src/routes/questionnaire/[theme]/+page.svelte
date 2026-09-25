@@ -11,7 +11,7 @@
 	import { coords, hasPolitiscales, fromMember, COUNTRIES } from '$lib/compass/model.js';
 	import { board, readPrefs } from '$lib/compass/board.svelte.js';
 	import { ALL, isFlow, flowThemes, screensFor, screenKey, scoreOf, openThemes } from '$lib/quiz/flow.js';
-	import { mine, startMine, setAnswer, eraseKeys, flush } from '$lib/quiz/answers.svelte.js';
+	import { mine, startMine, setAnswer, eraseKeys, flush, guestMember } from '$lib/quiz/answers.svelte.js';
 	import SignedIn from '$lib/components/SignedIn.svelte';
 	import Question from '$lib/components/Question.svelte';
 	import JourneyStrip from '$lib/components/JourneyStrip.svelte';
@@ -26,8 +26,8 @@
 
 	let started = false;
 	$effect(() => {
-		if (session.me && !started) {
-			startMine('server');
+		if (session.ready && !started) {
+			startMine(session.me ? 'server' : 'guest');
 			started = true;
 		}
 	});
@@ -39,7 +39,11 @@
 	});
 
 	const me = $derived(
-		session.me ? fromMember({ username: session.me.username, me: true, flag: session.me.profile.flag, politiscales: session.me.profile.politiscales, answers: mine.answers }) : null
+		session.me
+			? fromMember({ username: session.me.username, me: true, flag: session.me.profile.flag, politiscales: session.me.profile.politiscales, answers: mine.answers })
+			: session.ready
+				? fromMember({ ...(guestMember() || { username: L.guestName, me: true }), answers: mine.answers })
+				: null
 	);
 	const native = $derived(me ? !hasPolitiscales(me) : false);
 	const c = $derived(me ? coords(me) : null);
@@ -88,7 +92,7 @@
 <svelte:window onkeydown={onkey} />
 <svelte:head><title>{isFlow(theme) ? themeName(theme) + ' · ' : ''}{L.tabQuiz} · Politiskel</title></svelte:head>
 
-<SignedIn>
+<SignedIn guest>
 	<div class="quiz-view">
 		{#if !isFlow(theme)}
 			<section class="quiz-card"><p class="lead">{L.notFoundLead}</p><a class="button ghost" href="/questionnaire">{L.backToThemes}</a></section>
@@ -106,7 +110,7 @@
 				<section class="quiz-card screen">
 					{#if step === 0}
 						<p class="eyebrow">{L.hubEyebrow} · {themeName(theme)}</p>
-						<h2>{native ? L.nativeTitle(session.me.username) : L.quizIntroTitle(session.me.username)}</h2>
+						<h2>{native ? L.nativeTitle(me.alias) : L.quizIntroTitle(me.alias)}</h2>
 						<p class="lead">
 							{theme === ALL ? L.allLead(openThemes().length, PolitiQuiz.THEMES.length) : native ? L.themes[theme].leadNative : L.themes[theme].lead}
 						</p>
@@ -146,7 +150,7 @@
 					<span class="end-actions">
 						<button type="button" class="ghost" onclick={() => goStep(1)}>{L.quizReview}</button>
 						<a class="button ghost" href="/questionnaire">{L.otherThemes}</a>
-						<a class="button primary" href="/boussole/{encodeURIComponent(session.me.username)}">{L.backToCompass}</a>
+						<a class="button primary" href="/boussole/{encodeURIComponent(me.alias)}">{L.backToCompass}</a>
 					</span>
 				{/if}
 			</div>

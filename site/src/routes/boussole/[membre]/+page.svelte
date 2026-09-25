@@ -17,7 +17,7 @@
 	import PartyList from '$lib/components/PartyList.svelte';
 
 	$effect(() => {
-		if (session.me) ensureBoard();
+		if (session.ready) ensureBoard();
 	});
 
 	const id = $derived(page.params.membre);
@@ -34,7 +34,7 @@
 
 <svelte:head><title>{id} · {L.tabCompass} · Politiskel</title></svelte:head>
 
-<SignedIn>
+<SignedIn guest>
 	<div class="top">
 		<a class="back" href="/boussole">{L.memberBack}</a>
 		{#if board.members.length > 1}

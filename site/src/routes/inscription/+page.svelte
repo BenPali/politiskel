@@ -6,6 +6,7 @@
 	import { api, apiError } from '$lib/api.js';
 	import { session, refresh } from '$lib/session.svelte.js';
 	import { pendingInvite } from '$lib/invite.js';
+	import { readGuest, writeGuest } from '$lib/quiz/answers.svelte.js';
 
 	let username = $state('');
 	let password = $state('');
@@ -28,6 +29,12 @@
 		const r = await api('POST', '/api/register', { username, password, consent: true, invite: invite || undefined });
 		busy = false;
 		if (!r.ok) return (error = apiError(r));
+		/* a trial profile in this browser becomes the new account's */
+		const g = readGuest();
+		if (g && (g.politiscales || Object.keys(g.answers).length)) {
+			const put = await api('PUT', '/api/me/profile', { politiscales: g.politiscales, answers: g.answers, flag: g.flag });
+			if (put.ok) writeGuest(null);
+		}
 		await refresh();
 		/* an invitation brought them here: back to it, to decide on joining */
 		goto(invite ? '/rejoindre/' + encodeURIComponent(invite) : '/boussole');
@@ -48,7 +55,7 @@
 			<input type="text" placeholder={L.username} autocomplete="username" maxlength="24" required bind:value={username} />
 			<input type="password" placeholder={L.passwordNew} autocomplete="new-password" required bind:value={password} />
 			<label class="consent"><input type="checkbox" bind:checked={consent} /><span>{L.consent}</span></label>
-			<button type="submit" class="primary" disabled={busy}>{L.register}</button>
+			<button type="submit" class="primary" disabled={busy || !consent}>{L.register}</button>
 			{#if error}<p class="error">{error}</p>{/if}
 			<p class="note">{L.serverNote}</p>
 		</form>

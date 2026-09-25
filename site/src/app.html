@@ -20,6 +20,7 @@
 				if (d && d.palette && d.mode) {
 					document.documentElement.dataset.theme = d.palette;
 					document.documentElement.dataset.mode = d.mode;
+					if (d.motion === 'reduce') document.documentElement.dataset.motion = 'reduce';
 				}
 			} catch (e) {}
 		</script>

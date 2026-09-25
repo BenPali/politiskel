@@ -10,7 +10,7 @@
 	import SignedIn from '$lib/components/SignedIn.svelte';
 
 	$effect(() => {
-		if (session.me) startMine('server');
+		if (session.ready) startMine(session.me ? 'server' : 'guest');
 	});
 
 	const cards = $derived(
@@ -26,7 +26,7 @@
 
 <svelte:head><title>{L.tabQuiz} · Politiskel</title></svelte:head>
 
-<SignedIn>
+<SignedIn guest>
 	<div class="hub">
 		<p class="eyebrow">{L.hubEyebrow}</p>
 		<h1>{L.hubTitle}</h1>

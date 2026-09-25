@@ -13,7 +13,7 @@
 	let { selected = null, onpick, aside } = $props();
 
 	$effect(() => {
-		if (session.me) ensureBoard();
+		if (session.ready) ensureBoard();
 	});
 
 	const country = $derived(COUNTRIES.find((c) => c.code === board.country) || COUNTRIES[0]);

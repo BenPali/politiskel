@@ -17,14 +17,25 @@ export const mine = $state({
 	status: ''
 });
 
-/* the guest's profile, kept in this browser: an alias and the answers */
+/* the guest's profile, kept in this browser: the answers, and a
+   PolitiScales result with its flag when one was imported */
 export function readGuest() {
 	try {
 		const g = JSON.parse(localStorage.getItem(GUEST_KEY) || 'null');
-		return g && typeof g === 'object' ? { alias: String(g.alias || ''), answers: g.answers || {} } : null;
+		return g && typeof g === 'object'
+			? { alias: String(g.alias || ''), answers: g.answers || {}, politiscales: g.politiscales || null, flag: g.flag || null }
+			: null;
 	} catch {
 		return null;
 	}
+}
+/* the guest as a group member would come from the server */
+export function guestMember() {
+	const g = readGuest();
+	return g ? { username: L.guestName, me: true, owner: false, politiscales: g.politiscales, answers: g.answers, flag: g.flag } : null;
+}
+export function updateGuest(part) {
+	writeGuest({ alias: '', answers: {}, politiscales: null, flag: null, ...(readGuest() || {}), ...part });
 }
 export function writeGuest(g) {
 	try {
@@ -56,8 +67,9 @@ export function eraseKeys(keys) {
 
 function persist() {
 	if (mine.mode === 'guest') {
-		const g = readGuest() || { alias: '', answers: {} };
-		writeGuest({ ...g, answers: mine.answers });
+		updateGuest({ answers: mine.answers });
+		/* the compass reads the guest again next time */
+		board.loaded = false;
 		return;
 	}
 	clearTimeout(timer);
