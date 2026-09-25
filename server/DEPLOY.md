@@ -130,6 +130,25 @@ Hand it over privately; they change it from their account page.
 
 ## 7. Updating
 
+Two scripts do it. On the machine that builds, `server/deploy/pack.sh`
+builds the site and the Linux binary, packs them with `update.sh` and a
+checksum, and, given a host, copies the archive there:
+
+```
+server/deploy/pack.sh you@host          # SSH_KEY=~/.ssh/key to pick a key
+```
+
+On the host, `~/politiskel/update.sh` checks the archive, backs the database
+up under a dated name, puts the new binary and site in place (the previous
+ones kept as `.prev`), restarts, checks that the service, the API and a page
+answer — and puts the previous version back on its own if one does not. It
+is written for the user service above; for the system one, run it as
+`APP_DIR=/opt/politiskel ENV_FILE=/etc/politiskel/politiskel.env
+SYSTEMCTL="sudo systemctl" ./update.sh`. Each archive carries the script, so
+it updates itself.
+
+By hand, the steps are these:
+
 Back up under a name of its own — the daily backup may already have run,
 and a backup never overwrites — then replace the binary and the site, and
 restart:
