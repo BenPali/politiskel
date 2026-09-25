@@ -79,6 +79,19 @@ export function chooseGroup(id) {
 export const currentGroup = () =>
 	session.me && board.groupId !== null ? session.me.groups.find((g) => g.id === board.groupId) || null : null;
 
+/* The board's first load, once a member is signed in: the preferences, the
+   group last chosen, its members. Pages call it whenever the session
+   changes; it runs once. */
+let starting = false;
+export async function ensureBoard() {
+	readPrefs();
+	if (board.loaded || starting || !session.me) return;
+	starting = true;
+	chooseGroup();
+	await loadMembers();
+	starting = false;
+}
+
 /* Two switches in a row start two loads: only the latest may land. */
 let seq = 0;
 export async function loadMembers() {

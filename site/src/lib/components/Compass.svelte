@@ -18,12 +18,12 @@
 
 	const geo = $derived.by(() => {
 		const placed = computed.map((r, i) => ({ ...r, i })).filter((r) => !r.c.off);
-		const qw = [W.quadTopLeft, W.quadTopRight, W.quadBottomLeft, W.quadBottomRight].map((t) => textWidth(t, 10));
+		const qw = [W.quadTopLeft, W.quadTopRight, W.quadBottomLeft, W.quadBottomRight].map((t) => textWidth(t, 12.5));
 		const taken = [
 			{ x0: 46, x1: 90, y0: 306, y1: 318 }, { x0: 160, x1: 190, y0: 306, y1: 318 },
 			{ x0: 410, x1: 440, y0: 306, y1: 318 }, { x0: 510, x1: 554, y0: 306, y1: 318 },
-			{ x0: 56, x1: 64 + qw[0], y0: 58, y1: 72 }, { x0: 536 - qw[1], x1: 544, y0: 58, y1: 72 },
-			{ x0: 56, x1: 64 + qw[2], y0: 528, y1: 542 }, { x0: 536 - qw[3], x1: 544, y0: 528, y1: 542 },
+			{ x0: 56, x1: 64 + qw[0], y0: 56, y1: 74 }, { x0: 536 - qw[1], x1: 544, y0: 56, y1: 74 },
+			{ x0: 56, x1: 64 + qw[2], y0: 526, y1: 544 }, { x0: 536 - qw[3], x1: 544, y0: 526, y1: 544 },
 			{ x0: 50, x1: 64, y0: 293, y1: 307 }, { x0: 536, x1: 550, y0: 293, y1: 307 },
 			{ x0: 293, x1: 307, y0: 50, y1: 64 }, { x0: 293, x1: 307, y0: 536, y1: 550 }
 		];
@@ -48,15 +48,15 @@
 			const x = toSvgX(c.x), y = toSvgY(c.y);
 			const text = p.alias.slice(0, 16);
 			/* a member always keeps a label: they are the chart's subject */
-			const place = show.labels ? placeLabel({ x, y, w: textWidth(text, 10.5, 600), size: 10.5 }, taken) || CANDIDATES[0] : null;
+			const place = show.labels ? placeLabel({ x, y, w: textWidth(text, 14.5, 650), size: 14.5 }, taken) || CANDIDATES[0] : null;
 			const trail = show.trail && c.from && (c.from.x !== c.x || c.from.y !== c.y) ? { x: toSvgX(c.from.x), y: toSvgY(c.from.y) } : null;
-			return { i, x, y, text, place, trail, alias: p.alias };
+			return { i, x, y, text, place, trail, alias: p.alias, me: !!p.me };
 		});
 		const parties = show.refs
 			? refs.map((r, ri) => {
 					const x = toSvgX(r.x), y = toSvgY(r.y);
 					/* no free spot: no label, rather than one over a member's */
-					const place = show.refLabels ? placeLabel({ x, y, w: textWidth(r.name, 9.5), size: 9.5 }, taken) : null;
+					const place = show.refLabels ? placeLabel({ x, y, w: textWidth(r.name, 12.5), size: 12.5 }, taken) : null;
 					return { ri, x, y, name: r.name, title: r.name + ' — ' + noteOf(r), place };
 				})
 			: [];
@@ -177,7 +177,7 @@
 
 		<g id="points-layer" class:dim={!!selected}>
 			{#each geo.pts as pt (pt.i)}
-				<g class:sel={selected?.kind === 'profile' && selected.i === pt.i}
+				<g class:sel={selected?.kind === 'profile' && selected.i === pt.i} class:me={pt.me}
 					onclick={() => onpick('profile', pt.i)} role="presentation"
 					onmouseenter={(e) => showTip(pt.i, e)} onmousemove={(e) => showTip(pt.i, e)} onmouseleave={() => (tip = null)}>
 					<circle class="hit" cx={pt.x} cy={pt.y} r="14" tabindex="0" role="button" aria-label={pt.alias}

@@ -2,91 +2,13 @@
      each part of the page in turn — header, compass, tables, strips, forms,
      the questionnaire, and the site's pages in server mode. */
 
-  :root {
-    color-scheme: light;
-    --bg:            #f4f4f2;
-    --surface:       #fcfcfb;
-    --border:        #e2e1dd;
-    --grid:          #eceae5;
-    --axis:          #8f8d86;
-    --text:          #0b0b0b;
-    --text-2:        #52514e;
-    --text-3:        #7d7b75;
-    --series-1:      #2a78d6;
-    --series-1-soft: #cde2fb;
-    --ref-ink:       #8a8880;
-    --warn:          #ec835a;
-    --focus:         #2a78d6;
-  }
-  /* the system's choice, unless a theme was picked in the header */
-  @media (prefers-color-scheme: dark) {
-    :root:not([data-theme]) {
-      color-scheme: dark;
-      --bg:            #121211;
-      --surface:       #1a1a19;
-      --border:        #343430;
-      --grid:          #2a2a27;
-      --axis:          #6e6d66;
-      --text:          #ffffff;
-      --text-2:        #c3c2b7;
-      --text-3:        #8f8e85;
-      --series-1:      #3987e5;
-      --series-1-soft: #184f95;
-      --ref-ink:       #86847c;
-      --warn:          #ec835a;
-      --focus:         #3987e5;
-    }
-  }
-  :root[data-theme="dark"] {
-    color-scheme: dark;
-    --bg:            #121211;
-    --surface:       #1a1a19;
-    --border:        #343430;
-    --grid:          #2a2a27;
-    --axis:          #6e6d66;
-    --text:          #ffffff;
-    --text-2:        #c3c2b7;
-    --text-3:        #8f8e85;
-    --series-1:      #3987e5;
-    --series-1-soft: #184f95;
-    --ref-ink:       #86847c;
-    --warn:          #ec835a;
-    --focus:         #3987e5;
-  }
-  /* high contrast: pure black on white, borders and secondary text dark
-     enough to read at a glance */
-  :root[data-theme="contrast"] {
-    color-scheme: light;
-    --bg:            #ffffff;
-    --surface:       #ffffff;
-    --border:        #5c5c5c;
-    --grid:          #c8c8c8;
-    --axis:          #2b2b2b;
-    --text:          #000000;
-    --text-2:        #1c1c1c;
-    --text-3:        #3a3a3a;
-    --series-1:      #0048a8;
-    --series-1-soft: #c9dcff;
-    --ref-ink:       #2b2b2b;
-    --warn:          #a8200d;
-    --focus:         #0048a8;
-  }
-  /* sepia: warm paper, for long reading */
-  :root[data-theme="sepia"] {
-    color-scheme: light;
-    --bg:            #f2eadb;
-    --surface:       #faf5ea;
-    --border:        #ddd0b8;
-    --grid:          #e6dac4;
-    --axis:          #8a7c63;
-    --text:          #2a2317;
-    --text-2:        #574a36;
-    --text-3:        #82745c;
-    --series-1:      #8a5424;
-    --series-1-soft: #ecd6b8;
-    --ref-ink:       #82745c;
-    --warn:          #b8521f;
-    --focus:         #8a5424;
+  /* The first version's colour names, pointed at the design tokens
+     (src/tokens.css) so the styles below follow the chosen palette. */
+  :root, [data-theme] {
+    --series-1: var(--accent);
+    --series-1-soft: var(--accent-soft);
+    --ref-ink: var(--ref);
+    --warn: var(--danger);
   }
 
   * { box-sizing: border-box; }
