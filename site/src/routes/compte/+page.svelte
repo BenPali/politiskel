@@ -13,6 +13,7 @@
 	import { progressOf } from '$lib/quiz/flow.js';
 	import SignedIn from '$lib/components/SignedIn.svelte';
 	import CaptureImport from '$lib/components/CaptureImport.svelte';
+	import { mine, startMine, eraseAll } from '$lib/quiz/answers.svelte.js';
 	import { board } from '$lib/compass/board.svelte.js';
 
 	let status = $state('');
@@ -48,6 +49,14 @@
 		a.click();
 		a.remove();
 		setTimeout(() => URL.revokeObjectURL(a.href), 1000);
+	}
+	let erasing = $state(false);
+	const hasAnswers = $derived(!!session.me && Object.keys(session.me.profile.answers || {}).length > 0);
+	async function eraseAnswers() {
+		erasing = false;
+		startMine('server');
+		await eraseAll();
+		status = mine.status && mine.status !== L.saved ? mine.status : L.eraseAllDone;
 	}
 	async function savePs({ politiscales, flag }) {
 		const r = await api('PUT', '/api/me/profile', flag ? { politiscales, flag } : { politiscales });
@@ -112,9 +121,20 @@
 					</dl>
 					<div class="actions">
 						<a href="/questionnaire" class="button primary">{L.quizEdit}</a>
+						{#if hasAnswers}<button type="button" class="skip warn" onclick={() => (erasing = true)}>{L.eraseAllTitle}</button>{/if}
 						<a href="/boussole/{encodeURIComponent(session.me.username)}" class="button ghost">{L.openCard(session.me.username)}</a>
 					</div>
 				</section>
+
+				{#if erasing}
+					<div class="confirm" role="alertdialog" aria-label={L.eraseAllTitle}>
+						<p>{L.eraseAllConfirm}</p>
+						<div class="actions">
+							<button type="button" class="danger" onclick={eraseAnswers}>{L.eraseAllTitle}</button>
+							<button type="button" class="ghost" onclick={() => (erasing = false)}>{L.confirmCancel}</button>
+						</div>
+					</div>
+				{/if}
 
 				<section class="card">
 					<h2>{L.psTitle}</h2>

@@ -6,7 +6,7 @@
 	import { session } from '$lib/session.svelte.js';
 	import { PolitiQuiz } from '$lib/model.js';
 	import { ALL, openThemes, progressOf } from '$lib/quiz/flow.js';
-	import { mine, startMine } from '$lib/quiz/answers.svelte.js';
+	import { mine, startMine, eraseAll } from '$lib/quiz/answers.svelte.js';
 	import SignedIn from '$lib/components/SignedIn.svelte';
 
 	$effect(() => {
@@ -19,6 +19,14 @@
 			return { key: t.key, copy, ...progressOf(t.key, mine.answers) };
 		})
 	);
+	let erasing = $state(false);
+	let done = $state('');
+	const anyAnswer = $derived(Object.keys(mine.answers).length > 0);
+	async function eraseAnswers() {
+		erasing = false;
+		await eraseAll();
+		done = L.eraseAllDone;
+	}
 	const planned = $derived(PolitiQuiz.THEMES.filter((t) => t.planned).map((t) => ({ key: t.key, copy: L.themes[t.key] })));
 </script>
 
@@ -50,6 +58,23 @@
 				</article>
 			{/each}
 		</div>
+		{#if anyAnswer}
+			<div class="erase">
+				{#if erasing}
+					<div class="confirm" role="alertdialog" aria-label={L.eraseAllTitle}>
+						<p>{L.eraseAllConfirm}</p>
+						<div class="actions">
+							<button type="button" class="danger" onclick={eraseAnswers}>{L.eraseAllTitle}</button>
+							<button type="button" class="ghost" onclick={() => (erasing = false)}>{L.confirmCancel}</button>
+						</div>
+					</div>
+				{:else}
+					<button type="button" class="skip warn" onclick={() => (erasing = true)}>{L.eraseAllTitle}</button>
+					<span>{L.eraseAllLead}</span>
+				{/if}
+			</div>
+		{/if}
+		{#if done}<p class="status" role="status">{done}</p>{/if}
 		{#if planned.length}
 			<h2 class="soon">{L.hubPlanned}</h2>
 			<div class="planned">
@@ -83,6 +108,13 @@
 	.bar.none { opacity: .6; }
 	.bar span { display: block; height: 100%; width: 100%; background: var(--accent); transform-origin: left; }
 	.theme .button { height: 48px; padding: 0 22px; font-size: 15.5px; }
+	.erase { display: flex; flex-wrap: wrap; align-items: center; gap: 6px 14px; margin-top: 22px; font-size: 14px; color: var(--text-3); }
+	.erase .confirm { width: 100%; }
+	.warn { color: var(--danger); }
+	.warn:hover { background: var(--danger-soft); }
+	.confirm { padding: 14px 16px; border-radius: var(--r-md); background: var(--danger-soft); color: var(--text); }
+	.confirm p { margin: 0 0 10px; }
+	.actions { display: flex; flex-wrap: wrap; gap: 10px; }
 	.soon { font-family: var(--font-sans); font-size: 13px; letter-spacing: var(--tracking-caps); text-transform: uppercase; color: var(--text-3);
 		font-weight: 650; margin: 32px 0 12px; }
 	.planned { display: grid; grid-template-columns: repeat(auto-fit, minmax(220px, 1fr)); gap: 12px; }

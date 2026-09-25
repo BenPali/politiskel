@@ -65,6 +65,13 @@ export function eraseKeys(keys) {
 	persist();
 }
 
+/* Every answer, every theme: gone, and saved at once. */
+export async function eraseAll() {
+	mine.answers = {};
+	persist();
+	await flush();
+}
+
 function persist() {
 	if (mine.mode === 'guest') {
 		updateGuest({ answers: mine.answers });

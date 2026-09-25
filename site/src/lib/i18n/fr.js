@@ -699,6 +699,10 @@ export const LOCALES = {
     quizStart: "Commencer", quizResume: "Reprendre", quizPrev: "← Précédent",
     quizNext: "Suivant →", quizSkip: "Passer", quizSeeResult: "Voir le résultat →",
     quizErase: "Effacer mes réponses",
+    eraseAllTitle: "Effacer toutes mes réponses",
+    eraseAllLead: "Toutes les réponses au questionnaire, de tous les thèmes. Votre résultat PolitiScales et votre compte restent.",
+    eraseAllConfirm: "Effacer toutes vos réponses au questionnaire ? Votre position sur la boussole reviendra à celle de PolitiScales, ou disparaîtra si vous n'en avez pas. C'est définitif.",
+    eraseAllDone: "Toutes vos réponses sont effacées.",
     exportAnswers: "Exporter mes réponses",
     exportHint: "Le fichier téléchargé contient vos réponses, rien d'autre. Déposé dans "
       + "politi-results/answers/ par la personne qui assemble la page du groupe, il y ajoute "
