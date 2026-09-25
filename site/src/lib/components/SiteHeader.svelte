@@ -164,6 +164,7 @@
 		position: absolute; right: 0; top: calc(100% + 8px); width: 300px; z-index: 30;
 		background: var(--surface); border: 1px solid var(--border); border-radius: var(--r-lg);
 		box-shadow: var(--shadow-3); padding: var(--sp-4);
+		max-height: calc(100dvh - 96px); overflow-y: auto; overscroll-behavior: contain;
 		animation: pop var(--dur-base) var(--ease-out) both;
 	}
 	@keyframes pop { from { opacity: 0; transform: translateY(-4px); } to { opacity: 1; transform: none; } }
@@ -180,6 +181,10 @@
 	.segmented button[aria-checked='true'] { background: var(--surface); box-shadow: var(--shadow-1); font-weight: var(--fw-bold); }
 	.burger { display: none; border-color: var(--border); background: var(--bg); color: var(--text); }
 	@media (max-width: 860px) {
+		/* on a phone the button is not at the edge: the panel spans the screen
+		   under the header instead, and scrolls when it is taller than it */
+		.pop { position: fixed; top: 68px; left: 12px; right: 12px; width: auto;
+			max-height: calc(100dvh - 80px - env(safe-area-inset-bottom)); }
 		.site-header { height: 60px; padding: 0 var(--sp-4); gap: var(--sp-3); }
 		.name { font-size: 19px; }
 		.sections { display: none; position: absolute; left: 0; right: 0; top: 60px; flex-direction: column; align-items: stretch;
