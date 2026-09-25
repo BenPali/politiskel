@@ -95,12 +95,12 @@
 		{:else}
 			<div class="quiz-top">
 				<a href="/questionnaire">{L.backToThemes}</a>
+				<span class="theme-name">{themeName(theme)}</span>
 				{#if sc}
 					<div class="progress"><div style="width: {Math.round((100 * step) / n)}%"></div></div>
 					<span class="quiz-count">{L.quizCount(step, n)}</span>
 				{/if}
-				<span class="who">{L.quizWho(session.me.username)}</span>
-			</div>
+							</div>
 
 			{#key step}
 				<section class="quiz-card screen">

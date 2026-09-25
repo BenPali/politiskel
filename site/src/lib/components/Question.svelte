@@ -62,6 +62,6 @@
 	<p class="q-src">{L.quizSalienceSrc}</p>
 {:else if src}
 	<p class="q-src">
-		<a href={q.src.url} target="_blank" rel="noopener noreferrer">{src}</a>{#if q.translated}<span class="tr"> · {L.quizTranslated[q.translated]}</span>{/if}
+		{L.quizSourceLabel}<a href={q.src.url} target="_blank" rel="noopener noreferrer">{src}</a>{#if q.translated}<br /><span class="tr">{L.quizTranslated[q.translated]}</span>{/if}
 	</p>
 {/if}

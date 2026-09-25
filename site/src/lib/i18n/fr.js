@@ -194,16 +194,22 @@ export const LOCALES = {
     modes: { auto: "Auto", clair: "Clair", sombre: "Sombre" },
     navHome: "Accueil", navTry: "Essayer", navMethod: "Méthode", navFlags: "Drapeaux",
     navSignIn: "Se connecter", navSignUp: "Créer un compte",
-    homeTitle: "Votre squelette politique",
-    homeLead: "Politiskel place votre profil politique sur plusieurs lectures de l'espace politique, le "
-      + "compare aux partis de votre pays, placés d'après une enquête d'experts, et le décompose axe par "
-      + "axe — pour voir, dans un groupe, où l'on diverge vraiment plutôt que seulement où tombe la moyenne.",
+    homeTitle: "Voyez où vous divergez vraiment, entre amis.",
+    homeLead: "Politiskel place votre profil sur une boussole, le compare aux partis de votre pays, placés "
+      + "d'après une enquête d'experts, et le décompose axe par axe — pour voir, dans un groupe, où l'on "
+      + "diverge plutôt que seulement où tombe la moyenne.",
+    homeTry: "Essayer sans compte →",
+    homePrivacy: "Aucun e-mail demandé · aucun traceur · vos réponses ne sont vues que de vos groupes.",
+    homeAxes: { top: "TRADITION", bottom: "OUVERTURE", left: "GAUCHE", right: "DROITE" },
+    /* the hero's illustration: invented names, placed by hand */
+    homeSample: [["Camille", -38, -52], ["Inès", -74, -61], ["Jules", 14, -26], ["Sacha", 46, 22]],
     homePoints: [
-      ["Un questionnaire sourcé", "Chaque question vient d'une grande enquête publique (ESS, ISSP, EVS), "
-        + "dans sa version française officielle."],
-      ["Des repères réels", "Les partis sont placés par les experts du Chapel Hill Expert Survey, pays par pays."],
+      ["Un questionnaire sourcé", "Chaque question vient d'une grande enquête publique — ESS, ISSP, EVS — "
+        + "dans sa version française officielle, avec sa variable."],
+      ["Des repères réels", "Les partis sont placés par les experts du Chapel Hill Expert Survey, pays par "
+        + "pays. Les rares estimations à la main sont signalées."],
       ["En groupe, et entre soi", "Un groupe ne se voit que de l'intérieur, sur invitation ; vos réponses "
-        + "ne sont montrées qu'à ses membres."]
+        + "ne sont montrées qu'à ses membres. Exportez ou effacez tout, quand vous voulez."]
     ],
     homeSignedIn: n => "Bon retour, " + n + ".",
     loadingPage: "Chargement…",
@@ -463,13 +469,16 @@ export const LOCALES = {
     },
     quizOpen: "Compléter mon profil", quizEdit: "Modifier mes réponses",
     quizBack: "← Retour à la boussole",
-    quizWho: a => "Profil de " + a,
     backToThemes: "← Tous les thèmes", otherThemes: "Autres thèmes",
     hubEyebrow: "Questionnaire Politiskel",
     hubLead: "Le questionnaire est découpé en thèmes, que vous remplissez dans l'ordre que "
       + "vous voulez. Chacun remplace ou ajoute une lecture de votre profil ; l'économie est la "
       + "première disponible, pas la seule.",
     hubPlanned: "À venir",
+    hubTitle: "Répondez par thèmes, dans l'ordre que vous voulez.",
+    hubLeadShort: "Chacun remplace ou ajoute une lecture de votre profil. L'économie est la première disponible, pas la seule.",
+    hubSources: "Aucune question n'est écrite pour Politiskel : chacune est citée d'une grande enquête publique — ESS, ISSP, EVS — dans sa version française officielle, avec sa source.",
+    hubMethod: "Lire la méthode",
     hubProgress: (n, m) => n + " / " + m + " réponses",
     themes: {
       economy: { name: "Économie",
@@ -533,6 +542,7 @@ export const LOCALES = {
     resultWas: "PolitiScales", resultNow: "Politiskel",
     resultEnds: { x: ["gauche", "droite"], y: ["ouverture", "tradition"] },
     backToCompass: "Voir sur la boussole", quizReview: "Revoir mes réponses",
+    quizSourceLabel: "Source : ",
     quizTranslated: { item: "traduction Politiskel", anchors: "bornes traduites par Politiskel" },
     quizSalienceSrc: "Question Politiskel — aucune enquête publique ne mesure l'importance "
       + "d'un thème sur une échelle.",
