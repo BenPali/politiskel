@@ -260,17 +260,23 @@
 			</g>
 		{/if}
 
-		<!-- labels last, over every mark; they move with their mark -->
+		<!-- labels last, over every mark; they move with their mark. A click on
+		     one picks its mark, a larger target than the diamond; the keyboard
+		     keeps to the marks themselves. -->
 		<g class="labels" class:on={labelsOn} aria-hidden="true">
 			{#each geo.parties as r (r.ri)}
 				{#if r.place}
+					<!-- svelte-ignore a11y_click_events_have_key_events, a11y_no_static_element_interactions -->
 					<text class="ref-label mark" class:near={r.near} class:dim={r.dim} style="transform: translate({r.x}px, {r.y}px); --i: {r.ri}"
+						onclick={() => onpick('party', r.ri)}
 						x={r.place.dx} y={r.place.dy} text-anchor={r.place.anchor} font-size={F.ref}>{r.name}</text>
 				{/if}
 			{/each}
 			{#each geo.pts as pt (pt.i)}
 				{#if pt.place}
+					<!-- svelte-ignore a11y_click_events_have_key_events, a11y_no_static_element_interactions -->
 					<text class="pt-label mark" class:dim={pt.dim} style="transform: translate({pt.x}px, {pt.y}px); --i: {pt.i}"
+						onclick={() => onpick('profile', pt.i)}
 						x={pt.place.dx} y={pt.place.dy} text-anchor={pt.place.anchor} font-size={F.member}>{pt.text}</text>
 				{/if}
 			{/each}
@@ -344,6 +350,7 @@
 	/* labels fade in once the marks have landed */
 	.labels { opacity: 0; transition: opacity var(--dur-base) var(--ease-out); pointer-events: none; }
 	.labels.on { opacity: 1; }
+	.labels.on text { pointer-events: auto; cursor: pointer; }
 	.pt-label { fill: var(--text); font-weight: 650; stroke: var(--quad); stroke-width: 4; paint-order: stroke; stroke-linejoin: round; }
 	.ref-label { fill: var(--text-2); font-weight: 500; stroke: var(--quad); stroke-width: 4; paint-order: stroke; stroke-linejoin: round; }
 	.ref-label.near { fill: var(--text); font-weight: 650; }
