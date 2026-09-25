@@ -1,0 +1,22 @@
+<!-- Every page's frame: the header, the page, the footer. The session is
+     asked for once, here; pages read it from the shared state. -->
+<script>
+	import '../fonts.css';
+	import '../tokens.css';
+	import '../app.css';
+	import '../design.css';
+	import { onMount } from 'svelte';
+	import { refresh } from '$lib/session.svelte.js';
+	import SiteHeader from '$lib/components/SiteHeader.svelte';
+	import SiteFooter from '$lib/components/SiteFooter.svelte';
+
+	let { children } = $props();
+
+	onMount(refresh);
+</script>
+
+<SiteHeader />
+<main>
+	{@render children()}
+</main>
+<SiteFooter />

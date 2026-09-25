@@ -451,11 +451,12 @@
       fr: "Et les dirigeants du commerce et de l'industrie, ont-ils trop ou pas assez de pouvoir ?",
       src: { survey: "ISSP", wave: "Rôle de l'État 1996", variable: "Q11b", url: GESIS(6806) } },
 
-    /* ================= society: y, the libertarian-authoritarian axis =====
+    /* ================= society: y, the GAL-TAN axis (cultural, not the state) =====
        Seven sub-dimensions, the ones CHES 2024 rates and whose plain mean
        reproduces galtan at r = 0.97 across its 279 parties (each alone 0.77
        to 0.94, and none indispensable: dropping any leaves 0.96). After
-       orientation +1 always means authoritarian, as on the compass.
+       orientation +1 always means the TAN end (tradition, authority,
+       nation), up on the compass.
 
        `reserve: true` items are verified and sourced but not asked: kept so
        that a thin sub-dimension can be widened without searching again. Each
@@ -653,6 +654,51 @@
       fr: "…d'être né en France" }, NI23("Q01_A"))
   ];
 
+  /* What a screen shows above its question. A survey's stem introduces a
+     grid — "each of the following statements", "the things I am going to
+     read you", "using this card" — and here each screen asks one item, in a
+     mixed order: repeated as is, the stem promised a run of questions that
+     the next, unrelated screen broke. So `stem` keeps the official wording,
+     the item's provenance, which the source check compares; `ask` is what the
+     screen shows: the same instruction, for one item, with no interviewer or
+     card. The item's own wording is never touched. A stem missing here that
+     speaks of a list is caught by tools/extract.js. */
+  const AGREE_ONE = "Êtes-vous d'accord ou pas d'accord avec l'affirmation suivante ?";
+  const SCREEN_STEMS = new Map([
+    [SPEND_STEM, "Souhaiteriez-vous que le gouvernement dépense plus ou moins dans le domaine suivant ? "
+      + "N'oubliez pas que dépenser « beaucoup plus » peut entraîner une augmentation des impôts, taxes "
+      + "ou cotisations sociales."],
+    [OWNER_STEM, "Qui, d'après vous, devrait principalement gérer le service suivant, l'État ou le secteur privé ?"],
+    [ACTIONS_STEM, "Voici une action économique qu'un gouvernement peut mener. Y êtes-vous favorable ou défavorable ?"],
+    [IMMIG_STEM, "Il existe différentes opinions concernant les immigrés venus d'autres pays pour vivre en France. "
+      + "Êtes-vous d'accord ou pas d'accord avec l'affirmation suivante ?"],
+    [IMMIG_STEM_13, "Il existe différentes opinions concernant les immigrés venus d'autres pays pour vivre en France. "
+      + "Êtes-vous d'accord ou pas d'accord avec l'affirmation suivante ?"],
+    [REFUGEE_STEM, "Certaines personnes arrivent en France et demandent le statut de réfugié parce qu'elles "
+      + "craignent des persécutions dans leur propre pays. Êtes-vous d'accord ou pas d'accord avec la "
+      + "proposition suivante ?"],
+    [MINORITIES_STEM, "À propos des minorités en France : êtes-vous d'accord ou pas d'accord avec l'affirmation suivante ?"],
+    [EVS_SCALES_STEM, "Personnellement, où vous situez-vous sur cette échelle ?"],
+    [EVS_AGREE_STEM, AGREE_ONE],
+    [NI_AGREE_STEM, AGREE_ONE],
+    [NI13_AGREE_STEM, "Êtes-vous d'accord ou pas d'accord avec la proposition suivante ?"],
+    [EVS_OPINIONS_STEM, "Êtes-vous tout à fait d'accord, plutôt d'accord, plutôt pas d'accord ou pas d'accord "
+      + "du tout avec l'opinion suivante ?"],
+    [EVS_JUSTIF_STEM, "Pensez-vous que ce qui suit peut toujours se justifier, ne peut jamais se justifier, ou "
+      + "que c'est entre les deux ?"],
+    [PROTEST_STEM, "Il y a plusieurs façons de s'opposer à une décision gouvernementale que l'on désapprouve "
+      + "fortement. De votre point de vue, l'action suivante doit-elle être autorisée ou non autorisée ?"],
+    [ESS_B38_STEM, "Dans quelle mesure êtes-vous d'accord ou non avec la proposition suivante ?"],
+    [ESS_B33_STEM, "Dans quelle mesure êtes-vous d'accord ou non avec la phrase suivante ?"],
+    [FAM_STEM, "Dans quelle mesure êtes-vous d'accord ou pas d'accord avec la proposition suivante ?"],
+    [FAM_FR_STEM, "Êtes-vous tout à fait d'accord, plutôt d'accord, plutôt pas d'accord ou pas d'accord du "
+      + "tout avec la phrase suivante ?"],
+    [FAMILIES_STEM, "Les enfants grandissent dans différents types de familles. Dans quelle mesure êtes-vous "
+      + "d'accord ou pas d'accord avec l'affirmation suivante ?"],
+    ["Voici plusieurs affirmations : pouvez-vous me dire si vous êtes d'accord ou pas d'accord avec elles ?", AGREE_ONE]
+  ]);
+  for (const item of ITEMS) if (item.stem) item.ask = SCREEN_STEMS.get(item.stem) || item.stem;
+
   /* The economy is the first theme, not the only one. The others are listed
      so the page can say what is coming; each has its counterpart in CHES, so
      its readings will be comparable to the parties like x is. `planned`
@@ -683,9 +729,9 @@
      than a seeded shuffle: adding an item slots it in somewhere without
      moving any of the others, where a shuffle would deal the whole deck
      again. Items of a shared grid need no special care, since every screen
-     repeats the grid's stem; an item whose wording leans on the one before
-     it says so with `follows`, and the two travel as one block, placed by the
-     first one's hash. */
+     shows its instruction in the singular (`ask`, above); an item whose
+     wording leans on the one before it says so with `follows`, and the two
+     travel as one block, placed by the first one's hash. */
   function hashId(id) {
     let h = 0x811c9dc5;
     for (let k = 0; k < id.length; k++) {
@@ -735,6 +781,17 @@
 
      `n` counts the answers behind each reading, so the page can say how
      thin it is. */
+  /* The items that ask about a group's rights, by group — not about a
+     policy, an effect or a movement. "Immigration" in CHES mixes the rights
+     of immigrants with immigration policy (how many, deportations, the
+     economy), and "women" includes a judgement on feminism: those are left
+     out here. Equal rights across groups is read on these alone. */
+  const RIGHTS = {
+    lgbt: ["ess.freehms", "ess.hmsacld", "ess.hmsfmlsh", "evs.v153", "issp.two.women", "issp.trans"],
+    women: ["issp.working.mother", "issp.breadwinner", "evs.v76", "evs.v81", "evs.v154"],
+    minorities: ["issp.immig.priority", "ess.rfgbfml", "issp.never.french"]
+  };
+
   function score(answers, themeKey) {
     const theme = THEMES.find(t => t.key === themeKey);
     const items = askedItems(themeKey);
@@ -774,14 +831,31 @@
       const v = answers[key];
       return Number.isInteger(v) && v >= 0 && v < SCALES.salience.values.length ? v : null;
     };
+    /* Equal rights: for each group, how egalitarian the answers on its rights
+       are (positive = equal rights, on [0, 100] once oriented), and the
+       weakest of the three — a profile egalitarian for one group only is not
+       read as egalitarian for all. Null unless every group was answered. */
+    if (themeKey === "society") {
+      const groups = {};
+      for (const [g, ids] of Object.entries(RIGHTS)) {
+        const vs = answered.filter(a => ids.includes(a.i.id)).map(a => a.v);
+        groups[g] = vs.length ? Math.round(-100 * mean(vs)) : null;
+      }
+      const gs = Object.values(groups);
+      out.equality = gs.every(v => v !== null)
+        ? { groups, min: Math.min(...gs), mean: Math.round(mean(gs)) } : null;
+    }
+
     out.salience = level("salience." + themeKey);
     out.salienceAfter = level("salience." + themeKey + ".after");
 
     return out;
   }
 
-  const api = { SCALES, ITEMS, THEMES, itemById, itemValue, score, mixedOrder, askedItems };
+  const api = { SCALES, ITEMS, THEMES, RIGHTS, itemById, itemValue, score, mixedOrder, askedItems };
+  /* both: Node's tools require it, and the site imports it as a module,
+     which may or may not see `module` depending on where it runs */
   if (typeof module !== "undefined" && module.exports) module.exports = api;
-  else global.PolitiQuiz = api;
+  global.PolitiQuiz = api;
 
 })(typeof globalThis !== "undefined" ? globalThis : this);

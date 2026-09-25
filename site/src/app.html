@@ -1,0 +1,43 @@
+<!doctype html>
+<html lang="fr" data-theme="classique" data-mode="auto">
+	<head>
+		<meta charset="utf-8" />
+		<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
+		<!-- The icons, as browsers look for them: the .ico for whatever asks
+		     /favicon.ico without reading the page, the SVG (with its dark
+		     version) for current tabs, the touch icon for iOS home screens, the
+		     manifest's for Android and installing. ?v= changes when the icon
+		     does: browsers keep an icon, even a failed one, for its address. -->
+		<link rel="icon" href="%sveltekit.assets%/favicon.ico?v=2" sizes="32x32" />
+		<link rel="icon" href="%sveltekit.assets%/favicon.svg?v=2" type="image/svg+xml" />
+		<link rel="apple-touch-icon" href="%sveltekit.assets%/apple-touch-icon.png?v=2" />
+		<link rel="manifest" href="%sveltekit.assets%/site.webmanifest?v=2" />
+		<link rel="preload" href="%sveltekit.assets%/fonts/AtkinsonHyperlegibleNext-normal-latin.woff2" as="font" type="font/woff2" crossorigin />
+		<link rel="preload" href="%sveltekit.assets%/fonts/Unbounded-normal-latin.woff2" as="font" type="font/woff2" crossorigin />
+		<!-- The chosen palette and mode, applied before anything is drawn so the
+		     page never flashes in another. The header's picker sets them. The
+		     first version's single theme setting is read once and carried over. -->
+		<script>
+			try {
+				/* the palettes of lib/theme.js: one no longer offered falls back to classique */
+				var P = ['classique', 'pop', 'journal', 'nuit', 'aurore', 'graphite', 'catppuccin', 'sepia', 'contraste'];
+				var d = JSON.parse(localStorage.getItem('politiskel.display.v1') || 'null');
+				if (d && P.indexOf(d.palette) < 0) d.palette = 'classique';
+				if (!d) {
+					var old = localStorage.getItem('politicompass.theme.v1');
+					var map = { light: ['classique', 'clair'], dark: ['classique', 'sombre'], contrast: ['contraste', 'clair'], sepia: ['sepia', 'clair'] };
+					if (map[old]) d = { palette: map[old][0], mode: map[old][1] };
+				}
+				if (d && d.palette && d.mode) {
+					document.documentElement.dataset.theme = d.palette;
+					document.documentElement.dataset.mode = d.mode;
+					if (d.motion === 'reduce') document.documentElement.dataset.motion = 'reduce';
+				}
+			} catch (e) {}
+		</script>
+		%sveltekit.head%
+	</head>
+	<body data-sveltekit-preload-data="hover">
+		<div style="display: contents">%sveltekit.body%</div>
+	</body>
+</html>

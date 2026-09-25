@@ -1,0 +1,11 @@
+# Caddy in front of the Politiskel server: HTTPS certificates are obtained
+# and renewed on their own. Caddy passes the Host header through and appends
+# the client's address to X-Forwarded-For, which is what the server expects.
+
+politiskel.example.org {
+	header Strict-Transport-Security "max-age=31536000"
+	request_body {
+		max_size 128KB
+	}
+	reverse_proxy 127.0.0.1:8080
+}

@@ -1,7 +1,8 @@
 #!/usr/bin/env node
 "use strict";
-/* Reads every PolitiScales result in politi-results/, writes profiles-data.js
-   and assembles index.html.
+/* Reads every PolitiScales result in politi-results/ and writes
+   profiles-data.js, for the measuring tools (model-check.js, verify.js). The
+   site is built on its own, in site/.
 
      node tools/extract.js            # only re-reads changed screenshots
      node tools/extract.js --force    # ignores the cache
@@ -25,57 +26,6 @@ const CACHE = path.join(SRC, ".extract-cache.json");
    beside the screenshots, so they are as local and as ignored by git. */
 const ANSWERS = path.join(SRC, "answers");
 const OUT = path.join(ROOT, "profiles-data.js");
-const PAGE = path.join(ROOT, "index.html");       /* generated, not committed */
-const TEMPLATE = path.join(ROOT, "template.html"); /* committed source, no data */
-/* The files shared with the browser, each inlined into its own marked block:
-   the screenshot reader, the compass model, and the questionnaire. */
-const SHARED = [
-  { file: path.join(__dirname, "politi-dissect.js"),
-    start: "/* POLITI-EXTRACTOR:START */", end: "/* POLITI-EXTRACTOR:END */" },
-  { file: path.join(__dirname, "politi-model.js"),
-    start: "/* POLITI-MODEL:START */", end: "/* POLITI-MODEL:END */" },
-  { file: path.join(__dirname, "politi-quiz.js"),
-    start: "/* POLITI-QUIZ:START */", end: "/* POLITI-QUIZ:END */" }
-];
-
-/* Replaces the content between two markers, leaving the rest untouched. */
-function between(text, start, end, body) {
-  const a = text.indexOf(start), b = text.indexOf(end);
-  if (a < 0 || b < 0 || b < a) return null;
-  return text.slice(0, a + start.length) + "\n" + body + "\n" + text.slice(b);
-}
-
-/* A literal "</script>" inside a string would close the surrounding tag. */
-const safe = s => s.replace(/<\/(script)/gi, "<\\/$1");
-
-/* The shared files are code, so they are inlined into the template itself and
-   committed: someone who clones the repository gets a page that works straight
-   away, with no build step and no Node. Only the DATA is
-   template-only-in-index.html, since that is what must never be committed.
-
-   index.html is then REBUILT from the template on every run, so it never holds
-   anything beyond the template plus the current data. */
-function inject(count, dataJs) {
-  if (!fs.existsSync(TEMPLATE) || SHARED.some(s => !fs.existsSync(s.file))) return false;
-
-  let page = fs.readFileSync(TEMPLATE, "utf8");
-  for (const { file, start, end } of SHARED) {
-    const code = safe(fs.readFileSync(file, "utf8").trimEnd());
-    const next = between(page, start, end, code);
-    if (!next) return false;
-    if (next !== page) {                 /* only touch it when it changed */
-      fs.writeFileSync(TEMPLATE, next);
-      page = next;
-    }
-  }
-
-  const out = between(page, "/* POLITI-DATA:START */", "/* POLITI-DATA:END */",
-                      "/* " + count + " profile(s) extracted from politi-results/ */\n"
-                      + safe(dataJs));
-  if (!out) return false;
-  fs.writeFileSync(PAGE, out);
-  return true;
-}
 
 const argv = process.argv.slice(2);
 const FORCE = argv.includes("--force");
@@ -228,7 +178,7 @@ function existingProfileCount() {
 
 /* ------------------------------------------------------------ answers ---
    A group answers on as many machines as it has members, and each browser
-   keeps its own answers. "Exporter mes réponses" on the page writes one file;
+   keeps its own answers. The site's account export writes one file;
    dropped in politi-results/answers/, it is folded into the page like a
    screenshot, and read by tools/model-check.js.
 
@@ -254,6 +204,10 @@ function readAnswers() {
     let data;
     try { data = JSON.parse(fs.readFileSync(path.join(ANSWERS, file), "utf8")); }
     catch (e) { console.log("  ! answers/" + file + "  not JSON: " + e.message); continue; }
+    /* the site's account export ("Exporter toutes mes données") holds the
+       answers too: read as an answers file under the account's name */
+    if (data && data.format === "politiskel-account" && data.version === 1 && data.profile)
+      data = { format: "politiskel-answers", version: 1, alias: data.username, answers: data.profile.answers };
     if (!data || data.format !== "politiskel-answers" || data.version !== 1
         || typeof data.alias !== "string" || !data.alias.trim()
         || !data.answers || typeof data.answers !== "object") {
@@ -317,7 +271,22 @@ function resolveAnswers(files, profiles) {
   return [...byKey.values()].map(a => ({ alias: a.alias, source: a.source, answers: a.answers }));
 }
 
+/* A screen asks one item, in a mixed order: an instruction that speaks of a
+   list ("les affirmations suivantes", "que je vais vous citer") promises
+   questions the next screen does not ask. politi-quiz.js gives each survey
+   stem a one-item version; this catches a new stem left without one. */
+function checkScreenStems() {
+  const LIST = /\b(suivant(e)?s|chacun(e)? de|chacun(e)? d'|je vais|cette carte|cette liste|une liste|un certain nombre|ces échelles|avec elles)\b/i;
+  const bad = Q.ITEMS.filter(i => !i.reserve && i.ask && LIST.test(i.ask));
+  for (const i of bad) console.log("  ! " + i.id + "  its screen instruction speaks of a list: « " + i.ask + " »");
+  if (bad.length) {
+    console.error(bad.length + " item(s) need a one-item instruction in SCREEN_STEMS (tools/politi-quiz.js) — aborting.");
+    process.exit(1);
+  }
+}
+
 function main() {
+  checkScreenStems();
   /* No screenshots is not an error: the page works without them — a profile
      can be dropped onto it or typed in by hand. Failing here left whoever
      just cloned the repository with no index.html at all, and no way to get
@@ -401,19 +370,11 @@ function main() {
     + "\nwindow.POLITI_ANSWERS = " + JSON.stringify(answers, null, 1) + ";";
   fs.writeFileSync(OUT, banner + dataJs + "\n");
 
-  /* The extractor and the data are also copied INTO index.html. A file:// page
-     loading neighbouring <script src> depends on browser settings (and on any
-     extensions): when those blocked it, the page came up empty. Inlining
-     everything removes the problem and makes the file shareable as-is. */
-  const injected = inject(profiles.length, dataJs);
 
   console.log("\n" + fresh + " extracted, " + reused + " cached, " + failed + " failed"
     + (answers.length ? ", answers for " + answers.length + " profile(s)" : "")
     + "  →  " + path.relative(ROOT, OUT)
-    + " (" + (fs.statSync(OUT).size / 1024).toFixed(1) + " KB)"
-    + (injected ? "\n   index.html rebuilt (extractor + data inlined, "
-        + (fs.statSync(PAGE).size / 1024).toFixed(1) + " KB)"
-      : "\n   index.html NOT rebuilt: POLITI-DATA/POLITI-EXTRACTOR markers not found"));
+    + " (" + (fs.statSync(OUT).size / 1024).toFixed(1) + " KB)");
   if (failed) process.exitCode = 1;
 }
 
