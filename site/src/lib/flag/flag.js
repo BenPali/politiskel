@@ -50,13 +50,13 @@ import { FLAG_ICONS } from '$lib/flag/icons.js';
 export const FLAG_COLOURS = {
   red: "#d52b1e", gold: "#f5c518", blue: "#1c4fa0", black: "#151515", purple: "#6b2c91",
   green: "#1a8a4a", pink: "#e0529c", orange: "#f28c28", sky: "#4a90d9", steel: "#5f6f7e",
-  white: "#ffffff"
+  white: "#ffffff", navy: "#1b2a4a", brown: "#6b4226"
 };
 export const FLAG_LIGHT = new Set(["gold", "white", "pink", "orange", "sky"]);
 export const FLAG_RAINBOW = ["#e40303", "#ff8c00", "#ffed00", "#008026", "#004dff", "#750787"];
 export const FLAG_KEY = "politicompass.flags.v1";
 /* symbols of revolution, which may take the revolutionary triangle */
-export const FLAG_REBEL = new Set(["fist", "phrygian", "anarchy"]);
+export const FLAG_REBEL = new Set(["fist", "phrygian", "anarchy", "hammer"]);
 
 /* Readings a future theme will provide — the institutions theme will measure
    monarchism. Until then they are absent and what depends on them never
@@ -76,7 +76,7 @@ export function flagTraits(c, p) {
   const x = c.x, y = c.y;
   const d = Object.assign({}, (c.quiz && c.quiz.dims) || {}, (c.soc && c.soc.dims) || {});
   const ps = {};
-  for (const k of ["com", "laf", "eco", "prod", "rehab", "pun", "prg", "csv", "int", "nat", "rev", "ref"])
+  for (const k of ["com", "reg", "laf", "eco", "prod", "rehab", "pun", "prg", "csv", "int", "nat", "rev", "ref"])
     if (p && Number.isFinite(p[k])) ps[k] = p[k];
   const has = v => v !== null && v !== undefined && Number.isFinite(v);
   const neg = v => (has(v) ? -v : null);
@@ -99,6 +99,10 @@ export function flagTraits(c, p) {
      marked too. */
   const eq = c.soc && c.soc.equality ? c.soc.equality : null;
   const stands = (v, axis) => v >= 80 || !has(axis) || v >= axis + 15;
+  /* the state in the economy: regulation, read on the questionnaire or PolitiScales */
+  const regul = first(neg(d.deregulation), ps.reg);
+  const labour = c.quiz ? c.quiz.labour : null;
+  const notAnarchist = !has(antistate) || antistate < 60;
 
   const T = [
     { k: "left",        s: neg(x),                      min: 34, colour: "red" },
@@ -121,7 +125,8 @@ export function flagTraits(c, p) {
     { k: "tradition",   s: first(d.religion, has(ps.csv) ? ps.csv - 10 : null), min: 60, symbol: "column" },
     { k: "multicultural", s: neg(d.multiculturalism),   min: 60, symbol: "rings" },
     { k: "feminism",    s: neg(d.women),                min: 60, colour: "purple", symbol: "venus" },
-    { k: "lgbt",        s: neg(d.lgbt),                 min: 60, colour: "pink" },
+    /* LGBT rights are said by the rainbow bar alone: pink is socialism's, as in France */
+    { k: "lgbt",        s: neg(d.lgbt),                 min: 60 },
     { k: "ecology",     s: ps.eco,                      min: 60, colour: "green", symbol: "sprout" },
     { k: "productivism", s: ps.prod,                    min: 60, colour: "steel", symbol: "factory" },
     { k: "revolution",  s: ps.rev,                      min: 65, symbol: "star" },
@@ -129,7 +134,34 @@ export function flagTraits(c, p) {
     { k: "progress",    s: ps.prg,                      min: 70, symbol: "torch" },
     { k: "centre",      s: has(x) && has(y) && Math.abs(x) < 25 && Math.abs(y) < 25
                              ? 60 - Math.max(Math.abs(x), Math.abs(y)) : null, min: 1, colour: "orange" },
+    /* the side of labour against capital: unions, workers' power */
+    { k: "syndicalism", s: labour,                      min: 60, symbol: "cog" },
     /* composites, which outrank the traits they combine */
+    /* communism: collective ownership, with a state — the anarchist's is the A */
+    { k: "communism",   s: first(ps.com, cls),          min: 75, colour: "red", symbol: "hammer", bonus: 10,
+      when: () => notAnarchist },
+    /* social democracy: a moderate left that reforms rather than overturns */
+    { k: "socdem",      s: has(x) && x <= -15 && x >= -70 && rev < 60 ? first(ps.ref, neg(d.redistribution)) : null,
+                             min: 60, colour: "pink", symbol: "rose", bonus: 5 },
+    /* Gaullism: the nation and a state that steers the economy, away from both ends */
+    { k: "gaullism",    s: has(nat) && has(regul) && has(x) && Math.abs(x) <= 45 ? Math.min(nat, regul) : null,
+                             min: 60, symbol: "lorraine", bonus: 15 },
+    /* national conservatism: nation and order together, in navy */
+    { k: "natcons",     s: has(nat) && has(ord) ? Math.min(nat, ord) : null, min: 60, colour: "navy" },
+    /* the authoritarian far right: nation, order and the refusal of equal rights,
+       all very marked; brown, the colour history gave it */
+    { k: "farright",    s: has(nat) && has(ord) && eq ? Math.min(nat, ord, -eq.mean) : null, min: 70, colour: "brown", bonus: 5 },
+    /* readings the coming themes will measure: until then, never drawn */
+    { k: "pacifism",    s: futureReading(c, "pacifism"),        min: 60, symbol: "dove" },
+    { k: "rural",       s: futureReading(c, "rural"),           min: 60, symbol: "wheat" },
+    { k: "degrowth",    s: futureReading(c, "degrowth"),        min: 60, colour: "green", symbol: "snail" },
+    { k: "transition",  s: futureReading(c, "transition"),      min: 60, colour: "green", symbol: "turbine" },
+    { k: "nuclear",     s: futureReading(c, "nuclear"),         min: 60, symbol: "atom" },
+    { k: "federalism",  s: futureReading(c, "europe"),          min: 60, symbol: "eustars" },
+    { k: "sovereignty", s: neg(futureReading(c, "europe")),     min: 60, symbol: "wall" },
+    { k: "direct",      s: futureReading(c, "directdemocracy"), min: 60, symbol: "vote" },
+    { k: "populism",    s: futureReading(c, "populism"),        min: 60, symbol: "megaphone" },
+    { k: "regionalism", s: futureReading(c, "regionalism"),     min: 60, symbol: "ermine" },
     { k: "anarchy",     s: antistate,                   min: 80, symbol: "anarchy", bonus: 12 },
     /* no bonus: it takes a place at its own strength, never ahead of a
        stronger trait; the causes it replaces give way to it regardless */
@@ -153,7 +185,8 @@ export function flagTraits(c, p) {
   /* symbols: the two strongest, from two different traits; a composite
      replaces the symbols of the traits it is made of */
   const covers = { anarchy: [], phrygian: ["revolution", "class"], croix: ["nation", "laworder"],
-                   monarchy: [], legitimism: ["monarchy"] };
+                   monarchy: [], legitimism: ["monarchy"], communism: ["class"], socdem: ["reform", "redistribution"],
+                   gaullism: ["nation"] };
   const syms = [];
   const hidden = new Set();
   for (const t of T) {
@@ -177,7 +210,14 @@ export function flagLayout(t) {
   if (t.antistate !== null && t.antistate >= 60 && y <= 0) return "diagonal";
   if (t.rev >= 70) return "revolution";
   if (y >= 60 && t.tradition >= 60) return "royal";
+  /* a cross where the two axes cut across the usual pairing: a traditional
+     left, or a liberal right */
+  const x = t.x === null ? 0 : t.x;
+  if ((x <= -34 && y >= 34) || (x >= 34 && y <= -34)) return "centred";
   if (y >= 34) return "nordic";
+  /* one cause above everything else: it takes the disc at the crossing */
+  const [first, second] = t.syms;
+  if (first && first.s >= 80 && (!second || second.s < 55)) return "disc";
   if (t.multi >= 70) return "pall";
   if (t.intl >= 60) return "stripes";
   if (t.nat >= 60) return "triband";
@@ -207,10 +247,9 @@ export function politiskelFlag(c, p) {
   const t = flagTraits(c, p);
   if (t.x === null && t.y === null && !t.traits.length) return null;
   const layout = flagLayout(t);
-  /* The rainbow bar already says LGBT rights: pink would say it a second
-     time, so it gives its field to the next colour. */
-  const rainbow = t.lgbt >= 80 && layout !== "revolution";
-  const pool = rainbow ? t.colsAll.filter(k => k !== "pink") : t.colsAll;
+  /* LGBT rights have no colour of their own: the rainbow bar says them. */
+  const rainbow = t.lgbt >= 60 && layout !== "revolution";
+  const pool = t.colsAll;
   const cols = pool.length ? pool.slice(0, 3) : ["white"];
   const border = t.prot >= 75 && layout !== "royal";
   const d = drawFlag({ layout, cols, syms: t.syms, rainbow, border, wide: t.intl >= 80 });
@@ -269,6 +308,22 @@ export function drawFlag({ layout, cols, syms: given, rainbow = false, border = 
     if (c3) P.push('<rect x="64" y="63" width="86" height="37" fill="' + C(c3) + '"/>');
     places = [{ x: 19, y: 19, size: 28, bg: a }, { x: 107, y: 81, size: 24, bg: c3 || a }];
     drawn = [a, cross, c3].filter(k => k && k !== "white");
+  } else if (layout === "centred") {
+    /* a centred cross, edged in a third colour */
+    const cross = b || "white", edge = c3 || (cross === "white" ? "black" : "white");
+    P.push('<rect width="150" height="100" fill="' + C(a) + '"/>',
+           '<rect x="62" width="26" height="100" fill="' + C(edge) + '"/><rect y="37" width="150" height="26" fill="' + C(edge) + '"/>',
+           '<rect x="67" width="16" height="100" fill="' + C(cross) + '"/><rect y="42" width="150" height="16" fill="' + C(cross) + '"/>');
+    places = [{ x: 31, y: 19, size: 26, bg: a }, { x: 119, y: 81, size: 22, bg: a }];
+    drawn = [a, cross, c3].filter(k => k && k !== "white");
+  } else if (layout === "disc") {
+    /* a Nordic cross with a disc at the crossing, which holds the symbol */
+    const cross = b || (a === "white" ? "black" : "white");
+    P.push('<rect width="150" height="100" fill="' + C(a) + '"/>',
+           '<rect x="41" width="18" height="100" fill="' + C(cross) + '"/><rect y="41" width="150" height="18" fill="' + C(cross) + '"/>',
+           '<circle cx="50" cy="50" r="24" fill="' + C(cross) + '"/>');
+    places = [{ x: 50, y: 50, size: 32, bg: cross }, { x: 110, y: 80, size: 20, bg: a }];
+    drawn = [a, cross].filter(k => k && k !== "white");
   } else if (layout === "pall") {
     const field2 = b || "white";
     P.push('<rect width="150" height="100" fill="' + C(a) + '"/>',

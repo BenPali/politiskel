@@ -26,7 +26,9 @@
 		['revolution', { cols: ['red', 'black'], syms: S('star') }],
 		['diagonal', { cols: ['red'], syms: S('anarchy') }],
 		['pall', { cols: ['red', 'purple', 'sky'], syms: S('rings', 'venus') }],
-		['stripes', { cols: ['sky', 'gold'], syms: S('globe') }]
+		['stripes', { cols: ['sky', 'gold'], syms: S('globe') }],
+		['centred', { cols: ['red', 'navy', 'white'], syms: S('lorraine', 'wheat') }],
+		['disc', { cols: ['red', 'gold'], syms: S('hammer') }]
 	].map(([layout, spec]) => ({ name: F.layouts[layout][0], desc: F.layouts[layout][1], url: drawFlag({ layout, ...spec }).url }));
 	const mods = [
 		['rainbow', { layout: 'pale', cols: ['purple', 'green'], syms: S('torch'), rainbow: true }],

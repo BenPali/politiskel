@@ -28,6 +28,9 @@
 	const c = $derived(p ? project(p, board.view) : null);
 	const q = $derived(c ? (c.base || c).quiz : null);
 	const flag = $derived(p ? politiskelFlag(coords(p), p) : null);
+	/* the flag cropped from the PolitiScales capture, when there is one */
+	const psFlag = $derived(!!p?.flag && /^data:image\/(png|jpeg|webp);base64,/.test(p.flag));
+	let which = $state('politiskel');
 	const concepts = $derived(p && hasPolitiscales(p) ? PolitiExtract.keyConcepts(p, 3) : []);
 	const source = $derived(p ? L.profileSource(hasPolitiscales(p), !!(q || c?.soc || c?.quiz)) : '');
 </script>
@@ -66,8 +69,17 @@
 							{#each concepts as k}<li><b>{L.pole[k.key]}</b> {k.intensity}</li>{/each}
 						</ul>
 					{/if}
-					{#if flag}
-						<img class="hero" src={flag.url} alt={L.flagGeneratedAlt(p.alias)} width="432" height="288" />
+					{#if psFlag}
+						<div class="segmented flag-pick" role="radiogroup" aria-label={L.flagWhich}>
+							<button type="button" role="radio" aria-checked={which === 'politiskel'} onclick={() => (which = 'politiskel')}>{L.flagPolitiskel}</button>
+							<button type="button" role="radio" aria-checked={which === 'politiscales'} onclick={() => (which = 'politiscales')}>{L.flagPolitiscales}</button>
+						</div>
+					{/if}
+					{#if psFlag && which === 'politiscales'}
+						{#key which}<img class="hero ps" src={p.flag} alt={L.flagAlt(p.alias)} />{/key}
+						<p class="legend-head">{L.flagPsCaption}</p>
+					{:else if flag}
+						{#key which}<img class="hero" src={flag.url} alt={L.flagGeneratedAlt(p.alias)} width="432" height="288" />{/key}
 						<p class="legend-head">{L.flagFigureTitle}</p>
 						<ol class="legend">
 							{#each flag.legend as line, i}<li><span>{i + 1}</span><span>{line}</span></li>{/each}
@@ -125,6 +137,11 @@
 	.hero { display: block; width: 100%; max-width: 432px; height: auto; aspect-ratio: 3 / 2; border-radius: 6px;
 		box-shadow: 0 0 0 1px var(--border), var(--shadow-2); animation: flag-in var(--dur-base) var(--ease-out) both; }
 	@keyframes flag-in { from { opacity: 0; transform: scale(.97); } }
+	.flag-pick { margin-bottom: 14px; }
+	.segmented { display: inline-flex; gap: 4px; padding: 4px; border-radius: var(--r-sm); background: var(--surface-2); }
+	.segmented button { min-height: 36px; padding: 0 14px; border: none; background: transparent; font-weight: 500; font-size: var(--fs-sm); }
+	.segmented button[aria-checked='true'] { background: var(--surface); box-shadow: var(--shadow-1); font-weight: var(--fw-bold); }
+	.hero.ps { aspect-ratio: auto; object-fit: contain; background: var(--surface-2); }
 	.legend-head { margin: 20px 0 10px; font-size: 14px; color: var(--text-2); font-weight: 650; }
 	.legend { margin: 0; padding: 0; list-style: none; display: flex; flex-direction: column; gap: 8px; }
 	.legend li { display: grid; grid-template-columns: 22px 1fr; gap: 10px; font-size: 14px; line-height: 1.45; color: var(--text-2); }

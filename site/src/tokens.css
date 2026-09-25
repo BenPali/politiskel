@@ -3,14 +3,13 @@
    by hand outside the flags and the party markers.
 
    Two independent settings on <html>:
-     data-theme = classique | pop | sepia | contraste | journal | nuit | argile | graphite | catppuccin
+     data-theme = classique | pop | sepia | contraste | journal | nuit | aurore | graphite | catppuccin
      data-mode  = clair | sombre | auto                                 (auto follows the system)
    Every palette has its dark version.
 
-   Neutrality: the brand accent is a petrol blue-green, outside French party
-   colours; Pop pushes it to bright turquoise with lemon as decoration. No
-   red, plain blue, plain green, purple or pink in the chrome: they belong to
-   the flags. --pop / --pop-soft are decorative, never carry meaning.
+   Palettes are free to take any colour, political ones included: the
+   flags and the party markers carry meaning, the chrome only carries a
+   look. --pop / --pop-soft are decorative, never carry meaning.
 
    The dark blocks exist twice — [data-mode="sombre"], and [data-mode="auto"]
    inside the dark-scheme query — so `auto` follows the system. */
@@ -123,39 +122,39 @@
   --shadow-3: 0 18px 44px rgba(20,30,50,.15), 0 3px 8px rgba(20,30,50,.07);
   --focus-ring: 0 0 0 2px var(--surface), 0 0 0 4px var(--focus);
 }
-/* Argile: raw clay and linen, a deep umber accent, warm matt shadows. */
-[data-theme="argile"] {
+/* Aurore: dawn violet and peach, a deep violet accent. */
+[data-theme="aurore"] {
   color-scheme: light;
-  --bg: #efe3d9;
-  --surface: #faf4ee;
-  --surface-2: #e7d8cb;
-  --surface-sunk: #decbbb;
-  --border: #dbc8b8;
-  --border-strong: #8a7160;
-  --text: #2a1d15;
-  --text-2: #4e3b2f;
-  --text-3: #6a5446;
-  --accent: #7a4a1e;
-  --accent-strong: #653c16;
-  --on-accent: #fff8f0;
-  --accent-soft: #efd9bf;
-  --accent-ink: #4f2e10;
-  --pop: #d8b48c;
-  --pop-soft: #f3e6d8;
-  --danger: #a0302a;
-  --danger-soft: #f6dcd6;
-  --on-danger: #fff8f4;
-  --focus: #4f2e10;
-  --grid: #e3d5c8;
-  --axis: #8a7160;
-  --quad: #f6ede5;
-  --dot: #2a1d15;
-  --dot-me: #7a4a1e;
-  --ref: #93796a;
+  --bg: #efe6f3;
+  --surface: #fbf8fc;
+  --surface-2: #e6dcec;
+  --surface-sunk: #ddd0e5;
+  --border: #d9cbe2;
+  --border-strong: #7d6a8c;
+  --text: #231a2e;
+  --text-2: #463a55;
+  --text-3: #5f526d;
+  --accent: #6a2fa0;
+  --accent-strong: #57258a;
+  --on-accent: #fdf8ff;
+  --accent-soft: #e9d8f6;
+  --accent-ink: #43186e;
+  --pop: #ffb38a;
+  --pop-soft: #fde8dc;
+  --danger: #b0302a;
+  --danger-soft: #f7dcd8;
+  --on-danger: #ffffff;
+  --focus: #43186e;
+  --grid: #e4d9ea;
+  --axis: #7d6a8c;
+  --quad: #f7f1f9;
+  --dot: #231a2e;
+  --dot-me: #6a2fa0;
+  --ref: #8c7a9a;
   --scrim: rgba(40,24,14,.45);
-  --shadow-1: 0 1px 2px rgba(80,45,20,.08), 0 1px 1px rgba(80,45,20,.04);
-  --shadow-2: 0 6px 18px rgba(80,45,20,.10), 0 1px 3px rgba(80,45,20,.06);
-  --shadow-3: 0 18px 44px rgba(80,45,20,.15), 0 3px 8px rgba(80,45,20,.07);
+  --shadow-1: 0 1px 2px rgba(60,30,90,.08), 0 1px 1px rgba(60,30,90,.04);
+  --shadow-2: 0 6px 18px rgba(60,30,90,.10), 0 1px 3px rgba(60,30,90,.06);
+  --shadow-3: 0 18px 44px rgba(60,30,90,.15), 0 3px 8px rgba(60,30,90,.07);
   --focus-ring: 0 0 0 2px var(--surface), 0 0 0 4px var(--focus);
 }
 /* Graphite: cool pencil greys, a dark mustard accent, flat cards set off by rules. */
@@ -193,7 +192,7 @@
   --shadow-3: 0 12px 28px rgba(0,0,0,.14), 0 0 0 1px #4a4d55;
   --focus-ring: 0 0 0 2px var(--surface), 0 0 0 4px var(--focus);
 }
-/* Catppuccin: Latte by day, Mocha by night, lavender accent, rosewater as decoration. */
+/* Catppuccin: Latte by day, Mocha by night, its mauve accent, rosewater as decoration. */
 [data-theme="catppuccin"] {
   color-scheme: light;
   --bg: #eff1f5;
@@ -205,22 +204,22 @@
   --text: #4c4f69;
   --text-2: #5c5f77;
   --text-3: #60637a;
-  --accent: #4d59d1;
-  --accent-strong: #3f4bc0;
+  --accent: #8839ef;
+  --accent-strong: #7527d6;
   --on-accent: #ffffff;
-  --accent-soft: #dde1fb;
-  --accent-ink: #2f3a9e;
+  --accent-soft: #eadcfd;
+  --accent-ink: #5b1bb0;
   --pop: #dc8a78;
   --pop-soft: #f5e6e2;
   --danger: #d20f39;
   --danger-soft: #f7d9df;
   --on-danger: #ffffff;
-  --focus: #2f3a9e;
+  --focus: #5b1bb0;
   --grid: #e1e4ea;
   --axis: #8c8fa1;
   --quad: #f5f6f9;
   --dot: #4c4f69;
-  --dot-me: #4d59d1;
+  --dot-me: #8839ef;
   --ref: #9ca0b0;
   --scrim: rgba(30,30,46,.45);
   --shadow-1: 0 1px 2px rgba(76,79,105,.08), 0 1px 1px rgba(76,79,105,.04);
@@ -405,34 +404,34 @@
   --shadow-3: 0 18px 44px rgba(0,0,0,.42), 0 3px 8px rgba(0,0,0,.26);
   --focus-ring: 0 0 0 2px var(--surface), 0 0 0 4px var(--focus);
 }
-[data-theme="argile"][data-mode="sombre"] {
+[data-theme="aurore"][data-mode="sombre"] {
   color-scheme: dark;
-  --bg: #231a15;
-  --surface: #2c211b;
-  --surface-2: #372a22;
-  --surface-sunk: #1a1310;
-  --border: #46362b;
-  --border-strong: #9a8272;
-  --text: #f4e9df;
-  --text-2: #d9c9bb;
-  --text-3: #b3a192;
-  --accent: #e0b47e;
-  --accent-strong: #e0b47e;
-  --on-accent: #22150a;
-  --accent-soft: #4a3522;
-  --accent-ink: #f5dcbc;
-  --pop: #6b4f3a;
-  --pop-soft: #33261e;
-  --danger: #ef8f72;
-  --danger-soft: #4a2f28;
+  --bg: #1b1426;
+  --surface: #241b32;
+  --surface-2: #2e2340;
+  --surface-sunk: #140e1d;
+  --border: #3b2e50;
+  --border-strong: #9a88ad;
+  --text: #f5eefa;
+  --text-2: #d9cde4;
+  --text-3: #b3a6c1;
+  --accent: #c9a2f5;
+  --accent-strong: #c9a2f5;
+  --on-accent: #1b0f2a;
+  --accent-soft: #3d2a5a;
+  --accent-ink: #e8d6ff;
+  --pop: #ffb38a;
+  --pop-soft: #2f2438;
+  --danger: #f39a82;
+  --danger-soft: #4a2a2e;
   --on-danger: #1f0c06;
-  --focus: #f5dcbc;
-  --grid: #342820;
-  --axis: #9a8272;
-  --quad: #281e18;
-  --dot: #f4e9df;
-  --dot-me: #e0b47e;
-  --ref: #a68d7d;
+  --focus: #e8d6ff;
+  --grid: #2b2139;
+  --axis: #9a88ad;
+  --quad: #20182c;
+  --dot: #f5eefa;
+  --dot-me: #c9a2f5;
+  --ref: #a293b3;
   --scrim: rgba(0,0,0,.6);
   --shadow-1: 0 1px 2px rgba(0,0,0,.3);
   --shadow-2: 0 6px 18px rgba(0,0,0,.32), 0 1px 3px rgba(0,0,0,.22);
@@ -484,22 +483,22 @@
   --text: #cdd6f4;
   --text-2: #bac2de;
   --text-3: #a6adc8;
-  --accent: #b4befe;
-  --accent-strong: #b4befe;
+  --accent: #cba6f7;
+  --accent-strong: #cba6f7;
   --on-accent: #1e1e2e;
-  --accent-soft: #34385a;
-  --accent-ink: #d6dbff;
+  --accent-soft: #3d3055;
+  --accent-ink: #e6d6ff;
   --pop: #f5e0dc;
   --pop-soft: #2d2d40;
   --danger: #f38ba8;
   --danger-soft: #45293a;
   --on-danger: #1e1e2e;
-  --focus: #b4befe;
+  --focus: #cba6f7;
   --grid: #2c2d40;
   --axis: #7f849c;
   --quad: #212132;
   --dot: #cdd6f4;
-  --dot-me: #b4befe;
+  --dot-me: #cba6f7;
   --ref: #7f849c;
   --scrim: rgba(0,0,0,.6);
   --shadow-1: 0 1px 2px rgba(0,0,0,.3);
@@ -633,34 +632,34 @@
     --shadow-3: 0 18px 44px rgba(0,0,0,.42), 0 3px 8px rgba(0,0,0,.26);
     --focus-ring: 0 0 0 2px var(--surface), 0 0 0 4px var(--focus);
   }
-  [data-theme="argile"][data-mode="auto"] {
+  [data-theme="aurore"][data-mode="auto"] {
     color-scheme: dark;
-    --bg: #231a15;
-    --surface: #2c211b;
-    --surface-2: #372a22;
-    --surface-sunk: #1a1310;
-    --border: #46362b;
-    --border-strong: #9a8272;
-    --text: #f4e9df;
-    --text-2: #d9c9bb;
-    --text-3: #b3a192;
-    --accent: #e0b47e;
-    --accent-strong: #e0b47e;
-    --on-accent: #22150a;
-    --accent-soft: #4a3522;
-    --accent-ink: #f5dcbc;
-    --pop: #6b4f3a;
-    --pop-soft: #33261e;
-    --danger: #ef8f72;
-    --danger-soft: #4a2f28;
+    --bg: #1b1426;
+    --surface: #241b32;
+    --surface-2: #2e2340;
+    --surface-sunk: #140e1d;
+    --border: #3b2e50;
+    --border-strong: #9a88ad;
+    --text: #f5eefa;
+    --text-2: #d9cde4;
+    --text-3: #b3a6c1;
+    --accent: #c9a2f5;
+    --accent-strong: #c9a2f5;
+    --on-accent: #1b0f2a;
+    --accent-soft: #3d2a5a;
+    --accent-ink: #e8d6ff;
+    --pop: #ffb38a;
+    --pop-soft: #2f2438;
+    --danger: #f39a82;
+    --danger-soft: #4a2a2e;
     --on-danger: #1f0c06;
-    --focus: #f5dcbc;
-    --grid: #342820;
-    --axis: #9a8272;
-    --quad: #281e18;
-    --dot: #f4e9df;
-    --dot-me: #e0b47e;
-    --ref: #a68d7d;
+    --focus: #e8d6ff;
+    --grid: #2b2139;
+    --axis: #9a88ad;
+    --quad: #20182c;
+    --dot: #f5eefa;
+    --dot-me: #c9a2f5;
+    --ref: #a293b3;
     --scrim: rgba(0,0,0,.6);
     --shadow-1: 0 1px 2px rgba(0,0,0,.3);
     --shadow-2: 0 6px 18px rgba(0,0,0,.32), 0 1px 3px rgba(0,0,0,.22);
@@ -712,22 +711,22 @@
     --text: #cdd6f4;
     --text-2: #bac2de;
     --text-3: #a6adc8;
-    --accent: #b4befe;
-    --accent-strong: #b4befe;
+    --accent: #cba6f7;
+    --accent-strong: #cba6f7;
     --on-accent: #1e1e2e;
-    --accent-soft: #34385a;
-    --accent-ink: #d6dbff;
+    --accent-soft: #3d3055;
+    --accent-ink: #e6d6ff;
     --pop: #f5e0dc;
     --pop-soft: #2d2d40;
     --danger: #f38ba8;
     --danger-soft: #45293a;
     --on-danger: #1e1e2e;
-    --focus: #b4befe;
+    --focus: #cba6f7;
     --grid: #2c2d40;
     --axis: #7f849c;
     --quad: #212132;
     --dot: #cdd6f4;
-    --dot-me: #b4befe;
+    --dot-me: #cba6f7;
     --ref: #7f849c;
     --scrim: rgba(0,0,0,.6);
     --shadow-1: 0 1px 2px rgba(0,0,0,.3);

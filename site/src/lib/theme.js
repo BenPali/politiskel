@@ -2,7 +2,7 @@
    data-theme, data-mode and data-motion, remembered in this browser. app.html applies them before the
    first paint; this module reads and changes them. */
 
-export const PALETTES = ['classique', 'pop', 'journal', 'nuit', 'argile', 'graphite', 'catppuccin', 'sepia', 'contraste'];
+export const PALETTES = ['classique', 'pop', 'journal', 'nuit', 'aurore', 'graphite', 'catppuccin', 'sepia', 'contraste'];
 export const MODES = ['auto', 'clair', 'sombre'];
 /* 'reduce' stills the site even where the system asks for nothing */
 export const MOTIONS = ['full', 'reduce'];

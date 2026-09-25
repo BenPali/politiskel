@@ -190,12 +190,12 @@ export const LOCALES = {
     memberUnknown: n => "« " + n + " » n'est pas dans le groupe affiché.",
     brandHome: "Politiskel, accueil", navMain: "Navigation principale", navMenu: "Ouvrir le menu",
     displayPalette: "Palette", displayMode: "Mode",
-    palettes: { classique: "Classique", pop: "Pop", journal: "Journal", nuit: "Nuit", argile: "Argile", graphite: "Graphite",
+    palettes: { classique: "Classique", pop: "Pop", journal: "Journal", nuit: "Nuit", aurore: "Aurore", graphite: "Graphite",
                 catppuccin: "Catppuccin", sepia: "Sépia", contraste: "Contraste élevé" },
     modes: { auto: "Auto", clair: "Clair", sombre: "Sombre" },
     paletteHints: { classique: "Neutre, accent pétrole", pop: "Turquoise et citron", journal: "Papier journal, encre noire",
-                    nuit: "Encre profonde et cuivre", argile: "Terre crue et lin", graphite: "Gris crayon, filets nets",
-                    catppuccin: "Latte le jour, Mocha la nuit", sepia: "Lecture longue", contraste: "AAA, traits pleins" },
+                    nuit: "Encre profonde et cuivre", aurore: "Violet d'aube et pêche", graphite: "Gris crayon, filets nets",
+                    catppuccin: "Latte le jour, Mocha la nuit, mauve", sepia: "Lecture longue", contraste: "AAA, traits pleins" },
     displayLead: "Choisissez votre palette, puis clair, sombre ou comme le système : chaque palette a sa version sombre.",
     displayMotion: "Animations", motions: { full: "Activées", reduce: "Réduites" },
     accountSignedIn: (n, g) => "Connecté : " + n + " · membre de " + g + " groupe" + (g > 1 ? "s" : ""),
@@ -298,6 +298,10 @@ export const LOCALES = {
         ? "Champ blanc et bordure d'or : la famille des drapeaux royaux, pour un monarchisme marqué ("
           + signed(Math.round(t.monarchy)) + ")."
         : "Champ blanc et bordure d'or : ordre (Y " + signed(t.y) + ") et tradition marqués.",
+      centred: t => "Croix centrée liserée : deux axes qui se croisent à rebours de l'habitude — "
+        + (t.x < 0 ? "une gauche traditionaliste" : "une droite d'ouverture") + " (X " + signed(t.x) + ", Y " + signed(t.y) + ").",
+      disc: t => "Croix nordique à disque : une cause au-dessus de toutes les autres, portée au croisement ("
+        + Math.round(t.syms[0].s) + ").",
       nordic: t => "Croix nordique : la famille des drapeaux d'ordre, pour un profil traditionaliste (Y "
         + signed(t.y) + ").",
       pall: t => "Pall en Y, comme sur le drapeau sud-africain : la convergence, pour un "
@@ -350,6 +354,8 @@ export const LOCALES = {
       aside: "Les calculs sont publics et peuvent être refaits : les pondérations, les seuils et les affirmations de cette page sont mesurés par des scripts du dépôt, que chacun peut relancer.",
       source: "Voir le code source"
     },
+    flagWhich: "Drapeau affiché", flagPolitiskel: "Politiskel", flagPolitiscales: "PolitiScales",
+    flagPsCaption: "Drapeau extrait du résultat PolitiScales, tel que PolitiScales l'a dessiné.",
     flagsPage: {
       eyebrow: "Drapeaux",
       title: "Un drapeau tiré de vos positions",
@@ -370,15 +376,23 @@ export const LOCALES = {
         tower: ["Tour", "le protectionnisme"], book: ["Livre ouvert", "la religion hors de la politique"],
         column: ["Colonne", "la tradition"], venus: ["Symbole ♀", "le féminisme"],
         equality: ["Signe égal", "l'égalité des droits pour tous"], croix: ["Croix de guerre", "le patriotisme martial"],
-        crown: ["Couronne", "le monarchisme"], fleur: ["Fleur de lys", "un monarchisme légitimiste"]
+        crown: ["Couronne", "le monarchisme"], fleur: ["Fleur de lys", "un monarchisme légitimiste"],
+        hammer: ["Faucille et marteau", "le communisme"], rose: ["Rose", "la social-démocratie"],
+        lorraine: ["Croix de Lorraine", "le gaullisme"], cog: ["Roue dentée", "le syndicalisme"],
+        dove: ["Colombe", "le pacifisme · thème Europe et monde"], wheat: ["Épi de blé", "l'agrarisme · à venir"],
+        snail: ["Escargot", "la décroissance · thème Écologie"], turbine: ["Éolienne", "la transition énergétique · thème Écologie"],
+        atom: ["Atome", "le nucléaire civil · thème Écologie"], eustars: ["Cercle d'étoiles", "le fédéralisme européen · thème Europe"],
+        wall: ["Rempart", "la souveraineté nationale · thème Europe"], vote: ["Urne", "la démocratie directe · thème Institutions"],
+        megaphone: ["Mégaphone", "le populisme · thème Institutions"], ermine: ["Hermine", "le régionalisme · thème Institutions"]
       },
       coloursTitle: "Les couleurs",
-      coloursLead: "Les couleurs politiques conventionnelles. Elles n'appartiennent qu'aux drapeaux et aux repères : l'interface n'en emploie aucune.",
+      coloursLead: "Les couleurs politiques conventionnelles, d'après l'usage français et européen.",
       colours: {
         red: ["Rouge", "la gauche économique"], gold: ["Or", "le libéralisme économique"], blue: ["Bleu", "l'ordre"],
-        purple: ["Violet", "le féminisme"], pink: ["Rose", "les droits des personnes LGBT"], green: ["Vert", "l'écologie"],
+        purple: ["Violet", "le féminisme"], pink: ["Rose", "la social-démocratie"], green: ["Vert", "l'écologie"],
         steel: ["Acier", "le productivisme"], sky: ["Bleu ciel", "le cosmopolitisme"], orange: ["Orange", "le centre"],
-        black: ["Noir", "le rejet de l'État"], white: ["Blanc", "aucune lecture marquée"]
+        black: ["Noir", "le rejet de l'État"], navy: ["Bleu marine", "le national-conservatisme"],
+        brown: ["Brun", "l'extrême droite autoritaire"], white: ["Blanc", "aucune lecture marquée"]
       },
       layoutsTitle: "Les dispositions",
       layoutsLead: "La disposition vient de la lecture dominante ; ses champs prennent les couleurs des traits les plus forts, dans l'ordre.",
@@ -390,7 +404,9 @@ export const LOCALES = {
         revolution: ["Triangle de hampe", "Les drapeaux révolutionnaires, pour une lecture de classe très marquée."],
         diagonal: ["Diagonale", "La convention anarchiste, noir en bas côté battant, pour le rejet de l'État."],
         pall: ["Pall en Y", "Comme le drapeau sud-africain : la convergence, pour un multiculturalisme marqué."],
-        stripes: ["Canton et bandes", "L'ouverture sur le monde, pour un cosmopolitisme marqué."]
+        stripes: ["Canton et bandes", "L'ouverture sur le monde, pour un cosmopolitisme marqué."],
+        centred: ["Croix centrée liserée", "Deux axes qui se croisent à rebours : une gauche traditionaliste, une droite d'ouverture."],
+        disc: ["Croix nordique à disque", "Une cause au-dessus de toutes les autres, portée au croisement."]
       },
       modifier: n => "Modificateur · " + n,
       mods: {
@@ -399,16 +415,18 @@ export const LOCALES = {
       },
       example: n => "Exemple : " + n,
       asideTitle: "Écartés volontairement",
-      aside: "La faucille et le marteau, la fleur de lys telle que PolitiScales l'emploie (elle attend une lecture du monarchisme), "
-        + "le brun et le « bleu marine », les logos de partis, les emblèmes religieux, et tout symbole de haine — la croix de fer "
-        + "parmi eux ; la croix de guerre porte le patriotisme martial sans cette charge."
+      aside: "Les logos de partis, les emblèmes religieux, et tout symbole de haine — la croix de fer, la croix gammée "
+        + "et leurs dérivés parmi eux ; la croix de guerre porte le patriotisme martial sans cette charge. Les symboles marqués "
+        + "d'un thème à venir ne sont pas encore dessinés : ils attendent la lecture qui les justifie."
     },
     flagColourLines: {
       red: v => "Rouge : la gauche économique (" + v + ").",
       gold: v => "Or : le libéralisme économique (" + v + ").",
       blue: v => "Bleu : l'ordre (" + v + ").",
       purple: v => "Violet, la couleur des suffragettes : le féminisme (" + v + ").",
-      pink: v => "Rose : les droits des personnes LGBT (" + v + ").",
+      pink: v => "Rose, celle des socialistes : la social-démocratie (" + v + ").",
+      navy: v => "Bleu marine : le national-conservatisme, nation et ordre ensemble (" + v + ").",
+      brown: v => "Brun, la couleur que l'histoire a donnée à l'extrême droite autoritaire : nation, ordre et refus de l'égalité des droits, tous très marqués (" + v + ").",
       green: v => "Vert : l'écologie, d'après PolitiScales (" + v + ").",
       sky: v => "Bleu ciel, celui des Nations unies : le cosmopolitisme (" + v + ").",
       orange: () => "Orange, la couleur des centristes : aucun axe ne penche nettement.",
@@ -443,7 +461,21 @@ export const LOCALES = {
       croix: v => "Croix de guerre : le patriotisme martial, nation et ordre ensemble (" + v + ").",
       crown: v => "Couronne : le monarchisme (" + v + ").",
       equality: v => "Signe égal : l'égalité des droits pour tous — personnes LGBT, femmes, minorités — plutôt qu'une cause parmi d'autres (" + v + ").",
-      fleur: v => "Fleur de lys : un monarchisme légitimiste (" + v + ")."
+      fleur: v => "Fleur de lys : un monarchisme légitimiste (" + v + ").",
+      hammer: v => "Faucille et marteau : le communisme, l'alliance des ouvriers et des paysans (" + v + ").",
+      rose: v => "Rose : la social-démocratie, le socialisme qui réforme (" + v + ").",
+      lorraine: v => "Croix de Lorraine : le gaullisme, la nation et un État qui oriente l'économie (" + v + ").",
+      cog: v => "Roue dentée : le syndicalisme, du côté du travail face au capital (" + v + ").",
+      dove: v => "Colombe : le pacifisme (" + v + ").",
+      wheat: v => "Épi de blé : l'agrarisme et la ruralité (" + v + ").",
+      snail: v => "Escargot : la décroissance (" + v + ").",
+      turbine: v => "Éolienne : la transition énergétique (" + v + ").",
+      atom: v => "Atome : le nucléaire civil (" + v + ").",
+      eustars: v => "Cercle d'étoiles : le fédéralisme européen (" + v + ").",
+      wall: v => "Rempart : la souveraineté nationale face à l'Union (" + v + ").",
+      vote: v => "Urne : la démocratie directe, le référendum d'initiative citoyenne (" + v + ").",
+      megaphone: v => "Mégaphone : le populisme, le peuple contre les élites (" + v + ").",
+      ermine: v => "Hermine : le régionalisme, la décentralisation (" + v + ")."
     },
     tabCompass: "Boussole", tabQuiz: "Questionnaire", tabGroups: "Groupes", tabAccount: "Mon compte",
     welcomeTitle: "Politiskel, en groupe",

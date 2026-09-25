@@ -191,6 +191,46 @@ ICONS.equality = [
   rrect(144, 276, 368, 322, 12)
 ];
 
+/* Cross of Lorraine: a bar, and two crossbars, the upper one shorter —
+   Free France's, and the Gaullist tradition's since. */
+ICONS.lorraine = [
+  rrect(228, 40, 284, 472, 8),
+  rrect(152, 132, 360, 180, 8),
+  rrect(100, 236, 412, 284, 8)
+];
+
+/* Circle of stars: twelve five-pointed stars on a ring, as on the European
+   flag, drawn large enough to stay stars at 24px. */
+{
+  const star = (cx, cy, R) => {
+    const pts = [];
+    for (let i = 0; i < 10; i++) {
+      const a = -Math.PI / 2 + i * Math.PI / 5, r = i % 2 ? R * 0.42 : R;
+      pts.push([cx + r * Math.cos(a), cy + r * Math.sin(a)]);
+    }
+    return P(...pts);
+  };
+  ICONS.eustars = Array.from({ length: 12 }, (_, i) => {
+    const a = -Math.PI / 2 + i * Math.PI / 6;
+    return star(256 + 180 * Math.cos(a), 256 + 180 * Math.sin(a), 46);
+  });
+}
+
+/* Wind turbine: a tapering mast, a hub, three broad blades — the energy
+   transition. */
+{
+  const blade = deg => {
+    const pts = [[256, 196], [240, 186], [248, 60], [262, 44], [274, 186]];
+    return P(...rot(pts.map(([x, y]) => [x, y + 60]), deg).map(([x, y]) => [x, y - 60]));
+  };
+  ICONS.turbine = [
+    P([244, 214], [268, 214], [284, 472], [228, 472]),
+    rrect(176, 452, 336, 476, 8),
+    blade(0), blade(120), blade(240),
+    circle(256, 196, 26)
+  ];
+}
+
 if (require.main === module) {
   const file = path.join(__dirname, "..", "site", "src", "lib", "flag", "icons.js");
   let src = fs.readFileSync(file, "utf8");
