@@ -66,7 +66,7 @@ export const LOCALES = {
     groupMean: v => "Moyenne du groupe : " + v,
 
     emptyDrop: "Aucun profil. Déposez une capture ci-dessous, ou saisissez-en un à la main.",
-    emptyNoData: "profiles-data.js absent — lancez « node tools/extract.js » pour lire politi-results/.",
+    emptyNoData: "Aucun profil à afficher pour l'instant.",
     detailHint: n => "Cliquez un profil (●) pour voir sa distance à chacun des " + n
       + " partis, ou un parti (◇) pour voir quels profils s'en rapprochent le plus.",
     stripsHint: "Chaque ligne est un axe PolitiScales, chaque point un profil. Les axes sont "

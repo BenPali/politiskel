@@ -1,9 +1,8 @@
 //! Politiskel's optional backend: accounts, groups on invitation, and one
 //! saved profile per account.
 //!
-//! The page works without it, as a single local file. Served from here, the
-//! same page finds `/api/me` and turns on accounts. The server stores what the
-//! page needs and nothing more: PolitiScales percentages already read in the
+//! It serves the built site (site/build) and its API. The server stores what
+//! the site needs and nothing more: PolitiScales percentages already read in the
 //! browser (never the screenshot), and questionnaire answers. Scoring stays in
 //! the browser.
 //!
@@ -15,7 +14,7 @@
 //! The crate is split by concern: `state` (configuration and shared state),
 //! `error`, `security` (the middleware on every response), `auth` (sign-up,
 //! sessions, passwords), `account` (one's profile, export, deletion),
-//! `groups`, and `site` (the page). `validate` checks every input.
+//! `groups`, and `site` (the built site). `validate` checks every input.
 
 pub mod validate;
 mod account;
@@ -41,7 +40,7 @@ use sqlx::SqlitePool;
 
 use crate::auth::{config, register, login, logout, change_password, end_other_sessions};
 use crate::security::{same_origin_writes, security_headers};
-use crate::site::{page, site_page};
+use crate::site::site_page;
 use crate::account::{me, put_profile, export, delete_me};
 use crate::groups::{create_group, invite_preview, join_group, leave_group, new_invite, remove_member, hand_over_group, delete_group, group_profiles};
 
@@ -51,7 +50,7 @@ pub async fn migrate(db: &SqlitePool) -> Result<(), sqlx::migrate::MigrateError>
 
 pub fn app(state: AppState) -> Router {
     Router::new()
-        .route("/", get(page))
+        .route("/", get(site_page))
         .route("/api/config", get(config))
         .route("/api/register", post(register))
         .route("/api/login", post(login))

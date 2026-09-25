@@ -9,6 +9,18 @@ use serde_json::{json, Value};
 use sqlx::sqlite::SqlitePoolOptions;
 use tower::ServiceExt;
 
+/// A stand-in for site/build: a home page and the fallback page, written once.
+fn test_site() -> std::path::PathBuf {
+    static DIR: std::sync::OnceLock<std::path::PathBuf> = std::sync::OnceLock::new();
+    DIR.get_or_init(|| {
+        let dir = std::env::temp_dir().join(format!("politiskel-test-site-{}", std::process::id()));
+        std::fs::create_dir_all(&dir).unwrap();
+        std::fs::write(dir.join("index.html"), "<!doctype html><title>Politiskel</title>").unwrap();
+        std::fs::write(dir.join("200.html"), "<!doctype html><title>Politiskel</title>").unwrap();
+        dir
+    }).clone()
+}
+
 async fn server() -> axum::Router { server_with(false).await }
 
 async fn server_with(trust_proxy: bool) -> axum::Router { server_full(trust_proxy, Signup::Open).await }
@@ -19,7 +31,7 @@ async fn server_full(trust_proxy: bool, signup: Signup) -> axum::Router {
         .connect("sqlite::memory:").await.unwrap();
     sqlx::query("PRAGMA foreign_keys = ON").execute(&db).await.unwrap();
     migrate(&db).await.unwrap();
-    app(AppState::new(db, "<!doctype html><title>Politiskel</title>".into(), true)
+    app(AppState::new(db, test_site(), true)
         .trusting_proxy(trust_proxy).with_signup(signup))
 }
 
@@ -306,7 +318,7 @@ async fn ipv6_neighbours_share_a_limit() {
 async fn a_configured_origin_replaces_the_host_check() {
     let db = SqlitePoolOptions::new().max_connections(1).connect("sqlite::memory:").await.unwrap();
     migrate(&db).await.unwrap();
-    let app = app(AppState::new(db, String::new(), true)
+    let app = app(AppState::new(db, test_site(), true)
         .with_origin(Some("https://politiskel.example.org/".into())));
     // behind nginx, Host arrives as the upstream address
     let mut c = Client { app: app.clone(), cookie: None, headers: vec![
@@ -548,7 +560,7 @@ async fn a_built_site_is_served_page_by_page() {
     }
     let db = SqlitePoolOptions::new().max_connections(1).connect("sqlite::memory:").await.unwrap();
     migrate(&db).await.unwrap();
-    let app = app(AppState::new(db, String::new(), true).serving_site(Some(dir.clone())));
+    let app = app(AppState::new(db, dir.clone(), true));
     let get = |uri: &'static str| {
         let app = app.clone();
         async move {

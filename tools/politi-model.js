@@ -8,8 +8,8 @@
    computes.
 
    It returns KEYS, never sentences: `fitOf` gives "near", not "proche", and
-   `methodTag` gives "revolutionary". Wording belongs to the locale table in
-   web/locale-fr.js, so a second language changes nothing here.
+   `methodTag` gives "revolutionary". Wording belongs to the site's locale table,
+   site/src/lib/i18n/fr.js, so a second language changes nothing here.
 
    Being requirable is the point: the weighting, the thresholds and the
    proximity claims have all been measured, and a measurement nobody else can

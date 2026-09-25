@@ -30,15 +30,15 @@
                cosmopolitanism, a national triband, the vertical tricolour; a
                rainbow bar joins any of them for marked support of LGBT rights
      symbols   chosen in flagTraits below; each one's meaning is in
-               web/locale-fr.js, flagSymbolLines
+               site/src/lib/i18n/fr.js, flagSymbolLines
 
-   Left out on purpose: the hammer and sickle and the fleur-de-lis as
-   PolitiScales uses them (the fleur-de-lis waits for a monarchism reading),
-   brown and "bleu marine", party logos, faiths' emblems, and hate symbols —
+   Left out on purpose: party logos, faiths' emblems, and hate symbols —
    the Iron Cross among them, which the far right has made its own; the croix
-   de guerre carries martial patriotism without that charge.
+   de guerre carries martial patriotism without that charge. Brown is drawn,
+   but only when nation, order and the refusal of equal rights are all very
+   marked.
 
-   The drawing is numbers, fixed colours and the paths of web/flag-icons.js
+   The drawing is numbers, fixed colours and the paths of icons.js
    only; no string from a profile ever enters it.
 
    */

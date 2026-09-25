@@ -1,5 +1,5 @@
 //! Configuration and the state every handler shares: the database, the
-//! page, how the server sits behind its proxy, and who may sign up.
+//! built site, how the server sits behind its proxy, and who may sign up.
 
 use std::collections::HashMap;
 use std::sync::{Arc, Mutex};
@@ -20,11 +20,8 @@ pub enum Signup {
 #[derive(Clone)]
 pub struct AppState {
     pub db: SqlitePool,
-    /// The page, served as is: template.html already carries every script
-    /// inlined and an empty data slot.
-    pub page: Arc<String>,
-    /// The built site (site/build): when set, it is served instead of `page`.
-    pub site_dir: Option<std::path::PathBuf>,
+    /// The built site (site/build), served page by page.
+    pub site_dir: std::path::PathBuf,
     /// Off only for local development over plain http.
     pub secure_cookies: bool,
     /// Whether to read the client's address from X-Forwarded-For, as set by
@@ -39,14 +36,9 @@ pub struct AppState {
 }
 
 impl AppState {
-    pub fn new(db: SqlitePool, page: String, secure_cookies: bool) -> Self {
-        Self { db, page: Arc::new(page), secure_cookies, trust_proxy: false, origin: None,
-               signup: Signup::Open, failures: Arc::default(), signups: Arc::default(), site_dir: None }
-    }
-
-    pub fn serving_site(mut self, dir: Option<std::path::PathBuf>) -> Self {
-        self.site_dir = dir;
-        self
+    pub fn new(db: SqlitePool, site_dir: std::path::PathBuf, secure_cookies: bool) -> Self {
+        Self { db, site_dir, secure_cookies, trust_proxy: false, origin: None,
+               signup: Signup::Open, failures: Arc::default(), signups: Arc::default() }
     }
 
     pub fn with_signup(mut self, signup: Signup) -> Self {

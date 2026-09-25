@@ -1,7 +1,8 @@
 #!/usr/bin/env node
 "use strict";
-/* Reads every PolitiScales result in politi-results/, writes profiles-data.js
-   and assembles index.html.
+/* Reads every PolitiScales result in politi-results/ and writes
+   profiles-data.js, for the measuring tools (model-check.js, verify.js). The
+   site is built on its own, in site/.
 
      node tools/extract.js            # only re-reads changed screenshots
      node tools/extract.js --force    # ignores the cache
@@ -25,69 +26,6 @@ const CACHE = path.join(SRC, ".extract-cache.json");
    beside the screenshots, so they are as local and as ignored by git. */
 const ANSWERS = path.join(SRC, "answers");
 const OUT = path.join(ROOT, "profiles-data.js");
-const PAGE = path.join(ROOT, "index.html");       /* generated, not committed */
-/* The page's sources live in web/: a shell with the markup, the stylesheet,
-   and the app's scripts, each a file of its own. The build assembles them —
-   with the shared tools below — into template.html, which is committed so
-   that a clone works with no build step and no Node, and which the group
-   server serves. template.html is generated: edit web/, not it. */
-const WEB = path.join(ROOT, "web");
-const SHELL = path.join(WEB, "shell.html");
-const TEMPLATE = path.join(ROOT, "template.html"); /* assembled, committed, no data */
-/* The files shared with the browser, each inlined into its own marked block:
-   the screenshot reader, the compass model, and the questionnaire. */
-const SHARED = [
-  { file: path.join(__dirname, "politi-dissect.js"),
-    start: "/* POLITI-EXTRACTOR:START */", end: "/* POLITI-EXTRACTOR:END */" },
-  { file: path.join(__dirname, "politi-model.js"),
-    start: "/* POLITI-MODEL:START */", end: "/* POLITI-MODEL:END */" },
-  { file: path.join(__dirname, "politi-quiz.js"),
-    start: "/* POLITI-QUIZ:START */", end: "/* POLITI-QUIZ:END */" }
-];
-
-/* Replaces the content between two markers, leaving the rest untouched. */
-function between(text, start, end, body) {
-  const a = text.indexOf(start), b = text.indexOf(end);
-  if (a < 0 || b < 0 || b < a) return null;
-  return text.slice(0, a + start.length) + "\n" + body + "\n" + text.slice(b);
-}
-
-/* A literal "</script>" inside a string would close the surrounding tag. */
-const safe = s => s.replace(/<\/(script)/gi, "<\\/$1");
-
-/* The shell's "/* @include web/<file> *\/" lines are replaced by those files,
-   verbatim; its marked blocks by the shared tools. The page stays one file:
-   opened as file://, a page cannot reliably load its neighbours, and a single
-   file can be shared as is. */
-function assemble() {
-  if (!fs.existsSync(SHELL) || SHARED.some(s => !fs.existsSync(s.file))) return null;
-  let page = fs.readFileSync(SHELL, "utf8").replace(
-    /^\/\* @include (web\/[\w.-]+) \*\/\n/gm,
-    (_, f) => safe(fs.readFileSync(path.join(ROOT, f), "utf8")));
-  for (const { file, start, end } of SHARED) {
-    page = between(page, start, end, safe(fs.readFileSync(file, "utf8").trimEnd()));
-    if (page === null) return null;
-  }
-  return page;
-}
-
-/* Rewrites template.html only when its sources changed, then fills in the
-   data. Only the DATA is left out of the template, since that is what must
-   never be committed; index.html is REBUILT from the template on every run,
-   so it never holds anything beyond the template plus the current data. */
-function inject(count, dataJs) {
-  const page = assemble();
-  if (!page) return false;
-  if (!fs.existsSync(TEMPLATE) || fs.readFileSync(TEMPLATE, "utf8") !== page)
-    fs.writeFileSync(TEMPLATE, page);
-
-  const out = between(page, "/* POLITI-DATA:START */", "/* POLITI-DATA:END */",
-                      "/* " + count + " profile(s) extracted from politi-results/ */\n"
-                      + safe(dataJs));
-  if (!out) return false;
-  fs.writeFileSync(PAGE, out);
-  return true;
-}
 
 const argv = process.argv.slice(2);
 const FORCE = argv.includes("--force");
@@ -240,7 +178,7 @@ function existingProfileCount() {
 
 /* ------------------------------------------------------------ answers ---
    A group answers on as many machines as it has members, and each browser
-   keeps its own answers. "Exporter mes réponses" on the page writes one file;
+   keeps its own answers. The site's account export writes one file;
    dropped in politi-results/answers/, it is folded into the page like a
    screenshot, and read by tools/model-check.js.
 
@@ -266,6 +204,10 @@ function readAnswers() {
     let data;
     try { data = JSON.parse(fs.readFileSync(path.join(ANSWERS, file), "utf8")); }
     catch (e) { console.log("  ! answers/" + file + "  not JSON: " + e.message); continue; }
+    /* the site's account export ("Exporter toutes mes données") holds the
+       answers too: read as an answers file under the account's name */
+    if (data && data.format === "politiskel-account" && data.version === 1 && data.profile)
+      data = { format: "politiskel-answers", version: 1, alias: data.username, answers: data.profile.answers };
     if (!data || data.format !== "politiskel-answers" || data.version !== 1
         || typeof data.alias !== "string" || !data.alias.trim()
         || !data.answers || typeof data.answers !== "object") {
@@ -428,19 +370,11 @@ function main() {
     + "\nwindow.POLITI_ANSWERS = " + JSON.stringify(answers, null, 1) + ";";
   fs.writeFileSync(OUT, banner + dataJs + "\n");
 
-  /* The extractor and the data are also copied INTO index.html. A file:// page
-     loading neighbouring <script src> depends on browser settings (and on any
-     extensions): when those blocked it, the page came up empty. Inlining
-     everything removes the problem and makes the file shareable as-is. */
-  const injected = inject(profiles.length, dataJs);
 
   console.log("\n" + fresh + " extracted, " + reused + " cached, " + failed + " failed"
     + (answers.length ? ", answers for " + answers.length + " profile(s)" : "")
     + "  →  " + path.relative(ROOT, OUT)
-    + " (" + (fs.statSync(OUT).size / 1024).toFixed(1) + " KB)"
-    + (injected ? "\n   index.html rebuilt (extractor + data inlined, "
-        + (fs.statSync(PAGE).size / 1024).toFixed(1) + " KB)"
-      : "\n   index.html NOT rebuilt: POLITI-DATA/POLITI-EXTRACTOR markers not found"));
+    + " (" + (fs.statSync(OUT).size / 1024).toFixed(1) + " KB)");
   if (failed) process.exitCode = 1;
 }
 

@@ -5,10 +5,16 @@ SQLite file. The files this guide refers to are in `deploy/`.
 
 ## 1. Build
 
-**On the server**, with Rust installed (`rustup`), from a checkout:
+The site, with Node, on any machine — the result is static files, the same
+everywhere:
 
 ```
-node tools/extract.js            # builds template.html (no profile in it)
+cd site && npm install && npm run build      # → site/build
+```
+
+The server, **on the host**, with Rust installed (`rustup`), from a checkout:
+
+```
 cd server && cargo build --release
 ```
 
@@ -29,7 +35,7 @@ sudo useradd --system --home /var/lib/politiskel --shell /usr/sbin/nologin polit
 sudo install -d -o politiskel -g politiskel -m 700 /var/lib/politiskel /var/backups/politiskel
 sudo install -d -m 755 /opt/politiskel /etc/politiskel
 sudo install -m 755 politiskel-server /opt/politiskel/
-sudo install -m 644 template.html /opt/politiskel/
+sudo cp -r site/build /opt/politiskel/site            # the built site
 sudo install -m 640 -g politiskel deploy/politiskel.env.example /etc/politiskel/politiskel.env
 sudoedit /etc/politiskel/politiskel.env          # the public address, sign-up mode
 sudo cp deploy/politiskel.service /etc/systemd/system/
@@ -47,8 +53,8 @@ your home directory:
 
 ```
 mkdir -p ~/politiskel/data ~/politiskel/backups && chmod 700 ~/politiskel ~/politiskel/data ~/politiskel/backups
-# politiskel-server, template.html and a politiskel.env with absolute paths
-# under /home/<you>/politiskel go into ~/politiskel/
+# politiskel-server, the built site as ~/politiskel/site, and a
+# politiskel.env with absolute paths under /home/<you>/politiskel
 mkdir -p ~/.config/systemd/user
 # politiskel.service, politiskel-backup.service and .timer: the deploy/ ones,
 # with User/Group and the hardening lines dropped and paths as %h/politiskel/…
@@ -124,16 +130,17 @@ Hand it over privately; they change it from their account page.
 
 ## 7. Updating
 
-Back up, replace the binary and `template.html`, restart:
+Back up, replace the binary and the site, restart:
 
 ```
 sudo systemctl start politiskel-backup
-sudo install -m 755 politiskel-server /opt/politiskel/ && sudo install -m 644 template.html /opt/politiskel/
+sudo install -m 755 politiskel-server /opt/politiskel/
+sudo rm -rf /opt/politiskel/site && sudo cp -r site/build /opt/politiskel/site
 sudo systemctl restart politiskel
 ```
 
-The server reads the page only at start, hence the restart. New database
-migrations run on their own.
+The site's files are read on each request, so replacing them alone needs no
+restart; the binary does. New database migrations run on their own.
 
 ## 8. The legal side
 

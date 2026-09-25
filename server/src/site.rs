@@ -1,27 +1,20 @@
-//! The site: the SvelteKit build when one is configured, else the single
-//! page of the first version, served at / and at every path it routes.
+//! The site: the SvelteKit build, served at / and at every path it routes.
 
 use axum::extract::State;
 use axum::http::{header, HeaderValue, Method, Request, StatusCode};
-use axum::response::{Html, IntoResponse, Response};
+use axum::response::{IntoResponse, Response};
 use tower::ServiceExt;
 use tower_http::services::ServeFile;
 
 use crate::error::ApiError;
 use crate::state::AppState;
 
-pub(crate) async fn page(State(state): State<AppState>, req: Request<axum::body::Body>) -> Response {
-    site_page(State(state), req).await
-}
-
 pub(crate) async fn site_page(State(state): State<AppState>, req: Request<axum::body::Body>) -> Response {
     let path = req.uri().path().to_string();
     if !matches!(*req.method(), Method::GET | Method::HEAD) || path.starts_with("/api/") {
         return ApiError(StatusCode::NOT_FOUND, "not_found").into_response();
     }
-    let Some(dir) = state.site_dir.clone() else {
-        return Html(state.page.as_ref().clone()).into_response();
-    };
+    let dir = state.site_dir.clone();
     // A prerendered page is /x.html or /x/index.html; an asset is itself;
     // anything else — a member, a group, an invitation — is the fallback
     // page, which routes in the browser. No "..", no hidden file.

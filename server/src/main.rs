@@ -3,8 +3,7 @@
 //! Configuration, all optional, from the environment:
 //!   POLITISKEL_ADDR   address to listen on        (default 127.0.0.1:8080)
 //!   POLITISKEL_DB     SQLite database file        (default politiskel.db)
-//!   POLITISKEL_PAGE   the page to serve           (default ../template.html)
-//!   POLITISKEL_SITE   the built site (site/build), served instead of the page
+//!   POLITISKEL_SITE   the built site               (default ../site/build)
 //!   POLITISKEL_INSECURE_COOKIES=1   plain-http development only
 //!   POLITISKEL_TRUST_PROXY=1        take the client address from the
 //!                                   X-Forwarded-For the reverse proxy sets
@@ -35,7 +34,6 @@ async fn main() {
     let env = |k: &str, d: &str| std::env::var(k).unwrap_or_else(|_| d.to_string());
     let addr = env("POLITISKEL_ADDR", "127.0.0.1:8080");
     let db_path = env("POLITISKEL_DB", "politiskel.db");
-    let page_path = env("POLITISKEL_PAGE", "../template.html");
     let insecure = std::env::var("POLITISKEL_INSECURE_COOKIES").is_ok_and(|v| v == "1");
     let trust_proxy = std::env::var("POLITISKEL_TRUST_PROXY").is_ok_and(|v| v == "1");
 
@@ -60,15 +58,9 @@ async fn main() {
         None => {}
     }
 
-    // The built site, when there is one; else the single page of the first version.
-    let site_dir = std::env::var("POLITISKEL_SITE").ok().filter(|v| !v.is_empty()).map(std::path::PathBuf::from);
-    if let Some(dir) = &site_dir {
-        assert!(dir.join("200.html").is_file(), "POLITISKEL_SITE={}: no 200.html there — build the site first", dir.display());
-    }
-    let page = if site_dir.is_some() { String::new() } else {
-        std::fs::read_to_string(&page_path)
-            .unwrap_or_else(|e| panic!("cannot read the page at {page_path}: {e}"))
-    };
+    let site_dir = std::path::PathBuf::from(env("POLITISKEL_SITE", "../site/build"));
+    assert!(site_dir.join("200.html").is_file(),
+            "POLITISKEL_SITE={}: no 200.html there — build the site first (cd site && npm run build)", site_dir.display());
     let signup = match env("POLITISKEL_SIGNUP", "open").as_str() {
         "open" => Signup::Open,
         "invite" => Signup::Invite,
@@ -82,8 +74,8 @@ async fn main() {
     }
     eprintln!("politiskel-server listening on http://{addr}  (database {db_path})");
     let origin = std::env::var("POLITISKEL_ORIGIN").ok().filter(|v| !v.is_empty());
-    let state = AppState::new(db, page, !insecure).trusting_proxy(trust_proxy).with_origin(origin)
-        .with_signup(signup).serving_site(site_dir);
+    let state = AppState::new(db, site_dir, !insecure).trusting_proxy(trust_proxy).with_origin(origin)
+        .with_signup(signup);
     if signup == Signup::Invite {
         eprintln!("sign-up: by invitation only");
     }
