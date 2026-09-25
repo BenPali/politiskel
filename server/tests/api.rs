@@ -592,3 +592,51 @@ async fn a_built_site_is_served_page_by_page() {
     assert_eq!((s, body.contains("not_found")), (StatusCode::NOT_FOUND, true));
     std::fs::remove_dir_all(&dir).ok();
 }
+
+#[tokio::test]
+async fn a_listed_group_can_be_asked_to_join_and_only_its_owner_answers() {
+    let app = server().await;
+    let (mut ben, mut zoe, mut jc) = (Client::new(&app), Client::new(&app), Client::new(&app));
+    ben.register("Ben").await; zoe.register("Zoe").await; jc.register("Jc").await;
+    let (gid, _) = group_of(&mut ben, &mut []).await;
+
+    // secret by default: not in the directory, and not to be asked
+    assert_eq!(zoe.call("GET", "/api/directory", None).await.1, json!([]));
+    assert_eq!(zoe.call("POST", &format!("/api/groups/{gid}/request"), None).await.0, StatusCode::NOT_FOUND);
+
+    // listed: its name and size, nothing more
+    assert_eq!(zoe.call("POST", &format!("/api/groups/{gid}/listed"), Some(json!({ "listed": true }))).await.0,
+               StatusCode::NOT_FOUND);
+    assert_eq!(ben.call("POST", &format!("/api/groups/{gid}/listed"), Some(json!({ "listed": true }))).await.0,
+               StatusCode::NO_CONTENT);
+    let (_, dir) = zoe.call("GET", "/api/directory", None).await;
+    assert_eq!(dir, json!([{ "id": gid, "name": "Les copains", "members": 1, "member": false, "requested": false }]));
+
+    // two ask; only the owner sees who
+    assert_eq!(zoe.call("POST", &format!("/api/groups/{gid}/request"), None).await.0, StatusCode::NO_CONTENT);
+    assert_eq!(jc.call("POST", &format!("/api/groups/{gid}/request"), None).await.0, StatusCode::NO_CONTENT);
+    assert_eq!(zoe.call("GET", "/api/directory", None).await.1[0]["requested"], json!(true));
+    assert_eq!(zoe.call("GET", &format!("/api/groups/{gid}/requests"), None).await.0, StatusCode::NOT_FOUND);
+    let (_, waiting) = ben.call("GET", &format!("/api/groups/{gid}/requests"), None).await;
+    assert_eq!(waiting.as_array().unwrap().len(), 2);
+    assert_eq!(ben.call("GET", "/api/me", None).await.1["groups"][0]["requests"], json!(2));
+
+    // accepted: a member, who sees the group; declined: nothing
+    assert_eq!(ben.call("POST", &format!("/api/groups/{gid}/requests/accept"), Some(json!({ "username": "Zoe" }))).await.0,
+               StatusCode::NO_CONTENT);
+    assert_eq!(zoe.call("GET", &format!("/api/groups/{gid}/profiles"), None).await.0, StatusCode::OK);
+    assert_eq!(zoe.call("POST", &format!("/api/groups/{gid}/request"), None).await.0, StatusCode::CONFLICT);
+    assert_eq!(ben.call("POST", &format!("/api/groups/{gid}/requests/decline"), Some(json!({ "username": "Jc" }))).await.0,
+               StatusCode::NO_CONTENT);
+    assert_eq!(jc.call("GET", &format!("/api/groups/{gid}/profiles"), None).await.0, StatusCode::NOT_FOUND);
+
+    // a member who is not the owner answers nothing
+    jc.call("POST", &format!("/api/groups/{gid}/request"), None).await;
+    assert_eq!(zoe.call("POST", &format!("/api/groups/{gid}/requests/accept"), Some(json!({ "username": "Jc" }))).await.0,
+               StatusCode::FORBIDDEN);
+
+    // taken out of the directory: gone from it, and its requests with it
+    ben.call("POST", &format!("/api/groups/{gid}/listed"), Some(json!({ "listed": false }))).await;
+    assert_eq!(jc.call("GET", "/api/directory", None).await.1, json!([]));
+    assert_eq!(ben.call("GET", &format!("/api/groups/{gid}/requests"), None).await.1, json!([]));
+}

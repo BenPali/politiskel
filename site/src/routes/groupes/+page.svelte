@@ -24,6 +24,22 @@
 	const status = session.status;
 	session.status = '';
 
+	/* the directory: listed groups, and where one stands in each */
+	let listed = $state(null);
+	async function loadDirectory() {
+		const r = await api('GET', '/api/directory');
+		listed = r.ok ? r.data : [];
+	}
+	$effect(() => {
+		if (session.me && listed === null) loadDirectory();
+	});
+	async function ask(g) {
+		error = '';
+		const r = await api(g.requested ? 'DELETE' : 'POST', '/api/groups/' + g.id + '/request');
+		if (!r.ok) return (error = apiError(r));
+		loadDirectory();
+	}
+
 	$effect(() => {
 		if (!session.me) return;
 		for (const g of session.me.groups)
@@ -79,6 +95,7 @@
 						<p class="meta">
 							{L.memberCount(g.members)}
 							{#if g.owner}<span class="badge">{L.ownerYou}</span>{:else if g.owner_name} · {L.ownerIs(g.owner_name)}{/if}
+							{#if g.owner && g.requests}<a class="badge ask" href="/groupes/{g.id}">{L.requestsBadge(g.requests)}</a>{/if}
 						</p>
 						{#if members[g.id]}
 							<div class="flags">
@@ -115,6 +132,31 @@
 					<label>{L.groupName}<input type="text" bind:value={name} maxlength="60" required /></label>
 					<button type="submit" class="primary" disabled={busy || !name.trim()}>{L.groupCreate}</button>
 				</form>
+				<section class="card directory">
+					<h2>{L.directoryTitle}</h2>
+					<p class="note">{L.directoryLead}</p>
+					{#if listed === null}
+						<p class="status">{L.loadingPage}</p>
+					{:else if !listed.length}
+						<p class="note">{L.directoryEmpty}</p>
+					{:else}
+						<ul>
+							{#each listed as g (g.id)}
+								<li>
+									<span><b>{g.name}</b><small>{L.memberCount(g.members)}</small></span>
+									{#if g.member}
+										<a href="/groupes/{g.id}">{L.directoryMember}</a>
+									{:else}
+										<button type="button" class={g.requested ? 'skip' : 'ghost'} onclick={() => ask(g)}>
+											{g.requested ? L.directoryWithdraw : L.directoryAsk}
+										</button>
+									{/if}
+								</li>
+							{/each}
+						</ul>
+						<p class="fine">{L.directoryAskNote}</p>
+					{/if}
+				</section>
 				<form class="card" onsubmit={follow}>
 					<h2>{L.joinTitle}</h2>
 					<p class="note">{L.joinNote}</p>
@@ -146,5 +188,13 @@
 	form label { display: flex; flex-direction: column; gap: 6px; font-size: 14px; font-weight: 650; color: var(--text-2); margin-bottom: 12px; }
 	form input { font-weight: 400; }
 	.status, .error { margin-bottom: 16px; }
+	.badge.ask { background: var(--pop-soft); color: var(--text); text-decoration: none; }
+	.directory h2 { font-family: var(--font-sans); font-size: 18px; font-weight: 650; margin: 0 0 6px; }
+	.directory ul { list-style: none; margin: 0; padding: 0; }
+	.directory li { display: flex; align-items: center; justify-content: space-between; gap: 12px; padding: 10px 0; border-top: 1px solid var(--border); }
+	.directory li b { display: block; }
+	.directory li small { display: block; color: var(--text-3); font-size: 13px; }
+	.directory li button { flex: none; min-height: 40px; }
+	.fine { margin: 12px 0 0; font-size: 13px; color: var(--text-3); }
 	@media (max-width: 860px) { .cols { grid-template-columns: 1fr; } }
 </style>

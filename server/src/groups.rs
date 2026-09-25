@@ -49,17 +49,22 @@ pub(crate) async fn is_member(state: &AppState, group: i64, user: i64) -> ApiRes
 }
 
 pub(crate) async fn groups_of(state: &AppState, user: i64) -> ApiResult<Vec<Value>> {
-    let rows: Vec<(i64, String, String, i64, Option<i64>, Option<String>)> = sqlx::query_as(
+    let rows: Vec<(i64, String, String, i64, Option<i64>, Option<String>, bool, i64)> = sqlx::query_as(
         "SELECT g.id, g.name, g.invite_code,
                 (SELECT COUNT(*) FROM members m2 WHERE m2.group_id = g.id), g.owner_id,
-                (SELECT u.username FROM users u WHERE u.id = g.owner_id)
+                (SELECT u.username FROM users u WHERE u.id = g.owner_id), g.listed,
+                (SELECT COUNT(*) FROM join_requests r WHERE r.group_id = g.id)
          FROM groups g JOIN members m ON m.group_id = g.id
          WHERE m.user_id = ? ORDER BY g.name")
         .bind(user).fetch_all(&state.db).await?;
     Ok(rows.into_iter()
-        .map(|(id, name, invite, n, owner, owner_name)| json!({ "id": id, "name": name, "invite": invite,
-                                                    "members": n, "owner": owner == Some(user),
-                                                    "owner_name": owner_name }))
+        .map(|(id, name, invite, n, owner, owner_name, listed, waiting)| {
+            let mine = owner == Some(user);
+            json!({ "id": id, "name": name, "invite": invite, "members": n, "owner": mine,
+                    "owner_name": owner_name, "listed": listed,
+                    // who asks to join is the owner's to see
+                    "requests": if mine { waiting } else { 0 } })
+        })
         .collect())
 }
 
@@ -111,6 +116,9 @@ pub(crate) async fn join_group(State(state): State<AppState>, jar: CookieJar, Js
     let (gid, name) = row.ok_or(ApiError(StatusCode::NOT_FOUND, "no_such_invite"))?;
     sqlx::query("INSERT OR IGNORE INTO members (group_id, user_id, joined_at) VALUES (?, ?, ?)")
         .bind(gid).bind(user).bind(now()).execute(&state.db).await?;
+    // joined by the link: a request of theirs waiting on the group is moot
+    sqlx::query("DELETE FROM join_requests WHERE group_id = ? AND user_id = ?")
+        .bind(gid).bind(user).execute(&state.db).await?;
     Ok(Json(json!({ "id": gid, "name": name })))
 }
 

@@ -14,10 +14,12 @@
 //! The crate is split by concern: `state` (configuration and shared state),
 //! `error`, `security` (the middleware on every response), `auth` (sign-up,
 //! sessions, passwords), `account` (one's profile, export, deletion),
-//! `groups`, and `site` (the built site). `validate` checks every input.
+//! `groups`, `directory` (listed groups and requests to join), and `site`
+//! (the built site). `validate` checks every input.
 
 pub mod validate;
 mod account;
+mod directory;
 mod auth;
 mod error;
 mod groups;
@@ -42,6 +44,7 @@ use crate::auth::{config, register, login, logout, change_password, end_other_se
 use crate::security::{same_origin_writes, security_headers};
 use crate::site::site_page;
 use crate::account::{me, put_profile, export, delete_me};
+use crate::directory::{directory, ask_to_join, withdraw_request, requests, accept_request, decline_request, set_listed};
 use crate::groups::{create_group, invite_preview, join_group, leave_group, new_invite, remove_member, hand_over_group, delete_group, group_profiles};
 
 pub async fn migrate(db: &SqlitePool) -> Result<(), sqlx::migrate::MigrateError> {
@@ -69,6 +72,12 @@ pub fn app(state: AppState) -> Router {
         .route("/api/groups/{id}/remove", post(remove_member))
         .route("/api/groups/{id}/owner", post(hand_over_group))
         .route("/api/groups/{id}/profiles", get(group_profiles))
+        .route("/api/directory", get(directory))
+        .route("/api/groups/{id}/request", post(ask_to_join).delete(withdraw_request))
+        .route("/api/groups/{id}/requests", get(requests))
+        .route("/api/groups/{id}/requests/accept", post(accept_request))
+        .route("/api/groups/{id}/requests/decline", post(decline_request))
+        .route("/api/groups/{id}/listed", post(set_listed))
         // The site's pages — /connexion, /groupes, /rejoindre/<code>… — are
         // one page that routes itself; an unknown /api/ path stays a 404.
         .fallback(site_page)

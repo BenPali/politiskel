@@ -168,7 +168,7 @@ export const LOCALES = {
     profilesFoot: "Une proximité mesurée sur deux axes, pas une appartenance.",
     openCard: a => "Fiche de " + a + " →",
     points: d => d + " pts",
-    tieShort: (name, margin) => " · ou " + name + ", à " + margin + " pts près",
+    tieShort: (name, margin) => " · ou " + name + ", à " + margin + (margin > 1 ? " pts" : " pt") + " près",
     profileSource: (ps, quiz) => "Profil tiré de : " + (ps && quiz ? "Questionnaire + PolitiScales" : ps ? "PolitiScales" : quiz ? "Questionnaire" : "aucune réponse pour l'instant"),
     flagFigureShort: "Drapeau",
     bands: {
@@ -186,7 +186,7 @@ export const LOCALES = {
     partiesTitle: "Partis, du plus proche au plus lointain",
     partiesScope: (country, view) => country + " · " + view,
     nearestLine: (name, fit, d) => "Le plus proche : " + name + ", proximité " + fit + " (" + d + " pts)",
-    nearestTie: (name, margin) => " — ou " + name + ", à " + margin + " points près.",
+    nearestTie: (name, margin) => " — ou " + name + ", à " + margin + (margin > 1 ? " points" : " point") + " près.",
     memberUnknown: n => "« " + n + " » n'est pas dans le groupe affiché.",
     brandHome: "Politiskel, accueil", navMain: "Navigation principale", navMenu: "Ouvrir le menu",
     displayPalette: "Palette", displayMode: "Mode",
@@ -219,7 +219,7 @@ export const LOCALES = {
         + "dans sa version française officielle, avec sa variable."],
       ["Des repères réels", "Les partis sont placés par les experts du Chapel Hill Expert Survey, pays par "
         + "pays. Les rares estimations à la main sont signalées."],
-      ["En groupe, et entre soi", "Un groupe ne se voit que de l'intérieur, sur invitation ; vos réponses "
+      ["En groupe, et entre soi", "Un groupe ne se voit que de l'intérieur, sur invitation ou sur demande acceptée ; vos réponses "
         + "ne sont montrées qu'à ses membres. Exportez ou effacez tout, quand vous voulez."]
     ],
     homeSignedIn: n => "Bon retour, " + n + ".",
@@ -501,7 +501,7 @@ export const LOCALES = {
     joinTitle: "Rejoindre un groupe", joinPlaceholder: "Lien ou code d'invitation",
     joinGo: "Voir l'invitation",
     groupsTitle: "Mes groupes",
-    groupsLeadShort: "Un groupe ne se voit que de l'intérieur : sans invitation, personne ne sait qu'il existe.",
+    groupsLeadShort: "Un groupe ne se voit que de l'intérieur : sans invitation, personne ne sait qu'il existe — sauf si son propriétaire le met dans l'annuaire.",
     groupNotFound: "Ce groupe n'existe pas, ou vous n'en êtes pas membre.",
     memberSource: (ps, quiz) => ps && quiz ? "Questionnaire + PolitiScales" : ps ? "PolitiScales" : quiz ? "Questionnaire" : "Pas encore de réponses",
     youOwner: "vous · propriétaire", youTag: "vous", ownerTag: "propriétaire",
@@ -513,6 +513,20 @@ export const LOCALES = {
     memberToolsLead: "Quitter le groupe : vous n'y verrez plus ses membres, et ils ne verront plus votre profil.",
     confirmCancel: "Annuler",
     backToGroupsShort: "← Mes groupes",
+    directoryTitle: "Annuaire des groupes",
+    directoryLead: "Les groupes que leur propriétaire a rendus visibles : leur nom et leur taille, rien d'autre. Demandez à entrer ; le propriétaire accepte ou refuse.",
+    directoryEmpty: "Aucun groupe n'est visible dans l'annuaire pour l'instant.",
+    directoryAsk: "Demander à rejoindre", directoryAsked: "Demande envoyée", directoryWithdraw: "Annuler la demande",
+    directoryMember: "Vous en êtes membre",
+    directoryAskNote: "En entrant, vos réponses et vos pourcentages PolitiScales seront visibles des membres du groupe.",
+    requestsBadge: n => n + " demande" + (n > 1 ? "s" : ""),
+    listedTitle: "Annuaire",
+    listedToggle: "Visible dans l'annuaire",
+    listedLead: "Visible, le groupe montre son nom et son nombre de membres à tous les inscrits, qui peuvent demander à entrer. Rien d'autre : ni les membres, ni leurs réponses. Retiré, les demandes en attente sont effacées.",
+    requestsTitle: "Demandes pour entrer",
+    requestsNone: "Aucune demande en attente.",
+    requestAccept: "Accepter", requestDecline: "Refuser",
+    requestAccepted: n => n + " fait maintenant partie du groupe.",
     joinNote: "Vous verrez le nom du groupe avant de décider : rien n'est rejoint sans votre accord.",
     inviteTitle: "Invitation",
     inviteWarn: "En rejoignant ce groupe, vos réponses et vos pourcentages PolitiScales seront "
@@ -600,6 +614,8 @@ export const LOCALES = {
       group_name_length: "Donnez au groupe un nom de 1 à 60 caractères.",
       not_owner: "Seul le propriétaire du groupe peut faire cela.",
       no_such_member: "Ce membre n'est plus dans le groupe.",
+      no_such_request: "Cette demande n'existe plus.",
+      already_member: "Vous êtes déjà membre de ce groupe.",
       signup_invite_only: "Sur ce site, on crée un compte depuis un lien d'invitation : demandez-en un au "
         + "groupe que vous voulez rejoindre.",
       too_many_signups: "Trop de comptes créés depuis cette adresse : réessayez dans une heure."

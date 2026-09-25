@@ -162,6 +162,10 @@
 					(n.margin <= limits.tie ? L.tieWith(n.second.name, n.margin) : '')
 		};
 	}
+	/* Escape lets go of the selection too */
+	function escape(e) {
+		if (e.key === 'Escape' && selected && !document.querySelector('.pop')) onpick(null);
+	}
 	const key = (fn) => (e) => {
 		if (e.key === 'Enter' || e.key === ' ') {
 			e.preventDefault();
@@ -170,8 +174,13 @@
 	};
 </script>
 
+<svelte:window onkeydown={escape} />
+
 <div class="plot">
-	<svg id="compass" class:appeared viewBox="0 0 600 600" role="img" aria-label={L.compassAria}>
+	<!-- a click on nothing — the plane, a caption — lets go of the selection -->
+	<!-- svelte-ignore a11y_click_events_have_key_events, a11y_no_noninteractive_element_interactions -->
+	<svg id="compass" class:appeared viewBox="0 0 600 600" role="img" aria-label={L.compassAria}
+		onclick={(e) => { if (selected && !e.target.closest('.mark')) onpick(null); }}>
 		<rect class="plane" x="44" y="44" width="512" height="512" rx="12" />
 		{#each grid as v}
 			<line class="grid-line" x1={300 + v * S} y1="44" x2={300 + v * S} y2="556" />

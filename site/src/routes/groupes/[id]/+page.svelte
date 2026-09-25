@@ -37,6 +37,23 @@
 		if (session.me && g) load();
 	});
 
+	/* the owner's side of the directory: listing, and the requests waiting */
+	let waiting = $state([]);
+	async function loadRequests() {
+		const r = await api('GET', '/api/groups/' + id + '/requests');
+		waiting = r.ok ? r.data : [];
+	}
+	$effect(() => {
+		if (g?.owner) loadRequests();
+	});
+	const setListed = (e) => run('POST', '/api/groups/' + id + '/listed', { listed: e.currentTarget.checked }, loadRequests);
+	const answer = (name, yes) =>
+		run('POST', '/api/groups/' + id + '/requests/' + (yes ? 'accept' : 'decline'), { username: name }, () => {
+			if (yes) notice = L.requestAccepted(name);
+			loadRequests();
+			load();
+		});
+
 	const link = $derived(g ? origin + '/rejoindre/' + g.invite : '');
 	async function copy() {
 		try {
@@ -142,6 +159,30 @@
 
 					{#if g.owner}
 						<section class="card">
+							<h2>{L.listedTitle}</h2>
+							<label class="toggle"><input type="checkbox" checked={g.listed} onchange={setListed} />{L.listedToggle}</label>
+							<p class="note">{L.listedLead}</p>
+							{#if g.listed}
+								<h3>{L.requestsTitle}</h3>
+								{#if !waiting.length}
+									<p class="note">{L.requestsNone}</p>
+								{:else}
+									<ul class="requests">
+										{#each waiting as w (w.username)}
+											<li>
+												<b>{w.username}</b>
+												<span class="actions">
+													<button type="button" class="primary" onclick={() => answer(w.username, true)}>{L.requestAccept}</button>
+													<button type="button" class="ghost" onclick={() => answer(w.username, false)}>{L.requestDecline}</button>
+												</span>
+											</li>
+										{/each}
+									</ul>
+								{/if}
+							{/if}
+						</section>
+
+						<section class="card">
 							<h2>{L.ownerToolsTitle}</h2>
 							<p class="note">{L.ownerNote}</p>
 							<button type="button" class="ghost" onclick={() => ask('link')}>{L.ownerNewLink}</button>
@@ -222,6 +263,11 @@
 	.link span { flex: 1 1 auto; min-width: 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; font-size: 14px;
 		font-variant-numeric: tabular-nums; color: var(--text-2); }
 	.link button { flex: none; min-height: 40px; }
+	.toggle { display: flex; align-items: center; gap: 10px; min-height: 44px; font-weight: 600; cursor: pointer; }
+	h3 { font-family: var(--font-sans); font-size: 15px; font-weight: 650; margin: 16px 0 6px; }
+	.requests { list-style: none; margin: 0; padding: 0; }
+	.requests li { display: flex; align-items: center; justify-content: space-between; gap: 10px; padding: 10px 0; border-top: 1px solid var(--border); }
+	.requests button { min-height: 38px; }
 	.danger-zone { margin-top: 20px; padding-top: 16px; border-top: 1px solid var(--border); }
 	.danger-zone p { margin: 0 0 12px; font-size: 14px; color: var(--text-2); }
 	.status, .error { margin-bottom: 16px; }

@@ -15,8 +15,9 @@
 	let selected = $state(null);
 	const same = (kind, i) => selected && selected.kind === kind && selected.i === i;
 
+	/* onpick(null): a click on nothing, or Escape, lets go */
 	function onpick(kind, i) {
-		selected = same(kind, i) ? null : { kind, i };
+		selected = kind === null || same(kind, i) ? null : { kind, i };
 	}
 	/* a party index belongs to one reading's table, a member index to one
 	   group: either change clears the selection */
