@@ -1,12 +1,15 @@
-/* One's own answers while answering. Signed in, they are the server's copy,
-   saved half a second after the last answer so a run of answers is one
-   request; a save that did not leave is kept and sent again. As a guest
-   they live in this browser only. */
+/* One's own answers while answering. Signed in, they are the server's copy:
+   an answer waits while its question is on screen — it may still change —
+   and is saved when the reader moves on (flush, called by the page), or
+   when the page is left or closed. Quietly: only a failure says so. A save
+   that did not leave is kept and sent again. As a guest they live in this
+   browser only. */
 
 import { api, apiError } from '$lib/api.js';
 import { session } from '$lib/session.svelte.js';
 import { board } from '$lib/compass/board.svelte.js';
 import { L } from '$lib/i18n/fr.js';
+import { toast } from '$lib/toast.svelte.js';
 
 const GUEST_KEY = 'politiskel.guest.v1';
 
@@ -14,7 +17,6 @@ export const mine = $state({
 	/** "server" or "guest" */
 	mode: 'server',
 	answers: {},
-	status: ''
 });
 
 /* the guest's profile, kept in this browser: the answers, and a
@@ -51,6 +53,7 @@ let timer = null;
 let pending = null;
 let pendingFor = null;
 let inflight = null;
+let retrying = false;
 
 export function startMine(mode) {
 	const who = session.me?.username ?? null;
@@ -97,7 +100,21 @@ function persist() {
 	clearTimeout(timer);
 	pending = { ...mine.answers };
 	pendingFor = session.me?.username ?? null;
-	timer = setTimeout(flush, 500);
+}
+
+/* The page is being closed: what waits goes in one last request, which the
+   browser finishes even once the page is gone. */
+export function flushOnExit() {
+	if (!pending || !session.me || session.me.username !== pendingFor) return;
+	try {
+		fetch('/api/me/profile', {
+			method: 'PUT', keepalive: true, credentials: 'same-origin',
+			headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ answers: pending })
+		});
+		pending = null;
+	} catch {
+		/* too large for keepalive, or no fetch: the next visit's answers stand */
+	}
 }
 
 /* Sends what is pending, and returns only once nothing is in flight: a page
@@ -114,7 +131,10 @@ export async function flush() {
 	pending = null;
 	inflight = (async () => {
 		const r = await api('PUT', '/api/me/profile', { answers });
-		mine.status = r.ok ? L.saved : apiError(r);
+		/* a network failure retries on its own; any other refusal is said */
+		if (!r.ok && r.status !== 0) toast(apiError(r), { kind: 'error' });
+		if (r.status === 0 && !retrying) toast(L.saveRetrying, { kind: 'error', ms: 6000 });
+		retrying = r.status === 0;
 		if (r.ok) {
 			session.me.profile = r.data;
 			/* the compass reloads the group next time, with these answers */

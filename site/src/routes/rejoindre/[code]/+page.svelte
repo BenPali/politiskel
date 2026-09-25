@@ -8,6 +8,7 @@
 	import { api, apiError } from '$lib/api.js';
 	import { session, refresh } from '$lib/session.svelte.js';
 	import { keepInvite } from '$lib/invite.js';
+	import { toast } from '$lib/toast.svelte.js';
 
 	const code = $derived(page.params.code);
 	let preview = $state(null);
@@ -23,7 +24,7 @@
 			if (!r.ok) return (error = apiError(r));
 			if (r.data.member) {
 				keepInvite(null);
-				session.status = L.alreadyMember(r.data.name);
+				toast(L.alreadyMember(r.data.name));
 				return goto('/groupes/' + r.data.id, { replaceState: true });
 			}
 			preview = r.data;
@@ -35,7 +36,7 @@
 		if (!r.ok) return (error = apiError(r));
 		keepInvite(null);
 		await refresh();
-		session.status = L.joined(r.data.name);
+		toast(L.joined(r.data.name));
 		goto('/groupes/' + r.data.id);
 	}
 

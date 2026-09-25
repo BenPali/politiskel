@@ -13,10 +13,10 @@
 	import { progressOf } from '$lib/quiz/flow.js';
 	import SignedIn from '$lib/components/SignedIn.svelte';
 	import CaptureImport from '$lib/components/CaptureImport.svelte';
-	import { mine, startMine, eraseAll } from '$lib/quiz/answers.svelte.js';
+	import { startMine, eraseAll } from '$lib/quiz/answers.svelte.js';
+	import { toast } from '$lib/toast.svelte.js';
 	import { board } from '$lib/compass/board.svelte.js';
 
-	let status = $state('');
 	let current = $state('');
 	let next = $state('');
 	let pwError = $state('');
@@ -42,7 +42,7 @@
 	const slug = (s) => s.normalize('NFD').replace(/[̀-ͯ]/g, '').replace(/[^a-zA-Z0-9]+/g, '-').toLowerCase();
 	async function exportAll() {
 		const r = await api('GET', '/api/me/export');
-		if (!r.ok) return (status = apiError(r));
+		if (!r.ok) return toast(apiError(r), { kind: 'error' });
 		const blob = new Blob([JSON.stringify(r.data, null, 1) + '\n'], { type: 'application/json' });
 		const a = Object.assign(document.createElement('a'), { href: URL.createObjectURL(blob), download: slug(session.me.username) + '-compte.json' });
 		document.body.appendChild(a);
@@ -56,7 +56,7 @@
 		erasing = false;
 		startMine('server');
 		await eraseAll();
-		status = mine.status && mine.status !== L.saved ? mine.status : L.eraseAllDone;
+		toast(L.eraseAllDone);
 	}
 	async function savePs({ politiscales, flag }) {
 		const r = await api('PUT', '/api/me/profile', flag ? { politiscales, flag } : { politiscales });
@@ -67,7 +67,7 @@
 	}
 	async function endOthers() {
 		const r = await api('DELETE', '/api/me/sessions/others');
-		status = r.ok ? L.signedOutOthers : apiError(r);
+		r.ok ? toast(L.signedOutOthers) : toast(apiError(r), { kind: 'error' });
 	}
 	async function changePassword(e) {
 		e.preventDefault();
@@ -75,7 +75,7 @@
 		if (!r.ok) return (pwError = r.data?.error === 'bad_credentials' ? L.passwordWrong : apiError(r));
 		pwError = '';
 		current = next = '';
-		status = L.passwordChanged;
+		toast(L.passwordChanged);
 	}
 	async function leave() {
 		await signOut();
@@ -105,7 +105,6 @@
 			</div>
 			<button type="button" class="ghost" onclick={leave}>{L.signOut}</button>
 		</div>
-		{#if status}<p class="status" role="status">{status}</p>{/if}
 
 		<div class="cols">
 			<div class="col">

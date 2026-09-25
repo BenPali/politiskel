@@ -10,10 +10,10 @@
 	import { PolitiQuiz } from '$lib/model.js';
 	import { screensFor } from '$lib/quiz/flow.js';
 	import { readGuest, updateGuest, writeGuest } from '$lib/quiz/answers.svelte.js';
+	import { toast } from '$lib/toast.svelte.js';
 	import CaptureImport from '$lib/components/CaptureImport.svelte';
 
 	let guest = $state(null);
-	let notice = $state('');
 	onMount(() => (guest = readGuest()));
 
 	/* a member has no use for the trial: their own questionnaire is there */
@@ -41,7 +41,7 @@
 		writeGuest(null);
 		guest = null;
 		board.loaded = false;
-		notice = L.guestForgotten;
+		toast(L.guestForgotten);
 	}
 	const hasAny = $derived(!!guest && (!!guest.politiscales || Object.keys(guest.answers).length > 0));
 </script>
@@ -56,7 +56,6 @@
 	</div>
 	<h1>{L.guestTitle}</h1>
 	<p class="lead">{L.guestLead}</p>
-	{#if notice}<p class="status" role="status">{notice}</p>{/if}
 	{#if hasAny}
 		<div class="ready">
 			<a class="button primary" href="/boussole">{L.guestSeeCompass}</a>

@@ -9,6 +9,7 @@
 	import { session, refresh } from '$lib/session.svelte.js';
 	import { board, showGroup } from '$lib/compass/board.svelte.js';
 	import { fromMember } from '$lib/compass/model.js';
+	import { toast } from '$lib/toast.svelte.js';
 	import SignedIn from '$lib/components/SignedIn.svelte';
 	import MemberFlag from '$lib/components/MemberFlag.svelte';
 
@@ -21,8 +22,6 @@
 	let leaving = $state(null);
 	let origin = $state('');
 	onMount(() => (origin = location.origin));
-	const status = session.status;
-	session.status = '';
 
 	/* the directory: listed groups, and where one stands in each */
 	let listed = $state(null);
@@ -61,7 +60,7 @@
 		busy = false;
 		if (!r.ok) return (error = apiError(r));
 		await refresh();
-		session.status = L.groupCreated(r.data.name);
+		toast(L.groupCreated(r.data.name));
 		goto('/groupes/' + r.data.id);
 	}
 	/* a pasted link or a bare code: the code is the link's last segment */
@@ -85,7 +84,6 @@
 	<div class="groups">
 		<h1>{L.groupsTitle}</h1>
 		<p class="lead">{L.groupsLeadShort}</p>
-		{#if status}<p class="status" role="status">{status}</p>{/if}
 		{#if error}<p class="error" role="alert">{error}</p>{/if}
 		<div class="cols">
 			<div class="list">

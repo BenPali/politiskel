@@ -714,6 +714,8 @@ export const LOCALES = {
       + "restent dans ce navigateur.",
     quizStart: "Commencer", quizResume: "Reprendre", quizPrev: "← Précédent",
     quizNext: "Suivant →", quizSkip: "Passer", quizSeeResult: "Voir le résultat →",
+    toastClose: "Fermer",
+    saveRetrying: "Réponse pas encore enregistrée : pas de connexion. Nouvel essai dans quelques secondes.",
     quizErase: "Effacer mes réponses", seeResult: "Voir le résultat",
     eraseAllTitle: "Effacer toutes mes réponses",
     eraseAllLead: "Toutes les réponses au questionnaire, de tous les thèmes. Votre résultat PolitiScales et votre compte restent.",

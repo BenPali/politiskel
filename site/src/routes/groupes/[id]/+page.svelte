@@ -12,6 +12,7 @@
 	import { session, refresh } from '$lib/session.svelte.js';
 	import { board, showGroup } from '$lib/compass/board.svelte.js';
 	import { fromMember, hasPolitiscales } from '$lib/compass/model.js';
+	import { toast } from '$lib/toast.svelte.js';
 	import SignedIn from '$lib/components/SignedIn.svelte';
 	import MemberFlag from '$lib/components/MemberFlag.svelte';
 
@@ -20,8 +21,6 @@
 
 	let members = $state(null);
 	let error = $state('');
-	let notice = $state(session.status);
-	session.status = '';
 	/** the action waiting for a second yes: { kind, name? } */
 	let asking = $state(null);
 	let copied = $state(false);
@@ -49,7 +48,7 @@
 	const setListed = (e) => run('POST', '/api/groups/' + id + '/listed', { listed: e.currentTarget.checked }, loadRequests);
 	const answer = (name, yes) =>
 		run('POST', '/api/groups/' + id + '/requests/' + (yes ? 'accept' : 'decline'), { username: name }, () => {
-			if (yes) notice = L.requestAccepted(name);
+			if (yes) toast(L.requestAccepted(name));
 			loadRequests();
 			load();
 		});
@@ -81,7 +80,7 @@
 	}
 	const removeMember = (name) => run('POST', '/api/groups/' + id + '/remove', { username: name }, load);
 	const handOver = (name) => run('POST', '/api/groups/' + id + '/owner', { username: name }, load);
-	const newLink = () => run('POST', '/api/groups/' + id + '/invite', null, () => (notice = L.ownerNewLinkDone));
+	const newLink = () => run('POST', '/api/groups/' + id + '/invite', null, () => toast(L.ownerNewLinkDone));
 	const remove = () => run('DELETE', '/api/groups/' + id, null, () => goto('/groupes'));
 	const leave = () => run('POST', '/api/groups/' + id + '/leave', null, () => goto('/groupes'));
 	const ask = (kind, name = null) => (asking = { kind, name });
@@ -106,7 +105,6 @@
 				</div>
 				<button type="button" class="primary" onclick={compass}>{L.seeOnCompass}</button>
 			</div>
-			{#if notice}<p class="status" role="status">{notice}</p>{/if}
 			{#if error}<p class="error" role="alert">{error}</p>{/if}
 
 			<div class="cols">

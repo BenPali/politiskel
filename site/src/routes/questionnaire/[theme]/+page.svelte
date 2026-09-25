@@ -11,7 +11,7 @@
 	import { coords, hasPolitiscales, fromMember, COUNTRIES } from '$lib/compass/model.js';
 	import { board, readPrefs } from '$lib/compass/board.svelte.js';
 	import { ALL, isFlow, flowThemes, screensFor, screenKey, scoreOf, openThemes, progressOf } from '$lib/quiz/flow.js';
-	import { mine, startMine, setAnswer, eraseKeys, flush, guestMember } from '$lib/quiz/answers.svelte.js';
+	import { mine, startMine, setAnswer, eraseKeys, flush, flushOnExit, guestMember } from '$lib/quiz/answers.svelte.js';
 	import SignedIn from '$lib/components/SignedIn.svelte';
 	import Question from '$lib/components/Question.svelte';
 	import JourneyStrip from '$lib/components/JourneyStrip.svelte';
@@ -63,8 +63,10 @@
 	});
 
 	let advance = null;
+	/* moving to another screen is when the answers given go to the server */
 	function goStep(s) {
 		clearTimeout(advance);
+		flush();
 		goto('?q=' + Math.max(0, Math.min(n + 1, s)));
 	}
 	function answer(v) {
@@ -135,7 +137,7 @@
 	}
 </script>
 
-<svelte:window onkeydown={onkey} />
+<svelte:window onkeydown={onkey} onpagehide={flushOnExit} />
 <svelte:head><title>{isFlow(theme) ? themeName(theme) + ' · ' : ''}{L.tabQuiz} · Politiskel</title></svelte:head>
 
 <SignedIn guest>
@@ -226,7 +228,6 @@
 				{/if}
 			</div>
 			{#if sc}<p class="quiz-keys">{L.quizKeys}</p>{/if}
-			{#if mine.status}<p class="status">{mine.status}</p>{/if}
 		{/if}
 	</div>
 </SignedIn>

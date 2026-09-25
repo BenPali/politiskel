@@ -9,6 +9,7 @@
 	import { refresh } from '$lib/session.svelte.js';
 	import SiteHeader from '$lib/components/SiteHeader.svelte';
 	import SiteFooter from '$lib/components/SiteFooter.svelte';
+	import Toasts from '$lib/components/Toasts.svelte';
 
 	let { children } = $props();
 
@@ -20,3 +21,4 @@
 	{@render children()}
 </main>
 <SiteFooter />
+<Toasts />
