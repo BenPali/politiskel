@@ -79,6 +79,14 @@ export function chooseGroup(id) {
 export const currentGroup = () =>
 	session.me && board.groupId !== null ? session.me.groups.find((g) => g.id === board.groupId) || null : null;
 
+/* Puts a group on show and has the board load it afresh: from the groups
+   pages, after joining, leaving or any change to its members. */
+export function showGroup(id) {
+	chooseGroup(id);
+	board.loaded = false;
+	board.members = [];
+}
+
 /* The board's first load, once a member is signed in: the preferences, the
    group last chosen, its members. Pages call it whenever the session
    changes; it runs once. */

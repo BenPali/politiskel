@@ -99,6 +99,7 @@ input[type=checkbox]:checked::after { transform: rotate(-45deg) scale(1); opacit
 .group-title .eyebrow { color: var(--accent-ink); }
 .flag.pill { width: 36px; height: 24px; margin: 0; border-radius: var(--r-pill); border: 0; box-shadow: 0 0 0 1px var(--border); }
 .flag.row { width: 33px; height: 22px; margin: 0; border-radius: 3px; border: 0; box-shadow: 0 0 0 1px var(--border); vertical-align: middle; }
+.flag.list { width: 42px; height: 28px; margin: 0; border-radius: 4px; border: 0; box-shadow: 0 0 0 1px var(--border); display: block; }
 .flag.tab { width: 33px; height: 22px; margin: 0; border-radius: var(--r-pill); border: 0; }
 .group-title h2 { font-size: var(--fs-2xl); }
 

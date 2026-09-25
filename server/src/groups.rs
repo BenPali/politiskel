@@ -49,15 +49,17 @@ pub(crate) async fn is_member(state: &AppState, group: i64, user: i64) -> ApiRes
 }
 
 pub(crate) async fn groups_of(state: &AppState, user: i64) -> ApiResult<Vec<Value>> {
-    let rows: Vec<(i64, String, String, i64, Option<i64>)> = sqlx::query_as(
+    let rows: Vec<(i64, String, String, i64, Option<i64>, Option<String>)> = sqlx::query_as(
         "SELECT g.id, g.name, g.invite_code,
-                (SELECT COUNT(*) FROM members m2 WHERE m2.group_id = g.id), g.owner_id
+                (SELECT COUNT(*) FROM members m2 WHERE m2.group_id = g.id), g.owner_id,
+                (SELECT u.username FROM users u WHERE u.id = g.owner_id)
          FROM groups g JOIN members m ON m.group_id = g.id
          WHERE m.user_id = ? ORDER BY g.name")
         .bind(user).fetch_all(&state.db).await?;
     Ok(rows.into_iter()
-        .map(|(id, name, invite, n, owner)| json!({ "id": id, "name": name, "invite": invite,
-                                                    "members": n, "owner": owner == Some(user) }))
+        .map(|(id, name, invite, n, owner, owner_name)| json!({ "id": id, "name": name, "invite": invite,
+                                                    "members": n, "owner": owner == Some(user),
+                                                    "owner_name": owner_name }))
         .collect())
 }
 
