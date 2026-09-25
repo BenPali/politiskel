@@ -290,7 +290,8 @@
 </div>
 
 <style>
-	.plot { position: relative; }
+	/* above what follows it, so a ring around a mark at the edge is drawn whole, over the card's margins */
+	.plot { position: relative; z-index: 2; }
 	.tip { position: absolute; pointer-events: none; z-index: 5; }
 	svg { width: 100%; height: auto; display: block; font-family: var(--font-sans); overflow: visible; }
 	.plane { fill: var(--quad); }

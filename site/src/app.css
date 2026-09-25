@@ -124,7 +124,6 @@
   .card + .card { margin-top: 20px; }
 
   .plot { position: relative; }
-  svg#compass { width: 100%; height: auto; display: block; overflow: hidden; }
 
   /* panneau de distances */
   tbody tr { cursor: pointer; }
