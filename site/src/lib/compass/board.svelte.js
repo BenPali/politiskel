@@ -73,10 +73,14 @@ export function savePrefs() {
 export function chooseGroup(id) {
 	const groups = session.me ? session.me.groups : [];
 	let want = id;
-	if (want === undefined) want = Number(read(KEYS.group));
+	/* "alone" is remembered as such, so a reload keeps one's profile alone */
+	if (want === undefined) {
+		const kept = read(KEYS.group);
+		want = kept === 'alone' ? null : Number(kept);
+	}
 	const found = groups.find((g) => g.id === want);
-	board.groupId = found ? found.id : id === null ? null : groups[0] ? groups[0].id : null;
-	write(KEYS.group, board.groupId === null ? null : String(board.groupId));
+	board.groupId = found ? found.id : want === null ? null : groups[0] ? groups[0].id : null;
+	write(KEYS.group, board.groupId === null ? 'alone' : String(board.groupId));
 }
 
 export const currentGroup = () =>

@@ -11,7 +11,10 @@
 		     first version's single theme setting is read once and carried over. -->
 		<script>
 			try {
+				/* the palettes of lib/theme.js: one no longer offered falls back to classique */
+				var P = ['classique', 'pop', 'journal', 'nuit', 'aurore', 'graphite', 'catppuccin', 'sepia', 'contraste'];
 				var d = JSON.parse(localStorage.getItem('politiskel.display.v1') || 'null');
+				if (d && P.indexOf(d.palette) < 0) d.palette = 'classique';
 				if (!d) {
 					var old = localStorage.getItem('politicompass.theme.v1');
 					var map = { light: ['classique', 'clair'], dark: ['classique', 'sombre'], contrast: ['contraste', 'clair'], sepia: ['sepia', 'clair'] };

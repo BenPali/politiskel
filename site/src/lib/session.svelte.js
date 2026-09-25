@@ -23,5 +23,8 @@ export async function refresh() {
 
 export async function signOut() {
 	await api('POST', '/api/logout');
+	/* nothing of this account's may be sent once it is gone */
+	const { forgetPending } = await import('$lib/quiz/answers.svelte.js');
+	forgetPending();
 	session.me = null;
 }

@@ -8,11 +8,25 @@ export const MODES = ['auto', 'clair', 'sombre'];
 export const MOTIONS = ['full', 'reduce'];
 const KEY = 'politiskel.display.v1';
 
+/* the first version's single setting, carried over once */
+const OLD_KEY = 'politicompass.theme.v1';
+const OLD = { light: ['classique', 'clair'], dark: ['classique', 'sombre'], contrast: ['contraste', 'clair'], sepia: ['sepia', 'clair'] };
+
+/* What app.html applies before the first paint must be what this returns,
+   or the page and the pickers disagree: both read the same entry, keep a
+   palette only if it still exists (Riso and Lagune are gone), and carry
+   the old setting over. */
 export function readDisplay() {
 	try {
 		const d = JSON.parse(localStorage.getItem(KEY) || 'null');
-		if (d && PALETTES.includes(d.palette) && MODES.includes(d.mode))
-			return { palette: d.palette, mode: d.mode, motion: MOTIONS.includes(d.motion) ? d.motion : 'full' };
+		if (d && MODES.includes(d.mode))
+			return {
+				palette: PALETTES.includes(d.palette) ? d.palette : 'classique',
+				mode: d.mode,
+				motion: MOTIONS.includes(d.motion) ? d.motion : 'full'
+			};
+		const old = OLD[localStorage.getItem(OLD_KEY)];
+		if (old) return { palette: old[0], mode: old[1], motion: 'full' };
 	} catch {
 		/* private browsing, or a broken entry */
 	}

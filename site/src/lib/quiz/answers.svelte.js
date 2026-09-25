@@ -45,14 +45,29 @@ export function writeGuest(g) {
 	}
 }
 
+let timer = null;
+/* what waits to be sent, and whose it is: a save is only ever sent for the
+   account that made it, never for whoever is signed in by then */
+let pending = null;
+let pendingFor = null;
+let inflight = null;
+
 export function startMine(mode) {
+	const who = session.me?.username ?? null;
+	/* answers of this account not yet on the server are newer than its copy:
+	   keep them rather than reload what they replace */
+	if (mode === 'server' && mine.mode === 'server' && who && pendingFor === who && (pending || inflight)) return;
 	mine.mode = mode;
 	mine.answers = mode === 'server' ? { ...(session.me?.profile?.answers || {}) } : { ...(readGuest()?.answers || {}) };
 }
 
-let timer = null;
-let pending = null;
-let inflight = null;
+/* Signing out: whatever was waiting belonged to that account, and goes. */
+export function forgetPending() {
+	clearTimeout(timer);
+	pending = null;
+	pendingFor = null;
+	mine.answers = {};
+}
 
 export function setAnswer(key, value) {
 	mine.answers = { ...mine.answers, [key]: value };
@@ -81,6 +96,7 @@ function persist() {
 	}
 	clearTimeout(timer);
 	pending = { ...mine.answers };
+	pendingFor = session.me?.username ?? null;
 	timer = setTimeout(flush, 500);
 }
 
@@ -91,6 +107,10 @@ export async function flush() {
 	while (inflight) await inflight;
 	const answers = pending;
 	if (!answers || !session.me) return;
+	if (session.me.username !== pendingFor) {
+		pending = pendingFor = null;
+		return;
+	}
 	pending = null;
 	inflight = (async () => {
 		const r = await api('PUT', '/api/me/profile', { answers });
@@ -101,7 +121,10 @@ export async function flush() {
 			board.loaded = false;
 		}
 		if (r.status === 0) {
-			if (!pending) pending = answers;
+			if (!pending) {
+				pending = answers;
+				pendingFor = session.me?.username ?? null;
+			}
 			timer = setTimeout(flush, 5000);
 		}
 	})();

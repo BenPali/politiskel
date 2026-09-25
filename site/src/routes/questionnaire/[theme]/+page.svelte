@@ -33,8 +33,11 @@
 	});
 	onMount(readPrefs);
 	/* an answer still waiting reaches the server before the page changes */
-	beforeNavigate(() => {
+	beforeNavigate(({ to }) => {
 		clearTimeout(advance);
+		/* moving between the questions of this flow is not leaving it: the
+		   half-second batch stays one request */
+		if (to?.url.pathname === page.url.pathname) return;
 		flush();
 	});
 
