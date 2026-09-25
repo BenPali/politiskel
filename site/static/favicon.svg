@@ -1,0 +1,12 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 34 34">
+  <style>
+    .ring { fill: #fcfcfb; stroke: #b9b7b0; }
+    .axis { stroke: #8f8d86; }
+    @media (prefers-color-scheme: dark) { .ring { fill: #1a1a19; stroke: #4a4a45; } .axis { stroke: #8f8e85; } }
+  </style>
+  <circle class="ring" cx="17" cy="17" r="15.5" stroke-width="1.5"/>
+  <line class="axis" x1="17" y1="4" x2="17" y2="30" stroke-width="1.4"/>
+  <line class="axis" x1="4" y1="17" x2="30" y2="17" stroke-width="1.4"/>
+  <circle cx="11.5" cy="22" r="3.6" fill="#2a78d6"/>
+  <circle cx="22" cy="12" r="2.6" fill="#2a78d6" opacity="0.45"/>
+</svg>

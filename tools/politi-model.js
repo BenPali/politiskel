@@ -276,7 +276,9 @@
   const api = { AXES, COUNTRIES, clamp, axisScore, methodTag, coords, spacingOf,
                 limitsFor, fitOf, nearestReference, rankParties, widestEconGap,
                 countryByCode };
+  /* both: Node's tools require it, and the site imports it as a module,
+     which may or may not see `module` depending on where it runs */
   if (typeof module !== "undefined" && module.exports) module.exports = api;
-  else global.PolitiModel = api;
+  global.PolitiModel = api;
 
 })(typeof globalThis !== "undefined" ? globalThis : this);

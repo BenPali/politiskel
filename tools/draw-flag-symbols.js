@@ -6,7 +6,7 @@
    solid silhouettes, few details, cut-outs wide enough to survive 24px.
    Each is built here from plain shapes in
    the 512 × 512 box the other symbols use, and written into
-   web/flag-icons.js in place of its previous entry:
+   site/src/lib/flag/icons.js in place of its previous entry:
 
      node tools/draw-flag-symbols.js
 
@@ -192,7 +192,7 @@ ICONS.equality = [
 ];
 
 if (require.main === module) {
-  const file = path.join(__dirname, "..", "web", "flag-icons.js");
+  const file = path.join(__dirname, "..", "site", "src", "lib", "flag", "icons.js");
   let src = fs.readFileSync(file, "utf8");
   for (const [k, v] of Object.entries(ICONS)) {
     const re = new RegExp("\\n  " + k + ": \\[[^\\n]*\\],?(?=\\n)");
@@ -202,7 +202,7 @@ if (require.main === module) {
       /* a new symbol: appended to FLAG_ICONS, credited as drawn */
       src = src.replace(/(\n  [a-z]+: \[[^\n]*\])\n};/, (m, last) => last + ",\n  " + k + ": " + JSON.stringify(v) + "\n};");
       src = src.replace(/(const FLAG_ICON_CREDITS = \{[^\n]*)\};/, (m, head) => head + ", " + JSON.stringify(k) + ": \"Politiskel (drawn)\"};");
-      if (!src.includes("\n  " + k + ": ")) throw new Error("could not add " + k + " to web/flag-icons.js");
+      if (!src.includes("\n  " + k + ": ")) throw new Error("could not add " + k + " to site/src/lib/flag/icons.js");
     }
   }
   fs.writeFileSync(file, src);

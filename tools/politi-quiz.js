@@ -853,7 +853,9 @@
   }
 
   const api = { SCALES, ITEMS, THEMES, RIGHTS, itemById, itemValue, score, mixedOrder, askedItems };
+  /* both: Node's tools require it, and the site imports it as a module,
+     which may or may not see `module` depending on where it runs */
   if (typeof module !== "undefined" && module.exports) module.exports = api;
-  else global.PolitiQuiz = api;
+  global.PolitiQuiz = api;
 
 })(typeof globalThis !== "undefined" ? globalThis : this);

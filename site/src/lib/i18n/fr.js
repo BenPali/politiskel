@@ -153,6 +153,13 @@ export const LOCALES = {
     footFine: "Les repères partisans situent un ordre de grandeur, pas une mesure : la plupart viennent "
       + "d'une enquête d'experts, les autres sont des estimations à la main, signalées comme telles et "
       + "comptées dans la méthode, pays par pays.",
+    compassAria: "Boussole Politiskel : axe horizontal gauche-droite économique, axe vertical sociétal, "
+      + "tradition, autorité et nation en haut, écologie, alternatives et libertés en bas. Choisissez un "
+      + "membre ou un parti pour voir toutes les distances ; les valeurs chiffrées sont dans le tableau.",
+    membersTitle: "Membres",
+    boardHint: "Choisissez un membre pour ouvrir sa fiche, ou un parti pour voir qui en est le plus proche.",
+    memberBack: "← Tous les membres",
+    memberUnknown: n => "« " + n + " » n'est pas dans le groupe affiché.",
     navHome: "Accueil", navTry: "Essayer", navMethod: "Méthode", navFlags: "Drapeaux",
     navSignIn: "Se connecter", navSignUp: "Créer un compte",
     homeTitle: "Votre squelette politique",
