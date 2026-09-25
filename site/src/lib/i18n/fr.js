@@ -278,6 +278,100 @@ export const LOCALES = {
       pale: t => "Bandes verticales : la disposition des tricolores républicains, quand rien ne "
         + "l'emporte nettement."
     },
+    /* The method page. Paragraphs are trusted markup (em, code, strong),
+       written here, never taken from a profile. */
+    methodPage: {
+      eyebrow: "Méthode",
+      title: "Comment Politiskel mesure, et ce qu'il ne mesure pas",
+      standfirst: "Une boussole est une réduction. Voici ce qu'elle garde, ce qu'elle perd, et d'où vient chaque chiffre.",
+      toc: "Sommaire",
+      sections: [
+        { id: "mesure", title: "Ce que mesure Politiskel", paras: [
+          "La boussole croise deux axes. L'axe horizontal est l'économie, de la gauche à la droite : redistribution, services publics et impôts, régulation des marchés. L'axe vertical est celui que les politistes appellent GAL-TAN — écologie, alternatives, libertés en bas ; tradition, autorité, nation en haut. C'est l'espace dans lequel le <em>Chapel Hill Expert Survey</em> (CHES) place les partis européens depuis vingt ans.",
+          "GAL-TAN mesure des valeurs culturelles, pas le rapport à l'État : on peut être tout en bas et demander plus d'État, pour l'économie comme pour les services publics. Deux axes compressent forcément ; Politiskel propose donc plusieurs <em>lectures</em> — celle du questionnaire, celle de PolitiScales d'origine, l'économie croisée avec le protectionnisme — et la fiche d'un profil décompose le reste lecture par lecture."
+        ] },
+        { id: "sources", title: "Les deux sources d'un profil", paras: [
+          "Un profil a deux sources possibles : un résultat PolitiScales, lu sur une capture, et le questionnaire Politiskel. Quand un thème du questionnaire est répondu, l'axe qu'il mesure <strong>remplace entièrement</strong> celui de PolitiScales — les deux ne sont jamais moyennés. Chaque coordonnée a donc une seule source, et le tableau la signale.",
+          "Depuis PolitiScales, X est une moyenne pondérée de Capitalisme − Communisme (<code>0,45</code>) et de Laissez-faire − Régulation (<code>0,35</code>) ; Y, de Essentialisme − Constructivisme (<code>0,30</code>), Justice punitive − réhabilitative (<code>0,25</code>), Conservatisme − Progressisme (<code>0,25</code>) et Nationalisme − Internationalisme (<code>0,20</code>). Les poids sont renormalisés sur les seules composantes renseignées. Écologie ↔ Productivisme n'entre pas dans X : l'échelle économique du CHES exclut l'environnement.",
+          "Depuis le questionnaire, X est la moyenne simple de trois sous-dimensions — redistribution, services publics contre impôts, régulation des marchés —, les trois sous-échelles économiques du CHES, dont la moyenne reproduit son axe <code>lrecon</code> à <code>r = 0,96</code>. Y suit le même principe sur les sept sous-dimensions sociétales du CHES ; leur moyenne reproduit <code>galtan</code> à <code>r = 0,97</code>. Le protectionnisme est lu à part, jamais dans X : dans le CHES il va contre la gauche-droite économique (<code>r = −0,37</code>)."
+        ] },
+        { id: "questions", title: "D'où viennent les questions", paras: [
+          "Aucune question n'est écrite pour Politiskel. Chacune est citée d'une enquête publique éprouvée — l'<em>European Social Survey</em>, l'<em>International Social Survey Programme</em>, l'<em>European Values Study</em> — dans sa version française officielle, avec sa source jusqu'à la variable. On peut donc vérifier chaque formulation.",
+          "Les exceptions sont signalées sur la question même : l'échelle de classe d'Erik Olin Wright, qui n'existe pas en français et est traduite, et les deux bornes d'une échelle de l'ESS dont la carte n'a pas été retrouvée. Seule la consigne change : écrite pour une série de questions posées à la suite, elle est mise au singulier, puisqu'ici chaque écran n'en pose qu'une, dans un ordre mélangé mais identique pour tout le monde."
+        ], quote: ["« Le gouvernement devrait prendre des mesures pour réduire les différences de revenu. »", "ESS, variable <code>gincdif</code> — questionnaire français officiel"] },
+        { id: "partis", title: "Comment les partis sont placés", paras: [
+          "Les repères viennent du CHES 2024 : 609 politologues notent 279 partis européens sur les échelles <code>lrecon</code> et <code>galtan</code>, exactement les deux dimensions de cette boussole, ramenées de −100 à +100 : position = (note sur 10 − 5) × 20. Ce ne sont pas des scores PolitiScales ; les distances profil-parti gardent donc une part d'approximation."
+        ] },
+        { id: "distance", title: "Une proximité, pas une appartenance", paras: [
+          "La distance entre un profil et un parti est mesurée sur les deux axes de la lecture choisie. Les seuils ne sont pas fixés à la main : on mesure l'espacement médian entre un parti et son voisin le plus proche, puis <em>proche</em> vaut jusqu'à cet espacement, <em>modérée</em> jusqu'à une fois et demie. Au-delà, le parti le moins lointain reste nommé, mais la page dit qu'aucun n'est vraiment proche. Le repère le plus proche n'est pas une famille politique : c'est le point le moins éloigné, et il peut être loin."
+        ] },
+        { id: "limites", title: "Limites", paras: [
+          "Un groupe d'amis est un petit échantillon : il montre où ses membres divergent, il ne dit rien de la population. L'import PolitiScales lit une capture d'écran ; si sa mise en page change, la lecture peut échouer, et Politiskel le dit plutôt que de deviner.",
+          "Deux axes ne voient ni le populisme — peuple contre élites — ni l'intégration européenne, dont les deux axes n'expliquent pas même la moitié dans le CHES. Ce sont des thèmes à venir du questionnaire. Le drapeau, enfin, est une illustration : il suit les conventions des drapeaux politiques, et sa légende dit ce que chaque élément représente."
+        ] },
+        { id: "donnees", title: "Vos données", paras: [
+          "Vos réponses sont des opinions politiques — des données sensibles au sens de l'article 9 du RGPD. Elles ne sont enregistrées qu'avec votre consentement explicite, sur ce serveur seulement, et ne sont montrées qu'aux membres des groupes que vous avez rejoints. Les captures PolitiScales ne quittent jamais votre navigateur. Aucun traceur, aucun e-mail. Vous pouvez tout exporter ou tout effacer depuis votre compte."
+        ] }
+      ],
+      limitsCaption: "Seuils de proximité par pays, en points sur l'échelle −100 … +100",
+      colCountry: "Pays", colNear: "Proche", colFar: "Modérée", colTie: "Second repère affiché",
+      upTo: n => "jusqu'à " + n, under: n => "moins de " + n + " pts d'écart",
+      aside: "Les calculs sont publics et peuvent être refaits : les pondérations, les seuils et les affirmations de cette page sont mesurés par des scripts du dépôt, que chacun peut relancer.",
+      source: "Voir le code source"
+    },
+    flagsPage: {
+      eyebrow: "Drapeaux",
+      title: "Un drapeau tiré de vos positions",
+      lead: "Chaque profil reçoit un drapeau, dans les conventions des drapeaux politiques : deux ou trois couleurs fortes, "
+        + "un symbole, de grandes formes, aucune lettre. Rien n'est choisi dans une liste fixe : chaque trait porte sa "
+        + "couleur et son symbole, et le drapeau combine les traits les plus marqués.",
+      symbolsTitle: n => "Les " + n + " symboles",
+      symbolsLead: "Silhouettes pleines et évidements larges : chacun reste lisible à 24 px, taille des pastilles de groupe.",
+      drawn: "Dessin Politiskel", credit: a => "game-icons.net · " + a,
+      symbols: {
+        fist: ["Poing levé", "une lecture de classe anticapitaliste"], scales: ["Balance", "la redistribution"],
+        swallow: ["Hirondelle", "le libre marché"], factory: ["Usine", "le productivisme"], sprout: ["Pousse", "l'écologie"],
+        handshake: ["Poignée de mains", "le réformisme"], star: ["Étoile", "la révolution"],
+        phrygian: ["Bonnet phrygien", "la révolution et la liberté"], anarchy: ["A cerclé", "un rejet radical de l'État"],
+        torch: ["Torche", "le progressisme"], liberty: ["Chaîne brisée", "les libertés publiques"],
+        shield: ["Bouclier", "l'ordre et la sécurité"], globe: ["Globe", "le cosmopolitisme"],
+        rings: ["Anneaux entrelacés", "le multiculturalisme"], oak: ["Feuille de chêne", "l'enracinement national"],
+        tower: ["Tour", "le protectionnisme"], book: ["Livre ouvert", "la religion hors de la politique"],
+        column: ["Colonne", "la tradition"], venus: ["Symbole ♀", "le féminisme"],
+        equality: ["Signe égal", "l'égalité des droits pour tous"], croix: ["Croix de guerre", "le patriotisme martial"],
+        crown: ["Couronne", "le monarchisme"], fleur: ["Fleur de lys", "un monarchisme légitimiste"]
+      },
+      coloursTitle: "Les couleurs",
+      coloursLead: "Les couleurs politiques conventionnelles. Elles n'appartiennent qu'aux drapeaux et aux repères : l'interface n'en emploie aucune.",
+      colours: {
+        red: ["Rouge", "la gauche économique"], gold: ["Or", "le libéralisme économique"], blue: ["Bleu", "l'ordre"],
+        purple: ["Violet", "le féminisme"], pink: ["Rose", "les droits des personnes LGBT"], green: ["Vert", "l'écologie"],
+        steel: ["Acier", "le productivisme"], sky: ["Bleu ciel", "le cosmopolitisme"], orange: ["Orange", "le centre"],
+        black: ["Noir", "le rejet de l'État"], white: ["Blanc", "aucune lecture marquée"]
+      },
+      layoutsTitle: "Les dispositions",
+      layoutsLead: "La disposition vient de la lecture dominante ; ses champs prennent les couleurs des traits les plus forts, dans l'ordre.",
+      layouts: {
+        pale: ["Bandes verticales", "La disposition des tricolores républicains, quand rien ne l'emporte nettement."],
+        triband: ["Triband", "La famille des drapeaux nationaux, pour un nationalisme marqué."],
+        nordic: ["Croix nordique", "La famille des drapeaux d'ordre, pour un profil traditionaliste."],
+        royal: ["Champ blanc, bordure d'or", "La famille des drapeaux royaux : ordre et tradition marqués, ou monarchisme."],
+        revolution: ["Triangle de hampe", "Les drapeaux révolutionnaires, pour une lecture de classe très marquée."],
+        diagonal: ["Diagonale", "La convention anarchiste, noir en bas côté battant, pour le rejet de l'État."],
+        pall: ["Pall en Y", "Comme le drapeau sud-africain : la convergence, pour un multiculturalisme marqué."],
+        stripes: ["Canton et bandes", "L'ouverture sur le monde, pour un cosmopolitisme marqué."]
+      },
+      modifier: n => "Modificateur · " + n,
+      mods: {
+        rainbow: ["Barre arc-en-ciel", "Un soutien marqué aux droits des personnes LGBT ; elle rejoint n'importe quelle disposition."],
+        border: ["Bordure sombre", "Un protectionnisme très marqué."]
+      },
+      example: n => "Exemple : " + n,
+      asideTitle: "Écartés volontairement",
+      aside: "La faucille et le marteau, la fleur de lys telle que PolitiScales l'emploie (elle attend une lecture du monarchisme), "
+        + "le brun et le « bleu marine », les logos de partis, les emblèmes religieux, et tout symbole de haine — la croix de fer "
+        + "parmi eux ; la croix de guerre porte le patriotisme martial sans cette charge."
+    },
     flagColourLines: {
       red: v => "Rouge : la gauche économique (" + v + ").",
       gold: v => "Or : le libéralisme économique (" + v + ").",

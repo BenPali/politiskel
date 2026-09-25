@@ -212,12 +212,21 @@ export function politiskelFlag(c, p) {
   const rainbow = t.lgbt >= 80 && layout !== "revolution";
   const pool = rainbow ? t.colsAll.filter(k => k !== "pink") : t.colsAll;
   const cols = pool.length ? pool.slice(0, 3) : ["white"];
+  const border = t.prot >= 75 && layout !== "royal";
+  const d = drawFlag({ layout, cols, syms: t.syms, rainbow, border, wide: t.intl >= 80 });
+  return { url: d.url, layout, legend: flagLegend(t, d.drawn, layout, d.shown, border, rainbow, d.layoutStar) };
+}
+
+/* The drawing itself, from a layout, its colours in order, the symbols in
+   order ({ symbol }), and the modifiers. The flags page draws its examples
+   with it. `wide`: seven stripes instead of five. */
+export function drawFlag({ layout, cols, syms: given, rainbow = false, border = false, wide = false }) {
   const C = k => FLAG_COLOURS[k];
   const [a, b, c3] = cols;
   const P = [];
   let places = [];   /* [{ x, y, size, bg }] — where the symbols go, first the main one */
   let drawn = [];    /* the meaningful colours shown, for the legend */
-  let syms = t.syms.slice();
+  let syms = given.slice();
   let layoutStar = false;   /* the revolution layout's own star, drawn for want of a symbol */
 
   if (layout === "diagonal") {
@@ -271,7 +280,7 @@ export function politiskelFlag(c, p) {
     drawn = [a, b, c3].filter(k => k && k !== "white");
   } else if (layout === "stripes") {
     const second = b && b !== "sky" ? b : (a === "sky" ? "white" : "sky");
-    const n = t.intl >= 80 ? 7 : 5, h = 100 / n, canton = h * (n === 7 ? 4 : 3);
+    const n = wide ? 7 : 5, h = 100 / n, canton = h * (n === 7 ? 4 : 3);
     for (let i = 0; i < n; i++)
       P.push('<rect y="' + (i * h) + '" width="150" height="' + (h + 0.2) + '" fill="' + (i % 2 ? C("white") : C(second === "white" ? a : second)) + '"/>');
     P.push('<rect width="66" height="' + canton + '" fill="' + C(a) + '"/>');
@@ -302,7 +311,6 @@ export function politiskelFlag(c, p) {
   /* modifiers */
   if (rainbow)
     FLAG_RAINBOW.forEach((col, i) => P.push('<rect x="138" y="' + (i * 100 / 6) + '" width="12" height="' + (100 / 6 + 0.2) + '" fill="' + col + '"/>'));
-  const border = t.prot >= 75 && layout !== "royal";
   if (border) P.push('<rect x="3" y="3" width="144" height="94" fill="none" stroke="' + C("black") + '" stroke-width="6"/>');
 
   const shown = syms.slice(0, places.length);
@@ -315,8 +323,7 @@ export function politiskelFlag(c, p) {
 
   const svg = '<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 150 100" width="150" height="100">'
     + P.join("") + "</svg>";
-  return { url: "data:image/svg+xml;charset=utf-8," + encodeURIComponent(svg), layout,
-           legend: flagLegend(t, drawn, layout, shown, border, rainbow, layoutStar) };
+  return { url: "data:image/svg+xml;charset=utf-8," + encodeURIComponent(svg), drawn, shown, layoutStar };
 }
 
 /* One line per element, in the order the eye reads a flag. */
