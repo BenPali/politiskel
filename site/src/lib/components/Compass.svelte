@@ -29,8 +29,9 @@
 
 	/* The design's placement: eight spots around a mark, the first free one
 	   wins; a mark's own box and every label placed so far are taken. */
-	function place(taken, cx, cy, text, size, weight, gap, always = false) {
+	function place(taken, cx, cy, text, size, weight, gap, always = false, faint = false) {
 		const w = textWidth(text, size, weight) + 2, h = size;
+		let inBounds = null;
 		const spots = [[gap, 0, 'start'], [-gap, 0, 'end'], [0, -gap - h / 2, 'middle'], [0, gap + h / 2, 'middle'],
 			[gap * 0.75, -gap * 0.75 - h / 3, 'start'], [-gap * 0.75, -gap * 0.75 - h / 3, 'end'],
 			[gap * 0.75, gap * 0.75 + h / 3, 'start'], [-gap * 0.75, gap * 0.75 + h / 3, 'end']];
@@ -38,11 +39,16 @@
 			const x1 = anchor === 'start' ? cx + dx : anchor === 'end' ? cx + dx - w : cx + dx - w / 2;
 			const r = { x1, x2: x1 + w, y1: cy + dy - h / 2, y2: cy + dy + h / 2 };
 			if (r.x1 < 46 || r.x2 > 554 || r.y1 < 46 || r.y2 > 554) continue;
+			inBounds ||= { dx, dy: dy + h * 0.34, anchor, faint: true };
 			if (taken.some((o) => r.x1 < o.x2 && r.x2 > o.x1 && r.y1 < o.y2 && r.y2 > o.y1)) continue;
 			taken.push(r);
 			/* the text's baseline sits a third of its size below the box's middle */
 			return { dx, dy: dy + h * 0.34, anchor };
 		}
+		/* no free spot: a party keeps its name, faint and underneath, at the
+		   first spot inside the plane — claiming nothing, so it never pushes a
+		   member's name away */
+		if (faint) return inBounds;
 		if (!always) return null;
 		/* a member keeps a label even with no free spot: above its dot, or
 		   below when it sits at the top, and inward from a side */
@@ -104,7 +110,7 @@
 			parties[ri] = {
 				ri, x, y, name: r.name, title: r.name + ' — ' + noteOf(r), near,
 				dim: (sel || selRef) && !near,
-				place: show.refLabels || near ? place(taken, x, y, r.name, F.ref, near ? 650 : 500, 11) : null
+				place: show.refLabels || near ? place(taken, x, y, r.name, F.ref, near ? 650 : 500, 11, false, true) : null
 			};
 		}
 		const origin = sel ? { x: X(sel.c.x), y: Y(sel.c.y) } : selRef ? { x: X(selRef.x), y: Y(selRef.y) } : null;
@@ -235,6 +241,18 @@
 			</g>
 		{/if}
 
+		<!-- the party names that found no room: underneath the members -->
+		<g class="labels" class:on={labelsOn} aria-hidden="true">
+			{#each geo.parties as r (r.ri)}
+				{#if r.place?.faint}
+					<!-- svelte-ignore a11y_click_events_have_key_events, a11y_no_static_element_interactions -->
+					<text class="ref-label mark faint" class:near={r.near} class:dim={r.dim} style="transform: translate({r.x}px, {r.y}px); --i: {r.ri}"
+						onclick={() => onpick('party', r.ri)}
+						x={r.place.dx} y={r.place.dy} text-anchor={r.place.anchor} font-size={F.ref}>{r.name}</text>
+				{/if}
+			{/each}
+		</g>
+
 		<g id="points-layer">
 			{#each geo.pts as pt (pt.i)}
 				<g class="mark" style="transform: translate({pt.x}px, {pt.y}px); --i: {pt.i}"
@@ -274,7 +292,7 @@
 		     keeps to the marks themselves. -->
 		<g class="labels" class:on={labelsOn} aria-hidden="true">
 			{#each geo.parties as r (r.ri)}
-				{#if r.place}
+				{#if r.place && !r.place.faint}
 					<!-- svelte-ignore a11y_click_events_have_key_events, a11y_no_static_element_interactions -->
 					<text class="ref-label mark" class:near={r.near} class:dim={r.dim} style="transform: translate({r.x}px, {r.y}px); --i: {r.ri}"
 						onclick={() => onpick('party', r.ri)}
@@ -363,6 +381,8 @@
 	.pt-label { fill: var(--text); font-weight: 650; stroke: var(--quad); stroke-width: 4; paint-order: stroke; stroke-linejoin: round; }
 	.ref-label { fill: var(--text-2); font-weight: 500; stroke: var(--quad); stroke-width: 4; paint-order: stroke; stroke-linejoin: round; }
 	.ref-label.near { fill: var(--text); font-weight: 650; }
+	/* a name drawn where there was no room: behind, and quiet */
+	.ref-label.faint { opacity: .42; stroke-width: 0; }
 	.pt-label.dim { opacity: .3; }
 	.ref-label.dim { opacity: .35; }
 </style>

@@ -52,9 +52,13 @@
 							<span>{L.hubProgress(t.done, t.total)}</span>
 						</div>
 					</div>
-					<a class="button {t.done === t.total ? 'ghost' : 'primary'}" href="/questionnaire/{t.key}">
-						{!t.done ? L.quizStart : t.done < t.total ? L.quizResume : L.quizReview}
-					</a>
+					<div class="ctas">
+						<a class="button {t.done === t.total ? 'ghost' : 'primary'}" href="/questionnaire/{t.key}">
+							{!t.done ? L.quizStart : t.done < t.total ? L.quizResume : L.quizReview}
+						</a>
+						<!-- straight to the result, past the questions: the screen after the last -->
+						{#if t.done}<a class="button {t.done === t.total ? 'primary' : 'skip'}" href="/questionnaire/{t.key}?q={t.total + 1}">{L.seeResult}</a>{/if}
+					</div>
 				</article>
 			{/each}
 		</div>
@@ -108,6 +112,7 @@
 	.bar.none { opacity: .6; }
 	.bar span { display: block; height: 100%; width: 100%; background: var(--accent); transform-origin: left; }
 	.theme .button { height: 48px; padding: 0 22px; font-size: 15.5px; }
+	.ctas { display: flex; flex-wrap: wrap; gap: 8px; justify-content: flex-end; }
 	.erase { display: flex; flex-wrap: wrap; align-items: center; gap: 6px 14px; margin-top: 22px; font-size: 14px; color: var(--text-3); }
 	.erase .confirm { width: 100%; }
 	.warn { color: var(--danger); }

@@ -202,7 +202,11 @@
 
 			<div class="quiz-nav">
 				{#if step === 0}
-					<span></span>
+					{#if anyStarted}
+						<button type="button" class="ghost" onclick={() => goStep(n + 1)}>{L.seeResult}</button>
+					{:else}
+						<span></span>
+					{/if}
 					<button type="button" class="primary" onclick={() => goStep(1)}>{anyStarted ? L.quizResume : L.quizStart}</button>
 				{:else if sc}
 					<button type="button" class="ghost" onclick={() => goStep(step - 1)}>{L.quizPrev}</button>
