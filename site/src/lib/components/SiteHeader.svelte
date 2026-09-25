@@ -23,6 +23,17 @@
 		menuOpen = false;
 		pickerOpen = false;
 	});
+	/* the picker closes on a click outside it, or on Escape */
+	let pickerEl = $state(null);
+	function outside(e) {
+		if (pickerOpen && pickerEl && !pickerEl.contains(e.target)) pickerOpen = false;
+	}
+	function escape(e) {
+		if (e.key === 'Escape' && pickerOpen) {
+			pickerOpen = false;
+			pickerEl?.querySelector('button')?.focus();
+		}
+	}
 	function set(k, v) {
 		display = { ...display, [k]: v };
 		applyDisplay(display);
@@ -52,6 +63,8 @@
 	const here = (href) => page.url.pathname === href || page.url.pathname.startsWith(href + '/');
 </script>
 
+<svelte:window onpointerdown={outside} onkeydown={escape} />
+
 <header class="site-header">
 	<a class="brand" href="/" aria-label={L.brandHome}>
 		<svg width="30" height="30" viewBox="0 0 32 32" aria-hidden="true">
@@ -73,7 +86,7 @@
 	</nav>
 
 	<div class="end">
-		<div class="picker">
+		<div class="picker" bind:this={pickerEl}>
 			<button type="button" class="icon" aria-label={L.themeLabel} aria-expanded={pickerOpen} onclick={() => { display = readDisplay(); pickerOpen = !pickerOpen; }}>
 				<svg width="20" height="20" viewBox="0 0 20 20" aria-hidden="true"><circle cx="10" cy="10" r="7.5" fill="none" stroke="currentColor" stroke-width="1.8" /><path d="M10 2.5 A7.5 7.5 0 0 1 10 17.5 Z" fill="currentColor" /></svg>
 			</button>
