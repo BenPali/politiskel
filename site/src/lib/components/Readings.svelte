@@ -7,7 +7,8 @@
 	import { PolitiQuiz } from '$lib/model.js';
 	import { nearestBase } from '$lib/compass/model.js';
 
-	let { c, country } = $props();
+	/** keys: the themes to show — a flow's result shows its own; default all open themes */
+	let { c, country, keys = null } = $props();
 
 	const show = (v) => (v === null || v === undefined ? L.readingNone : signed(v));
 	const pair = (x, y) => '(' + (x === null ? '—' : signed(x)) + ', ' + (y === null ? '—' : signed(y)) + ')';
@@ -15,7 +16,7 @@
 	const scoreOf = (key) => (key === 'economy' ? c.quiz : key === 'society' ? c.soc : null);
 
 	const themes = $derived(
-		PolitiQuiz.THEMES.filter((t) => !t.planned)
+		PolitiQuiz.THEMES.filter((t) => !t.planned && (!keys || keys.includes(t.key)))
 			.map((theme) => {
 				const q = scoreOf(theme.key);
 				const any = q && (Object.values(q.n).some((n) => n > 0) || q.salience !== null || q.salienceAfter !== null);
