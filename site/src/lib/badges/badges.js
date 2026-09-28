@@ -10,7 +10,7 @@
    like the compass. The drawings are in scenes/, loaded only where shown. */
 import { traitStrengths } from '$lib/flag/flag.js';
 import { progressOf, ALL } from '$lib/quiz/flow.js';
-import { PolitiModel } from '$lib/model.js';
+import { PolitiModel, PolitiQuiz } from '$lib/model.js';
 import { CHANGES, isMeta } from '$lib/quiz/meta.js';
 
 /* a girouette changed this many answers given on earlier visits */
@@ -21,8 +21,8 @@ export const levelOf = (s) => (s >= 90 ? 3 : s >= 75 ? 2 : s >= 60 ? 1 : 0);
 
 /* the catalog, in the order of the badge page */
 export const FAMILIES = [
-	['economy', ['robin', 'hand', 'classstruggle', 'camarade', 'rose', 'picket', 'customs', 'factory', 'market']],
-	['society', ['sheriff', 'liberties', 'hussard', 'temple', 'cocarde', 'globe', 'mosaic', 'feminism', 'pride', 'tightrope', 'reform', 'barricade']],
+	['economy', ['robin', 'hand', 'classstruggle', 'camarade', 'rose', 'picket', 'customs', 'factory', 'market', 'taxpayer', 'boss', 'startup']],
+	['society', ['sheriff', 'liberties', 'hussard', 'temple', 'cocarde', 'oldfrance', 'chrisdem', 'fortress', 'gauls', 'globe', 'mosaic', 'feminism', 'pride', 'tightrope', 'nuance', 'reform', 'barricade']],
 	['ecology', ['forest', 'snail', 'turbines', 'atom']],
 	['world', ['eustars', 'border', 'dove', 'defence', 'ironcurtain', 'datcha', 'bluehelmet']],
 	['institutions', ['ballot', 'megaphone', 'executive', 'hemicycle', 'colombey']],
@@ -50,14 +50,42 @@ const num = (v) => (Number.isFinite(v) ? v : null);
 const neg = (v) => (num(v) === null ? null : -v);
 
 /* Strengths the flag does not carry. The centre is the nearness of both
-   axes to zero: 60 within 16 points, 75 within 10, 90 within 4. */
-function extraStrengths(c) {
+   axes to zero: 60 within 16 points, 75 within 10, 90 within 4. The liberal
+   centre (market and openness together) is 60 at 40 on both, 90 at 60. */
+function extraStrengths(c, raw, p) {
 	const r = c.readings || {};
+	const e = (c.quiz && c.quiz.dims) || {}, s = (c.soc && c.soc.dims) || {};
+	const both = (a, b) => (num(a) === null || num(b) === null ? null : Math.min(a, b));
 	const centre = num(c.x) !== null && num(c.y) !== null ? 100 - 2.5 * Math.max(Math.abs(c.x), Math.abs(c.y)) : null;
+	const liberal = both(c.x, neg(c.y));
 	return {
 		tightrope: centre, defence: neg(r.pacifism), ironcurtain: neg(r.russia), datcha: num(r.russia),
-		bluehelmet: num(r.world), executive: num(r.executive), hemicycle: neg(r.executive)
+		bluehelmet: num(r.world), executive: num(r.executive), hemicycle: neg(r.executive),
+		/* lower taxes over public services; the side of capital; the two ends of y the flag reads on its own */
+		taxpayer: num(e.spendvtax), boss: neg(c.quiz ? c.quiz.labour : null),
+		startup: liberal === null ? null : liberal * 1.5,
+		fortress: num(s.immigration), gauls: num(s.multiculturalism),
+		oldfrance: both(raw.nation, raw.laworder),
+		/* faith with a social economy: Christian democracy */
+		chrisdem: both(num(s.religion), neg(e.redistribution)),
+		nuance: middleShare(p)
 	};
+}
+
+/* The share of middle answers ("ni d'accord ni pas d'accord"), on 20
+   answers or more: 60 at 30 %, 75 at 37.5 %, 90 at 45 %. */
+function middleShare(p) {
+	const answers = (p && p.answers) || {};
+	let n = 0, mid = 0;
+	for (const [k, v] of Object.entries(answers)) {
+		const item = PolitiQuiz.itemById(k);
+		if (!item || v === 'dk') continue;
+		const values = PolitiQuiz.SCALES[item.scale].values;
+		if (values.length % 2 === 0) continue;
+		n++;
+		if (values[v] === 0) mid++;
+	}
+	return n >= 20 ? (mid / n) * 200 : null;
 }
 
 /* Traits that seldom go together: marked on both sides of the social axis,
@@ -72,7 +100,7 @@ const RIGHT = ['hand', 'market'];
 export function badgesOf(p, c, ctx = {}) {
 	const out = [];
 	const raw = traitStrengths(c, p);
-	const extra = extraStrengths(c);
+	const extra = extraStrengths(c, raw, p);
 	for (const [, keys] of FAMILIES)
 		for (const key of keys) {
 			if (SINGLE.has(key)) continue;
