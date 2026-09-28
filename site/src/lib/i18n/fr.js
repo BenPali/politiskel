@@ -178,7 +178,8 @@ export const LOCALES = {
       label: { x: "Économie (X)", y: "Société (Y)", protectionism: "Protectionnisme", class: "Classe (Wright)",
                conflict: "Conflit de classe perçu", labour: "Capital / travail",
                europe: "Europe", russia: "Russie", world: "Instances internationales",
-               people: "Peuple / élus", executive: "Pouvoir exécutif" },
+               people: "Peuple / élus", executive: "Pouvoir exécutif",
+               ecology: "Écologie", transition: "Transition énergétique", nuclear: "Nucléaire" },
       hintQuiz: { x: "Questionnaire · échelle CHES", y: "Questionnaire · GAL-TAN" },
       hintPs: "D'après PolitiScales",
       hintPending: (n, ps) => (ps ? "D'après PolitiScales · " : "") + "questionnaire en cours, encore "
@@ -187,11 +188,14 @@ export const LOCALES = {
               conflict: "ISSP", labour: "Syndicats, pouvoir des patrons · ESS, ISSP",
               europe: "Questionnaire · échelle CHES", russia: "Eurobaromètre · sans repère de parti",
               people: "Questionnaire · échelle POPPA", executive: "ESS, ISSP, EVS · sans repère de parti",
+              ecology: "Questionnaire · échelle CHES", transition: "ESS · sans repère de parti", nuclear: "ESS · sans repère de parti",
               world: "ISSP · sans repère de parti" },
       ends: { x: ["Gauche", "Droite"], y: ["Ouverture", "Tradition"], protectionism: ["Libre-échange", "Protection"],
               class: ["Pro-capitaliste", "Anticapitaliste"], conflict: ["Faible", "Fort"], labour: ["Côté capital", "Côté travail"],
               europe: ["Souveraineté", "Intégration"], russia: ["Fermeté", "Conciliation"],
               people: ["Les élus décident", "Le peuple décide"], executive: ["Parlement", "Exécutif fort"],
+              ecology: ["Croissance d'abord", "Environnement d'abord"], transition: ["Fossiles", "Renouvelables"],
+              nuclear: ["Sans nucléaire", "Beaucoup de nucléaire"],
               world: ["Intérêt national", "Autorité internationale"] }
     },
     partiesTitle: "Partis, du plus proche au plus lointain",
@@ -340,6 +344,7 @@ export const LOCALES = {
           "Depuis PolitiScales, X est une moyenne pondérée de Capitalisme − Communisme (<code>0,45</code>) et de Laissez-faire − Régulation (<code>0,35</code>) ; Y, de Essentialisme − Constructivisme (<code>0,30</code>), Justice punitive − réhabilitative (<code>0,25</code>), Conservatisme − Progressisme (<code>0,25</code>) et Nationalisme − Internationalisme (<code>0,20</code>). Les poids sont renormalisés sur les seules composantes renseignées. Écologie ↔ Productivisme n'entre pas dans X : l'échelle économique du CHES exclut l'environnement.",
           "Depuis le questionnaire, X est la moyenne simple de trois sous-dimensions (redistribution, services publics contre impôts, régulation des marchés), les trois sous-échelles économiques du CHES, dont la moyenne reproduit son axe <code>lrecon</code> à <code>r = 0,96</code>. Y suit le même principe sur les sept sous-dimensions sociétales du CHES ; leur moyenne reproduit <code>galtan</code> à <code>r = 0,97</code>. Le protectionnisme est lu à part, jamais dans X : dans le CHES il va contre la gauche-droite économique (<code>r = −0,37</code>).",
           "Le thème Europe et monde ne touche à aucun des deux axes. Il donne trois lectures à part : l'intégration européenne, moyenne de trois groupes de questions (l'appartenance à l'Union, ses pouvoirs face aux gouvernements nationaux, ses politiques communes), sur l'échelle <code>eu_position</code> du CHES ; le rapport à la Russie ; l'autorité des instances internationales face à l'intérêt national. Seule la première est comparée aux partis. Le CHES note bien le rapport des partis à la Russie, mais en France chaque position n'y repose que sur deux ou trois experts, en Italie sur un seul au plus : trop peu pour servir de repère.",
+          "Le thème Écologie donne trois lectures à part. La première, la place donnée à l'environnement face à la croissance, est comparée aux partis sur la moyenne des échelles <code>environment</code> et <code>climate_change</code> du CHES, qui vont ensemble (<code>r = 0,86</code>) ; elle a deux groupes de questions, les politiques climatiques et la priorité à l'environnement. Les deux autres, la transition vers les renouvelables et la place du nucléaire, sont mesurées sans repère de parti : le nucléaire est lu à part parce qu'il divise la gauche comme la droite. C'est le thème que les deux axes prédisent le mieux (73 à 80 % des positions des partis) : il sert moins à situer par rapport aux partis qu'à distinguer les gens entre eux.",
           "Le thème Institutions donne deux lectures à part. La première, qui du peuple ou des élus doit décider, est comparée aux partis tels que les note l'enquête d'experts <em>POPPA</em> 2023 (<em>Populism and Political Parties Expert Survey</em>, données libres), sur son score de populisme, celui que ses auteurs valident par analyse factorielle à partir de cinq critères : place du peuple, rejet des élites, volonté générale, peuple indivisible, vision d'un combat entre bons et méchants (Andrej Zaslove, Maurits Meijers et Robert A. Huber, « <a href=\"https://doi.org/10.1177/13540688251361813\">The state of populism: Introducing the 2023 wave of the Populism and Political Parties Expert Survey</a> », <em>Party Politics</em>, 2025). C'est la lecture populiste, présentée comme telle, car opposer le peuple aux élites est une façon de lire le conflit politique parmi d'autres, pas une dimension neutre. Les deux axes n'en expliquent que 43 %. Le CHES a été essayé d'abord, mais son échelle <code>people_v_elite</code> oppose démocratie directe et représentative, pas le populisme : les partis suisses y sont en tête, le RN à peine au-dessus du milieu. La seconde, le poids donné à l'exécutif face au Parlement, suit déjà l'axe sociétal (<code>r = 0,75</code>) : elle est mesurée, pas comparée aux partis. L'indépendance de la justice et la décentralisation, que le CHES note aussi, n'ont pas de question éprouvée en français : les enquêtes demandent l'attachement à sa région, pas le partage des pouvoirs."
         ] },
         { id: "questions", title: "D'où viennent les questions", paras: [
@@ -393,8 +398,8 @@ export const LOCALES = {
         hammer: ["Faucille et marteau", "le communisme"], rose: ["Rose", "la social-démocratie"],
         lorraine: ["Croix de Lorraine", "le gaullisme"], cog: ["Roue dentée", "le syndicalisme"],
         dove: ["Colombe", "le pacifisme · à venir"], wheat: ["Épi de blé", "l'agrarisme · à venir"],
-        snail: ["Escargot", "la décroissance · thème Écologie"], turbine: ["Éolienne", "la transition énergétique · thème Écologie"],
-        atom: ["Atome", "le nucléaire civil · thème Écologie"], eustars: ["Cercle d'étoiles", "le fédéralisme européen"],
+        snail: ["Escargot", "la décroissance · à venir"], turbine: ["Éolienne", "la transition énergétique"],
+        atom: ["Atome", "le nucléaire civil"], eustars: ["Cercle d'étoiles", "le fédéralisme européen"],
         wall: ["Rempart", "la souveraineté nationale"], vote: ["Urne", "la démocratie directe"],
         megaphone: ["Mégaphone", "le populisme"], ermine: ["Hermine", "le régionalisme · à venir"]
       },
@@ -725,6 +730,17 @@ export const LOCALES = {
           + (n > 1 ? "ne sont" : "n'est") + " pas placé" + (n > 1 ? "s" : "") + " : c'est lui qui mesure "
           + "l'intégration européenne."
       },
+      ecology: {
+        allEstimated: "Aucun repère dans cette lecture : ceux de ce pays sont tous des estimations à la "
+          + "main, et il n'y a rien sur quoi estimer leur position sur l'environnement.",
+        dropped: n => n + " repère" + (n > 1 ? "s" : "") + " placé" + (n > 1 ? "s" : "") + " à la main n'"
+          + (n > 1 ? "ont" : "a") + " pas de position CHES sur l'environnement et n'" + (n > 1 ? "apparaissent" : "apparaît") + " pas.",
+        pending: n => n + " profil" + (n > 1 ? "s ont" : " a") + " commencé le thème Écologie sans avoir "
+          + "encore assez de réponses pour être placé" + (n > 1 ? "s" : "") + ".",
+        none: n => n + " profil" + (n > 1 ? "s" : "") + " sans réponse au thème Écologie "
+          + (n > 1 ? "ne sont" : "n'est") + " pas placé" + (n > 1 ? "s" : "") + " : c'est lui qui mesure "
+          + "la place donnée à l'environnement."
+      },
       populist: {
         allEstimated: "Aucun repère dans cette lecture : l'enquête POPPA ne note aucun des partis de ce pays.",
         dropped: n => n + " repère" + (n > 1 ? "s" : "") + " n'" + (n > 1 ? "ont" : "a") + " pas de note de populisme "
@@ -763,6 +779,13 @@ export const LOCALES = {
         colY: "Y Europe",
         titleY: "Positif = pour l'intégration européenne (haut) · négatif = souverainiste (bas)",
         tipSocial: "Europe", suffixAuthor: " europ.", suffixLibert: " souv." },
+      ecology: { name: "Économie × écologie",
+        axisTop: "L'environnement d'abord", axisBottom: "La croissance d'abord",
+        quadTopLeft: "Gauche écologiste", quadTopRight: "Droite écologiste",
+        quadBottomLeft: "Gauche productiviste", quadBottomRight: "Droite productiviste",
+        colY: "Y écologie",
+        titleY: "Positif = l'environnement d'abord (haut) · négatif = la croissance d'abord (bas)",
+        tipSocial: "Écologie", suffixAuthor: " env.", suffixLibert: " croiss." },
       populist: { name: "Lecture populiste : économie × peuple et élus",
         axisTop: "Le peuple décide", axisBottom: "Les élus décident",
         quadTopLeft: "Gauche populiste", quadTopRight: "Droite populiste",
@@ -821,7 +844,18 @@ export const LOCALES = {
         salienceAfter: "Maintenant que vous avez répondu : quelle place l'Europe et les relations "
           + "internationales tiennent-elles dans vos choix politiques ?" },
       ecology: { name: "Écologie",
-        desc: "Environnement et climat, lus à part de l'économie, comme le fait le CHES." },
+        desc: "Climat, environnement ou croissance, et l'électricité de demain : renouvelables, fossiles, "
+          + "nucléaire. Lus à part de l'économie, comme le fait le CHES.",
+        lead: "Ces questions mesurent trois choses à part : la place donnée à l'environnement face à la "
+          + "croissance, sur l'échelle qu'utilisent les experts du CHES pour les partis, la transition vers "
+          + "les renouvelables, et le nucléaire, qui divise la gauche comme la droite. Aucune ne déplace "
+          + "votre point sur la boussole principale.",
+        leadNative: "Ces questions mesurent trois choses à part : la place donnée à l'environnement face "
+          + "à la croissance, sur l'échelle qu'utilisent les experts du CHES pour les partis, la transition "
+          + "vers les renouvelables, et le nucléaire.",
+        salience: "Quelle place l'écologie tient-elle dans vos choix politiques ?",
+        salienceAfter: "Maintenant que vous avez répondu : quelle place l'écologie tient-elle dans vos "
+          + "choix politiques ?" },
       institutions: { name: "Institutions",
         desc: "Référendum, peuple et élus, Président et Parlement : la lecture populiste, présentée "
           + "comme telle, et le poids donné à l'exécutif.",
@@ -889,11 +923,13 @@ export const LOCALES = {
     resultLead: { x: "Vos réponses remplacent l'axe économique de PolitiScales, qui ne posait rien sur la redistribution. Votre point se déplace sur la boussole.",
                   y: "Vos réponses remplacent l'axe sociétal de PolitiScales, question par question tirées des enquêtes publiques. Votre point se déplace sur la boussole.",
                   europe: "Votre position sur l'intégration européenne, parmi les partis que le CHES place sur la même échelle. Elle se lit aussi sur la boussole, dans la lecture « Économie × Europe »." ,
-                  people: "Une lecture que la boussole n'a pas : qui, selon vous, doit décider, le peuple ou ceux qu'il élit, parmi les partis que les experts de l'enquête POPPA placent sur la même échelle. Elle se lit aussi sur la boussole, dans la lecture populiste." },
+                  people: "Une lecture que la boussole n'a pas : qui, selon vous, doit décider, le peuple ou ceux qu'il élit, parmi les partis que les experts de l'enquête POPPA placent sur la même échelle. Elle se lit aussi sur la boussole, dans la lecture populiste.",
+                  ecology: "Une lecture que la boussole n'a pas : la place que vous donnez à l'environnement face à la croissance, parmi les partis que le CHES place sur la même échelle. Elle se lit aussi sur la boussole, dans la lecture Économie × écologie." },
     resultLeadNative: "Vos réponses placent votre point sur cet axe de la boussole.",
     resultWasPs: v => "était " + v + " avec PolitiScales", resultNativeNote: "mesuré par le questionnaire",
     resultOwnNote: { europe: "positif = pour l'intégration, sur l'échelle eu_position du CHES",
-                     people: "positif = le peuple doit décider, sur l'échelle de populisme de l'enquête POPPA" },
+                     people: "positif = le peuple doit décider, sur l'échelle de populisme de l'enquête POPPA",
+                     ecology: "positif = l'environnement d'abord, sur les échelles environment et climate_change du CHES" },
     resultNoReading: theme => "Aucune réponse au thème " + theme + " pour l'instant.",
     resultPending: (n, axis, native) => "Encore " + n + " réponse" + (n > 1 ? "s" : "") + " au moins : "
       + "il en faut deux dans chaque groupe de questions pour que le résultat compte. "
@@ -939,6 +975,12 @@ export const LOCALES = {
         def: "Première étape officielle vers l'entrée dans l'UE. L'adhésion elle-même demande ensuite des années de négociations." },
       { term: "Sputnik et Russia Today", match: /Sputnik|Russia Today/,
         def: "Médias d'information financés par l'État russe, interdits de diffusion dans l'UE depuis 2022." },
+      { term: "Énergies fossiles", match: /énergies fossiles|charbon|gaz naturel/i,
+        def: "Le pétrole, le gaz et le charbon, formés sous terre en des millions d'années. Les brûler émet l'essentiel du gaz carbonique d'origine humaine." },
+      { term: "Énergies renouvelables", match: /énergies renouvelables|énergie solaire|énergie éolienne/i,
+        def: "Des sources qui se renouvellent à l'échelle humaine : soleil, vent, eau des rivières, biomasse. Le solaire et l'éolien produisent selon la météo." },
+      { term: "Nucléaire", match: /nucléaire/i,
+        def: "L'électricité produite par la fission de l'uranium dans des réacteurs. Elle émet très peu de gaz carbonique, et laisse des déchets radioactifs à stocker. Elle fournit environ les deux tiers de l'électricité française." },
       { term: "Retraites", match: /\bretraites?\b/i,
         def: "Les pensions versées à ceux qui ont cessé de travailler. En France, elles sont surtout payées par les cotisations de ceux qui travaillent aujourd'hui." },
       { term: "Allocations de chômage", match: /allocations de chômage/i,
@@ -986,8 +1028,9 @@ export const LOCALES = {
             laworder: "Libertés / ordre", women: "Droits des femmes", lgbt: "Droits LGBT",
             religion: "Religion et politique", nationalism: "Nationalisme",
             membership: "Appartenance à l'UE", powers: "Pouvoirs de l'UE", common: "Politiques communes",
-            direct: "Démocratie directe", sovereign: "Volonté du peuple" },
-    readingAxis: { x: "Économie (X)", y: "Société (Y)", europe: "Europe", people: "Peuple / élus" },
+            direct: "Démocratie directe", sovereign: "Volonté du peuple",
+            climate: "Politiques climatiques", priority: "Priorité à l'environnement" },
+    readingAxis: { x: "Économie (X)", y: "Société (Y)", europe: "Europe", people: "Peuple / élus", ecology: "Écologie" },
     readingProtectionism: "Protectionnisme",
     readingClass: "Classe (Wright)",
     readingConflict: "Conflit de classe perçu",

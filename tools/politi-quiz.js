@@ -49,6 +49,15 @@
      executive  a strong executive against parliament (CHES
                 `executive_power`), which in CHES already runs with galtan
                 (r = 0.75): measured, not compared
+   The Ecology theme feeds three readings, none a compass axis:
+     ecology     the environment against growth, on the scale of the mean of
+                 CHES `environment` and `climate_change` (r = 0.86 between
+                 them): two groups, climate policies and the priority given
+                 to the environment
+     transition  more solar and wind, less coal and gas, in France's
+                 electricity: not compared
+     nuclear     how much of it should be nuclear: not compared, and apart
+                 from ecology, since it splits the left
    Judicial independence and decentralisation, which CHES also rates, have
    no field-tested French question: the surveys ask about attachment to
    one's region, not about its powers.
@@ -292,6 +301,40 @@
     },
     forEb: { values: [1, -1], fr: ["Pour", "Contre"] },
 
+    /* ---- Ecology ---- */
+    /* ESS 8, D30-D32. */
+    forAgainstEss: {
+      values: [1, 0.5, 0, -0.5, -1],
+      fr: ["Tout à fait pour", "Plutôt pour", "Ni pour, ni contre", "Plutôt contre", "Tout à fait contre"]
+    },
+    /* ESS 8, D4-D10: "never heard of it" was the interviewer's, in brackets. */
+    amountEss: {
+      values: [1, 0.5, 0, -0.5, -1],
+      fr: ["Une très grande quantité", "Une grande quantité", "Une quantité moyenne", "Une faible quantité", "Rien du tout"]
+    },
+    /* ESS 8, D24. */
+    worryEss: {
+      values: [-1, -0.5, 0, 0.5, 1],
+      fr: ["Pas du tout préoccupé(e)", "Pas très préoccupé(e)", "Assez préoccupé(e)", "Très préoccupé(e)", "Extrêmement préoccupé(e)"]
+    },
+    /* ESS 8, D19. */
+    climateEss: {
+      values: [1, 1 / 3, -1 / 3, -1],
+      fr: ["Le climat est vraiment en train de changer", "Le climat est probablement en train de changer",
+           "Le climat n'est probablement pas en train de changer", "Le climat n'est pas du tout en train de changer"]
+    },
+    /* EVS 2017, Q56: its own card ("Pas du tout d'accord"). */
+    agreeEvsEnv: {
+      values: [1, 0.5, 0, -0.5, -1],
+      fr: ["Tout à fait d'accord", "Plutôt d'accord", "Ni d'accord, ni pas d'accord", "Plutôt pas d'accord", "Pas du tout d'accord"]
+    },
+    /* EVS 2017, Q57: two positions; "autre réponse" was spontaneous. */
+    growthEvs: {
+      values: [1, -1],
+      fr: ["On devrait donner la priorité à la protection de l'environnement, même si cela ralentit la croissance économique et si certains perdent leur emploi",
+           "On devrait donner la priorité à la croissance économique et à la création d'emplois, même si l'environnement en souffre d'une manière ou d'une autre"]
+    },
+
     /* ---- Institutions ---- */
     /* EVS 2017, Q43: four points; "NSP" was the interviewer's. */
     goodEvs: {
@@ -382,6 +425,10 @@
   const DEMOCRACY_STEM_2 = "Et toujours de façon générale et non par rapport à la France, diriez-vous qu'il est important pour la démocratie en général…";
   const OF32_STEM = "Dans quelle mesure êtes-vous d'accord ou pas d'accord avec les propositions suivantes ?";
   const SYSTEMS_STEM = "Je vais vous décrire différents types de systèmes politiques et vous demander ce que vous en pensez pour gouverner ce pays. Pour chacun, veuillez me dire si cette façon de gouverner le pays serait très bonne, assez bonne, assez mauvaise ou très mauvaise.";
+  const eco = (id, reading, dim, scale, pole, extra, src) =>
+    Object.assign({ id, theme: "ecology", reading, dim, scale, pole }, extra, { src });
+  const CLIMATE_STEM = "Dans quelle mesure êtes-vous pour ou contre la mise en œuvre en France des politiques suivantes afin d'atténuer le changement climatique ?";
+  const ENV_AGREE_STEM = "Je vais maintenant vous lire plusieurs affirmations au sujet de l'environnement. Pour chacune d'entre elles, pourriez-vous me dire dans quelle mesure vous êtes d'accord ou pas d'accord ?";
   const inst = (id, reading, dim, scale, pole, extra, src) =>
     Object.assign({ id, theme: "institutions", reading, dim, scale, pole }, extra, { src });
   const IMPORTANT = { left: "Pas du tout important pour la démocratie en général",
@@ -839,6 +886,65 @@
       fr: "Il serait préférable que chaque peuple ait son propre pays où il pourrait prendre ses propres décisions." },
       NI23("Q03")),
 
+    /* ===== Ecology =====
+       +1 means: for the environment (ecology), for renewables against
+       fossil fuels (transition), for nuclear power (nuclear). */
+
+    /* --- ecology · climate policies (ESS 8) --- */
+    eco("ess.inctxff", "ecology", "climate", "forAgainstEss", 1, { stem: CLIMATE_STEM,
+      fr: "Augmenter les taxes sur les énergies fossiles comme le pétrole, le gaz et le charbon." }, ESS8("D30 inctxff")),
+    eco("ess.sbsrnen", "ecology", "climate", "forAgainstEss", 1, { stem: CLIMATE_STEM,
+      fr: "Employer l'argent public pour subventionner les énergies renouvelables comme l'éolien et le solaire." },
+      ESS8("D31 sbsrnen")),
+    eco("ess.banhhap", "ecology", "climate", "forAgainstEss", 1, { stem: CLIMATE_STEM,
+      fr: "Interdire par la loi la vente des appareils électroménagers qui consomment le plus." }, ESS8("D32 banhhap")),
+
+    /* --- ecology · the priority given to the environment (EVS 2017, ESS 8) --- */
+    eco("evs.v204", "ecology", "priority", "growthEvs", 1, {
+      fr: "Voici deux affirmations qu'on entend parfois quand les gens discutent de l'environnement et de la croissance économique. Laquelle se rapproche le plus de votre point de vue ?" },
+      EVS("v204")),
+    eco("evs.v199", "ecology", "priority", "agreeEvsEnv", 1, { stem: ENV_AGREE_STEM,
+      fr: "Je donnerais une partie de mes revenus si j'étais sûr que l'argent soit utilisé pour éviter la pollution de l'environnement" },
+      EVS("v199")),
+    eco("evs.v201", "ecology", "priority", "agreeEvsEnv", -1, { stem: ENV_AGREE_STEM,
+      fr: "Il y a plus important à faire dans la vie que de protéger l'environnement" }, EVS("v201")),
+    eco("evs.v203", "ecology", "priority", "agreeEvsEnv", -1, { stem: ENV_AGREE_STEM,
+      fr: "Beaucoup des affirmations sur les menaces environnementales sont exagérées" }, EVS("v203")),
+    eco("ess.wrclmch", "ecology", "priority", "worryEss", 1, {
+      fr: "Dans quelle mesure êtes-vous préoccupé(e) par le changement climatique ?" }, ESS8("D24 wrclmch")),
+    eco("evs.v200", "ecology", "priority", "agreeEvsEnv", -1, { reserve: "one's own power to act, not a position",
+      stem: ENV_AGREE_STEM,
+      fr: "C'est juste trop difficile pour les gens comme moi de vraiment agir pour l'environnement" }, EVS("v200")),
+    eco("evs.v202", "ecology", "priority", "agreeEvsEnv", -1, { reserve: "whether acting alone is worth it, not a position",
+      stem: ENV_AGREE_STEM,
+      fr: "Ça ne sert à rien de faire ce que je peux pour l'environnement si les autres ne font pas la même chose" }, EVS("v202")),
+    eco("ess.clmchng", "ecology", "priority", "climateEss", 1, { reserve: "a belief about facts; its answers branch the survey's next questions",
+      fr: "Vous avez peut-être déjà entendu dire que le climat de la planète est en train de changer en raison d'une hausse des températures depuis une centaine d'années. Quelle est votre opinion sur ce sujet ? Pensez-vous que le climat de la planète est en train de changer ?" },
+      ESS8("D19 clmchng")),
+
+    /* --- transition and nuclear: France's electricity (ESS 8, D4-D10). The
+       survey asks them in a row, each after the one before ("Et à partir
+       du gaz naturel ?"), so they travel in the same blocks here. --- */
+    eco("ess.elgcoal", "transition", null, "amountEss", -1, {
+      fr: "Tout d'abord, quelle quantité de l'électricité utilisée en France devrait être produite à partir du charbon ?" },
+      ESS8("D4 elgcoal")),
+    eco("ess.elgngas", "transition", null, "amountEss", -1, { follows: "ess.elgcoal",
+      fr: "Et à partir du gaz naturel ?" }, ESS8("D5 elgngas")),
+    eco("ess.elgnuc", "nuclear", null, "amountEss", 1, {
+      fr: "Quelle quantité de l'électricité utilisée en France devrait être produite à partir du nucléaire ?" },
+      ESS8("D7 elgnuc")),
+    eco("ess.elgsun", "transition", null, "amountEss", 1, { follows: "ess.elgnuc",
+      fr: "Et à partir de l'énergie solaire ?" }, ESS8("D8 elgsun")),
+    eco("ess.elgwind", "transition", null, "amountEss", 1, { follows: "ess.elgsun",
+      fr: "Et à partir de l'énergie éolienne ?" }, ESS8("D9 elgwind")),
+    eco("ess.elghydr", "transition", null, "amountEss", 1, { reserve: "hydroelectricity: renewable, but no one's divide",
+      follows: "ess.elgngas",
+      fr: "Et à partir d'énergie hydroélectrique produite par l'exploitation des cours d'eau, les barrages et les marées ?" },
+      ESS8("D6 elghydr")),
+    eco("ess.elgbio", "transition", null, "amountEss", 1, { reserve: "biomass: counted as renewable, disputed as green",
+      follows: "ess.elgwind",
+      fr: "Et à partir de la biomasse, tels que le bois, les végétaux ou les excréments animaux ?" }, ESS8("D10 elgbio")),
+
     /* ===== Institutions =====
        +1 means: the people decide (people), a strong executive (executive).
        Every people item runs the same way, as the surveys asked them. */
@@ -944,6 +1050,9 @@
     [NI23_PROP_STEM, "Êtes-vous d'accord ou pas d'accord avec la proposition suivante ?"],
     [DEMOCRACY_STEM, "Dans quelle mesure pensez-vous qu'il est important pour la démocratie en général…"],
     [DEMOCRACY_STEM_2, "De façon générale et non par rapport à la France, diriez-vous qu'il est important pour la démocratie en général…"],
+    [CLIMATE_STEM, "Dans quelle mesure êtes-vous pour ou contre la mise en œuvre en France de la politique "
+      + "suivante afin d'atténuer le changement climatique ?"],
+    [ENV_AGREE_STEM, "Voici une affirmation au sujet de l'environnement. Dans quelle mesure êtes-vous d'accord ou pas d'accord ?"],
     [SYSTEMS_STEM, "Voici une façon de gouverner. Pour gouverner ce pays, serait-elle très bonne, assez bonne, assez mauvaise ou très mauvaise ?"],
     [EB_POLICY_STEM, "Quelle est votre opinion sur la proposition suivante ? Êtes-vous pour ou contre ?"],
     [EB_UKRAINE_STEM, "L'UE a pris une série de mesures en réponse à l'invasion de l'Ukraine par la "
@@ -968,7 +1077,8 @@
     /* no compass axis: `reading` is the one built from `dims` */
     { key: "europe", reading: "europe", readings: ["europe", "russia", "world"],
       dims: ["membership", "powers", "common"] },
-    { key: "ecology", planned: true },       /* environment, climate_change */
+    { key: "ecology", reading: "ecology", readings: ["ecology", "transition", "nuclear"],
+      dims: ["climate", "priority"] },
     { key: "institutions", reading: "people", readings: ["people", "executive"],
       dims: ["direct", "sovereign"] }
   ];

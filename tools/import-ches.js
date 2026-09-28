@@ -7,7 +7,8 @@
 
    Three public sources, downloaded each time, so that anyone can re-run it
    and get the same file:
-     - CHES 2024: positions (lrecon, galtan, protectionism, eu_position) and
+     - CHES 2024: positions (lrecon, galtan, protectionism, eu_position,
+       environment and climate_change) and
        each party's family
      - Party Facts: the party's full name, through its link to the CHES id
      - POPPA 2023 (CC0): populism, through the Party Facts id
@@ -116,6 +117,9 @@ const tidy = s => s.replace(/\s*—\s*/g, " / ");
         const p = { name: tidy(r.party), x: on10(num(r.lrecon)), y: on10(num(r.galtan)), src: "ches" };
         if (!protThin && num(r.protectionism) !== null) p.prot = on10(num(r.protectionism));
         if (num(r.eu_position) !== null) p.eu = on7(num(r.eu_position));
+        /* the environment against growth, turned so that +100 is the environment */
+        const envs = [num(r.environment), num(r.climate_change)].filter(v => v !== null);
+        if (envs.length) p.env = -on10(envs.reduce((a, b) => a + b, 0) / envs.length);
         const pop = pf ? popByPf.get(pf) : undefined;
         if (pop !== undefined) { p.pop = pop; withPop++; }
         p.note = (full ? full + " · " : "") + (FAMILY[r.family] || "famille non renseignée");

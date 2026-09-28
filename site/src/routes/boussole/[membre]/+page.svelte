@@ -95,7 +95,7 @@
 					<section class="card" aria-label={L.bands.title}>
 						<h2>{L.bands.title}</h2>
 						<p class="sub">{L.bands.lead}</p>
-						<ReadingBands {c} {q} soc={(c.base || c).soc} eu={(c.base || c).eu} inst={(c.base || c).inst} />
+						<ReadingBands {c} {q} soc={(c.base || c).soc} eu={(c.base || c).eu} inst={(c.base || c).inst} ecology={(c.base || c).ecology} />
 					</section>
 					<section class="card" aria-label={L.partiesTitle}>
 						<div class="head">

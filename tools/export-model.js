@@ -61,10 +61,10 @@ function fixture() {
       answers[i.id] = Q.SCALES[i.scale].dk && rnd() < 0.05 ? "dk" : Math.floor(rnd() * len);
     }
     const c = M.coords(ps), e = Q.score(answers, "economy"), s = Q.score(answers, "society"), u = Q.score(answers, "europe"),
-          i = Q.score(answers, "institutions");
+          i = Q.score(answers, "institutions"), g = Q.score(answers, "ecology");
     const has = Object.keys(ps).length > 0;
     profiles.push({ politiscales: has ? ps : null, answers,
-      expect: { ps_x: has ? c.x : null, ps_y: has ? c.y : null, x: e.x, y: s.y, europe: u.europe, people: i.people } });
+      expect: { ps_x: has ? c.x : null, ps_y: has ? c.y : null, x: e.x, y: s.y, europe: u.europe, people: i.people, ecology: g.ecology } });
   }
   return { model: model(), profiles };
 }

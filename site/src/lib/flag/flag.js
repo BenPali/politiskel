@@ -131,8 +131,10 @@ export function flagTraits(c, p) {
     { k: "feminism",    s: neg(d.women),                min: 60, colour: "purple", symbol: "venus" },
     /* LGBT rights are said by the rainbow bar alone: pink is socialism's, as in France */
     { k: "lgbt",        s: neg(d.lgbt),                 min: 60 },
-    { k: "ecology",     s: ps.eco,                      min: 60, colour: "green", symbol: "sprout" },
-    { k: "productivism", s: ps.prod,                    min: 60, colour: "steel", symbol: "factory" },
+    /* the questionnaire's ecology when answered, PolitiScales's otherwise */
+    { k: "ecology",     s: first(futureReading(c, "ecology"), ps.eco), min: 60, colour: "green", symbol: "sprout" },
+    { k: "productivism", s: has(futureReading(c, "ecology")) ? -futureReading(c, "ecology") : ps.prod,
+                             min: 60, colour: "steel", symbol: "factory" },
     { k: "revolution",  s: ps.rev,                      min: 65, symbol: "star" },
     { k: "reform",      s: ps.ref,                      min: 65, symbol: "handshake" },
     { k: "progress",    s: ps.prg,                      min: 70, symbol: "torch" },
@@ -157,6 +159,9 @@ export function flagTraits(c, p) {
     /* the authoritarian far right: nation, order and the refusal of equal rights,
        all very marked; brown, the colour history gave it */
     { k: "farright",    s: has(nat) && has(ord) && eq ? Math.min(nat, ord, -eq.mean) : null, min: 70, colour: "brown", bonus: 5 },
+    /* from the ecology theme */
+    { k: "transition",  s: futureReading(c, "transition"),      min: 60, colour: "green", symbol: "turbine" },
+    { k: "nuclear",     s: futureReading(c, "nuclear"),         min: 60, symbol: "atom" },
     /* Europe, either way; and from the institutions theme */
     { k: "federalism",  s: futureReading(c, "europe"),          min: 60, symbol: "eustars" },
     { k: "sovereignty", s: neg(futureReading(c, "europe")),     min: 60, symbol: "wall" },
@@ -166,8 +171,6 @@ export function flagTraits(c, p) {
     { k: "pacifism",    s: futureReading(c, "pacifism"),        min: 60, symbol: "dove" },
     { k: "rural",       s: futureReading(c, "rural"),           min: 60, symbol: "wheat" },
     { k: "degrowth",    s: futureReading(c, "degrowth"),        min: 60, colour: "green", symbol: "snail" },
-    { k: "transition",  s: futureReading(c, "transition"),      min: 60, colour: "green", symbol: "turbine" },
-    { k: "nuclear",     s: futureReading(c, "nuclear"),         min: 60, symbol: "atom" },
     { k: "regionalism", s: futureReading(c, "regionalism"),     min: 60, symbol: "ermine" },
     { k: "anarchy",     s: antistate,                   min: 80, symbol: "anarchy", bonus: 12 },
     /* no bonus: it takes a place at its own strength, never ahead of a

@@ -15,13 +15,14 @@ export const COUNTRIES = PolitiModel.COUNTRIES;
 
 /* Readings of the compass: the same profiles and parties, along other axes.
    A reading with no party counterpart does not belong here. */
-export const VIEWS = [{ key: 'politiskel' }, { key: 'politiscales' }, { key: 'protectionism' }, { key: 'europe' }, { key: 'populist' }];
+export const VIEWS = [{ key: 'politiskel' }, { key: 'politiscales' }, { key: 'protectionism' }, { key: 'europe' }, { key: 'ecology' }, { key: 'populist' }];
 
 /* The readings drawn as y against the economy, and where each is found:
    on the profile's score for a theme, and on each party. */
 const SIDE = {
 	protectionism: { of: (c) => c.quiz?.protectionism, ref: 'prot' },
 	europe: { of: (c) => c.eu?.europe, ref: 'eu', score: (c) => c.eu, theme: 'europe' },
+	ecology: { of: (c) => c.ecology?.ecology, ref: 'env', score: (c) => c.ecology, theme: 'ecology' },
 	populist: { of: (c) => c.inst?.people, ref: 'pop', score: (c) => c.inst, theme: 'institutions', ysrc: 'populisme : POPPA 2023' }
 };
 
@@ -34,7 +35,7 @@ export const viewAvailable = (viewKey, country) => {
 };
 
 /* A theme's own reading, as each party carries it (CHES for Europe, POPPA for populism) */
-export const THEME_REF = { europe: 'eu', institutions: 'pop' };
+export const THEME_REF = { europe: 'eu', ecology: 'env', institutions: 'pop' };
 
 /* Copy for a reading, falling back on the default wording. */
 export const copyOf = (viewKey) => Object.assign({}, L, L.views[viewKey] || {});
@@ -63,8 +64,12 @@ function withQuiz(p, c) {
 	c.soc = PolitiQuiz.score(answers, 'society');
 	c.eu = PolitiQuiz.score(answers, 'europe');
 	c.inst = PolitiQuiz.score(answers, 'institutions');
+	c.ecology = PolitiQuiz.score(answers, 'ecology');
 	/* readings by name, for the flag */
-	c.readings = { europe: c.eu.europe, populism: c.inst.people, directdemocracy: c.inst.dims.direct };
+	c.readings = { europe: c.eu.europe, populism: c.inst.people, directdemocracy: c.inst.dims.direct,
+		ecology: c.ecology.ecology, transition: c.ecology.transition, nuclear: c.ecology.nuclear };
+	/* the questionnaire's ecology replaces PolitiScales's in the readout, as an axis does */
+	if (c.ecology.ecology !== null) c.ecol = c.ecology.ecology;
 	const ps = { x: c.x, y: c.y };
 	if (c.quiz.x !== null) {
 		c.x = c.quiz.x;

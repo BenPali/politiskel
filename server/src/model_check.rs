@@ -312,6 +312,7 @@ mod tests {
             assert_eq!(model.reading(&p["answers"], "society"), e["y"].as_f64(), "profile {n}: y");
             assert_eq!(model.reading(&p["answers"], "europe"), e["europe"].as_f64(), "profile {n}: europe");
             assert_eq!(model.reading(&p["answers"], "institutions"), e["people"].as_f64(), "profile {n}: people");
+            assert_eq!(model.reading(&p["answers"], "ecology"), e["ecology"].as_f64(), "profile {n}: ecology");
             if e["x"].is_number() { placed += 1; }
         }
         assert!(placed > 10, "the fixture should place some profiles, not only test the null case");

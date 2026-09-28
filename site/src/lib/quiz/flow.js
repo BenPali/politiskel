@@ -21,7 +21,7 @@ export function screensFor(key) {
 
 export const screenKey = (sc) => (sc.kind === 'item' ? sc.item.id : 'salience.' + sc.theme + (sc.after ? '.after' : ''));
 
-export const scoreOf = (c, key) => ({ economy: c.quiz, society: c.soc, europe: c.eu, institutions: c.inst })[key] || null;
+export const scoreOf = (c, key) => ({ economy: c.quiz, society: c.soc, europe: c.eu, ecology: c.ecology, institutions: c.inst })[key] || null;
 
 /* How far a flow has got: every screen that asks something counts, the
    importance questions as much as the survey items — the reader answers
