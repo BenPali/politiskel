@@ -569,11 +569,11 @@
     soc("issp.never.french", "multiculturalism", "agreeIssp", 1, { stem: MINORITIES_STEM,
       fr: "Les personnes qui ne partagent pas les coutumes et les traditions françaises ne seront jamais des Français à part entière" },
       NI13("Q7a")),
-    soc("issp.minorities.help", "multiculturalism", "agreeIssp", -1, { reserve: "state support for customs, narrower than the integration question CHES asks",
+    soc("issp.minorities.help", "multiculturalism", "agreeIssp", -1, {
       stem: MINORITIES_STEM,
       fr: "Les minorités ethniques devraient bénéficier de l'aide du gouvernement pour préserver leurs coutumes et leurs traditions" },
       NI13("Q7b")),
-    soc("issp.same.rights", "multiculturalism", "agreeIssp", -1, { reserve: "closer to CHES ethnic_minorities, not one of the seven",
+    soc("issp.same.rights", "multiculturalism", "agreeIssp", -1, {
       stem: IMMIG_STEM_13,
       fr: "Les immigrés en situation régulière en France, mais qui ne sont pas français, devraient avoir les mêmes droits que les citoyens français" },
       NI13("Q9f")),
@@ -630,7 +630,8 @@
       fr: "Quand les emplois sont rares, un homme a plus droit à un travail qu'une femme" }, EVS("v81")),
     soc("evs.v154", "women", "bipolar10", -1, { stem: EVS_JUSTIF_STEM, fr: "L'avortement",
       left: "Jamais justifié", right: "Toujours justifié" }, EVS("v154")),
-    soc("issp.feminism", "women", "agreeFamFr", 1, { stem: FAM_FR_STEM,
+    soc("issp.feminism", "women", "agreeFamFr", 1, { reserve: "a judgement on a movement rather than on rights; and agreeing ran to TAN on four of the five women items",
+      stem: FAM_FR_STEM,
       fr: "Dans la société actuelle, le féminisme va trop loin",
       note: "Question ajoutée par l'équipe française de l'ISSP, non posée dans les autres pays." },
       FAM22("OF21c")),
@@ -695,7 +696,8 @@
       fr: "Je préfère être français(e) plutôt que citoyen(ne) d'un autre pays" }, NI23("Q02_A")),
     soc("issp.better.country", "nationalism", "agreeIssp", 1, { stem: NI_AGREE_STEM,
       fr: "D'une manière générale, la France est un pays meilleur que la plupart des autres" }, NI23("Q02_D")),
-    soc("issp.world.better", "nationalism", "agreeIssp", 1, { stem: NI_AGREE_STEM,
+    soc("issp.world.better", "nationalism", "agreeIssp", 1, { reserve: "repeats Q02_D, and agreeing ran to TAN on all but one nationalism item",
+      stem: NI_AGREE_STEM,
       fr: "Le monde serait meilleur si les gens des autres pays ressemblaient plus aux Français" }, NI23("Q02_C")),
     soc("issp.support.wrong", "nationalism", "agreeIssp", 1, { stem: NI_AGREE_STEM,
       fr: "Les gens devraient soutenir leur pays même lorsque ce pays se trompe" }, NI23("Q02_E")),
@@ -807,6 +809,12 @@
       fr: "Il serait préférable que chaque peuple ait son propre pays où il pourrait prendre ses propres décisions." },
       NI23("Q03"))
   ];
+
+  /* Agreeing is not neutral: many respondents lean towards "agree" whatever
+     is asked. The society items were chosen so that agreeing pulls towards
+     TAN as much as towards GAL, weighted by each item's share of y: 14 to 10
+     before, a pull of 9 points on y per unit of that tendency, 0.4 now. The
+     economy items were already balanced (2 to 3). */
 
   /* What a screen shows above its question. A survey's stem introduces a
      grid — "each of the following statements", "the things I am going to
@@ -958,7 +966,7 @@
   const RIGHTS = {
     lgbt: ["ess.freehms", "ess.hmsacld", "ess.hmsfmlsh", "evs.v153", "issp.two.women", "issp.trans"],
     women: ["issp.working.mother", "issp.breadwinner", "evs.v76", "evs.v81", "evs.v154"],
-    minorities: ["issp.immig.priority", "ess.rfgbfml", "issp.never.french"]
+    minorities: ["issp.immig.priority", "ess.rfgbfml", "issp.never.french", "issp.same.rights"]
   };
 
   function score(answers, themeKey) {
