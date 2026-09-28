@@ -4,7 +4,8 @@
 //! It serves the built site (site/build) and its API. The server stores what
 //! the site needs and nothing more: PolitiScales percentages already read in the
 //! browser (never the screenshot), and questionnaire answers. Scoring stays in
-//! the browser.
+//! the browser, except for the model check, which scores on the server so
+//! that the answers behind it never leave.
 //!
 //! Political opinions are special-category data under GDPR art. 9, which
 //! shapes the whole design: explicit consent at sign-up, pseudonymous
@@ -15,8 +16,9 @@
 //! `error`, `security` (the middleware on every response), `auth` (sign-up,
 //! sessions, passwords), `account` (one's profile, export, deletion),
 //! `groups`, `directory` (listed groups and requests to join), `logging`
-//! (a line per failed request, and /api/health), and `site`
-//! (the built site). `validate` checks every input.
+//! (a line per failed request, and /api/health), `model_check` (how the
+//! scoring behaves on the answers of those who agreed, in aggregates, for
+//! admins) and `site` (the built site). `validate` checks every input.
 
 pub mod validate;
 mod account;
@@ -25,6 +27,7 @@ mod auth;
 mod error;
 mod groups;
 mod logging;
+mod model_check;
 mod security;
 mod site;
 mod state;
@@ -45,7 +48,7 @@ use sqlx::SqlitePool;
 use crate::auth::{config, register, login, logout, change_password, end_other_sessions};
 use crate::security::{same_origin_writes, security_headers};
 use crate::site::site_page;
-use crate::account::{me, put_profile, export, delete_me, set_tour};
+use crate::account::{me, put_profile, export, delete_me, set_tour, set_model_check};
 use crate::directory::{directory, ask_to_join, withdraw_request, requests, accept_request, decline_request, set_listed};
 use crate::groups::{create_group, invite_preview, join_group, leave_group, new_invite, remove_member, hand_over_group, delete_group, group_profiles};
 
@@ -65,6 +68,8 @@ pub fn app(state: AppState) -> Router {
         .route("/api/me/profile", put(put_profile))
         .route("/api/me/export", get(export))
         .route("/api/me/tour", post(set_tour))
+        .route("/api/me/model-check", post(set_model_check))
+        .route("/api/admin/model-check", get(crate::model_check::report))
         .route("/api/me/password", post(change_password))
         .route("/api/me/sessions/others", axum::routing::delete(end_other_sessions))
         .route("/api/groups", post(create_group))

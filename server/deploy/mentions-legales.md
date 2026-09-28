@@ -19,7 +19,8 @@ Le site enregistre, pour chaque compte :
 - la **date** à laquelle vous avez donné votre consentement ;
 - les **groupes** que vous avez rejoints ;
 - vos **pourcentages PolitiScales**, déjà lus dans votre navigateur ; la capture d'écran, elle, n'est jamais envoyée ;
-- vos **réponses au questionnaire**.
+- vos **réponses au questionnaire** ;
+- si vous l'acceptez, la **date** à laquelle vous avez accepté le contrôle du modèle.
 
 Aucune adresse e-mail n'est demandée. Aucun traceur, aucune mesure d'audience,
 aucun service tiers. Le seul cookie est celui de la session, nécessaire pour
@@ -32,6 +33,14 @@ de l'article 9 du RGPD. Elles ne sont enregistrées qu'avec votre
 **consentement explicite**, donné à la création du compte (article 9, 2, a),
 et seulement pour vous montrer, à vous et aux membres de vos groupes, vos
 positions et celles des autres.
+
+Si vous cochez « Contrôle du modèle » dans votre compte (un second
+consentement, distinct du premier), vos réponses servent aussi à vérifier que
+le questionnaire mesure ce qu'il doit mesurer. Ce calcul se fait sur le
+serveur ; il n'en sort que des chiffres d'ensemble, rien en dessous de 30
+profils, aucune réponse ni aucun nom, et seuls les administrateurs du site
+les voient. Vous pouvez retirer ce consentement à tout moment depuis la même
+page : vos réponses cessent aussitôt d'y compter.
 
 ## Qui les voit
 

@@ -23,11 +23,13 @@ pub(crate) async fn profile_of(state: &AppState, user: i64) -> ApiResult<Value> 
 
 pub(crate) async fn me(State(state): State<AppState>, jar: CookieJar) -> ApiResult<Json<Value>> {
     let (id, name) = current_user(&state, &jar).await?;
-    let (tour_seen,): (bool,) = sqlx::query_as("SELECT tour_seen FROM users WHERE id = ?")
+    let (tour_seen, model_check): (bool, bool) = sqlx::query_as("SELECT tour_seen, model_check FROM users WHERE id = ?")
         .bind(id).fetch_one(&state.db).await?;
     Ok(Json(json!({
         "username": name,
         "tour_seen": tour_seen,
+        "model_check": model_check,
+        "admin": state.is_admin(&name),
         "groups": groups_of(&state, id).await?,
         "profile": profile_of(&state, id).await?,
     })))
@@ -42,6 +44,20 @@ pub(crate) async fn set_tour(State(state): State<AppState>, jar: CookieJar, Json
 {
     let (id, _) = current_user(&state, &jar).await?;
     sqlx::query("UPDATE users SET tour_seen = ? WHERE id = ?").bind(body.seen).bind(id).execute(&state.db).await?;
+    Ok(StatusCode::NO_CONTENT)
+}
+
+#[derive(Deserialize)]
+pub(crate) struct ModelCheck { on: bool }
+
+/// Whether one's answers may count in the model check: a consent of its own,
+/// given and withdrawn here, dated when given.
+pub(crate) async fn set_model_check(State(state): State<AppState>, jar: CookieJar, Json(body): Json<ModelCheck>)
+    -> ApiResult<StatusCode>
+{
+    let (id, _) = current_user(&state, &jar).await?;
+    sqlx::query("UPDATE users SET model_check = ?, model_check_at = ? WHERE id = ?")
+        .bind(body.on).bind(body.on.then(now)).bind(id).execute(&state.db).await?;
     Ok(StatusCode::NO_CONTENT)
 }
 
@@ -91,12 +107,13 @@ pub(crate) async fn put_profile(State(state): State<AppState>, jar: CookieJar, J
 /// Everything the server holds about the signed-in account (art. 15 and 20).
 pub(crate) async fn export(State(state): State<AppState>, jar: CookieJar) -> ApiResult<Json<Value>> {
     let (id, name) = current_user(&state, &jar).await?;
-    let (consent_at, created_at): (i64, i64) =
-        sqlx::query_as("SELECT consent_at, created_at FROM users WHERE id = ?")
+    let (consent_at, created_at, model_check_at): (i64, i64, Option<i64>) =
+        sqlx::query_as("SELECT consent_at, created_at, model_check_at FROM users WHERE id = ?")
             .bind(id).fetch_one(&state.db).await?;
     Ok(Json(json!({
         "format": "politiskel-account", "version": 1,
         "username": name, "created_at": created_at, "consent_at": consent_at,
+        "model_check_consent_at": model_check_at,
         "groups": groups_of(&state, id).await?,
         "profile": profile_of(&state, id).await?,
     })))

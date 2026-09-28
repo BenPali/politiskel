@@ -31,6 +31,8 @@ pub struct AppState {
     /// the proxy does not pass the Host header through (nginx by default).
     pub origin: Option<String>,
     pub signup: Signup,
+    /// The accounts that may read the model check, by username key.
+    pub(crate) admins: Vec<String>,
     pub(crate) failures: Arc<Mutex<HashMap<String, (u32, i64)>>>,
     pub(crate) signups: Arc<Mutex<HashMap<String, (u32, i64)>>>,
 }
@@ -38,7 +40,18 @@ pub struct AppState {
 impl AppState {
     pub fn new(db: SqlitePool, site_dir: std::path::PathBuf, secure_cookies: bool) -> Self {
         Self { db, site_dir, secure_cookies, trust_proxy: false, origin: None,
-               signup: Signup::Open, failures: Arc::default(), signups: Arc::default() }
+               signup: Signup::Open, admins: Vec::new(), failures: Arc::default(), signups: Arc::default() }
+    }
+
+    /// Usernames, as typed: compared the way sign-in compares them.
+    pub fn with_admins<S: AsRef<str>>(mut self, names: &[S]) -> Self {
+        self.admins = names.iter().map(|n| n.as_ref().trim()).filter(|n| !n.is_empty())
+            .map(crate::validate::username_key).collect();
+        self
+    }
+
+    pub(crate) fn is_admin(&self, username: &str) -> bool {
+        self.admins.contains(&crate::validate::username_key(username))
     }
 
     pub fn with_signup(mut self, signup: Signup) -> Self {

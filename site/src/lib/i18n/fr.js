@@ -353,7 +353,8 @@ export const LOCALES = {
           "Deux axes ne voient ni le populisme (le peuple contre les élites) ni l'intégration européenne, dont les deux axes n'expliquent pas même la moitié dans le CHES. L'Europe a désormais son thème et sa lecture ; le populisme attend le thème Institutions. Le drapeau, enfin, est une illustration : il suit les conventions des drapeaux politiques, et sa légende dit ce que chaque élément représente."
         ] },
         { id: "donnees", title: "Vos données", paras: [
-          "Vos réponses sont des opinions politiques, donc des données sensibles au sens de l'article 9 du RGPD. Elles ne sont enregistrées qu'avec votre consentement explicite, sur ce serveur seulement, et ne sont montrées qu'aux membres des groupes que vous avez rejoints. Les captures PolitiScales ne quittent jamais votre navigateur. Aucun traceur, aucun e-mail. Vous pouvez tout exporter ou tout effacer depuis votre compte."
+          "Vos réponses sont des opinions politiques, donc des données sensibles au sens de l'article 9 du RGPD. Elles ne sont enregistrées qu'avec votre consentement explicite, sur ce serveur seulement, et ne sont montrées qu'aux membres des groupes que vous avez rejoints. Les captures PolitiScales ne quittent jamais votre navigateur. Aucun traceur, aucun e-mail. Vous pouvez tout exporter ou tout effacer depuis votre compte.",
+          "Un second consentement, distinct et facultatif, se donne dans votre compte : le contrôle du modèle. Vos réponses servent alors aussi à vérifier que les questions mesurent ce qu'elles doivent mesurer. Le calcul se fait sur le serveur, il n'en sort que des chiffres d'ensemble (rien en dessous de 30 profils, aucune réponse, aucun nom), et seuls les administrateurs du site les voient. Il se retire à tout moment."
         ] }
       ],
       limitsCaption: "Seuils de proximité par pays, en points sur l'échelle −100 … +100",
@@ -547,6 +548,52 @@ export const LOCALES = {
     inviteWarn: "En rejoignant ce groupe, vos réponses et vos pourcentages PolitiScales seront "
       + "visibles de ses membres. Vous pourrez le quitter à tout moment.",
     alreadyMember: g => "Vous êtes déjà membre de « " + g + " ».",
+    modelCheck: {
+      title: "Contrôle du modèle",
+      lead: "Politiskel peut vérifier, sur les réponses de ceux qui l'acceptent, que ses questions "
+        + "mesurent ce qu'elles doivent mesurer : qu'aucune ne tire à contre-sens, que le "
+        + "questionnaire ne décale pas tout le monde du même côté. Le calcul se fait sur ce serveur. "
+        + "Seuls des chiffres d'ensemble en sortent, jamais une réponse, un profil ou un nom, et rien "
+        + "du tout en dessous de 30 profils. Seuls les administrateurs du site les voient.",
+      consent: "J'accepte que mes réponses comptent dans ces calculs. Je peux retirer mon accord à "
+        + "tout moment : elles cessent aussitôt d'y compter.",
+      on: "Vos réponses comptent désormais dans le contrôle du modèle.",
+      off: "Vos réponses ne comptent plus dans le contrôle du modèle.",
+      adminLink: "Voir le contrôle du modèle (administrateurs) →"
+    },
+    adminCheck: {
+      title: "Contrôle du modèle",
+      lead: "Chiffres d'ensemble, calculés sur ce serveur à partir des profils qui l'ont accepté. "
+        + "Aucune réponse ni aucun profil ne quitte le serveur. Un chiffre qui reposerait sur moins "
+        + "de profils que le seuil indiqué n'est pas affiché.",
+      counts: (c, p) => c + " profil" + (c > 1 ? "s ont" : " a") + " accepté, dont " + p + " avec des réponses.",
+      notReady: (p, min) => "Les résultats s'affichent à partir de " + min + " profils avec des réponses ; "
+        + "il y en a " + p + ".",
+      axis: { x: "Économie (X)", y: "Société (Y)" },
+      shiftTitle: "De PolitiScales au questionnaire",
+      shiftLead: "Pour les profils qui ont les deux : de combien le questionnaire déplace le profil. "
+        + "Une pente proche de 1 et un décalage médian proche de 0 disent que les deux mesures "
+        + "s'accordent. Si une tranche bouge nettement plus que les autres, et toujours dans le même "
+        + "sens, des questions consensuelles tirent ce côté.",
+      shiftNone: n => "Pas assez de profils avec PolitiScales et cet axe complet (" + n + ").",
+      rows: { profiles: "Profils", mean: "Décalage moyen", median: "Décalage médian", median_abs: "Écart médian",
+              p90_abs: "Un profil sur 10 au-delà de", slope: "Pente", r: "Corrélation" },
+      bands: { neg: "Gauche / ouverture (< −30)", mid: "Centre", pos: "Droite / tradition (> +30)" },
+      bandCol: "Tranche PolitiScales", bandShift: "Décalage médian",
+      itemsTitle: "Chaque question contre le reste de son axe",
+      itemsLead: "Une corrélation faible ou négative signale une question qui ne mesure pas la même "
+        + "chose que les autres, ou qui tire à contre-sens. La moyenne, de −100 à +100, dit si elle "
+        + "penche d'un côté pour tout le monde.",
+      itemCols: { item: "Question", dim: "Sous-dimension", profiles: "Profils", mean: "Moyenne", r: "Corrélation" },
+      dimsTitle: "Chaque sous-dimension contre les autres",
+      agreeTitle: "Tendance à répondre « d'accord »",
+      agreeLead: "La moyenne des réponses aux questions d'accord ou pas d'accord, avant orientation : "
+        + "+100, tout à fait d'accord avec tout. Si elle va avec un décalage sur un axe, "
+        + "l'équilibre des formulations de cet axe est à revoir.",
+      agreeRows: { profiles: "Profils", mean: "Moyenne", median: "Médiane", sd: "Écart-type",
+                   r_shift_x: "Corrélation avec le décalage sur X", r_shift_y: "Corrélation avec le décalage sur Y" },
+      none: "–"
+    },
     myProfile: "Mon profil", myData: "Mes données", deleteTitle: "Supprimer mon compte",
     savedPolitiscales: "Pourcentages PolitiScales enregistrés.",
     username: "Pseudonyme", password: "Mot de passe", passwordNew: "Mot de passe (10 caractères ou plus)",
@@ -611,6 +658,8 @@ export const LOCALES = {
     saved: "Enregistré.", addTitleServer: "Mon résultat PolitiScales",
     apiErrors: {
       default: "Le serveur n'a pas pu traiter la demande.",
+      not_admin: "Cette page est réservée aux administrateurs du site.",
+      no_model: "Le serveur ne trouve pas model.json dans le site construit : relancez la construction du site.",
       cross_origin: "Le serveur a refusé une demande qui ne venait pas de son propre site.",
       network: "Pas de connexion au serveur : ce qui n'a pas pu partir sera renvoyé.",
       flag_too_large: "Le drapeau de la capture est trop lourd pour être enregistré.",

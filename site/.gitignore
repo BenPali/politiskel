@@ -21,3 +21,6 @@ Thumbs.db
 # Vite
 vite.config.js.timestamp-*
 vite.config.ts.timestamp-*
+
+# Generated from tools/politi-quiz.js by tools/export-model.js, at each build
+/static/model.json

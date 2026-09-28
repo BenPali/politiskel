@@ -11,6 +11,8 @@
 //!                                   needed when the proxy rewrites Host
 //!   POLITISKEL_SIGNUP=invite        accounts only from an invitation link
 //!                                   (default: open to anyone)
+//!   POLITISKEL_ADMINS=a,b           the usernames that may read the model
+//!                                   check (aggregates only)
 //!
 //! Two maintenance commands, run beside the service on the same database:
 //!   politiskel-server reset-password <username>
@@ -75,7 +77,8 @@ async fn main() {
     eprintln!("politiskel-server listening on http://{addr}  (database {db_path})");
     let origin = std::env::var("POLITISKEL_ORIGIN").ok().filter(|v| !v.is_empty());
     let state = AppState::new(db, site_dir, !insecure).trusting_proxy(trust_proxy).with_origin(origin)
-        .with_signup(signup);
+        .with_signup(signup)
+        .with_admins(&env("POLITISKEL_ADMINS", "").split(',').collect::<Vec<_>>());
     if signup == Signup::Invite {
         eprintln!("sign-up: by invitation only");
     }

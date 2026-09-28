@@ -64,6 +64,17 @@
 		board.loaded = false;
 		return null;
 	}
+	/* a consent of its own: the box shows what the server holds, and goes back if the call fails */
+	async function setModelCheck(e) {
+		const on = e.currentTarget.checked;
+		const r = await api('POST', '/api/me/model-check', { on });
+		if (!r.ok) {
+			e.currentTarget.checked = !on;
+			return toast(apiError(r), { kind: 'error' });
+		}
+		session.me.model_check = on;
+		toast(on ? L.modelCheck.on : L.modelCheck.off);
+	}
 	async function endOthers() {
 		const r = await api('DELETE', '/api/me/sessions/others');
 		r.ok ? toast(L.signedOutOthers) : toast(apiError(r), { kind: 'error' });
@@ -175,6 +186,13 @@
 				</section>
 
 				<section class="card">
+					<h2>{L.modelCheck.title}</h2>
+					<p class="note">{L.modelCheck.lead}</p>
+					<label class="consent"><input type="checkbox" checked={session.me.model_check} onchange={setModelCheck} /><span>{L.modelCheck.consent}</span></label>
+					{#if session.me.admin}<p class="note admin"><a href="/admin/modele">{L.modelCheck.adminLink}</a></p>{/if}
+				</section>
+
+				<section class="card">
 					<h2>{L.passwordTitle}</h2>
 					<form onsubmit={changePassword}>
 						<label>{L.passwordCurrent}<input type="password" autocomplete="current-password" required bind:value={current} /></label>
@@ -218,6 +236,7 @@
 	.card + .card { margin-top: 0; }
 	h2 { font-family: var(--font-sans); font-size: 18px; font-weight: 650; margin: 0 0 10px; }
 	.note { margin: 0 0 14px; font-size: 14.5px; color: var(--text-2); }
+	.note.admin { margin: 14px 0 0; }
 	dl { display: grid; grid-template-columns: max-content 1fr; gap: 10px 20px; margin: 0 0 18px; font-size: 15px; }
 	dt { color: var(--text-2); }
 	dd { margin: 0; display: flex; align-items: center; gap: 10px; font-variant-numeric: tabular-nums; }

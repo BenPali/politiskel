@@ -102,6 +102,16 @@ five accounts an hour.
 Group owners can issue a new invitation link from the groups page; the old
 one stops working at once. That is the answer to a link that went too far.
 
+### The model check
+
+`POLITISKEL_ADMINS=name1,name2` names the accounts that may open
+`/admin/modele`: how the questionnaire behaves on the answers of the members
+who ticked "Contrôle du modèle" on their account page. The server computes
+it itself, from the `model.json` the site build writes, and returns
+aggregates only: nothing under 30 consenting profiles, no figure on fewer
+than 10, no answer, no name. Without the variable, nobody can open it.
+Members who have not ticked the box never count, whatever the setting.
+
 ## 5. Backups
 
 ```

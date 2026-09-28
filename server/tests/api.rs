@@ -663,3 +663,49 @@ async fn health_answers_while_the_database_does() {
     let body = res.into_body().collect().await.unwrap().to_bytes();
     assert_eq!(serde_json::from_slice::<Value>(&body).unwrap(), json!({ "ok": true }));
 }
+
+#[tokio::test]
+async fn the_model_check_is_for_admins_and_only_counts_consenting_members() {
+    let db = SqlitePoolOptions::new().max_connections(1).connect("sqlite::memory:").await.unwrap();
+    sqlx::query("PRAGMA foreign_keys = ON").execute(&db).await.unwrap();
+    migrate(&db).await.unwrap();
+    // the model the site was built with, as the build writes it
+    let fixture: Value = serde_json::from_str(include_str!("fixtures/scoring.json")).unwrap();
+    let site = test_site();
+    std::fs::write(site.join("model.json"), fixture["model"].to_string()).unwrap();
+    let app = app(AppState::new(db, site, true).with_admins(&["Admin"]));
+
+    let mut admin = Client::new(&app);
+    admin.register("admin").await;                       // matched however it is typed
+    let mut member = Client::new(&app);
+    member.register("Zoé").await;
+
+    // off unless given, and said so
+    let (_, me) = member.call("GET", "/api/me", None).await;
+    assert_eq!((me["model_check"].as_bool(), me["admin"].as_bool()), (Some(false), Some(false)));
+    assert_eq!(admin.call("GET", "/api/me", None).await.1["admin"], json!(true));
+
+    // a member is refused; so is anyone signed out
+    assert_eq!(member.call("GET", "/api/admin/model-check", None).await.0, StatusCode::FORBIDDEN);
+    assert_eq!(Client::new(&app).call("GET", "/api/admin/model-check", None).await.0, StatusCode::UNAUTHORIZED);
+
+    // answers without consent do not count
+    let answers = fixture["profiles"][3]["answers"].clone();
+    member.call("PUT", "/api/me/profile", Some(json!({ "answers": answers }))).await;
+    let (s, r) = admin.call("GET", "/api/admin/model-check", None).await;
+    assert_eq!((s, r["consenting"].as_u64(), r["ready"].as_bool()), (StatusCode::OK, Some(0), Some(false)));
+
+    // with it, they do; below the minimum, only the count comes back
+    assert_eq!(member.call("POST", "/api/me/model-check", Some(json!({ "on": true }))).await.0, StatusCode::NO_CONTENT);
+    let (_, r) = admin.call("GET", "/api/admin/model-check", None).await;
+    assert_eq!((r["consenting"].as_u64(), r["ready"].as_bool()), (Some(1), Some(false)));
+    assert!(r.get("axes").is_none());
+    let (_, ex) = member.call("GET", "/api/me/export", None).await;
+    assert!(ex["model_check_consent_at"].is_number());
+
+    // withdrawn, it stops counting at once
+    member.call("POST", "/api/me/model-check", Some(json!({ "on": false }))).await;
+    assert_eq!(admin.call("GET", "/api/admin/model-check", None).await.1["consenting"], json!(0));
+    let (_, ex) = member.call("GET", "/api/me/export", None).await;
+    assert!(ex["model_check_consent_at"].is_null());
+}
