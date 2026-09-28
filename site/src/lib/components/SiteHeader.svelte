@@ -174,8 +174,12 @@
 	@keyframes pop { from { opacity: 0; transform: translateY(-4px); } to { opacity: 1; transform: none; } }
 	.pop .eyebrow { margin: 0 0 var(--sp-2); }
 	.swatches { display: grid; grid-template-columns: minmax(0, 1fr) minmax(0, 1fr); gap: 6px; margin-bottom: var(--sp-4); }
-	.swatch-btn { justify-content: flex-start; min-height: 40px; padding: 0 10px; font-size: var(--fs-sm);
+	/* a palette's name may take two lines: "Contraste élevé" is wider than half the panel */
+	.swatch-btn { justify-content: flex-start; min-height: 40px; padding: 4px 10px; font-size: var(--fs-sm);
+		white-space: normal; text-align: left; line-height: 1.2; min-width: 0; overflow-wrap: anywhere;
 		background: var(--surface); color: var(--text); border: 1px solid var(--border); }
+	/* the last palette, alone on its row, takes the whole row */
+	.swatch-btn:last-child:nth-child(odd) { grid-column: 1 / -1; }
 	.swatch-btn[aria-pressed='true'] { border-color: var(--accent-strong); box-shadow: inset 0 0 0 1px var(--accent-strong); }
 	/* each chip shows its own palette: data-theme on the button scopes the tokens */
 	.chip { width: 18px; height: 18px; border-radius: 50%; flex: none;
