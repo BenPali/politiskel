@@ -11,7 +11,10 @@ pub struct ApiError(pub(crate) StatusCode, pub(crate) &'static str);
 
 impl IntoResponse for ApiError {
     fn into_response(self) -> Response {
-        (self.0, Json(json!({ "error": self.1 }))).into_response()
+        let mut res = (self.0, Json(json!({ "error": self.1 }))).into_response();
+        // the code, for the log line (logging.rs)
+        res.extensions_mut().insert(crate::logging::ErrorCode(self.1));
+        res
     }
 }
 

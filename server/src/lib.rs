@@ -14,7 +14,8 @@
 //! The crate is split by concern: `state` (configuration and shared state),
 //! `error`, `security` (the middleware on every response), `auth` (sign-up,
 //! sessions, passwords), `account` (one's profile, export, deletion),
-//! `groups`, `directory` (listed groups and requests to join), and `site`
+//! `groups`, `directory` (listed groups and requests to join), `logging`
+//! (a line per failed request, and /api/health), and `site`
 //! (the built site). `validate` checks every input.
 
 pub mod validate;
@@ -23,6 +24,7 @@ mod directory;
 mod auth;
 mod error;
 mod groups;
+mod logging;
 mod security;
 mod site;
 mod state;
@@ -55,6 +57,7 @@ pub fn app(state: AppState) -> Router {
     Router::new()
         .route("/", get(site_page))
         .route("/api/config", get(config))
+        .route("/api/health", get(crate::logging::health))
         .route("/api/register", post(register))
         .route("/api/login", post(login))
         .route("/api/logout", post(logout))
@@ -85,6 +88,8 @@ pub fn app(state: AppState) -> Router {
         .layer(DefaultBodyLimit::max(64 * 1024))
         .layer(middleware::from_fn_with_state(state.clone(), same_origin_writes))
         .layer(middleware::from_fn(security_headers))
+        // outermost: it sees every answer, the refusals of the layers above included
+        .layer(middleware::from_fn(crate::logging::log_errors))
         .with_state(state)
 }
 

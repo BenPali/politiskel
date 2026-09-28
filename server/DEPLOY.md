@@ -168,7 +168,23 @@ request, so replacing them alone needs no restart; the binary does. New
 database migrations run on their own. Packing on a Mac, `tar --no-xattrs`
 keeps macOS's metadata out of the archive.
 
-## 8. The legal side
+## 8. Logs and monitoring
+
+The server writes a line for every request that failed or took more than a
+second, with the route's shape and the error's code — `http 403 POST
+/api/groups/{id}/remove 4ms not_owner` — and nothing personal: numbers and
+invitation codes are replaced, and no address, name or body is written. The
+401 of a signed-out visit and robots probing for missing files are left out.
+
+```
+journalctl --user -u politiskel --since today --no-pager      # the user service
+journalctl -u politiskel --since today --no-pager             # the system one
+```
+
+`GET /api/health` answers `{"ok":true}` while the database does, 503
+otherwise: point an uptime monitor at `https://your.host/api/health`.
+
+## 9. The legal side
 
 Whoever runs an instance is the data controller: the answers are political
 opinions (GDPR art. 9), stored on explicit consent given at sign-up. Fill in

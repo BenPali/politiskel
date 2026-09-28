@@ -654,3 +654,12 @@ async fn the_tour_is_seen_once_per_account() {
     again.call("POST", "/api/login", Some(json!({ "username": "Ana", "password": "correct horse battery" }))).await;
     assert_eq!(again.call("GET", "/api/me", None).await.1["tour_seen"], json!(true));
 }
+
+#[tokio::test]
+async fn health_answers_while_the_database_does() {
+    let app = server().await;
+    let res = app.oneshot(Request::get("/api/health").body(Body::empty()).unwrap()).await.unwrap();
+    assert_eq!(res.status(), StatusCode::OK);
+    let body = res.into_body().collect().await.unwrap().to_bytes();
+    assert_eq!(serde_json::from_slice::<Value>(&body).unwrap(), json!({ "ok": true }));
+}
