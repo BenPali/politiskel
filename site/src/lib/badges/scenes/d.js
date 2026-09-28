@@ -392,7 +392,7 @@ import { star, person, cloud, blade, turbine, sky, starfield, tower } from '../d
   ART.fortress = {
     rim: "#6a5a48", ink: "#2e2418",
     art: (id, t = 2) => {
-      if (t === 1) return sky(id, ["#bcd7ec", "#f3ead8"]) + `
+      if (t === 2) return sky(id, ["#bcd7ec", "#f3ead8"]) + `
         <path d="M0 134 H200 V200 H0 Z" fill="#9fbf7a"/>
         <rect x="20" y="92" width="160" height="46" fill="#bdb3a2"/>
         ${Array.from({length: 4}, (_, r) => Array.from({length: 9}, (_, i) => `<rect x="${20 + i * 18 + (r % 2 ? 9 : 0) - 9}" y="${92 + r * 11.5}" width="18" height="11.5" fill="none" stroke="#8f8574" stroke-width=".8"/>`).join("")).join("")}
@@ -400,7 +400,7 @@ import { star, person, cloud, blade, turbine, sky, starfield, tower } from '../d
         ${[80, 90, 100, 110, 120].map(x => `<path d="M${x} ${138} V${100 - Math.max(0, 8 - Math.abs(x - 100) * 0.4)}" stroke="#5a3b1c" stroke-width="1"/>`).join("")}
         <path d="M70 110 H130 M70 128 H130" stroke="#3a3a3a" stroke-width="2.2"/>
         <g transform="translate(100 120)"><path d="M-4 -3 V-7 a4 4 0 0 1 8 0 V-3" stroke="#888" stroke-width="1.8" fill="none"/><rect x="-6" y="-3" width="12" height="10" rx="1.5" fill="#e3b33a" stroke="#8a620c" stroke-width=".8"/><circle cx="0" cy="1.5" r="1.3" fill="#5a3b1c"/></g>`;
-      if (t === 2) return sky(id, ["#dfe6ec", "#f6f2ea"]) + `
+      if (t === 1) return sky(id, ["#dfe6ec", "#f6f2ea"]) + `
         <rect x="0" y="138" width="200" height="62" fill="#c9c1b0"/>${Array.from({length: 8}, (_, i) => `<path d="M${i * 28} 138 L${i * 28 - 20} 200" stroke="#b3aa96" stroke-width="1"/>`).join("")}
         <rect x="120" y="60" width="44" height="18" rx="3" fill="#222a30" stroke="#555" stroke-width="1"/>
         ${[0,1,2,3,4,5].map(i => `<circle cx="${126 + i * 6.4}" cy="69" r="2.4" fill="${i < 4 ? '#3fd28e' : '#4a2a2a'}"/>`).join("")}<rect x="124" y="73.5" width="36" height="1.6" fill="#3fd28e" opacity=".5"/>
@@ -453,19 +453,37 @@ import { star, person, cloud, blade, turbine, sky, starfield, tower } from '../d
           <path d="M-38 -1 V14 M38 -1 V14" stroke="#4a3420" stroke-width="3"/><circle cx="26" cy="-10" r="3" fill="#222" stroke="#666" stroke-width=".6"/>
           <path d="M-20 -12 l20 -2" stroke="#e3b33a" stroke-width="2.2" stroke-linecap="round"/><rect x="-10" y="-13" width="16" height="10" fill="#fbf7ee" stroke="#b7ab90" stroke-width=".6" transform="rotate(-4)"/></g>`;
       if (t === 2) return sky(id, ["#2e3a5a", "#6a5a7a"]) + `
-        <defs><radialGradient id="${id}fire" cx=".5" cy=".8"><stop offset="0" stop-color="#fff2a0"/><stop offset=".6" stop-color="#ff9a2a"/><stop offset="1" stop-color="#e0401e"/></radialGradient></defs>
+        <defs><radialGradient id="${id}fire" cx=".5" cy=".8"><stop offset="0" stop-color="#fff2a0"/><stop offset=".6" stop-color="#ff9a2a"/><stop offset="1" stop-color="#e0401e"/></radialGradient>
+        <radialGradient id="${id}glow"><stop offset="0" stop-color="#ffb35a" stop-opacity=".55"/><stop offset="1" stop-color="#ffb35a" stop-opacity="0"/></radialGradient></defs>
+        <path d="M0 152 H200" stroke="#2a2430" stroke-width="26"/>
+        <g transform="translate(0 9)">
         ${Array.from({length: 14}, (_, i) => { const r = seeded(i + 3); const x = 50 + r() * 70, y = 34 + r() * 26; return `<circle cx="${x.toFixed(1)}" cy="${y.toFixed(1)}" r="${(2 + r() * 2.4).toFixed(1)}" fill="${["#e0457a", "#f2c230", "#3fb07a", "#5b8fd6", "#e8742a", "#9a5ad6", "#c9803a"][i % 7]}"/>`; }).join("")}
         <path d="M60 64 Q62 104 86 110 H110 Q134 104 136 64 Z" fill="#3a3a44" stroke="#1f1f26" stroke-width="1.5"/>
         <ellipse cx="98" cy="64" rx="38" ry="7" fill="#50505c" stroke="#1f1f26" stroke-width="1.5"/>
         <ellipse cx="98" cy="65" rx="33" ry="5" fill="url(#${id}fire)" opacity=".9"/>
         <path d="M66 66 Q64 50 70 44 M130 66 Q132 50 126 44" stroke="#1f1f26" stroke-width="2" fill="none"/>
-        <path d="M78 116 C74 104 88 102 86 92 C96 100 94 106 98 110 C100 100 106 98 106 90 C116 102 118 112 112 118 Z" fill="url(#${id}fire)"/>
+        <ellipse cx="98" cy="106" rx="30" ry="9" fill="#ff9a3a" opacity=".35"/>
+        <path d="M66 96 Q98 116 130 96" stroke="#ffb35a" stroke-width="4" fill="none" opacity=".45"/>
+        <circle cx="97" cy="118" r="32" fill="url(#${id}glow)"/>
+        <g transform="translate(97 128) scale(.9)">
+          <rect x="-26" y="-4" width="52" height="8" rx="4" fill="#6b3f1f" stroke="#3a220f" stroke-width="1" transform="rotate(12)"/>
+          <rect x="-26" y="-4" width="52" height="8" rx="4" fill="#7a4a26" stroke="#3a220f" stroke-width="1" transform="rotate(-12)"/>
+          <circle cx="${-25 * Math.cos(12 * Math.PI / 180)}" cy="${-25 * Math.sin(12 * Math.PI / 180)}" r="3.6" fill="#c98a54" stroke="#3a220f" stroke-width=".8"/>
+          <circle cx="${25 * Math.cos(12 * Math.PI / 180)}" cy="${-25 * Math.sin(12 * Math.PI / 180)}" r="3.6" fill="#c98a54" stroke="#3a220f" stroke-width=".8"/>
+          ${[[-14,3],[-6,5],[4,4],[12,6],[-2,1],[9,1]].map(([x,y]) => `<circle cx="${x}" cy="${y}" r="1.8" fill="#ff7a2a"/>`).join("")}
+          <path d="M-24 -2 C-28 -14 -18 -18 -20 -30 C-12 -24 -10 -16 -8 -12 C-8 -24 -2 -30 -4 -42 C6 -32 8 -22 6 -14 C10 -22 16 -24 16 -34 C26 -22 28 -10 22 -2 Z" fill="#b8321a"/>
+          <path d="M-18 -2 C-22 -12 -14 -15 -15 -24 C-9 -19 -8 -13 -6 -10 C-6 -20 -1 -24 -2 -34 C6 -26 7 -18 5 -12 C8 -18 13 -20 13 -27 C20 -18 21 -9 17 -2 Z" fill="#ff7a1e"/>
+          <path d="M-12 -2 C-14 -9 -9 -11 -10 -17 C-5 -13 -4 -9 -3 -7 C-3 -14 0 -18 0 -25 C5 -19 6 -13 4 -8 C7 -12 10 -13 10 -18 C14 -12 14 -6 11 -2 Z" fill="#ffc83a"/>
+          <path d="M-6 -2 C-7 -7 -3 -8 -3 -12 C0 -9 1 -7 1 -5 C2 -9 4 -10 4 -14 C7 -9 7 -5 5 -2 Z" fill="#fff6d8"/>
+          ${[[-16,-40,1.4],[12,-46,1.2],[2,-54,1]].map(([x,y,r]) => `<circle cx="${x}" cy="${y}" r="${r}" fill="#ffd35a"/><circle cx="${x}" cy="${y}" r="${r * 2.6}" fill="#ffd35a" opacity=".25"/>`).join("")}
+        </g>
         <path d="M132 82 Q150 84 152 108" stroke="#d9d0e8" stroke-width="5" fill="none" opacity=".9" stroke-linecap="round"/>
         <path d="M132 82 Q150 84 152 108" stroke="#fff" stroke-width="1.6" fill="none" opacity=".7"/>
         <g transform="translate(152 128)"><path d="M-22 -16 H22 L18 16 H-18 Z" fill="#8a8f96" stroke="#4a4f56" stroke-width="1"/>
           <rect x="-16" y="-12" width="10.6" height="24" fill="#2d5ab0"/><rect x="-5.4" y="-12" width="10.8" height="24" fill="#fff"/><rect x="5.4" y="-12" width="10.6" height="24" fill="#c0392b"/>
           <path d="M-16 -12 H16" stroke="#d9d0e8" stroke-width="3" opacity=".8"/></g>
-        <path d="M40 150 H200" stroke="#2a2430" stroke-width="30"/>`;
+        </g>
+`;
       return sky(id, ["#f2a35a", "#ffd88a", "#fff1c8"]) + `
         <defs><radialGradient id="${id}fire" cx=".5" cy=".8"><stop offset="0" stop-color="#fff2a0"/><stop offset=".6" stop-color="#ff9a2a"/><stop offset="1" stop-color="#e0401e"/></radialGradient></defs>
         <circle cx="46" cy="64" r="16" fill="#fff0b0" opacity=".85"/>

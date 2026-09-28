@@ -1123,7 +1123,7 @@ export const LOCALES = {
         cocarde: { label: "Nation", names: ["Patriote tranquille", "Cocardier", "Chauvin de compétition"] },
         oldfrance: { label: "Droite des valeurs", names: ["Conservateur tranquille", "Droite des valeurs", "Vieille France"] },
         chrisdem: { label: "Démocratie chrétienne", names: ["Humaniste chrétien", "Démocrate-chrétien", "Enfant de chœur"] },
-        fortress: { label: "Immigration", names: ["Partisan de la fermeté", "Partisan des quotas", "Forteresse assiégée"] },
+        fortress: { label: "Immigration", names: ["Partisan des quotas", "Partisan de la fermeté", "Forteresse assiégée"] },
         gauls: { label: "Assimilation", names: ["Modèle républicain", "Assimilationniste", "Nos ancêtres les Gaulois"] },
         globe: { label: "Cosmopolitisme", names: ["Voyageur curieux", "Citoyen du monde", "Apatride heureux"] },
         mosaic: { label: "Multiculturalisme", names: ["Curieux des cultures", "Mosaïque vivante", "Babel assumée"] },
