@@ -176,7 +176,9 @@ pub(crate) fn aggregate(model: &Model, profiles: &[(Value, Value)]) -> Value {
     let rows: Vec<Row> = profiles.iter().map(|(ps, a)| row(model, ps, a)).collect();
     let answering = rows.iter().filter(|r| r.items.iter().any(|v| !v.is_empty()) || r.agree.is_some()).count();
     if answering < MIN_PROFILES {
-        return json!({ "ready": false, "profiles": answering, "min_profiles": MIN_PROFILES });
+        /* not even the count, under MIN_CELL */
+        return json!({ "ready": false, "profiles": (answering >= MIN_CELL).then_some(answering),
+                       "min_profiles": MIN_PROFILES });
     }
     let mut axes = serde_json::Map::new();
     for (a, (axis, theme)) in AXES.iter().enumerate() {
@@ -283,7 +285,7 @@ pub(crate) async fn report(State(state): State<AppState>, jar: CookieJar) -> Api
         .map(|(ps, a)| (crate::parse_json(ps), crate::parse_json(Some(a)))).collect();
     let consenting = profiles.len();
     let mut out = aggregate(&model, &profiles);
-    out["consenting"] = json!(consenting);
+    out["consenting"] = json!((consenting >= MIN_CELL).then_some(consenting));
     Ok(Json(out))
 }
 

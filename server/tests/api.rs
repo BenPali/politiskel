@@ -696,19 +696,20 @@ async fn the_model_check_is_for_admins_and_only_counts_consenting_members() {
     let answers = fixture["profiles"][3]["answers"].clone();
     member.call("PUT", "/api/me/profile", Some(json!({ "answers": answers }))).await;
     let (s, r) = admin.call("GET", "/api/admin/model-check", None).await;
-    assert_eq!((s, r["consenting"].as_u64(), r["ready"].as_bool()), (StatusCode::OK, Some(0), Some(false)));
+    // under 10, not even the count
+    assert_eq!((s, r["consenting"].is_null(), r["ready"].as_bool()), (StatusCode::OK, true, Some(false)));
 
     // with it, they do; below the minimum, only the count comes back
     assert_eq!(member.call("POST", "/api/me/model-check", Some(json!({ "on": true }))).await.0, StatusCode::NO_CONTENT);
     let (_, r) = admin.call("GET", "/api/admin/model-check", None).await;
-    assert_eq!((r["consenting"].as_u64(), r["ready"].as_bool()), (Some(1), Some(false)));
+    assert_eq!((r["consenting"].is_null(), r["profiles"].is_null(), r["ready"].as_bool()), (true, true, Some(false)));
     assert!(r.get("axes").is_none());
     let (_, ex) = member.call("GET", "/api/me/export", None).await;
     assert!(ex["model_check_consent_at"].is_number());
 
     // withdrawn, it stops counting at once
     member.call("POST", "/api/me/model-check", Some(json!({ "on": false }))).await;
-    assert_eq!(admin.call("GET", "/api/admin/model-check", None).await.1["consenting"], json!(0));
+    assert!(admin.call("GET", "/api/admin/model-check", None).await.1["consenting"].is_null());
     let (_, ex) = member.call("GET", "/api/me/export", None).await;
     assert!(ex["model_check_consent_at"].is_null());
 
@@ -728,6 +729,11 @@ async fn groups_go_by_a_uuid_and_their_owner_can_rename_them() {
     assert_eq!(gid.len(), 36);
     assert_eq!(&gid[14..15], "4");
     assert_eq!(ben.call("GET", "/api/groups/1/profiles", None).await.0, StatusCode::NOT_FOUND);
+    // signed out, a real group and a made-up one answer alike
+    let mut out = Client::new(&app);
+    assert_eq!(out.call("GET", &format!("/api/groups/{gid}/profiles"), None).await.0, StatusCode::UNAUTHORIZED);
+    assert_eq!(out.call("GET", "/api/groups/00000000-0000-4000-8000-000000000000/profiles", None).await.0,
+               StatusCode::UNAUTHORIZED);
     assert_eq!(ben.call("GET", "/api/groups/00000000-0000-4000-8000-000000000000/profiles", None).await.0,
                StatusCode::NOT_FOUND);
     assert_eq!(ben.call("GET", &format!("/api/groups/{gid}/profiles"), None).await.0, StatusCode::OK);

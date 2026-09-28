@@ -104,6 +104,7 @@ function persist() {
 
 /* The page is being closed: what waits goes in one last request, which the
    browser finishes even once the page is gone. */
+export const saving = () => !!(pending || inflight);
 export function flushOnExit() {
 	if (!pending || !session.me || session.me.username !== pendingFor) return;
 	try {
@@ -130,9 +131,7 @@ export async function flush() {
 	}
 	pending = null;
 	inflight = (async () => {
-		/* keepalive: a page left mid-save (a reload onto a new version,
-		   a link) does not cancel it */
-		const r = await api('PUT', '/api/me/profile', { answers }, { keepalive: true });
+		const r = await api('PUT', '/api/me/profile', { answers });
 		/* a network failure retries on its own; any other refusal is said */
 		if (!r.ok && r.status !== 0) toast(apiError(r), { kind: 'error' });
 		if (r.status === 0 && !retrying) toast(L.saveRetrying, { kind: 'error', ms: 6000 });

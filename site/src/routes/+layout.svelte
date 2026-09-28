@@ -8,6 +8,7 @@
 	import { onMount } from 'svelte';
 	import { beforeNavigate } from '$app/navigation';
 	import { updated } from '$app/state';
+	import { saving, flush } from '$lib/quiz/answers.svelte.js';
 	import { refresh } from '$lib/session.svelte.js';
 	import SiteHeader from '$lib/components/SiteHeader.svelte';
 	import SiteFooter from '$lib/components/SiteFooter.svelte';
@@ -20,14 +21,17 @@
 
 	/* A new version is out: the next page is loaded afresh rather than drawn
 	   by the old code. A member who kept a tab open saw a page without a
-	   button the site had since gained. A save under way survives the reload:
-	   answers are sent with keepalive (answers.svelte.js). */
-	beforeNavigate(({ willUnload, to }) => {
+	   button the site had since gained. Answers still being saved are saved
+	   first: a reload would cancel the request. */
+	beforeNavigate(({ willUnload, to, cancel }) => {
 		if (!updated.current || willUnload || !to?.url) return;
 		/* moving between the screens of one page (the questionnaire's ?q=)
 		   is not a new page: it waits for the next one */
 		if (to.url.pathname === location.pathname) return;
-		location.href = to.url.href;
+		const href = to.url.href;
+		if (!saving()) return void (location.href = href);
+		cancel();
+		flush().finally(() => (location.href = href));
 	});
 
 	/* the session, then what waits for this owner; and again every minute */

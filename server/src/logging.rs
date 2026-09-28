@@ -29,7 +29,7 @@ pub(crate) fn route_of(path: &str) -> String {
     let parts: Vec<String> = path.split('/').map(|seg| {
         if !seg.is_empty() && seg.bytes().all(|b| b.is_ascii_digit()) {
             "{id}".to_string()
-        } else if crate::groups::is_public_id(seg) {
+        } else if crate::groups::is_public_id(&seg.to_ascii_lowercase()) {
             "{id}".to_string()
         } else if seg.len() >= 16 && seg.bytes().all(|b| b.is_ascii_hexdigit()) {
             "{code}".to_string()
@@ -84,6 +84,7 @@ mod tests {
     fn a_route_keeps_nothing_that_identifies() {
         assert_eq!(route_of("/api/groups/42/remove"), "/api/groups/{id}/remove");
         assert_eq!(route_of("/api/groups/1b4e28ba-2fa1-41d2-883f-0016d3cca427/remove"), "/api/groups/{id}/remove");
+        assert_eq!(route_of("/api/groups/1B4E28BA-2FA1-41D2-883F-0016D3CCA427/remove"), "/api/groups/{id}/remove");
         assert_eq!(route_of("/api/invites/0123456789abcdef0123456789abcdef"), "/api/invites/{code}");
         assert_eq!(route_of("/boussole/jean.dupont"), "/boussole/…");
         assert_eq!(route_of("/rejoindre/0123456789abcdef0123456789abcdef"), "/rejoindre/…");

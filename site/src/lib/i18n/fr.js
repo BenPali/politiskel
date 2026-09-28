@@ -561,9 +561,10 @@ export const LOCALES = {
       lead: "Chiffres d'ensemble, calculés sur ce serveur à partir des profils qui l'ont accepté. "
         + "Aucune réponse ni aucun profil ne quitte le serveur. Un chiffre qui reposerait sur moins "
         + "de profils que le seuil indiqué n'est pas affiché.",
-      counts: (c, p) => c + " profil" + (c > 1 ? "s ont" : " a") + " accepté, dont " + p + " avec des réponses.",
+      counts: (c, p) => c === null ? "Moins de 10 profils ont accepté pour l'instant."
+        : c + " profil" + (c > 1 ? "s ont" : " a") + " accepté, dont " + (p ?? "moins de 10") + " avec des réponses.",
       notReady: (p, min) => "Les résultats s'affichent à partir de " + min + " profils avec des réponses ; "
-        + "il y en a " + p + ".",
+        + "il y en a " + (p ?? "moins de 10") + ".",
       axis: { x: "Économie (X)", y: "Société (Y)" },
       shiftTitle: "De PolitiScales au questionnaire",
       shiftLead: "Pour les profils qui ont les deux : de combien le questionnaire déplace le profil. "

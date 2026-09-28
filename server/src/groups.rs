@@ -14,14 +14,18 @@ use crate::auth::{random_hex, current_user};
 use crate::{now, parse_json, validate};
 
 /// A group named in the address by its public id (a UUID), as its row id.
-/// An id that names no group is the 404 of a group that does not exist, the
-/// same answer as for a group one is not in.
+/// Signed-out, it is the 401 of every group route, before any lookup, so no
+/// answer tells whether a group exists. An id that names no group is the 404
+/// of a group that does not exist, the same answer as for one one is not in.
 pub(crate) struct Gid(pub(crate) i64);
 
 impl FromRequestParts<AppState> for Gid {
     type Rejection = ApiError;
     async fn from_request_parts(parts: &mut Parts, state: &AppState) -> Result<Self, Self::Rejection> {
         let missing = || ApiError(StatusCode::NOT_FOUND, "no_such_group");
+        let jar = CookieJar::from_request_parts(parts, state).await
+            .map_err(|_| ApiError(StatusCode::UNAUTHORIZED, "not_signed_in"))?;
+        current_user(state, &jar).await?;
         let Path(public): Path<String> = Path::from_request_parts(parts, state).await.map_err(|_| missing())?;
         if !is_public_id(&public) { return Err(missing()); }
         let row: Option<(i64,)> = sqlx::query_as("SELECT id FROM groups WHERE public_id = ?")

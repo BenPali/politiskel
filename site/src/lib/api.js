@@ -4,13 +4,11 @@
 
 import { L } from '$lib/i18n/fr.js';
 
-/** keepalive: the request goes on even if the page is left meanwhile */
-export async function api(method, path, body, { keepalive = false } = {}) {
+export async function api(method, path, body) {
 	let res;
 	try {
 		res = await fetch(path, {
 			method,
-			keepalive,
 			credentials: 'same-origin',
 			headers: body ? { 'Content-Type': 'application/json' } : {},
 			body: body ? JSON.stringify(body) : undefined
