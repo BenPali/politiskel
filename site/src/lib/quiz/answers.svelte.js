@@ -130,7 +130,9 @@ export async function flush() {
 	}
 	pending = null;
 	inflight = (async () => {
-		const r = await api('PUT', '/api/me/profile', { answers });
+		/* keepalive: a page left mid-save (a reload onto a new version,
+		   a link) does not cancel it */
+		const r = await api('PUT', '/api/me/profile', { answers }, { keepalive: true });
 		/* a network failure retries on its own; any other refusal is said */
 		if (!r.ok && r.status !== 0) toast(apiError(r), { kind: 'error' });
 		if (r.status === 0 && !retrying) toast(L.saveRetrying, { kind: 'error', ms: 6000 });

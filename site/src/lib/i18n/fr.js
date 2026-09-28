@@ -570,7 +570,8 @@ export const LOCALES = {
         + "Une pente proche de 1 et un décalage médian proche de 0 disent que les deux mesures "
         + "s'accordent. Si une tranche bouge nettement plus que les autres, et toujours dans le même "
         + "sens, des questions consensuelles tirent ce côté.",
-      shiftNone: n => "Pas assez de profils avec PolitiScales et cet axe complet (" + n + ").",
+      shiftNone: n => "Pas assez de profils avec PolitiScales et cet axe complet ("
+        + (n === null ? "moins de 10" : n) + ").",
       rows: { profiles: "Profils", mean: "Décalage moyen", median: "Décalage médian", median_abs: "Écart médian",
               p90_abs: "Un profil sur 10 au-delà de", slope: "Pente", r: "Corrélation" },
       bands: { neg: "Gauche / ouverture (< −30)", mid: "Centre", pos: "Droite / tradition (> +30)" },
@@ -702,6 +703,8 @@ export const LOCALES = {
     viewNoteDroppedEu: n => n + " repère" + (n > 1 ? "s" : "") + " placé" + (n > 1 ? "s" : "")
       + " à la main n'" + (n > 1 ? "ont" : "a") + " pas de position CHES sur l'Europe "
       + "et n'" + (n > 1 ? "apparaissent" : "apparaît") + " pas.",
+    viewNoteEuropePending: n => n + " profil" + (n > 1 ? "s ont" : " a") + " commencé le thème "
+      + "Europe et monde sans avoir encore assez de réponses pour être placé" + (n > 1 ? "s" : "") + ".",
     viewNoteNoEurope: n => n + " profil" + (n > 1 ? "s" : "") + " sans réponse au thème "
       + "Europe et monde " + (n > 1 ? "ne sont" : "n'est") + " pas placé" + (n > 1 ? "s" : "")
       + " : c'est lui qui mesure l'intégration européenne.",

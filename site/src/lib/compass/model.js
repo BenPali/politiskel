@@ -161,9 +161,13 @@ export function viewNotes(viewKey, country, refs, computed) {
 		if (!refs.length) parts.push(L.viewNoteAllEstimatedEu);
 		else if (dropped) parts.push(L.viewNoteDroppedEu(dropped));
 		const offs = computed.map((r) => r.c).filter((c) => c.off);
-		const none = offs.filter((c) => c.y === null).length;
+		/* begun but under the two-per-group threshold is not "no answer" */
+		const begun = (c) => (c.base || c).eu?.provisional != null;
+		const none = offs.filter((c) => c.y === null && !begun(c)).length;
+		const pending = offs.filter((c) => c.y === null && begun(c)).length;
 		const noX = offs.filter((c) => c.y !== null && c.x === null).length;
 		if (none) parts.push(L.viewNoteNoEurope(none));
+		if (pending) parts.push(L.viewNoteEuropePending(pending));
 		if (noX) parts.push(L.viewNoteNoX(noX));
 	}
 	return parts;

@@ -20,10 +20,14 @@
 
 	/* A new version is out: the next page is loaded afresh rather than drawn
 	   by the old code. A member who kept a tab open saw a page without a
-	   button the site had since gained. What waits to be saved goes with the
-	   page (flushOnExit, on pagehide). */
+	   button the site had since gained. A save under way survives the reload:
+	   answers are sent with keepalive (answers.svelte.js). */
 	beforeNavigate(({ willUnload, to }) => {
-		if (updated.current && !willUnload && to?.url) location.href = to.url.href;
+		if (!updated.current || willUnload || !to?.url) return;
+		/* moving between the screens of one page (the questionnaire's ?q=)
+		   is not a new page: it waits for the next one */
+		if (to.url.pathname === location.pathname) return;
+		location.href = to.url.href;
 	});
 
 	/* the session, then what waits for this owner; and again every minute */

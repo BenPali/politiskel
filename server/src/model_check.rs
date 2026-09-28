@@ -229,6 +229,8 @@ pub(crate) fn aggregate(model: &Model, profiles: &[(Value, Value)]) -> Value {
             }).collect();
             (pairs.len() >= MIN_PROFILES).then(|| json!({ "dim": d, "profiles": pairs.len(), "r_rest": fit(&pairs).map(|f| r2(f.0)) }))
         }).collect();
+        /* a count is a figure too: under MIN_CELL it is not given */
+        let placed = (placed >= MIN_CELL).then_some(placed);
         axes.insert(axis.to_string(), json!({ "placed": placed, "shift": shift, "items": items, "dims": dims }));
     }
     /* a tendency to agree, and whether it goes with a move on either axis */
@@ -243,7 +245,7 @@ pub(crate) fn aggregate(model: &Model, profiles: &[(Value, Value)]) -> Value {
         };
         json!({ "profiles": agree.len(), "mean": r0(m), "median": median(&mut vs).map(r0), "sd": r0(sd),
                 "r_shift_x": with(0), "r_shift_y": with(1) })
-    } else { json!({ "profiles": agree.len() }) };
+    } else { json!({ "profiles": null }) };
     json!({ "ready": true, "profiles": answering, "min_profiles": MIN_PROFILES, "min_cell": MIN_CELL,
             "axes": axes, "agree": tendency })
 }

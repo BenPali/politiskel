@@ -67,10 +67,12 @@
 	}
 	/* a consent of its own: the box shows what the server holds, and goes back if the call fails */
 	async function setModelCheck(e) {
-		const on = e.currentTarget.checked;
+		/* held now: once the handler has awaited, the event no longer has it */
+		const box = e.currentTarget;
+		const on = box.checked;
 		const r = await api('POST', '/api/me/model-check', { on });
 		if (!r.ok) {
-			e.currentTarget.checked = !on;
+			box.checked = !on;
 			return toast(apiError(r), { kind: 'error' });
 		}
 		session.me.model_check = on;
