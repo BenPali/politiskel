@@ -22,9 +22,14 @@
 	const clamp = (v) => Math.max(50, Math.min(550, v));
 	const X = (v) => clamp(300 + v * S);
 	const Y = (v) => clamp(300 - v * S);
-	/* text sizes in units, for the design's pixel sizes at the chart's usual width */
-	const K = 600 / 548;
-	const F = { cap: 12 * K, quad: 12.5 * K, tick: 11.5 * K, member: 14 * K, ref: 12 * K };
+	/* text sizes in units, for the design's pixel sizes at the width the chart
+	   is drawn at: on a phone the square shrinks, the text should not — a
+	   little smaller there, to leave room for the marks */
+	let width = $state(548);
+	const K = $derived(600 / Math.max(260, Math.min(width, 548)));
+	const small = $derived(width < 420);
+	const F = $derived({ cap: (small ? 10.5 : 12) * K, quad: (small ? 10.5 : 12.5) * K, tick: (small ? 10 : 11.5) * K,
+		member: (small ? 12.5 : 14) * K, ref: (small ? 10.5 : 12) * K });
 	const grid = [-75, -50, -25, 25, 50, 75];
 
 	/* The design's placement: eight spots around a mark, the first free one
@@ -182,7 +187,7 @@
 
 <svelte:window onkeydown={escape} />
 
-<div class="plot">
+<div class="plot" bind:clientWidth={width}>
 	<!-- a click on nothing — the plane, a caption — lets go of the selection -->
 	<!-- svelte-ignore a11y_click_events_have_key_events, a11y_no_noninteractive_element_interactions -->
 	<svg id="compass" class:appeared viewBox="0 0 600 600" role="img" aria-label={L.compassAria}
@@ -236,7 +241,7 @@
 					<title>{m.title}</title>
 					<path d="M-8,0 H8 M0,-8 V8" />
 					<circle r="11" />
-					<text x="14" y="-12" font-size="13">{L.optMean}</text>
+					<text x="14" y="-12" font-size={F.ref}>{L.optMean}</text>
 				</g>
 			</g>
 		{/if}
@@ -262,8 +267,8 @@
 						<g class="rings" class:on={pt.isSel}>
 							<circle class="ring far" r={limits.far * S} />
 							<circle class="ring near" r={limits.near * S} />
-							<text class="ring-cap" y={-limits.near * S - 5} text-anchor="middle">{L.fit.near}</text>
-							<text class="ring-cap" y={-limits.far * S - 5} text-anchor="middle">{L.fit.moderate}</text>
+							<text class="ring-cap" y={-limits.near * S - 5} text-anchor="middle" font-size={F.ref}>{L.fit.near}</text>
+							<text class="ring-cap" y={-limits.far * S - 5} text-anchor="middle" font-size={F.ref}>{L.fit.moderate}</text>
 						</g>
 						<circle class="hit" r="16" tabindex="0" role="button" aria-label={pt.aria} aria-pressed={pt.isSel}
 							onkeydown={key(() => onpick('profile', pt.i))} />
@@ -280,8 +285,8 @@
 					<g class="rings on">
 						<circle class="ring far" r={limits.far * S} />
 						<circle class="ring near" r={limits.near * S} />
-						<text class="ring-cap" y={-limits.near * S - 5} text-anchor="middle">{L.fit.near}</text>
-						<text class="ring-cap" y={-limits.far * S - 5} text-anchor="middle">{L.fit.moderate}</text>
+						<text class="ring-cap" y={-limits.near * S - 5} text-anchor="middle" font-size={F.ref}>{L.fit.near}</text>
+						<text class="ring-cap" y={-limits.far * S - 5} text-anchor="middle" font-size={F.ref}>{L.fit.moderate}</text>
 					</g>
 				{/key}
 			</g>
@@ -360,7 +365,7 @@
 	.rings.on { opacity: 1; transform: none; }
 	.ring.far { fill: var(--accent); fill-opacity: .05; stroke: var(--accent); stroke-opacity: .45; stroke-dasharray: 3 5; }
 	.ring.near { fill: var(--accent); fill-opacity: .07; stroke: var(--accent); stroke-opacity: .6; }
-	.ring-cap { font-size: 12.5px; fill: var(--accent-ink); stroke: var(--quad); stroke-width: 3; paint-order: stroke; }
+	.ring-cap { fill: var(--accent-ink); stroke: var(--quad); stroke-width: 3; paint-order: stroke; }
 
 	.trail { opacity: 0; transition: opacity var(--dur-base) var(--ease-out); }
 	.trail.on { opacity: 1; }

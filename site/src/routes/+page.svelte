@@ -128,7 +128,7 @@
 	.points p { margin: 0; font-size: 15.5px; line-height: 1.55; color: var(--text-2); }
 
 	@media (max-width: 900px) {
-		.hero { grid-template-columns: 1fr; gap: 32px; padding-top: 16px; }
-		.points { grid-template-columns: 1fr; }
+		.hero { grid-template-columns: minmax(0, 1fr); gap: 32px; padding-top: 16px; }
+		.points { grid-template-columns: minmax(0, 1fr); }
 	}
 </style>

@@ -48,10 +48,10 @@
 								{#if p.me}<span class="you">{L.you}</span>{/if}
 							</span>
 						</td>
-						<td class="num" class:quiz={c.xSrc === 'quiz'} title={c.xSrc === 'quiz' ? (c.native ? L.fromQuizNative : L.fromQuiz(signed(c.psX))) : undefined}>
+						<td class="num" data-label={L.colX} class:quiz={c.xSrc === 'quiz'} title={c.xSrc === 'quiz' ? (c.native ? L.fromQuizNative : L.fromQuiz(signed(c.psX))) : undefined}>
 							{c.x === null ? '—' : signed(c.x)}
 						</td>
-						<td class="num" class:quiz={c.ySrc === 'quiz' && c.y !== null} title={c.ySrc === 'quiz' && c.y !== null ? (c.native ? L.fromQuizNativeY : L.fromQuizY(signed(c.psY))) : undefined}>
+						<td class="num" data-label={W.colY} class:quiz={c.ySrc === 'quiz' && c.y !== null} title={c.ySrc === 'quiz' && c.y !== null ? (c.native ? L.fromQuizNativeY : L.fromQuizY(signed(c.psY))) : undefined}>
 							{c.y === null ? '—' : signed(c.y)}
 						</td>
 						<td class="near">
@@ -101,6 +101,24 @@
 	.near { line-height: 1.3; white-space: normal; min-width: 180px; }
 	.near .n { font-weight: 600; }
 	.near .fit { font-size: 12.5px; color: var(--text-3); }
+	/* on a phone each profile is a small card: name and coordinates, then
+	   the nearest party beneath — no table to scroll sideways */
+	@media (max-width: 600px) {
+		.table-scroll { margin: 0; padding: 0; overflow: visible; }
+		table, tbody { display: block; }
+		thead { display: none; }
+		tbody tr { display: grid; grid-template-columns: minmax(0, 1fr) auto auto; align-items: center; column-gap: 14px;
+			padding: 10px 4px; border-bottom: 1px solid var(--border); }
+		td { display: block; padding: 0; border: 0; }
+		td.num { font-size: 13.5px; text-align: right; }
+		td.num::before { content: attr(data-label); display: block; font-size: 10.5px; letter-spacing: var(--tracking-caps);
+			text-transform: uppercase; color: var(--text-3); font-weight: 650; }
+		td.near { grid-column: 1 / -1; padding: 6px 0 0 43px; min-width: 0; }
+		tbody tr:hover td, tbody tr.sel td { background: none; }
+		tbody tr.sel { background: var(--accent-soft); border-radius: var(--r-sm); }
+		.foot span { display: none; }
+		.foot .button { width: 100%; }
+	}
 	.foot { display: flex; justify-content: space-between; align-items: center; gap: 12px; padding: 14px 4px 12px; flex-wrap: wrap; }
 	.foot span { font-size: 13px; color: var(--text-3); }
 </style>

@@ -113,6 +113,14 @@
 	@media (max-width: 860px) {
 		.group-board { padding: 18px 16px; }
 		h1 { font-size: 24px; }
-		.frame, .frame label, .frame select, .frame .wide select { width: 100%; min-width: 0; max-width: none; }
+		/* on a phone: the group and the country side by side, the reading
+		   beneath, all compact — the compass should come into view soon */
+		.frame { display: grid; grid-template-columns: minmax(0, 1fr) minmax(0, 1fr); gap: 10px; width: 100%; }
+		.frame label { min-width: 0; font-size: 12px; gap: 4px; }
+		.frame select, .frame .wide select { width: 100%; min-width: 0; max-width: none; height: 40px; font-size: 14px; }
+		.frame .wide, .frame > button { grid-column: 1 / -1; }
+		.frame > button { min-height: 38px; }
+		.top { gap: 14px; }
+		.pills { gap: 6px; padding-top: 12px; }
 	}
 </style>

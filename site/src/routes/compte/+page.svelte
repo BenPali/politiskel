@@ -214,7 +214,7 @@
 	h1 { font-family: var(--font-display); font-size: clamp(30px, 4vw, 40px); font-weight: 600; letter-spacing: -0.02em; margin: 0 0 6px; }
 	.who { margin: 0; color: var(--text-2); }
 	.cols { display: grid; grid-template-columns: minmax(0, 1fr) minmax(0, 1fr); gap: 24px; align-items: start; }
-	.col { display: flex; flex-direction: column; gap: 16px; }
+	.col { min-width: 0; display: flex; flex-direction: column; gap: 16px; }
 	.card + .card { margin-top: 0; }
 	h2 { font-family: var(--font-sans); font-size: 18px; font-weight: 650; margin: 0 0 10px; }
 	.note { margin: 0 0 14px; font-size: 14.5px; color: var(--text-2); }
@@ -246,5 +246,5 @@
 	.confirm { margin-top: 14px; padding: 14px 16px; border-radius: var(--r-md); background: var(--danger-soft); }
 	.confirm p { margin: 0 0 10px; }
 	.status { margin-bottom: 16px; }
-	@media (max-width: 860px) { .cols { grid-template-columns: 1fr; } }
+	@media (max-width: 860px) { .cols { grid-template-columns: minmax(0, 1fr); } }
 </style>

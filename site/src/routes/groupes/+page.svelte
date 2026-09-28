@@ -265,7 +265,7 @@
 	.dir-empty { color: var(--text-2); }
 	.fine { margin: 12px 0 0; font-size: 13px; color: var(--text-3); }
 	@media (max-width: 700px) {
-		.panel { grid-template-columns: 1fr; }
+		.panel { grid-template-columns: minmax(0, 1fr); }
 		.inline { flex-direction: column; }
 		.top-actions, .top-actions button { width: 100%; }
 	}

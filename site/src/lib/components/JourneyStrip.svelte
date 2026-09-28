@@ -74,7 +74,7 @@
 </section>
 
 <style>
-	.jr-journey { background: var(--surface); border: 1px solid var(--border); border-radius: var(--r-lg); padding: 20px 22px 16px; box-shadow: var(--shadow-1); }
+	.jr-journey { overflow: hidden; background: var(--surface); border: 1px solid var(--border); border-radius: var(--r-lg); padding: 20px 22px 16px; box-shadow: var(--shadow-1); }
 	h2 { font-family: var(--font-sans); font-size: 15px; font-weight: 650; margin: 0; }
 	h2 span { font-weight: 400; color: var(--text-3); }
 	.jr-track { position: relative; height: 118px; margin: 6px 8px 0; }

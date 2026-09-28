@@ -173,7 +173,7 @@
 	}
 	@keyframes pop { from { opacity: 0; transform: translateY(-4px); } to { opacity: 1; transform: none; } }
 	.pop .eyebrow { margin: 0 0 var(--sp-2); }
-	.swatches { display: grid; grid-template-columns: 1fr 1fr; gap: 6px; margin-bottom: var(--sp-4); }
+	.swatches { display: grid; grid-template-columns: minmax(0, 1fr) minmax(0, 1fr); gap: 6px; margin-bottom: var(--sp-4); }
 	.swatch-btn { justify-content: flex-start; min-height: 40px; padding: 0 10px; font-size: var(--fs-sm);
 		background: var(--surface); color: var(--text); border: 1px solid var(--border); }
 	.swatch-btn[aria-pressed='true'] { border-color: var(--accent-strong); box-shadow: inset 0 0 0 1px var(--accent-strong); }

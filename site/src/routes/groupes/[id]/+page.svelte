@@ -236,7 +236,7 @@
 	h1 { font-family: var(--font-display); font-size: clamp(28px, 4vw, 38px); font-weight: 600; letter-spacing: -0.02em; margin: 0 0 6px; line-height: 1.1; }
 	.meta { margin: 0; color: var(--text-2); font-size: 14.5px; display: flex; gap: 10px; align-items: center; flex-wrap: wrap; }
 	.cols { display: grid; grid-template-columns: minmax(0, 1.3fr) minmax(0, 1fr); gap: 24px; align-items: start; }
-	.side { display: flex; flex-direction: column; gap: 16px; }
+	.side { min-width: 0; display: flex; flex-direction: column; gap: 16px; }
 	.card + .card { margin-top: 0; }
 	h2 { font-family: var(--font-sans); font-size: 18px; font-weight: 650; margin: 0 0 6px; }
 	.note { margin: 0 0 14px; font-size: 14.5px; color: var(--text-2); }
@@ -269,5 +269,5 @@
 	.danger-zone { margin-top: 20px; padding-top: 16px; border-top: 1px solid var(--border); }
 	.danger-zone p { margin: 0 0 12px; font-size: 14px; color: var(--text-2); }
 	.status { margin-bottom: 16px; }
-	@media (max-width: 860px) { .cols { grid-template-columns: 1fr; } }
+	@media (max-width: 860px) { .cols { grid-template-columns: minmax(0, 1fr); } }
 </style>

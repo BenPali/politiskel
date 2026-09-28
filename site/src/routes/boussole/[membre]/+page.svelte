@@ -152,7 +152,7 @@
 	.sub { margin: 0 0 18px; font-size: 14px; color: var(--text-2); }
 	.head { display: flex; justify-content: space-between; align-items: baseline; gap: 12px; margin: 0 0 4px; flex-wrap: wrap; }
 	.head span { font-size: 13px; color: var(--text-3); }
-	@media (max-width: 1000px) { .sheet { grid-template-columns: 1fr; } }
+	@media (max-width: 1000px) { .sheet { grid-template-columns: minmax(0, 1fr); } }
 	@media (max-width: 700px) {
 		.card { padding: 18px 16px; }
 		h1 { font-size: 30px; }

@@ -138,7 +138,7 @@
 	details { margin-top: 14px; }
 	summary { cursor: pointer; color: var(--accent-ink); font-weight: 650; min-height: 44px; display: flex; align-items: center; }
 	.axes { display: flex; flex-direction: column; gap: 6px; margin: 8px 0 14px; }
-	.axis { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; padding: 6px 8px; border-radius: var(--r-sm); }
+	.axis { display: grid; grid-template-columns: minmax(0, 1fr) minmax(0, 1fr); gap: 10px; padding: 6px 8px; border-radius: var(--r-sm); }
 	.axis.bad { background: var(--danger-soft); }
 	.axis label { display: flex; flex-direction: column; gap: 4px; font-size: 13px; font-weight: 600; color: var(--text-2); }
 	.axis input { width: 100%; box-sizing: border-box; min-height: 40px; font-variant-numeric: tabular-nums; }

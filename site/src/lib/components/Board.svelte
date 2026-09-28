@@ -83,5 +83,5 @@
 	.note { display: flex; gap: 10px; align-items: flex-start; margin-top: 10px; padding: 12px 14px; border-radius: var(--r-sm);
 		background: var(--surface-2); color: var(--text-2); font-size: 13.5px; line-height: 1.45; }
 	.note svg { flex: none; margin-top: 1px; }
-	@media (max-width: 1000px) { .layout { grid-template-columns: 1fr; } }
+	@media (max-width: 1000px) { .layout { grid-template-columns: minmax(0, 1fr); } }
 </style>

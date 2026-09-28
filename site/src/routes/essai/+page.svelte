@@ -104,5 +104,5 @@
 	.theme small { display: block; font-size: 13px; color: var(--text-3); font-weight: 400; }
 	.later { margin-top: 20px; color: var(--text-3); font-size: 14px; }
 	.status { margin-bottom: 16px; }
-	@media (max-width: 860px) { .ways { grid-template-columns: 1fr; } }
+	@media (max-width: 860px) { .ways { grid-template-columns: minmax(0, 1fr); } }
 </style>
