@@ -90,12 +90,12 @@
 		color: var(--text-2); font-size: 14.5px; margin-bottom: 28px; }
 	.banner svg { color: var(--accent); flex: none; }
 	.banner a { margin-left: auto; color: var(--accent-ink); font-weight: 650; }
-	h1 { font-family: var(--font-display); font-size: clamp(30px, 4vw, 42px); font-weight: 600; letter-spacing: -0.02em; margin: 0 0 10px; }
+	h1 { font-family: var(--font-display); font-size: clamp(30px, 4vw, 42px); font-weight: 700; letter-spacing: -0.02em; margin: 0 0 10px; }
 	.lead { margin: 0 0 24px; font-size: 17px; color: var(--text-2); max-width: 60ch; }
 	.ready { display: flex; flex-wrap: wrap; gap: 10px; align-items: center; margin-bottom: 24px; }
 	.ways { display: grid; grid-template-columns: minmax(0, 1fr) minmax(0, 1fr); gap: 24px; align-items: start; }
 	.card + .card { margin-top: 0; }
-	h2 { font-family: var(--font-display); font-size: 22px; font-weight: 600; margin: 0 0 6px; }
+	h2 { font-family: var(--font-display); font-size: 22px; font-weight: 700; margin: 0 0 6px; }
 	.note { margin: 0 0 16px; font-size: 15px; color: var(--text-2); }
 	.theme { width: 100%; justify-content: space-between; text-align: left; min-height: 64px; padding: 12px 16px; margin-bottom: 10px;
 		background: var(--surface); color: var(--text); border: 1px solid var(--border-strong); border-radius: var(--r-md); }

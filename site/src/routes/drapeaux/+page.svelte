@@ -89,10 +89,10 @@
 <style>
 	.flags { max-width: 1152px; margin: 0 auto; padding: 24px 0 32px; }
 	.eyebrow { color: var(--accent-ink); }
-	h1 { font-family: var(--font-display); font-size: clamp(32px, 4.4vw, 46px); line-height: 1.1; font-weight: 600; letter-spacing: -0.025em;
+	h1 { font-family: var(--font-display); font-size: clamp(32px, 4.4vw, 46px); line-height: 1.1; font-weight: 700; letter-spacing: -0.025em;
 		margin: 10px 0 14px; max-width: 18em; text-wrap: balance; }
 	.lead { margin: 0 0 36px; font-size: 18px; line-height: 1.55; color: var(--text-2); max-width: 42em; }
-	h2 { font-family: var(--font-display); font-size: 26px; font-weight: 600; margin: 44px 0 6px; }
+	h2 { font-family: var(--font-display); font-size: 26px; font-weight: 700; margin: 44px 0 6px; }
 	h2:first-of-type { margin-top: 0; }
 	.sub { margin: 0 0 18px; font-size: 15px; color: var(--text-2); }
 	.symbols { display: grid; grid-template-columns: repeat(auto-fill, minmax(170px, 1fr)); gap: 10px; }

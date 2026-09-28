@@ -229,7 +229,7 @@
 <style>
 	.account-page { max-width: 1080px; margin: 0 auto; padding: 16px 0 32px; }
 	.head { display: flex; justify-content: space-between; align-items: flex-end; gap: 16px; flex-wrap: wrap; margin-bottom: 24px; }
-	h1 { font-family: var(--font-display); font-size: clamp(30px, 4vw, 40px); font-weight: 600; letter-spacing: -0.02em; margin: 0 0 6px; }
+	h1 { font-family: var(--font-display); font-size: clamp(30px, 4vw, 40px); font-weight: 700; letter-spacing: -0.02em; margin: 0 0 6px; }
 	.who { margin: 0; color: var(--text-2); }
 	.cols { display: grid; grid-template-columns: minmax(0, 1fr) minmax(0, 1fr); gap: 24px; align-items: start; }
 	.col { min-width: 0; display: flex; flex-direction: column; gap: 16px; }

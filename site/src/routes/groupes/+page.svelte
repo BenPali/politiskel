@@ -216,7 +216,7 @@
 <style>
 	.groups { max-width: 1080px; margin: 0 auto; padding: 16px 0 40px; }
 	.top { display: flex; justify-content: space-between; align-items: flex-end; gap: 20px; flex-wrap: wrap; margin-bottom: 24px; }
-	h1 { font-family: var(--font-display); font-size: clamp(30px, 4vw, 42px); font-weight: 600; letter-spacing: -0.02em; margin: 0 0 8px; }
+	h1 { font-family: var(--font-display); font-size: clamp(30px, 4vw, 42px); font-weight: 700; letter-spacing: -0.02em; margin: 0 0 8px; }
 	.lead { color: var(--text-2); margin: 0; max-width: 56ch; }
 	.top-actions { display: flex; gap: 10px; flex-wrap: wrap; }
 	.top-actions button { gap: 8px; }
@@ -239,7 +239,7 @@
 	.stack span { margin-left: -8px; border-radius: var(--r-pill); box-shadow: 0 0 0 2px var(--surface); display: block; line-height: 0; }
 	.stack span:first-child { margin-left: 0; }
 	.stack .more { margin-left: 6px; box-shadow: none; font-size: 13px; line-height: 1; color: var(--text-3); font-weight: 650; }
-	.group h2 { font-family: var(--font-display); font-size: 22px; font-weight: 600; margin: 4px 0 0; letter-spacing: -0.01em; }
+	.group h2 { font-family: var(--font-display); font-size: 22px; font-weight: 700; margin: 4px 0 0; letter-spacing: -0.01em; }
 	.group h2 a { color: inherit; text-decoration: none; }
 	.group h2 a:hover { color: var(--accent-ink); }
 	.meta { margin: 0; color: var(--text-2); font-size: 14px; display: flex; gap: 8px; align-items: center; flex-wrap: wrap; }
@@ -254,7 +254,7 @@
 
 	.directory { margin-top: 40px; }
 	.dir-head { display: flex; justify-content: space-between; align-items: flex-end; gap: 16px; flex-wrap: wrap; margin-bottom: 14px; }
-	.directory h2 { font-family: var(--font-display); font-size: 24px; font-weight: 600; margin: 0 0 6px; }
+	.directory h2 { font-family: var(--font-display); font-size: 24px; font-weight: 700; margin: 0 0 6px; }
 	.search { width: 260px; max-width: 100%; }
 	.dir-list { list-style: none; margin: 0; padding: 0; display: grid; grid-template-columns: repeat(auto-fill, minmax(300px, 1fr)); gap: 10px; }
 	.dir-list li { display: flex; align-items: center; justify-content: space-between; gap: 12px; padding: 14px 16px; }

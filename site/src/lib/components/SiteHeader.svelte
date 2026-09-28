@@ -132,7 +132,7 @@
 		background: var(--surface); border-bottom: 1px solid var(--border); color: var(--text);
 	}
 	.brand { display: flex; align-items: center; gap: 10px; min-height: var(--tap); color: var(--text); text-decoration: none; }
-	.name { font-family: var(--font-display); font-size: 22px; font-weight: 600; letter-spacing: -0.01em; }
+	.name { font-family: var(--font-display); font-size: 22px; font-weight: 700; letter-spacing: -0.01em; }
 	.sections { display: flex; align-items: center; gap: 4px; margin-right: auto; }
 	.sections a {
 		position: relative; display: flex; align-items: center; height: var(--tap); padding: 0 14px;

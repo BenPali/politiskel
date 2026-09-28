@@ -264,10 +264,10 @@
 	.result { display: flex; flex-direction: column; gap: 18px; }
 	.result-head { animation: fade var(--dur-base) var(--ease-out) both; }
 	@keyframes fade { from { opacity: 0; } }
-	.result h1 { font-family: var(--font-display); font-size: clamp(28px, 4.4vw, 42px); line-height: 1.12; font-weight: 600; letter-spacing: -0.02em;
+	.result h1 { font-family: var(--font-display); font-size: clamp(28px, 4.4vw, 42px); line-height: 1.12; font-weight: 700; letter-spacing: -0.02em;
 		margin: 8px 0 10px; text-wrap: balance; }
 	.result .lead { margin: 0; font-size: var(--fs-lg); color: var(--text-2); max-width: 58ch; }
-	.theme-h { font-family: var(--font-display); font-size: 22px; font-weight: 600; margin: 12px 0 0; }
+	.theme-h { font-family: var(--font-display); font-size: 22px; font-weight: 700; margin: 12px 0 0; }
 	.result-cards { display: grid; grid-template-columns: repeat(auto-fit, minmax(150px, 1fr)); gap: 10px; }
 	.reading { padding: 14px 16px; border-radius: var(--r-md); background: var(--surface); border: 1px solid var(--border);
 		animation: card-in var(--dur-base) var(--ease-out) both; animation-delay: calc(var(--stagger) * var(--i) + 120ms); }

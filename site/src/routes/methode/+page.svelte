@@ -96,11 +96,11 @@
 	nav a[aria-current] { border-left-color: var(--accent); color: var(--text); font-weight: 650; }
 	article { max-width: 40rem; font-family: var(--font-text); font-size: 18.5px; line-height: var(--lh-article, 1.68); color: var(--text); }
 	.kicker { color: var(--accent-ink); }
-	h1 { font-family: var(--font-display); font-size: clamp(34px, 4.4vw, 48px); line-height: 1.08; font-weight: 600; letter-spacing: -0.025em;
+	h1 { font-family: var(--font-display); font-size: clamp(34px, 4.4vw, 48px); line-height: 1.08; font-weight: 700; letter-spacing: -0.025em;
 		margin: 10px 0 18px; text-wrap: balance; }
 	.standfirst { font-size: 21px; line-height: 1.5; color: var(--text-2); margin: 0 0 36px; font-style: italic; }
 	section { scroll-margin-top: 96px; }
-	h2 { font-family: var(--font-display); font-size: 28px; line-height: 1.2; font-weight: 600; letter-spacing: -0.015em; margin: 44px 0 14px; }
+	h2 { font-family: var(--font-display); font-size: 28px; line-height: 1.2; font-weight: 700; letter-spacing: -0.015em; margin: 44px 0 14px; }
 	section:first-of-type h2 { margin-top: 0; }
 	p { margin: 0 0 18px; text-wrap: pretty; hyphens: auto; }
 	article :global(code) { font-size: .86em; padding: 1px 5px; border-radius: 4px; background: var(--surface-2); }

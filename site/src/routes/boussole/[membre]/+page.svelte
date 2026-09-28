@@ -128,7 +128,7 @@
 	.card { padding: 24px; }
 	.card + .card { margin-top: 0; }
 	.name { display: flex; align-items: baseline; gap: 12px; margin-bottom: 4px; }
-	h1 { font-family: var(--font-display); font-size: 40px; font-weight: 600; margin: 0; letter-spacing: -0.02em; line-height: 1.1; overflow-wrap: anywhere; }
+	h1 { font-family: var(--font-display); font-size: 40px; font-weight: 700; margin: 0; letter-spacing: -0.02em; line-height: 1.1; overflow-wrap: anywhere; }
 	.you { font-size: 13px; font-weight: 650; color: var(--accent-ink); background: var(--accent-soft); padding: 3px 10px; border-radius: var(--r-pill); }
 	.source { margin: 0 0 14px; font-size: 14px; color: var(--text-3); }
 	.concepts { display: flex; flex-wrap: wrap; gap: 6px; list-style: none; margin: 0 0 18px; padding: 0; }

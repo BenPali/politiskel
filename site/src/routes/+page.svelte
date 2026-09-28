@@ -78,7 +78,7 @@
 
 <style>
 	.hero { display: grid; grid-template-columns: minmax(0, 1.05fr) minmax(0, 1fr); gap: 56px; align-items: center; padding: 40px 0 56px; }
-	h1 { font-family: var(--font-display); font-size: clamp(36px, 5vw, 56px); line-height: 1.06; font-weight: 600; letter-spacing: -0.025em;
+	h1 { font-family: var(--font-display); font-size: clamp(36px, 5vw, 56px); line-height: 1.06; font-weight: 700; letter-spacing: -0.025em;
 		margin: 0 0 18px; text-wrap: balance; }
 	.lead { margin: 0; font-size: 19px; line-height: 1.55; color: var(--text-2); max-width: 34em; }
 	.actions { display: flex; flex-wrap: wrap; align-items: center; gap: 10px; margin: 28px 0 16px; }
@@ -124,7 +124,7 @@
 	.points { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 16px; padding-bottom: 24px; }
 	.points article { padding: 24px; border-radius: var(--r-lg); background: var(--surface); border: 1px solid var(--border); box-shadow: var(--shadow-1); }
 	.icon { display: grid; place-items: center; width: 56px; height: 56px; border-radius: 50%; background: var(--pop-soft); color: var(--accent); }
-	.points h2 { font-family: var(--font-display); font-size: 22px; font-weight: 600; margin: 16px 0 8px; letter-spacing: -0.01em; }
+	.points h2 { font-family: var(--font-display); font-size: 22px; font-weight: 700; margin: 16px 0 8px; letter-spacing: -0.01em; }
 	.points p { margin: 0; font-size: 15.5px; line-height: 1.55; color: var(--text-2); }
 
 	@media (max-width: 900px) {

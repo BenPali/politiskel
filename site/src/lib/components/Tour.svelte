@@ -160,7 +160,7 @@
 	.dots i { width: 6px; height: 6px; border-radius: 50%; background: var(--border-strong); opacity: .5; transition: all var(--dur-base) var(--ease-out); }
 	.dots i.past { opacity: 1; }
 	.dots i.on { width: 16px; border-radius: 3px; background: var(--accent); opacity: 1; }
-	h2 { font-family: var(--font-display); font-size: 20px; font-weight: 600; margin: 0 0 6px; letter-spacing: -0.01em; }
+	h2 { font-family: var(--font-display); font-size: 20px; font-weight: 700; margin: 0 0 6px; letter-spacing: -0.01em; }
 	p { margin: 0 0 12px; font-size: 14.5px; line-height: 1.5; color: var(--text-2); }
 	.hint { display: flex; align-items: center; gap: 10px; font-weight: 650; color: var(--accent-ink); }
 	.tap { flex: none; width: 12px; height: 12px; border-radius: 50%; background: var(--accent); animation: tap 1.2s var(--ease-out) infinite; }

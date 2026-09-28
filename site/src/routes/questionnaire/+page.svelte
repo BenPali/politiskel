@@ -98,7 +98,7 @@
 
 <style>
 	.hub { max-width: 800px; margin: 0 auto; padding: 16px 0 24px; }
-	h1 { font-family: var(--font-display); font-size: clamp(28px, 5vw, 44px); line-height: 1.12; font-weight: 600; letter-spacing: -0.02em;
+	h1 { font-family: var(--font-display); font-size: clamp(28px, 5vw, 44px); line-height: 1.12; font-weight: 700; letter-spacing: -0.02em;
 		margin: 8px 0 14px; text-wrap: balance; }
 	.lead { margin: 0 0 20px; font-size: var(--fs-lg); line-height: var(--lh-body); color: var(--text-2); max-width: 60ch; }
 	.sources { display: flex; gap: 12px; align-items: flex-start; padding: 14px 16px; border-radius: var(--r-md); background: var(--pop-soft);
@@ -111,7 +111,7 @@
 		transition: transform var(--dur-instant) var(--ease-out), box-shadow var(--dur-instant); }
 	.theme:hover { transform: translateY(-2px); box-shadow: var(--shadow-2); }
 	.text { flex: 1 1 300px; min-width: 0; }
-	.theme h2 { font-family: var(--font-display); font-size: 24px; font-weight: 600; margin: 0 0 6px; letter-spacing: -0.01em; }
+	.theme h2 { font-family: var(--font-display); font-size: 24px; font-weight: 700; margin: 0 0 6px; letter-spacing: -0.01em; }
 	.theme p { margin: 0 0 12px; font-size: 15px; line-height: 1.5; color: var(--text-2); }
 	.meter { display: flex; align-items: center; gap: 12px; font-size: 13.5px; color: var(--text-3); }
 	.bar { width: 120px; height: 6px; border-radius: 3px; background: var(--surface-sunk); overflow: hidden; }

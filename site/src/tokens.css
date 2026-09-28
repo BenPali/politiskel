@@ -858,10 +858,9 @@
 /* @auto-end */
 
 :root {
-  /* Type — headings in Unbounded (geometric, like the flag symbols); the
-     interface, questions and long text in Atkinson Hyperlegible Next */
-  --font-sans: "Atkinson Hyperlegible Next", "Atkinson Hyperlegible", system-ui, -apple-system, "Segoe UI", sans-serif;
-  --font-display: "Unbounded", var(--font-sans);
+  /* Type: Geist throughout, headings set heavier (700) than the text */
+  --font-sans: "Geist", system-ui, -apple-system, "Segoe UI", sans-serif;
+  --font-display: var(--font-sans);
   --font-text: var(--font-sans);
   --fs-xs: 0.75rem;   /* 12 — notes, sources */
   --fs-sm: 0.875rem;  /* 14 — dense interface, tables */

@@ -233,7 +233,7 @@
 	.back { display: inline-flex; align-items: center; min-height: 44px; color: var(--text-2); font-size: 15px; text-decoration: none; margin-bottom: 8px; }
 	.back:hover { color: var(--text); }
 	.head { display: flex; justify-content: space-between; align-items: flex-end; gap: 20px; flex-wrap: wrap; margin-bottom: 24px; }
-	h1 { font-family: var(--font-display); font-size: clamp(28px, 4vw, 38px); font-weight: 600; letter-spacing: -0.02em; margin: 0 0 6px; line-height: 1.1; }
+	h1 { font-family: var(--font-display); font-size: clamp(28px, 4vw, 38px); font-weight: 700; letter-spacing: -0.02em; margin: 0 0 6px; line-height: 1.1; }
 	.meta { margin: 0; color: var(--text-2); font-size: 14.5px; display: flex; gap: 10px; align-items: center; flex-wrap: wrap; }
 	.cols { display: grid; grid-template-columns: minmax(0, 1.3fr) minmax(0, 1fr); gap: 24px; align-items: start; }
 	.side { min-width: 0; display: flex; flex-direction: column; gap: 16px; }

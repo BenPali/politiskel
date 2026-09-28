@@ -93,7 +93,7 @@
 	.eyebrow { margin: 0; display: flex; gap: 12px; align-items: baseline; }
 	.eyebrow a { text-transform: none; letter-spacing: 0; font-weight: 600; font-size: 13px; color: var(--accent-ink); }
 	.guest-lead { margin: 6px 0 0; color: var(--text-2); font-size: 14.5px; }
-	h1 { font-family: var(--font-display); font-size: 30px; font-weight: 600; letter-spacing: -0.015em; margin: 4px 0 0; line-height: 1.15; }
+	h1 { font-family: var(--font-display); font-size: 30px; font-weight: 700; letter-spacing: -0.015em; margin: 4px 0 0; line-height: 1.15; }
 	.frame { display: flex; flex: none; align-items: flex-end; gap: 12px; }
 	.frame label { display: flex; flex-direction: column; gap: 6px; font-size: 13px; font-weight: 650; color: var(--text-2); }
 	.frame select { min-width: 140px; max-width: 220px; height: 44px; font-size: 15px; font-weight: 400; }
