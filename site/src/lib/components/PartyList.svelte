@@ -38,12 +38,12 @@
 <style>
 	.line { margin: 0 0 16px; font-size: 15px; color: var(--text-2); }
 	ol { margin: 0; padding: 0; list-style: none; }
-	li { display: grid; grid-template-columns: 26px 210px minmax(0, 1fr) 58px 76px; align-items: center; gap: 14px; padding: 9px 0; border-top: 1px solid var(--border); }
+	li { display: grid; grid-template-columns: 26px minmax(0, 1.5fr) minmax(80px, 1fr) 58px 76px; align-items: center; gap: 14px; padding: 9px 0; border-top: 1px solid var(--border); }
 	.rank { font-size: 13px; color: var(--text-3); text-align: right; font-variant-numeric: tabular-nums; }
 	.who { line-height: 1.25; min-width: 0; }
 	.n { display: block; font-weight: 650; font-size: 14.5px; }
 	.full { font-weight: 400; color: var(--text-2); }
-	.note { display: block; font-size: 12.5px; color: var(--text-3); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+	.note { display: block; font-size: 12.5px; line-height: 1.35; margin-top: 2px; color: var(--text-3); }
 	.bar { position: relative; height: 10px; border-radius: 5px; background: var(--surface-sunk); overflow: hidden; }
 	.bar span { position: absolute; left: 0; top: 0; bottom: 0; border-radius: 5px; transform-origin: left center;
 		transition: transform var(--dur-slow) var(--ease-out); }
