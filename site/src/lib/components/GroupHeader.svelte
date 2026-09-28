@@ -6,7 +6,8 @@
 	import { L } from '$lib/i18n/fr.js';
 	import { session } from '$lib/session.svelte.js';
 	import { board, chooseGroup, currentGroup, loadMembers, savePrefs } from '$lib/compass/board.svelte.js';
-	import { COUNTRIES, VIEWS } from '$lib/compass/model.js';
+	import { COUNTRIES, VIEWS, viewAvailable } from '$lib/compass/model.js';
+	import { toast } from '$lib/toast.svelte.js';
 	import MemberFlag from '$lib/components/MemberFlag.svelte';
 
 	/** selectedId: the member followed; onpick(i): a pill was pressed */
@@ -22,6 +23,15 @@
 		chooseGroup(v === 'alone' ? null : v);
 		await loadMembers();
 		busy = false;
+	}
+	const country = $derived(COUNTRIES.find((c) => c.code === board.country));
+	/* a country where the reading on show has no party: back to the default one, and said */
+	function switchCountry() {
+		if (!viewAvailable(board.view, country)) {
+			toast(L.viewUnavailableSwitched(L.views[board.view].name, country.name));
+			board.view = 'politiskel';
+		}
+		savePrefs();
 	}
 	async function invite() {
 		const link = location.origin + '/rejoindre/' + g.invite;
@@ -60,13 +70,16 @@
 				</label>
 			{/if}
 			<label>{L.optCountry}
-				<select bind:value={board.country} onchange={savePrefs}>
+				<select bind:value={board.country} onchange={switchCountry}>
 					{#each COUNTRIES as c (c.code)}<option value={c.code}>{c.name}</option>{/each}
 				</select>
 			</label>
 			<label class="wide">{L.optView}
 				<select bind:value={board.view} onchange={savePrefs}>
-					{#each VIEWS as v (v.key)}<option value={v.key} disabled={v.planned}>{L.views[v.key].name}</option>{/each}
+					{#each VIEWS as v (v.key)}
+						{@const off = !viewAvailable(v.key, country)}
+						<option value={v.key} disabled={v.planned || off}>{L.views[v.key].name}{off ? L.viewUnavailable : ''}</option>
+					{/each}
 				</select>
 			</label>
 			{#if g}

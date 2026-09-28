@@ -5,7 +5,7 @@
 
 import { api } from '$lib/api.js';
 import { session } from '$lib/session.svelte.js';
-import { COUNTRIES, VIEWS, fromMember } from '$lib/compass/model.js';
+import { COUNTRIES, VIEWS, fromMember, viewAvailable } from '$lib/compass/model.js';
 import { guestMember } from '$lib/quiz/answers.svelte.js';
 
 const KEYS = {
@@ -52,6 +52,8 @@ export function readPrefs() {
 	if (COUNTRIES.some((x) => x.code === c)) board.country = c;
 	const v = read(KEYS.view);
 	if (VIEWS.some((x) => x.key === v && !x.planned)) board.view = v;
+	/* a reading kept from another country, with nothing to draw in this one */
+	if (!viewAvailable(board.view, COUNTRIES.find((x) => x.code === board.country))) board.view = 'politiskel';
 	board.flagMode = read(KEYS.flags) === 'politiskel' ? 'politiskel' : 'politiscales';
 	try {
 		Object.assign(board.show, JSON.parse(read(KEYS.show) || '{}'));

@@ -25,6 +25,14 @@ const SIDE = {
 	populist: { of: (c) => c.inst?.people, ref: 'pop', score: (c) => c.inst, theme: 'institutions', ysrc: 'populisme : POPPA 2023' }
 };
 
+/* Whether a reading has anything to draw in a country: a reading against
+   the economy needs parties that carry its measure (none carry POPPA's in
+   Turkey, CHES protectionism in Italy, anything but estimates in the US). */
+export const viewAvailable = (viewKey, country) => {
+	const side = SIDE[viewKey];
+	return !side || !country || country.parties.some((r) => r[side.ref] !== undefined);
+};
+
 /* A theme's own reading, as each party carries it (CHES for Europe, POPPA for populism) */
 export const THEME_REF = { europe: 'eu', institutions: 'pop' };
 

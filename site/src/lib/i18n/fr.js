@@ -741,6 +741,9 @@ export const LOCALES = {
       + "placé" + (n > 1 ? "s" : "") + ".",
     viewNoteNoX: n => n + " profil" + (n > 1 ? "s" : "") + " sans réponse sur l'axe économique "
       + (n > 1 ? "ne sont" : "n'est") + " pas placé" + (n > 1 ? "s" : "") + ".",
+    viewUnavailable: " (pas de repère pour ce pays)",
+    viewUnavailableSwitched: (view, country) => "« " + view + " » : aucun repère pour ce pays (" + country
+      + "). Retour à la lecture Politiskel.",
     views: {
       politiskel: { name: "Politiskel : économie × société" },
       politiscales: { name: "PolitiScales d'origine" },
