@@ -4,7 +4,8 @@
    frame grows with it: a plain ring, a studded ring, a scalloped rosette.
    Everything is SVG as a string, so a badge is drawn with {@html}. Every
    gradient id is prefixed with the badge's own id, so that badges on the
-   same page never share one. */
+   same page never share one; the frame's own ids take a hyphen, which no
+   scene uses, so that they never meet a scene's. */
 
 let uid = 0;
 export const star = (cx, cy, r1, r2, n = 5, rot = -90) => {
@@ -33,7 +34,7 @@ export const tower = (x, top, w, id) => `<path d="M${x - w * 0.55} 160 Q${x - w 
 /* ---------- frames by tier ---------- */
 export function drawBadge(a, tier, label, size = 200) {
   const id = "b" + (uid++), c = a.rim, ink = a.ink;
-  const clip = `<clipPath id="${id}c"><circle cx="100" cy="100" r="68"/></clipPath>`;
+  const clip = `<clipPath id="${id}-clip"><circle cx="100" cy="100" r="68"/></clipPath>`;
   let back = "", ring = "", front = "";
   if (tier === 1) {
     ring = `<circle cx="100" cy="100" r="80" fill="#fbf8f1"/><circle cx="100" cy="100" r="80" fill="none" stroke="${c}" stroke-width="3"/>
@@ -56,7 +57,7 @@ export function drawBadge(a, tier, label, size = 200) {
       [-90, -60, -120].map(deg => { const t = deg * Math.PI / 180; return `<path d="${star(100 + 76 * Math.cos(t), 100 + 76 * Math.sin(t), deg === -90 ? 7 : 4.5, deg === -90 ? 2.8 : 1.8)}" fill="#ffe7a0"/>`; }).join("");
   }
   return `<svg viewBox="-4 -4 208 208" width="${size}" height="${size}" xmlns="http://www.w3.org/2000/svg"><defs>${clip}</defs>
-    ${back}${ring}<g clip-path="url(#${id}c)">${a.art(id, tier)}</g>
+    ${back}${ring}<g clip-path="url(#${id}-clip)">${a.art(id, tier)}</g>
     <circle cx="100" cy="100" r="68" fill="none" stroke="#000" stroke-opacity=".18" stroke-width="1"/>
     <path d="M44 62 A66 66 0 0 1 120 34" stroke="#fff" stroke-opacity=".35" stroke-width="5" fill="none" stroke-linecap="round"/>
     ${front}${ribbon(c, ink, tier, label, id)}</svg>`;
@@ -68,8 +69,8 @@ function ribbon(c, ink, tier, label, id) {
   return `<path d="M${x1 - tail} ${y + 4} L${x1 + 2} ${y + 4} L${x1 + 2} ${y + h + 4} L${x1 - tail} ${y + h + 4} L${x1 - tail + 6} ${y + h / 2 + 4} Z" fill="${ink}"/>
     <path d="M${x2 + tail} ${y + 4} L${x2 - 2} ${y + 4} L${x2 - 2} ${y + h + 4} L${x2 + tail} ${y + h + 4} L${x2 + tail - 6} ${y + h / 2 + 4} Z" fill="${ink}"/>
     <path d="M${x1} ${y} Q100 ${y + 10} ${x2} ${y} L${x2} ${y + h} Q100 ${y + h + 10} ${x1} ${y + h} Z" fill="${tier === 1 ? '#fbf8f1' : c}" stroke="${ink}" stroke-width="${tier === 1 ? 1.2 : 1.5}"/>
-    <path id="${id}r" d="M${x1} ${mid - 5 + fs * 0.36} Q100 ${mid + 5 + fs * 0.36} ${x2} ${mid - 5 + fs * 0.36}" fill="none"/>
-    <text font-family="Geist, sans-serif" font-weight="700" font-size="${fs.toFixed(1)}" fill="${tier === 1 ? ink : '#fff'}" text-anchor="middle"><textPath href="#${id}r" startOffset="50%">${label}</textPath></text>
+    <path id="${id}-ribbon" d="M${x1} ${mid - 5 + fs * 0.36} Q100 ${mid + 5 + fs * 0.36} ${x2} ${mid - 5 + fs * 0.36}" fill="none"/>
+    <text font-family="Geist, sans-serif" font-weight="700" font-size="${fs.toFixed(1)}" fill="${tier === 1 ? ink : '#fff'}" text-anchor="middle"><textPath href="#${id}-ribbon" startOffset="50%">${label}</textPath></text>
     ${tier === 3 ? `<path d="${star(x1 - tail + 12, y + h / 2 + 4, 3.2, 1.3)}" fill="#ffe7a0"/><path d="${star(x2 + tail - 12, y + h / 2 + 4, 3.2, 1.3)}" fill="#ffe7a0"/>` : ""}`;
 }
 

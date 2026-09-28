@@ -18,9 +18,12 @@ const GUEST_KEY = 'politiskel.guest.v1';
    the answers under a key no item has, so that the server and the guest's
    browser keep it with them; the girouette badge reads it. Each question
    counts once a visit, and the count stops at 20, the largest value the
-   server takes. */
+   server takes. A visit is a page load: what the answers were then is
+   taken once for each account, not each time a questionnaire opens, which
+   would count again an answer given minutes before. */
 const CHANGES_MAX = 20;
 let before = {};
+let beforeFor = null;
 let changed = new Set();
 
 export const mine = $state({
@@ -72,8 +75,12 @@ export function startMine(mode) {
 	if (mode === 'server' && mine.mode === 'server' && who && pendingFor === who && (pending || inflight)) return;
 	mine.mode = mode;
 	mine.answers = mode === 'server' ? { ...(session.me?.profile?.answers || {}) } : { ...(readGuest()?.answers || {}) };
-	before = { ...mine.answers };
-	changed = new Set();
+	const whose = mode + ':' + (who ?? '');
+	if (beforeFor !== whose) {
+		before = { ...mine.answers };
+		beforeFor = whose;
+		changed = new Set();
+	}
 }
 
 /* Signing out: whatever was waiting belonged to that account, and goes. */
