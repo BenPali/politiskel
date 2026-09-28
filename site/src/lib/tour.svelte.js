@@ -42,10 +42,47 @@ const write = (v) => {
 	}
 };
 
+/* The accounts that have seen the tour in this browser: the server keeps
+   it too, but a reload right after skipping can cancel the request that
+   tells it, and the tour came back. */
+const SEEN_KEY = 'politiskel.tour.seen.v2';
+const seenHere = () => {
+	try {
+		const list = JSON.parse(localStorage.getItem(SEEN_KEY) || '[]');
+		return Array.isArray(list) ? list : [];
+	} catch {
+		return [];
+	}
+};
+const addSeenHere = (who) => {
+	try {
+		const list = seenHere();
+		if (!list.includes(who)) localStorage.setItem(SEEN_KEY, JSON.stringify([...list, who].slice(-20)));
+	} catch {
+		/* private browsing */
+	}
+};
+/* told to the server in a request the browser finishes even if the page goes */
+const tellServer = () => {
+	try {
+		fetch('/api/me/tour', { method: 'POST', keepalive: true, credentials: 'same-origin',
+			headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ seen: true }) });
+	} catch {
+		api('POST', '/api/me/tour', { seen: true });
+	}
+};
+
 /** whether the tour has yet to be seen: by this account, signed in */
 export function tourPending() {
 	if (!session.me) return read() !== 'done';
 	if (session.me.tour_seen) return false;
+	const who = session.me.username;
+	/* seen here, but the server was not told in time: tell it now */
+	if (seenHere().includes(who)) {
+		session.me.tour_seen = true;
+		tellServer();
+		return false;
+	}
 	/* seen in this browser before accounts kept it: the first account signed
 	   in here takes it over, and the browser's record goes — another
 	   account on this browser has not seen it */
@@ -58,9 +95,10 @@ export function tourPending() {
 }
 function markSeen() {
 	if (!session.me) return write('done');
+	addSeenHere(session.me.username);
 	if (!session.me.tour_seen) {
 		session.me.tour_seen = true;
-		api('POST', '/api/me/tour', { seen: true });
+		tellServer();
 	}
 }
 const forget = () => {
