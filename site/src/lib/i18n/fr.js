@@ -197,11 +197,11 @@ export const LOCALES = {
     memberUnknown: n => "« " + n + " » n'est pas dans le groupe affiché.",
     brandHome: "Politiskel, accueil", navMain: "Navigation principale", navMenu: "Ouvrir le menu",
     displayPalette: "Palette", displayMode: "Mode",
-    palettes: { classique: "Classique", pop: "Pop", journal: "Journal", nuit: "Nuit", aurore: "Aurore", graphite: "Graphite",
+    palettes: { classique: "Classique", pop: "Pop", journal: "Journal", nuit: "Nuit", aurore: "Aurore", graphite: "Graphite", corpo: "Corpo",
                 catppuccin: "Catppuccin", sepia: "Sépia", contraste: "Contraste élevé" },
     modes: { auto: "Auto", clair: "Clair", sombre: "Sombre" },
     paletteHints: { classique: "Neutre, accent pétrole", pop: "Turquoise et citron", journal: "Papier journal, encre noire",
-                    nuit: "Encre profonde et cuivre", aurore: "Violet d'aube et pêche", graphite: "Gris crayon, filets nets",
+                    nuit: "Encre profonde et cuivre", aurore: "Violet d'aube et pêche", graphite: "Gris crayon, filets nets", corpo: "Rouge sang, noir, acier",
                     catppuccin: "Latte le jour, Mocha la nuit, mauve", sepia: "Lecture longue", contraste: "AAA, traits pleins" },
     displayLead: "Choisissez votre palette, puis clair, sombre ou comme le système : chaque palette a sa version sombre.",
     displayMotion: "Animations", motions: { full: "Activées", reduce: "Réduites" },
@@ -810,7 +810,7 @@ export const LOCALES = {
         profiles: { title: "Les profils", text: "Les positions de chacun et le repère le plus proche : une proximité, pas une appartenance. La fiche d'un profil détaille ses lectures et son drapeau." },
         themes: { title: "Le questionnaire", text: "Des questions tirées des grandes enquêtes publiques, par thèmes, dans l'ordre que vous voulez. Chaque thème remplace un axe de la boussole ou ajoute une lecture ; vos réponses s'enregistrent en passant à la suivante." },
         groups: { title: "Vos groupes", text: "Créez un groupe et partagez son lien, ou rejoignez-en un. Un groupe peut aussi apparaître dans l'annuaire, où l'on demande à entrer." },
-        display: { title: "L'affichage", text: "Neuf palettes, chacune en clair, en sombre ou selon le système. Les animations se réduisent depuis votre compte." },
+        display: { title: "L'affichage", text: "Dix palettes, chacune en clair, en sombre ou selon le système. Les animations se réduisent depuis votre compte." },
         account: { title: "Votre compte", text: "Votre résultat PolitiScales, l'export de toutes vos données, le mot de passe, et la suppression du compte, qui efface tout." },
         end: { title: "À vous de jouer", text: "Commencez par un thème du questionnaire : votre point apparaîtra sur la boussole de vos groupes." }
       }

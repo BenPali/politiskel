@@ -3,7 +3,7 @@
    by hand outside the flags and the party markers.
 
    Two independent settings on <html>:
-     data-theme = classique | pop | sepia | contraste | journal | nuit | aurore | graphite | catppuccin
+     data-theme = classique | pop | sepia | contraste | journal | nuit | aurore | graphite | corpo | catppuccin
      data-mode  = clair | sombre | auto                                 (auto follows the system)
    Every palette has its dark version.
 
@@ -190,6 +190,42 @@
   --shadow-1: 0 0 0 1px #c9cbd0;
   --shadow-2: 0 0 0 1px #4a4d55;
   --shadow-3: 0 12px 28px rgba(0,0,0,.14), 0 0 0 1px #4a4d55;
+  --focus-ring: 0 0 0 2px var(--surface), 0 0 0 4px var(--focus);
+}
+/* Corpo: the megacorporation's tower. Blood red on black glass, steel grey,
+   sharp corners; errors in amber, since red is the house colour. */
+[data-theme="corpo"] {
+  color-scheme: light;
+  --bg: #e7e7e9;
+  --surface: #f8f8f9;
+  --surface-2: #dcdcdf;
+  --surface-sunk: #d2d2d6;
+  --border: #c4c4c9;
+  --border-strong: #2a2a2f;
+  --text: #0a0a0c;
+  --text-2: #2e2e34;
+  --text-3: #4c4c54;
+  --accent: #b3121d;
+  --accent-strong: #940e17;
+  --on-accent: #fff5f5;
+  --accent-soft: #f4d4d6;
+  --accent-ink: #7a0c13;
+  --pop: #2a2a2f;
+  --pop-soft: #e2e2e5;
+  --danger: #9a5200;
+  --danger-soft: #f6e6cf;
+  --on-danger: #fffaf2;
+  --focus: #b3121d;
+  --grid: #d8d8dc;
+  --axis: #2a2a2f;
+  --quad: #efeff1;
+  --dot: #0a0a0c;
+  --dot-me: #b3121d;
+  --ref: #66666e;
+  --scrim: rgba(8,8,10,.55);
+  --shadow-1: 0 0 0 1px #c4c4c9;
+  --shadow-2: 0 0 0 1px #2a2a2f;
+  --shadow-3: 0 14px 30px rgba(0,0,0,.18), 0 0 0 1px #2a2a2f;
   --focus-ring: 0 0 0 2px var(--surface), 0 0 0 4px var(--focus);
 }
 /* Catppuccin: Latte by day, Mocha by night, its mauve accent, rosewater as decoration. */
@@ -472,6 +508,40 @@
   --shadow-3: 0 12px 28px rgba(0,0,0,.4), 0 0 0 1px #9da1a9;
   --focus-ring: 0 0 0 2px var(--surface), 0 0 0 4px var(--focus);
 }
+[data-theme="corpo"][data-mode="sombre"] {
+  color-scheme: dark;
+  --bg: #0a0a0c;
+  --surface: #131316;
+  --surface-2: #1c1c21;
+  --surface-sunk: #060607;
+  --border: #2a2a31;
+  --border-strong: #7a7a84;
+  --text: #ecebe9;
+  --text-2: #c2c1c6;
+  --text-3: #9a99a1;
+  --accent: #e0202e;
+  --accent-strong: #c8141f;
+  --on-accent: #fff5f5;
+  --accent-soft: #3a0f13;
+  --accent-ink: #ff7a83;
+  --pop: #7a7a84;
+  --pop-soft: #1f1f24;
+  --danger: #f2b233;
+  --danger-soft: #3a2c10;
+  --on-danger: #1a1204;
+  --focus: #ff4d59;
+  --grid: #1f1f24;
+  --axis: #7a7a84;
+  --quad: #0f0f12;
+  --dot: #ecebe9;
+  --dot-me: #e0202e;
+  --ref: #8a8a93;
+  --scrim: rgba(0,0,0,.7);
+  --shadow-1: 0 0 0 1px #2a2a31;
+  --shadow-2: 0 0 0 1px #e0202e;
+  --shadow-3: 0 14px 32px rgba(0,0,0,.6), 0 0 0 1px #e0202e;
+  --focus-ring: 0 0 0 2px var(--surface), 0 0 0 4px var(--focus);
+}
 [data-theme="catppuccin"][data-mode="sombre"] {
   color-scheme: dark;
   --bg: #1e1e2e;
@@ -666,6 +736,40 @@
     --shadow-3: 0 18px 44px rgba(0,0,0,.42), 0 3px 8px rgba(0,0,0,.26);
     --focus-ring: 0 0 0 2px var(--surface), 0 0 0 4px var(--focus);
   }
+  [data-theme="corpo"][data-mode="auto"] {
+    color-scheme: dark;
+    --bg: #0a0a0c;
+    --surface: #131316;
+    --surface-2: #1c1c21;
+    --surface-sunk: #060607;
+    --border: #2a2a31;
+    --border-strong: #7a7a84;
+    --text: #ecebe9;
+    --text-2: #c2c1c6;
+    --text-3: #9a99a1;
+    --accent: #e0202e;
+    --accent-strong: #c8141f;
+    --on-accent: #fff5f5;
+    --accent-soft: #3a0f13;
+    --accent-ink: #ff7a83;
+    --pop: #7a7a84;
+    --pop-soft: #1f1f24;
+    --danger: #f2b233;
+    --danger-soft: #3a2c10;
+    --on-danger: #1a1204;
+    --focus: #ff4d59;
+    --grid: #1f1f24;
+    --axis: #7a7a84;
+    --quad: #0f0f12;
+    --dot: #ecebe9;
+    --dot-me: #e0202e;
+    --ref: #8a8a93;
+    --scrim: rgba(0,0,0,.7);
+    --shadow-1: 0 0 0 1px #2a2a31;
+    --shadow-2: 0 0 0 1px #e0202e;
+    --shadow-3: 0 14px 32px rgba(0,0,0,.6), 0 0 0 1px #e0202e;
+    --focus-ring: 0 0 0 2px var(--surface), 0 0 0 4px var(--focus);
+  }
   [data-theme="graphite"][data-mode="auto"] {
     color-scheme: dark;
     --bg: #16181b;
@@ -798,7 +902,8 @@
 }
 [data-motion="reduce"] { --dur-instant: 0ms; --dur-quick: 0ms; --dur-base: 0ms; --dur-slow: 0ms; --dur-deliberate: 0ms; --stagger: 0ms; --move-x: 0px; }
 
-/* Shapes that go with a palette: Journal and Graphite are drawn square.
+/* Shapes that go with a palette: Journal, Graphite and Corpo are drawn square.
    Last in the file, so they win over the shared radii above. */
 [data-theme="journal"] { --r-xs: 1px; --r-sm: 2px; --r-md: 2px; --r-lg: 3px; --r-xl: 4px; }
 [data-theme="graphite"] { --r-xs: 2px; --r-sm: 4px; --r-md: 6px; --r-lg: 8px; --r-xl: 10px; }
+[data-theme="corpo"] { --r-xs: 0; --r-sm: 1px; --r-md: 2px; --r-lg: 2px; --r-xl: 3px; }
