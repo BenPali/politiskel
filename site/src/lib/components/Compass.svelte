@@ -113,7 +113,7 @@
 			const x = X(r.x), y = Y(r.y);
 			const near = nearParties.includes(r.name);
 			parties[ri] = {
-				ri, x, y, name: r.name, title: r.name + ' : ' + noteOf(r), near,
+				ri, x, y, name: r.name, title: r.name + (r.full ? ' (' + r.full + ')' : '') + ' : ' + noteOf(r), near,
 				dim: (sel || selRef) && !near,
 				place: show.refLabels || near ? place(taken, x, y, r.name, F.ref, near ? 650 : 500, 11, false, true) : null
 			};

@@ -26,7 +26,7 @@
 		{#each rows as r, i (r.name)}
 			<li>
 				<span class="rank">{i + 1}</span>
-				<span class="who"><span class="n">{r.name}</span>{#if r.note}<span class="note">{r.note}</span>{/if}</span>
+				<span class="who"><span class="n">{r.name}{#if r.ref.full}<span class="full">{' (' + r.ref.full + ')'}</span>{/if}</span>{#if r.note}<span class="note">{r.note}</span>{/if}</span>
 				<span class="bar"><span class={kind(r.d)} style="width: {Math.min(100, r.d / 1.8)}%; transform: scaleX({arrived ? 1 : 0}); transition-delay: calc(var(--stagger) * {Math.min(i, 10)})"></span></span>
 				<span class="d">{L.points(r.d)}</span>
 				<span class="fit" class:on={kind(r.d) === 'near'}>{fitOf(r.d, limits)}</span>
@@ -42,6 +42,7 @@
 	.rank { font-size: 13px; color: var(--text-3); text-align: right; font-variant-numeric: tabular-nums; }
 	.who { line-height: 1.25; min-width: 0; }
 	.n { display: block; font-weight: 650; font-size: 14.5px; }
+	.full { font-weight: 400; color: var(--text-2); }
 	.note { display: block; font-size: 12.5px; color: var(--text-3); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
 	.bar { position: relative; height: 10px; border-radius: 5px; background: var(--surface-sunk); overflow: hidden; }
 	.bar span { position: absolute; left: 0; top: 0; bottom: 0; border-radius: 5px; transform-origin: left center;

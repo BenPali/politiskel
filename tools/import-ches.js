@@ -19,8 +19,9 @@
    scales, (score − 4) / 3 × 100 for eu_position, rounded as JavaScript does.
 
    A party is named by its CHES short name, the current one, as a foreign
-   party usually is. Its note gives its full name in its own language and
-   its CHES family, which is all these sources say about it; no
+   party usually is, with its full name in its own language beside it
+   (`full`). Its note gives its CHES family, which is all these sources say
+   about it; no
    description is written by hand for these countries. The full name comes
    from the codebook. Failing it, Party Facts's is taken, but only when its
    short name matches the CHES one: Party Facts follows a party's lineage
@@ -128,7 +129,9 @@ const tidy = s => s.replace(/\s*—\s*/g, " / ");
         if (envs.length) p.env = -on10(envs.reduce((a, b) => a + b, 0) / envs.length);
         const pop = pf ? popByPf.get(pf) : undefined;
         if (pop !== undefined) { p.pop = pop; withPop++; }
-        p.note = (full ? full + " · " : "") + (FAMILY[r.family] || "famille non renseignée");
+        if (full && bare(full) !== bare(p.name)) p.full = full;
+        const family = FAMILY[r.family] || "famille non renseignée";
+        p.note = family[0].toUpperCase() + family.slice(1);
         return p;
       })
       .sort((a, b) => a.x - b.x);

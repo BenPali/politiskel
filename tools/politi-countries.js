@@ -7,385 +7,385 @@
   {
     code: "at", name: "Autriche",
     parties: [
-      {"name":"Grune","x":-47,"y":-68,"src":"ches","prot":18,"eu":81,"env":82,"pop":-80,"note":"Die Grünen · écologistes"},
-      {"name":"SPO","x":-45,"y":-18,"src":"ches","prot":24,"eu":69,"env":10,"pop":-78,"note":"Sozialdemokratische Partei Österreichs · sociaux-démocrates"},
-      {"name":"FPO","x":32,"y":90,"src":"ches","prot":71,"eu":-69,"env":-67,"pop":90,"note":"Freiheitliche Partei Österreichs · droite radicale"},
-      {"name":"OVP","x":40,"y":45,"src":"ches","prot":-2,"eu":33,"env":-23,"pop":-60,"note":"Österreichische Volkspartei · démocrates-chrétiens"},
-      {"name":"NEOS","x":50,"y":-55,"src":"ches","prot":-60,"eu":97,"env":37,"note":"NEOS--Das Neue Österreich und Liberales Forum · libéraux"}
+      {"name":"Grune","x":-47,"y":-68,"src":"ches","prot":18,"eu":81,"env":82,"pop":-80,"full":"Die Grünen","note":"Écologistes"},
+      {"name":"SPO","x":-45,"y":-18,"src":"ches","prot":24,"eu":69,"env":10,"pop":-78,"full":"Sozialdemokratische Partei Österreichs","note":"Sociaux-démocrates"},
+      {"name":"FPO","x":32,"y":90,"src":"ches","prot":71,"eu":-69,"env":-67,"pop":90,"full":"Freiheitliche Partei Österreichs","note":"Droite radicale"},
+      {"name":"OVP","x":40,"y":45,"src":"ches","prot":-2,"eu":33,"env":-23,"pop":-60,"full":"Österreichische Volkspartei","note":"Démocrates-chrétiens"},
+      {"name":"NEOS","x":50,"y":-55,"src":"ches","prot":-60,"eu":97,"env":37,"full":"NEOS--Das Neue Österreich und Liberales Forum","note":"Libéraux"}
     ]
   },
   {
     code: "be", name: "Belgique",
     parties: [
-      {"name":"PVDA-PTB","x":-84,"y":-36,"src":"ches","prot":45,"eu":-52,"env":2,"pop":51,"note":"Partij van de Arbeid van België / Parti du travail de Belgique · gauche radicale"},
-      {"name":"PS","x":-51,"y":-44,"src":"ches","prot":15,"eu":59,"env":30,"pop":-19,"note":"Parti Socialiste · sociaux-démocrates"},
-      {"name":"Ecolo","x":-51,"y":-69,"src":"ches","prot":15,"eu":63,"env":90,"pop":-35,"note":"Écologistes Confédérés pour l'organisation de luttes originales · écologistes"},
-      {"name":"Groen","x":-46,"y":-68,"src":"ches","prot":10,"eu":63,"env":90,"pop":-27,"note":"Groen! · écologistes"},
-      {"name":"Vooruit","x":-18,"y":-38,"src":"ches","prot":5,"eu":70,"env":34,"pop":-20,"note":"Vooruit · sociaux-démocrates"},
-      {"name":"LE","x":7,"y":15,"src":"ches","prot":5,"eu":81,"env":5,"pop":-42,"note":"Les Engagés · démocrates-chrétiens"},
-      {"name":"DeFl","x":10,"y":-25,"src":"ches","prot":20,"eu":67,"env":20,"pop":-41,"note":"Démocrate fédéraliste independent · régionalistes"},
-      {"name":"CD&V","x":12,"y":36,"src":"ches","prot":5,"eu":90,"env":-16,"pop":-39,"note":"Christen-Democratisch & Vlaams · démocrates-chrétiens"},
-      {"name":"Open Vld","x":40,"y":-40,"src":"ches","prot":-60,"eu":90,"env":-8,"pop":-47,"note":"Open Vlaamse Liberalen en Democraten · libéraux"},
-      {"name":"VB","x":40,"y":78,"src":"ches","prot":40,"eu":-67,"env":-50,"note":"Vlaams Belang · droite radicale"},
-      {"name":"N-VA","x":50,"y":42,"src":"ches","prot":-45,"eu":17,"env":-24,"pop":20,"note":"Nieuw-Vlaamse Alliantie · régionalistes"},
-      {"name":"MR","x":60,"y":4,"src":"ches","prot":-65,"eu":81,"env":-29,"pop":-27,"note":"Mouvement Réformateur · libéraux"}
+      {"name":"PVDA-PTB","x":-84,"y":-36,"src":"ches","prot":45,"eu":-52,"env":2,"pop":51,"full":"Partij van de Arbeid van België / Parti du travail de Belgique","note":"Gauche radicale"},
+      {"name":"PS","x":-51,"y":-44,"src":"ches","prot":15,"eu":59,"env":30,"pop":-19,"full":"Parti Socialiste","note":"Sociaux-démocrates"},
+      {"name":"Ecolo","x":-51,"y":-69,"src":"ches","prot":15,"eu":63,"env":90,"pop":-35,"full":"Écologistes Confédérés pour l'organisation de luttes originales","note":"Écologistes"},
+      {"name":"Groen","x":-46,"y":-68,"src":"ches","prot":10,"eu":63,"env":90,"pop":-27,"note":"Écologistes"},
+      {"name":"Vooruit","x":-18,"y":-38,"src":"ches","prot":5,"eu":70,"env":34,"pop":-20,"note":"Sociaux-démocrates"},
+      {"name":"LE","x":7,"y":15,"src":"ches","prot":5,"eu":81,"env":5,"pop":-42,"full":"Les Engagés","note":"Démocrates-chrétiens"},
+      {"name":"DeFl","x":10,"y":-25,"src":"ches","prot":20,"eu":67,"env":20,"pop":-41,"full":"Démocrate fédéraliste independent","note":"Régionalistes"},
+      {"name":"CD&V","x":12,"y":36,"src":"ches","prot":5,"eu":90,"env":-16,"pop":-39,"full":"Christen-Democratisch & Vlaams","note":"Démocrates-chrétiens"},
+      {"name":"Open Vld","x":40,"y":-40,"src":"ches","prot":-60,"eu":90,"env":-8,"pop":-47,"full":"Open Vlaamse Liberalen en Democraten","note":"Libéraux"},
+      {"name":"VB","x":40,"y":78,"src":"ches","prot":40,"eu":-67,"env":-50,"full":"Vlaams Belang","note":"Droite radicale"},
+      {"name":"N-VA","x":50,"y":42,"src":"ches","prot":-45,"eu":17,"env":-24,"pop":20,"full":"Nieuw-Vlaamse Alliantie","note":"Régionalistes"},
+      {"name":"MR","x":60,"y":4,"src":"ches","prot":-65,"eu":81,"env":-29,"pop":-27,"full":"Mouvement Réformateur","note":"Libéraux"}
     ]
   },
   {
     code: "bg", name: "Bulgarie",
     parties: [
-      {"name":"BSP","x":-42,"y":63,"src":"ches","prot":64,"eu":14,"env":-38,"note":"Balgarska sotsialisticheska partiya · sociaux-démocrates"},
-      {"name":"Vazrazhdane","x":-23,"y":94,"src":"ches","prot":76,"eu":-85,"env":-67,"pop":84,"note":"Vazrazhdane · droite radicale"},
-      {"name":"MECh","x":-17,"y":69,"src":"ches","prot":74,"eu":-26,"env":-50,"note":"Moral, Edinstvo, Chest · droite radicale"},
-      {"name":"Velichie","x":-15,"y":77,"src":"ches","prot":76,"eu":-41,"env":-58,"note":"Velichie · droite radicale"},
-      {"name":"APS","x":-5,"y":10,"src":"ches","prot":13,"eu":65,"env":12,"pop":-41,"note":"Alians za prava i svobodi · libéraux"},
-      {"name":"ITN","x":2,"y":60,"src":"ches","prot":54,"eu":12,"env":-41,"note":"Ima takav narod · droite radicale"},
-      {"name":"PP","x":2,"y":-36,"src":"ches","prot":-42,"eu":96,"env":43,"note":"Prodalzhavame promyanata · écologistes"},
-      {"name":"DPS - Novo nachalo","x":9,"y":19,"src":"ches","prot":11,"eu":60,"env":9,"pop":16,"note":"DPS – Novo nachalo · libéraux"},
-      {"name":"GERB","x":33,"y":28,"src":"ches","prot":-13,"eu":81,"env":-1,"pop":14,"note":"Grazhdani za evropeysko razvitie na Balgariya · conservateurs"},
-      {"name":"DB","x":36,"y":-32,"src":"ches","prot":-46,"eu":98,"env":46,"pop":-37,"note":"Da Bulgaria · écologistes"},
-      {"name":"SDS","x":46,"y":22,"src":"ches","prot":-32,"eu":84,"env":-5,"note":"Sayuz na demokratichnite sili · droite radicale"}
+      {"name":"BSP","x":-42,"y":63,"src":"ches","prot":64,"eu":14,"env":-38,"full":"Balgarska sotsialisticheska partiya","note":"Sociaux-démocrates"},
+      {"name":"Vazrazhdane","x":-23,"y":94,"src":"ches","prot":76,"eu":-85,"env":-67,"pop":84,"note":"Droite radicale"},
+      {"name":"MECh","x":-17,"y":69,"src":"ches","prot":74,"eu":-26,"env":-50,"full":"Moral, Edinstvo, Chest","note":"Droite radicale"},
+      {"name":"Velichie","x":-15,"y":77,"src":"ches","prot":76,"eu":-41,"env":-58,"note":"Droite radicale"},
+      {"name":"APS","x":-5,"y":10,"src":"ches","prot":13,"eu":65,"env":12,"pop":-41,"full":"Alians za prava i svobodi","note":"Libéraux"},
+      {"name":"ITN","x":2,"y":60,"src":"ches","prot":54,"eu":12,"env":-41,"full":"Ima takav narod","note":"Droite radicale"},
+      {"name":"PP","x":2,"y":-36,"src":"ches","prot":-42,"eu":96,"env":43,"full":"Prodalzhavame promyanata","note":"Écologistes"},
+      {"name":"DPS - Novo nachalo","x":9,"y":19,"src":"ches","prot":11,"eu":60,"env":9,"pop":16,"note":"Libéraux"},
+      {"name":"GERB","x":33,"y":28,"src":"ches","prot":-13,"eu":81,"env":-1,"pop":14,"full":"Grazhdani za evropeysko razvitie na Balgariya","note":"Conservateurs"},
+      {"name":"DB","x":36,"y":-32,"src":"ches","prot":-46,"eu":98,"env":46,"pop":-37,"full":"Da Bulgaria","note":"Écologistes"},
+      {"name":"SDS","x":46,"y":22,"src":"ches","prot":-32,"eu":84,"env":-5,"full":"Sayuz na demokratichnite sili","note":"Droite radicale"}
     ]
   },
   {
     code: "cy", name: "Chypre",
     parties: [
-      {"name":"AKEL","x":-56,"y":-52,"src":"ches","prot":20,"eu":33,"env":30,"pop":30,"note":"Anorthotikó Kómma Ergazómenou Laoú · gauche radicale"},
-      {"name":"KOSP","x":-20,"y":-44,"src":"ches","prot":-7,"eu":73,"env":63,"pop":-5,"note":"Kínima Oikológon – Synergasía Politón · écologistes"},
-      {"name":"EDEK","x":-8,"y":8,"src":"ches","prot":-7,"eu":73,"env":-17,"pop":26,"note":"Sosialistiko Komma · sociaux-démocrates"},
-      {"name":"ELAM","x":-8,"y":84,"src":"ches","prot":33,"eu":0,"env":-50,"pop":67,"note":"Ethniko Laiko Metopo · droite radicale"},
-      {"name":"DIPA","x":-4,"y":28,"src":"ches","prot":0,"eu":87,"env":-13,"note":"Dimokratiki Parataxi · libéraux"},
-      {"name":"DIKO","x":4,"y":36,"src":"ches","prot":-13,"eu":87,"env":-13,"pop":-4,"note":"Dimokratikó Kómma · conservateurs"},
-      {"name":"DISY","x":60,"y":16,"src":"ches","prot":-13,"eu":100,"env":-27,"pop":-47,"note":"Dimokratikós Sinagermós · conservateurs"}
+      {"name":"AKEL","x":-56,"y":-52,"src":"ches","prot":20,"eu":33,"env":30,"pop":30,"full":"Anorthotikó Kómma Ergazómenou Laoú","note":"Gauche radicale"},
+      {"name":"KOSP","x":-20,"y":-44,"src":"ches","prot":-7,"eu":73,"env":63,"pop":-5,"full":"Kínima Oikológon – Synergasía Politón","note":"Écologistes"},
+      {"name":"EDEK","x":-8,"y":8,"src":"ches","prot":-7,"eu":73,"env":-17,"pop":26,"full":"Sosialistiko Komma","note":"Sociaux-démocrates"},
+      {"name":"ELAM","x":-8,"y":84,"src":"ches","prot":33,"eu":0,"env":-50,"pop":67,"full":"Ethniko Laiko Metopo","note":"Droite radicale"},
+      {"name":"DIPA","x":-4,"y":28,"src":"ches","prot":0,"eu":87,"env":-13,"full":"Dimokratiki Parataxi","note":"Libéraux"},
+      {"name":"DIKO","x":4,"y":36,"src":"ches","prot":-13,"eu":87,"env":-13,"pop":-4,"full":"Dimokratikó Kómma","note":"Conservateurs"},
+      {"name":"DISY","x":60,"y":16,"src":"ches","prot":-13,"eu":100,"env":-27,"pop":-47,"full":"Dimokratikós Sinagermós","note":"Conservateurs"}
     ]
   },
   {
     code: "hr", name: "Croatie",
     parties: [
-      {"name":"M!","x":-53,"y":-75,"src":"ches","prot":8,"eu":77,"env":83,"pop":-39,"note":"Možemo! · écologistes"},
-      {"name":"SDSS","x":-40,"y":-25,"src":"ches","prot":-5,"eu":76,"env":22,"pop":-61,"note":"Samostalna demokratska srpska stranka · sociaux-démocrates"},
-      {"name":"SDP","x":-28,"y":-35,"src":"ches","prot":-12,"eu":85,"env":31,"pop":-42,"note":"Socijaldemokratska partija Hrvatske · sociaux-démocrates"},
-      {"name":"HDZ","x":-8,"y":28,"src":"ches","prot":-4,"eu":93,"env":12,"pop":-16,"note":"Hrvatska demokratska zajednica · démocrates-chrétiens"},
-      {"name":"IDS","x":3,"y":-40,"src":"ches","prot":-28,"eu":89,"env":37,"pop":-79,"note":"Istarski demokratski sabor · régionalistes"},
-      {"name":"Most","x":21,"y":62,"src":"ches","prot":40,"eu":2,"env":-23,"pop":69,"note":"Most nezavisnih lista · conservateurs"},
-      {"name":"DPS","x":26,"y":82,"src":"ches","prot":32,"eu":-19,"env":-42,"pop":75,"note":"Domovinski pokret · droite radicale"},
-      {"name":"Centar","x":27,"y":-37,"src":"ches","prot":-36,"eu":78,"env":32,"note":"Centar · libéraux"}
+      {"name":"M!","x":-53,"y":-75,"src":"ches","prot":8,"eu":77,"env":83,"pop":-39,"full":"Možemo!","note":"Écologistes"},
+      {"name":"SDSS","x":-40,"y":-25,"src":"ches","prot":-5,"eu":76,"env":22,"pop":-61,"full":"Samostalna demokratska srpska stranka","note":"Sociaux-démocrates"},
+      {"name":"SDP","x":-28,"y":-35,"src":"ches","prot":-12,"eu":85,"env":31,"pop":-42,"full":"Socijaldemokratska partija Hrvatske","note":"Sociaux-démocrates"},
+      {"name":"HDZ","x":-8,"y":28,"src":"ches","prot":-4,"eu":93,"env":12,"pop":-16,"full":"Hrvatska demokratska zajednica","note":"Démocrates-chrétiens"},
+      {"name":"IDS","x":3,"y":-40,"src":"ches","prot":-28,"eu":89,"env":37,"pop":-79,"full":"Istarski demokratski sabor","note":"Régionalistes"},
+      {"name":"Most","x":21,"y":62,"src":"ches","prot":40,"eu":2,"env":-23,"pop":69,"full":"Most nezavisnih lista","note":"Conservateurs"},
+      {"name":"DPS","x":26,"y":82,"src":"ches","prot":32,"eu":-19,"env":-42,"pop":75,"full":"Domovinski pokret","note":"Droite radicale"},
+      {"name":"Centar","x":27,"y":-37,"src":"ches","prot":-36,"eu":78,"env":32,"note":"Libéraux"}
     ]
   },
   {
     code: "dk", name: "Danemark",
     parties: [
-      {"name":"EL","x":-73,"y":-62,"src":"ches","prot":23,"eu":-30,"env":64,"pop":0,"note":"Enhedslisten -- De Rød-Grønne · gauche radicale"},
-      {"name":"ALT","x":-53,"y":-65,"src":"ches","prot":4,"eu":39,"env":70,"pop":-5,"note":"Alternativet · écologistes"},
-      {"name":"SF","x":-45,"y":-40,"src":"ches","prot":10,"eu":52,"env":45,"pop":-27,"note":"Socialistisk Folkeparti · écologistes"},
-      {"name":"S","x":-18,"y":-20,"src":"ches","prot":-7,"eu":61,"env":24,"pop":-8,"note":"Socialdemokratiet · sociaux-démocrates"},
-      {"name":"RV","x":11,"y":-65,"src":"ches","prot":-43,"eu":100,"env":54,"note":"Det Radikale Venstre · libéraux"},
-      {"name":"DPP","x":11,"y":53,"src":"ches","prot":0,"eu":-70,"env":-42,"pop":55,"note":"Dansk Folkeparti · droite radicale"},
-      {"name":"M","x":13,"y":-24,"src":"ches","prot":-30,"eu":79,"env":6,"pop":-41,"note":"Moderaterne · libéraux"},
-      {"name":"V","x":31,"y":-7,"src":"ches","prot":-30,"eu":67,"env":-10,"pop":-32,"note":"Venstre · libéraux"},
-      {"name":"DD","x":35,"y":31,"src":"ches","prot":3,"eu":-27,"env":-51,"pop":35,"note":"Danmarksdemokraterne · droite radicale"},
-      {"name":"DKF","x":40,"y":18,"src":"ches","prot":-43,"eu":52,"env":1,"pop":-20,"note":"Det Konservative Folkeparti · conservateurs"},
-      {"name":"NB","x":58,"y":44,"src":"ches","prot":-25,"eu":-48,"env":-43,"pop":40,"note":"Nye Borgerlige · droite radicale"},
-      {"name":"LA","x":67,"y":-9,"src":"ches","prot":-70,"eu":21,"env":-29,"pop":-34,"note":"Liberal Alliance · libéraux"}
+      {"name":"EL","x":-73,"y":-62,"src":"ches","prot":23,"eu":-30,"env":64,"pop":0,"full":"Enhedslisten -- De Rød-Grønne","note":"Gauche radicale"},
+      {"name":"ALT","x":-53,"y":-65,"src":"ches","prot":4,"eu":39,"env":70,"pop":-5,"full":"Alternativet","note":"Écologistes"},
+      {"name":"SF","x":-45,"y":-40,"src":"ches","prot":10,"eu":52,"env":45,"pop":-27,"full":"Socialistisk Folkeparti","note":"Écologistes"},
+      {"name":"S","x":-18,"y":-20,"src":"ches","prot":-7,"eu":61,"env":24,"pop":-8,"full":"Socialdemokratiet","note":"Sociaux-démocrates"},
+      {"name":"RV","x":11,"y":-65,"src":"ches","prot":-43,"eu":100,"env":54,"full":"Det Radikale Venstre","note":"Libéraux"},
+      {"name":"DPP","x":11,"y":53,"src":"ches","prot":0,"eu":-70,"env":-42,"pop":55,"full":"Dansk Folkeparti","note":"Droite radicale"},
+      {"name":"M","x":13,"y":-24,"src":"ches","prot":-30,"eu":79,"env":6,"pop":-41,"full":"Moderaterne","note":"Libéraux"},
+      {"name":"V","x":31,"y":-7,"src":"ches","prot":-30,"eu":67,"env":-10,"pop":-32,"full":"Venstre","note":"Libéraux"},
+      {"name":"DD","x":35,"y":31,"src":"ches","prot":3,"eu":-27,"env":-51,"pop":35,"full":"Danmarksdemokraterne","note":"Droite radicale"},
+      {"name":"DKF","x":40,"y":18,"src":"ches","prot":-43,"eu":52,"env":1,"pop":-20,"full":"Det Konservative Folkeparti","note":"Conservateurs"},
+      {"name":"NB","x":58,"y":44,"src":"ches","prot":-25,"eu":-48,"env":-43,"pop":40,"full":"Nye Borgerlige","note":"Droite radicale"},
+      {"name":"LA","x":67,"y":-9,"src":"ches","prot":-70,"eu":21,"env":-29,"pop":-34,"full":"Liberal Alliance","note":"Libéraux"}
     ]
   },
   {
     code: "es", name: "Espagne",
     parties: [
-      {"name":"IU","x":-68,"y":-55,"src":"ches","prot":26,"eu":20,"env":49,"note":"Izquierda Unida · gauche radicale"},
-      {"name":"Podemos","x":-67,"y":-71,"src":"ches","prot":35,"eu":23,"env":56,"pop":52,"note":"Podemos · gauche radicale"},
-      {"name":"Sumar","x":-55,"y":-76,"src":"ches","prot":28,"eu":46,"env":68,"note":"Sumar · gauche radicale"},
-      {"name":"EH Bildu","x":-50,"y":-56,"src":"ches","prot":33,"eu":36,"env":49,"note":"Euskal Herria Bildu · régionalistes"},
-      {"name":"BNG","x":-45,"y":-49,"src":"ches","prot":29,"eu":44,"env":39,"pop":19,"note":"Bloque Nacionalista Galego · régionalistes"},
-      {"name":"ERC","x":-43,"y":-49,"src":"ches","prot":13,"eu":57,"env":40,"pop":31,"note":"Esquerra Republicana de Catalunya · régionalistes"},
-      {"name":"PSOE","x":-21,"y":-41,"src":"ches","prot":-7,"eu":98,"env":43,"pop":-27,"note":"Partido Socialista Obrero Español · sociaux-démocrates"},
-      {"name":"Cca","x":17,"y":23,"src":"ches","prot":0,"eu":62,"env":9,"pop":-26,"note":"Coalición Canaria · régionalistes"},
-      {"name":"EAJ/PNV","x":24,"y":24,"src":"ches","prot":0,"eu":69,"env":1,"pop":-7,"note":"Euzko Alderdi Jeltzalea / Partido Nacionalista Vasco · régionalistes"},
-      {"name":"Junts","x":27,"y":19,"src":"ches","prot":13,"eu":55,"env":-1,"note":"Junts per Catalunya · régionalistes"},
-      {"name":"UPN","x":41,"y":45,"src":"ches","prot":-9,"eu":64,"env":-14,"note":"Unión del Pueblo Navarro · régionalistes"},
-      {"name":"PP","x":45,"y":40,"src":"ches","prot":-30,"eu":81,"env":-21,"pop":-15,"note":"Partido Popular · conservateurs"},
-      {"name":"Salf","x":69,"y":69,"src":"ches","prot":40,"eu":-40,"env":-75,"note":"Se Acabó La Fiesta · droite radicale"},
-      {"name":"Vox","x":80,"y":90,"src":"ches","prot":38,"eu":-31,"env":-83,"pop":63,"note":"Vox · droite radicale"}
+      {"name":"IU","x":-68,"y":-55,"src":"ches","prot":26,"eu":20,"env":49,"full":"Izquierda Unida","note":"Gauche radicale"},
+      {"name":"Podemos","x":-67,"y":-71,"src":"ches","prot":35,"eu":23,"env":56,"pop":52,"note":"Gauche radicale"},
+      {"name":"Sumar","x":-55,"y":-76,"src":"ches","prot":28,"eu":46,"env":68,"note":"Gauche radicale"},
+      {"name":"EH Bildu","x":-50,"y":-56,"src":"ches","prot":33,"eu":36,"env":49,"full":"Euskal Herria Bildu","note":"Régionalistes"},
+      {"name":"BNG","x":-45,"y":-49,"src":"ches","prot":29,"eu":44,"env":39,"pop":19,"full":"Bloque Nacionalista Galego","note":"Régionalistes"},
+      {"name":"ERC","x":-43,"y":-49,"src":"ches","prot":13,"eu":57,"env":40,"pop":31,"full":"Esquerra Republicana de Catalunya","note":"Régionalistes"},
+      {"name":"PSOE","x":-21,"y":-41,"src":"ches","prot":-7,"eu":98,"env":43,"pop":-27,"full":"Partido Socialista Obrero Español","note":"Sociaux-démocrates"},
+      {"name":"Cca","x":17,"y":23,"src":"ches","prot":0,"eu":62,"env":9,"pop":-26,"full":"Coalición Canaria","note":"Régionalistes"},
+      {"name":"EAJ/PNV","x":24,"y":24,"src":"ches","prot":0,"eu":69,"env":1,"pop":-7,"full":"Euzko Alderdi Jeltzalea / Partido Nacionalista Vasco","note":"Régionalistes"},
+      {"name":"Junts","x":27,"y":19,"src":"ches","prot":13,"eu":55,"env":-1,"full":"Junts per Catalunya","note":"Régionalistes"},
+      {"name":"UPN","x":41,"y":45,"src":"ches","prot":-9,"eu":64,"env":-14,"full":"Unión del Pueblo Navarro","note":"Régionalistes"},
+      {"name":"PP","x":45,"y":40,"src":"ches","prot":-30,"eu":81,"env":-21,"pop":-15,"full":"Partido Popular","note":"Conservateurs"},
+      {"name":"Salf","x":69,"y":69,"src":"ches","prot":40,"eu":-40,"env":-75,"full":"Se Acabó La Fiesta","note":"Droite radicale"},
+      {"name":"Vox","x":80,"y":90,"src":"ches","prot":38,"eu":-31,"env":-83,"pop":63,"note":"Droite radicale"}
     ]
   },
   {
     code: "ee", name: "Estonie",
     parties: [
-      {"name":"Vasakliit","x":-78,"y":52,"src":"ches","prot":70,"eu":-50,"env":10,"note":"Vasakliit · gauche radicale"},
-      {"name":"SDE","x":-35,"y":-63,"src":"ches","prot":-23,"eu":90,"env":39,"pop":-56,"note":"Sotsiaaldemokraatlik Erakond · sociaux-démocrates"},
-      {"name":"EK","x":-27,"y":12,"src":"ches","prot":13,"eu":27,"env":-9,"pop":-18,"note":"Eesti Keskerakond · libéraux"},
-      {"name":"EKRE","x":17,"y":85,"src":"ches","prot":40,"eu":-55,"env":-61,"pop":86,"note":"Eesti Konservatiivne Rahvaerakond · droite radicale"},
-      {"name":"Isaama","x":40,"y":52,"src":"ches","prot":-2,"eu":32,"env":-18,"pop":-21,"note":"Isamaa · conservateurs"},
-      {"name":"E200","x":42,"y":-60,"src":"ches","prot":-49,"eu":80,"env":28,"pop":-62,"note":"Erakond Eesti 200 · libéraux"},
-      {"name":"ER","x":47,"y":-51,"src":"ches","prot":-72,"eu":87,"env":34,"pop":-50,"note":"Eesti Reformierakond · libéraux"},
-      {"name":"Parempoolsed","x":73,"y":-22,"src":"ches","prot":-55,"eu":51,"env":-5,"note":"Parempoolsed · libéraux"}
+      {"name":"Vasakliit","x":-78,"y":52,"src":"ches","prot":70,"eu":-50,"env":10,"note":"Gauche radicale"},
+      {"name":"SDE","x":-35,"y":-63,"src":"ches","prot":-23,"eu":90,"env":39,"pop":-56,"full":"Sotsiaaldemokraatlik Erakond","note":"Sociaux-démocrates"},
+      {"name":"EK","x":-27,"y":12,"src":"ches","prot":13,"eu":27,"env":-9,"pop":-18,"full":"Eesti Keskerakond","note":"Libéraux"},
+      {"name":"EKRE","x":17,"y":85,"src":"ches","prot":40,"eu":-55,"env":-61,"pop":86,"full":"Eesti Konservatiivne Rahvaerakond","note":"Droite radicale"},
+      {"name":"Isaama","x":40,"y":52,"src":"ches","prot":-2,"eu":32,"env":-18,"pop":-21,"full":"Isamaa","note":"Conservateurs"},
+      {"name":"E200","x":42,"y":-60,"src":"ches","prot":-49,"eu":80,"env":28,"pop":-62,"full":"Erakond Eesti 200","note":"Libéraux"},
+      {"name":"ER","x":47,"y":-51,"src":"ches","prot":-72,"eu":87,"env":34,"pop":-50,"full":"Eesti Reformierakond","note":"Libéraux"},
+      {"name":"Parempoolsed","x":73,"y":-22,"src":"ches","prot":-55,"eu":51,"env":-5,"note":"Libéraux"}
     ]
   },
   {
     code: "fi", name: "Finlande",
     protWhy: "pour ce pays, la moitié au moins des positions du CHES 2024 sur le protectionnisme sont des nombres entiers : vraisemblablement un ou deux experts, trop peu pour placer les partis.",
     parties: [
-      {"name":"VAS","x":-67,"y":-73,"src":"ches","eu":52,"env":71,"pop":-31,"note":"Vasemmistoliitto · gauche radicale"},
-      {"name":"SDP","x":-36,"y":-42,"src":"ches","eu":73,"env":32,"pop":-44,"note":"Suomen Sosialidemokraattinen · sociaux-démocrates"},
-      {"name":"VIHR","x":-18,"y":-84,"src":"ches","eu":79,"env":87,"pop":-48,"note":"Vihreä Liitto · écologistes"},
-      {"name":"KESK","x":16,"y":29,"src":"ches","eu":27,"env":-13,"pop":-29,"note":"Suomen Keskusta · agrariens et centre"},
-      {"name":"SFP/RKP","x":40,"y":-38,"src":"ches","eu":85,"env":15,"pop":-61,"note":"Ruotsalainen kansanpuolue / Svenska folkpartiet · régionalistes"},
-      {"name":"KD","x":40,"y":76,"src":"ches","eu":0,"env":-22,"pop":-6,"note":"Kristillisdemokraatit · confessionnels"},
-      {"name":"AS","x":47,"y":-10,"src":"ches","eu":67,"env":0,"note":"Åländsk Samling · régionalistes"},
-      {"name":"KOK","x":60,"y":5,"src":"ches","eu":76,"env":-3,"pop":-49,"note":"Kansallinen Kokoomus · conservateurs"},
-      {"name":"Liik","x":62,"y":-3,"src":"ches","eu":20,"env":-18,"pop":-25,"note":"Liike Nyt · libéraux"},
-      {"name":"PS","x":64,"y":78,"src":"ches","eu":-52,"env":-66,"pop":70,"note":"Suomen Puolue · droite radicale"}
+      {"name":"VAS","x":-67,"y":-73,"src":"ches","eu":52,"env":71,"pop":-31,"full":"Vasemmistoliitto","note":"Gauche radicale"},
+      {"name":"SDP","x":-36,"y":-42,"src":"ches","eu":73,"env":32,"pop":-44,"full":"Suomen Sosialidemokraattinen","note":"Sociaux-démocrates"},
+      {"name":"VIHR","x":-18,"y":-84,"src":"ches","eu":79,"env":87,"pop":-48,"full":"Vihreä Liitto","note":"Écologistes"},
+      {"name":"KESK","x":16,"y":29,"src":"ches","eu":27,"env":-13,"pop":-29,"full":"Suomen Keskusta","note":"Agrariens et centre"},
+      {"name":"SFP/RKP","x":40,"y":-38,"src":"ches","eu":85,"env":15,"pop":-61,"full":"Ruotsalainen kansanpuolue / Svenska folkpartiet","note":"Régionalistes"},
+      {"name":"KD","x":40,"y":76,"src":"ches","eu":0,"env":-22,"pop":-6,"full":"Kristillisdemokraatit","note":"Confessionnels"},
+      {"name":"AS","x":47,"y":-10,"src":"ches","eu":67,"env":0,"full":"Åländsk Samling","note":"Régionalistes"},
+      {"name":"KOK","x":60,"y":5,"src":"ches","eu":76,"env":-3,"pop":-49,"full":"Kansallinen Kokoomus","note":"Conservateurs"},
+      {"name":"Liik","x":62,"y":-3,"src":"ches","eu":20,"env":-18,"pop":-25,"full":"Liike Nyt","note":"Libéraux"},
+      {"name":"PS","x":64,"y":78,"src":"ches","eu":-52,"env":-66,"pop":70,"full":"Suomen Puolue","note":"Droite radicale"}
     ]
   },
   {
     code: "gr", name: "Grèce",
     protWhy: "pour ce pays, la moitié au moins des positions du CHES 2024 sur le protectionnisme sont des nombres entiers : vraisemblablement un ou deux experts, trop peu pour placer les partis.",
     parties: [
-      {"name":"KKE","x":-92,"y":44,"src":"ches","eu":-93,"env":-7,"pop":60,"note":"Kommounistikó Kómma Elládas · gauche radicale"},
-      {"name":"PE","x":-49,"y":-31,"src":"ches","eu":-3,"env":45,"note":"Plefsi Eleftherias · gauche radicale"},
-      {"name":"SYRIZA","x":-36,"y":-70,"src":"ches","eu":57,"env":60,"pop":57,"note":"Synaspismó's Rizospastikís Aristerás · gauche radicale"},
-      {"name":"PASOK","x":-14,"y":-24,"src":"ches","eu":93,"env":41,"pop":-23,"note":"Panellinio Sosialistikó Kínima -Kinima Allagís · sociaux-démocrates"},
-      {"name":"Spartans","x":3,"y":96,"src":"ches","eu":-33,"env":-50,"note":"Spartiátes · droite radicale"},
-      {"name":"Niki","x":13,"y":90,"src":"ches","eu":-41,"env":-30,"note":"Dimokratikó Patriotikó Kínima – Níki · confessionnels"},
-      {"name":"EL","x":30,"y":84,"src":"ches","eu":-48,"env":-50,"pop":76,"note":"Elliniki Lysi · droite radicale"},
-      {"name":"ND","x":48,"y":8,"src":"ches","eu":100,"env":7,"pop":-12,"note":"Néa Dimokratía · conservateurs"},
-      {"name":"FL","x":60,"y":88,"src":"ches","eu":-22,"env":-47,"note":"Foní Loyikís · droite radicale"}
+      {"name":"KKE","x":-92,"y":44,"src":"ches","eu":-93,"env":-7,"pop":60,"full":"Kommounistikó Kómma Elládas","note":"Gauche radicale"},
+      {"name":"PE","x":-49,"y":-31,"src":"ches","eu":-3,"env":45,"full":"Plefsi Eleftherias","note":"Gauche radicale"},
+      {"name":"SYRIZA","x":-36,"y":-70,"src":"ches","eu":57,"env":60,"pop":57,"full":"Synaspismó's Rizospastikís Aristerás","note":"Gauche radicale"},
+      {"name":"PASOK","x":-14,"y":-24,"src":"ches","eu":93,"env":41,"pop":-23,"full":"Panellinio Sosialistikó Kínima -Kinima Allagís","note":"Sociaux-démocrates"},
+      {"name":"Spartans","x":3,"y":96,"src":"ches","eu":-33,"env":-50,"full":"Spartiátes","note":"Droite radicale"},
+      {"name":"Niki","x":13,"y":90,"src":"ches","eu":-41,"env":-30,"full":"Dimokratikó Patriotikó Kínima – Níki","note":"Confessionnels"},
+      {"name":"EL","x":30,"y":84,"src":"ches","eu":-48,"env":-50,"pop":76,"full":"Elliniki Lysi","note":"Droite radicale"},
+      {"name":"ND","x":48,"y":8,"src":"ches","eu":100,"env":7,"pop":-12,"full":"Néa Dimokratía","note":"Conservateurs"},
+      {"name":"FL","x":60,"y":88,"src":"ches","eu":-22,"env":-47,"full":"Foní Loyikís","note":"Droite radicale"}
     ]
   },
   {
     code: "hu", name: "Hongrie",
     parties: [
-      {"name":"MSZP","x":-44,"y":-25,"src":"ches","prot":10,"eu":80,"env":9,"pop":0,"note":"Magyar Szocialista Párt · sociaux-démocrates"},
-      {"name":"LMP-MZP","x":-28,"y":-39,"src":"ches","prot":18,"eu":40,"env":78,"pop":-19,"note":"Lehet Más a Politika-Magyarország Zöld Pártja · écologistes"},
-      {"name":"Fidesz-KDNP","x":-26,"y":86,"src":"ches","prot":44,"eu":-37,"env":-37,"pop":100,"note":"Fidesz – Magyar Polgári Szövetség / Kereszténydemokrata Néppárt · droite radicale"},
-      {"name":"MKKP","x":-26,"y":-73,"src":"ches","prot":-29,"eu":49,"env":51,"note":"Magyar Kétfarkú Kutya Párt · sans famille"},
-      {"name":"DK","x":-20,"y":-33,"src":"ches","prot":-20,"eu":93,"env":22,"pop":26,"note":"Demokratikus Koalíció · sociaux-démocrates"},
-      {"name":"MHM","x":-7,"y":91,"src":"ches","prot":54,"eu":-63,"env":-22,"pop":79,"note":"Mi Hazánk Mozgalom · droite radicale"},
-      {"name":"JOBBIK","x":-6,"y":36,"src":"ches","prot":22,"eu":14,"env":-7,"pop":26,"note":"Jobbik Magyarországért Mozgalom · droite radicale"},
-      {"name":"Momentum","x":4,"y":-71,"src":"ches","prot":-35,"eu":93,"env":67,"pop":-28,"note":"Momentum Mozgalom · libéraux"},
-      {"name":"Tisza","x":9,"y":5,"src":"ches","prot":3,"eu":49,"env":25,"note":"Tisztelet és Szabadság Pártja · démocrates-chrétiens"}
+      {"name":"MSZP","x":-44,"y":-25,"src":"ches","prot":10,"eu":80,"env":9,"pop":0,"full":"Magyar Szocialista Párt","note":"Sociaux-démocrates"},
+      {"name":"LMP-MZP","x":-28,"y":-39,"src":"ches","prot":18,"eu":40,"env":78,"pop":-19,"full":"Lehet Más a Politika-Magyarország Zöld Pártja","note":"Écologistes"},
+      {"name":"Fidesz-KDNP","x":-26,"y":86,"src":"ches","prot":44,"eu":-37,"env":-37,"pop":100,"full":"Fidesz – Magyar Polgári Szövetség / Kereszténydemokrata Néppárt","note":"Droite radicale"},
+      {"name":"MKKP","x":-26,"y":-73,"src":"ches","prot":-29,"eu":49,"env":51,"full":"Magyar Kétfarkú Kutya Párt","note":"Sans famille"},
+      {"name":"DK","x":-20,"y":-33,"src":"ches","prot":-20,"eu":93,"env":22,"pop":26,"full":"Demokratikus Koalíció","note":"Sociaux-démocrates"},
+      {"name":"MHM","x":-7,"y":91,"src":"ches","prot":54,"eu":-63,"env":-22,"pop":79,"full":"Mi Hazánk Mozgalom","note":"Droite radicale"},
+      {"name":"JOBBIK","x":-6,"y":36,"src":"ches","prot":22,"eu":14,"env":-7,"pop":26,"full":"Jobbik Magyarországért Mozgalom","note":"Droite radicale"},
+      {"name":"Momentum","x":4,"y":-71,"src":"ches","prot":-35,"eu":93,"env":67,"pop":-28,"full":"Momentum Mozgalom","note":"Libéraux"},
+      {"name":"Tisza","x":9,"y":5,"src":"ches","prot":3,"eu":49,"env":25,"full":"Tisztelet és Szabadság Pártja","note":"Démocrates-chrétiens"}
     ]
   },
   {
     code: "ie", name: "Irlande",
     protWhy: "pour ce pays, la moitié au moins des positions du CHES 2024 sur le protectionnisme sont des nombres entiers : vraisemblablement un ou deux experts, trop peu pour placer les partis.",
     parties: [
-      {"name":"S-PBP","x":-82,"y":-65,"src":"ches","eu":-38,"env":18,"note":"People Before Profit--Solidarity · gauche radicale"},
-      {"name":"SF","x":-51,"y":-18,"src":"ches","eu":3,"env":-18,"note":"Sinn Féin · régionalistes"},
-      {"name":"SD","x":-43,"y":-55,"src":"ches","eu":46,"env":29,"pop":-17,"note":"Daonlathaigh Shóisialta · sociaux-démocrates"},
-      {"name":"Lab","x":-31,"y":-52,"src":"ches","eu":67,"env":35,"pop":-22,"note":"Páirti Lucht Oibre · sociaux-démocrates"},
-      {"name":"GP","x":-25,"y":-60,"src":"ches","eu":64,"env":67,"pop":-21,"note":"Comhaontas Glas · écologistes"},
-      {"name":"Aon","x":-3,"y":65,"src":"ches","eu":-33,"env":-41,"note":"Aontú · conservateurs"},
-      {"name":"FF","x":5,"y":5,"src":"ches","eu":82,"env":6,"pop":-35,"note":"Fianna Fáil · conservateurs"},
-      {"name":"FG","x":23,"y":-22,"src":"ches","eu":92,"env":9,"pop":-40,"note":"Fine Gael · démocrates-chrétiens"}
+      {"name":"S-PBP","x":-82,"y":-65,"src":"ches","eu":-38,"env":18,"full":"People Before Profit--Solidarity","note":"Gauche radicale"},
+      {"name":"SF","x":-51,"y":-18,"src":"ches","eu":3,"env":-18,"full":"Sinn Féin","note":"Régionalistes"},
+      {"name":"SD","x":-43,"y":-55,"src":"ches","eu":46,"env":29,"pop":-17,"full":"Daonlathaigh Shóisialta","note":"Sociaux-démocrates"},
+      {"name":"Lab","x":-31,"y":-52,"src":"ches","eu":67,"env":35,"pop":-22,"full":"Páirti Lucht Oibre","note":"Sociaux-démocrates"},
+      {"name":"GP","x":-25,"y":-60,"src":"ches","eu":64,"env":67,"pop":-21,"full":"Comhaontas Glas","note":"Écologistes"},
+      {"name":"Aon","x":-3,"y":65,"src":"ches","eu":-33,"env":-41,"full":"Aontú","note":"Conservateurs"},
+      {"name":"FF","x":5,"y":5,"src":"ches","eu":82,"env":6,"pop":-35,"full":"Fianna Fáil","note":"Conservateurs"},
+      {"name":"FG","x":23,"y":-22,"src":"ches","eu":92,"env":9,"pop":-40,"full":"Fine Gael","note":"Démocrates-chrétiens"}
     ]
   },
   {
     code: "is", name: "Islande",
     parties: [
-      {"name":"Graen","x":-53,"y":-73,"src":"ches","prot":0,"eu":-44,"env":80,"pop":-49,"note":"Vinstrihreyfingin – grænt framboð · écologistes"},
-      {"name":"FlF","x":-43,"y":30,"src":"ches","eu":-40,"env":-3,"pop":30,"note":"Flokkur fólksins · sans famille"},
-      {"name":"Pi","x":-30,"y":-90,"src":"ches","prot":-30,"eu":44,"env":83,"pop":-6,"note":"Pírata · sans famille"},
-      {"name":"Sam","x":-27,"y":-67,"src":"ches","prot":0,"eu":67,"env":53,"pop":-44,"note":"Samfylkingin · sociaux-démocrates"},
-      {"name":"F","x":3,"y":3,"src":"ches","prot":67,"eu":-67,"env":-3,"pop":-49,"note":"Framsóknarflokkurinn · agrariens et centre"},
-      {"name":"V","x":20,"y":-73,"src":"ches","prot":-53,"eu":89,"env":38,"pop":-54,"note":"Viðreisn · libéraux"},
-      {"name":"Sj","x":50,"y":3,"src":"ches","prot":0,"eu":-72,"env":-7,"note":"Sjálfstæðisflokkurinn · conservateurs"},
-      {"name":"M","x":67,"y":77,"src":"ches","prot":53,"eu":-94,"env":-60,"pop":34,"note":"Miðflokkurinn · agrariens et centre"}
+      {"name":"Graen","x":-53,"y":-73,"src":"ches","prot":0,"eu":-44,"env":80,"pop":-49,"full":"Vinstrihreyfingin – grænt framboð","note":"Écologistes"},
+      {"name":"FlF","x":-43,"y":30,"src":"ches","eu":-40,"env":-3,"pop":30,"full":"Flokkur fólksins","note":"Sans famille"},
+      {"name":"Pi","x":-30,"y":-90,"src":"ches","prot":-30,"eu":44,"env":83,"pop":-6,"full":"Pírata","note":"Sans famille"},
+      {"name":"Sam","x":-27,"y":-67,"src":"ches","prot":0,"eu":67,"env":53,"pop":-44,"full":"Samfylkingin","note":"Sociaux-démocrates"},
+      {"name":"F","x":3,"y":3,"src":"ches","prot":67,"eu":-67,"env":-3,"pop":-49,"full":"Framsóknarflokkurinn","note":"Agrariens et centre"},
+      {"name":"V","x":20,"y":-73,"src":"ches","prot":-53,"eu":89,"env":38,"pop":-54,"full":"Viðreisn","note":"Libéraux"},
+      {"name":"Sj","x":50,"y":3,"src":"ches","prot":0,"eu":-72,"env":-7,"full":"Sjálfstæðisflokkurinn","note":"Conservateurs"},
+      {"name":"M","x":67,"y":77,"src":"ches","prot":53,"eu":-94,"env":-60,"pop":34,"full":"Miðflokkurinn","note":"Agrariens et centre"}
     ]
   },
   {
     code: "lv", name: "Lettonie",
     parties: [
-      {"name":"LKS","x":-48,"y":65,"src":"ches","prot":-20,"eu":-23,"env":-16,"note":"Latvijas Krievu savienība · gauche radicale"},
-      {"name":"Progresivie","x":-46,"y":-77,"src":"ches","prot":-36,"eu":96,"env":54,"pop":-41,"note":"Progresīvie · écologistes"},
-      {"name":"Saskana","x":-34,"y":30,"src":"ches","prot":-12,"eu":28,"env":-11,"note":"Sociāldemokrātiskā Partija \"Saskaņa\" · sociaux-démocrates"},
-      {"name":"S!","x":-32,"y":67,"src":"ches","prot":8,"eu":-33,"env":-18,"pop":49,"note":"Stabilitātei! · régionalistes"},
-      {"name":"ZZS","x":8,"y":39,"src":"ches","prot":33,"eu":44,"env":7,"note":"Zaļo un Zemnieku savienība · écologistes"},
-      {"name":"AP!","x":14,"y":-40,"src":"ches","prot":-20,"eu":91,"env":27,"pop":-43,"note":"Attīstībai / Par! / Latvijas attīstībai · libéraux"},
-      {"name":"NA","x":15,"y":81,"src":"ches","prot":44,"eu":46,"env":-14,"note":"Nacionālā apvienība / Tēvzemei un Brīvībai / LNNK · droite radicale"},
-      {"name":"AS","x":18,"y":36,"src":"ches","prot":27,"eu":53,"env":5,"pop":-33,"note":"Latvijas Reģionu apvienība · régionalistes"},
-      {"name":"V","x":22,"y":-27,"src":"ches","prot":-36,"eu":94,"env":29,"note":"Jaunā Vienotība · libéraux"},
-      {"name":"LPV","x":22,"y":73,"src":"ches","prot":-17,"eu":-17,"env":-20,"pop":60,"note":"Latvija pirmajā vietā · sans famille"}
+      {"name":"LKS","x":-48,"y":65,"src":"ches","prot":-20,"eu":-23,"env":-16,"full":"Latvijas Krievu savienība","note":"Gauche radicale"},
+      {"name":"Progresivie","x":-46,"y":-77,"src":"ches","prot":-36,"eu":96,"env":54,"pop":-41,"note":"Écologistes"},
+      {"name":"Saskana","x":-34,"y":30,"src":"ches","prot":-12,"eu":28,"env":-11,"full":"Sociāldemokrātiskā Partija \"Saskaņa\"","note":"Sociaux-démocrates"},
+      {"name":"S!","x":-32,"y":67,"src":"ches","prot":8,"eu":-33,"env":-18,"pop":49,"full":"Stabilitātei!","note":"Régionalistes"},
+      {"name":"ZZS","x":8,"y":39,"src":"ches","prot":33,"eu":44,"env":7,"full":"Zaļo un Zemnieku savienība","note":"Écologistes"},
+      {"name":"AP!","x":14,"y":-40,"src":"ches","prot":-20,"eu":91,"env":27,"pop":-43,"full":"Attīstībai / Par! / Latvijas attīstībai","note":"Libéraux"},
+      {"name":"NA","x":15,"y":81,"src":"ches","prot":44,"eu":46,"env":-14,"full":"Nacionālā apvienība / Tēvzemei un Brīvībai / LNNK","note":"Droite radicale"},
+      {"name":"AS","x":18,"y":36,"src":"ches","prot":27,"eu":53,"env":5,"pop":-33,"full":"Latvijas Reģionu apvienība","note":"Régionalistes"},
+      {"name":"V","x":22,"y":-27,"src":"ches","prot":-36,"eu":94,"env":29,"full":"Jaunā Vienotība","note":"Libéraux"},
+      {"name":"LPV","x":22,"y":73,"src":"ches","prot":-17,"eu":-17,"env":-20,"pop":60,"full":"Latvija pirmajā vietā","note":"Sans famille"}
     ]
   },
   {
     code: "lt", name: "Lituanie",
     parties: [
-      {"name":"LLRA","x":-31,"y":81,"src":"ches","prot":27,"eu":14,"env":-22,"pop":-10,"note":"Lietuvos lenkų rinkimų akcija · régionalistes"},
-      {"name":"LSDP","x":-28,"y":4,"src":"ches","prot":-7,"eu":86,"env":13,"pop":-29,"note":"Lietuvos socialdemokratų partija · sociaux-démocrates"},
-      {"name":"LVZS","x":-22,"y":69,"src":"ches","prot":40,"eu":35,"env":-38,"pop":54,"note":"Lietuvos valstiečių sąjunga · agrariens et centre"},
-      {"name":"PPNA","x":-17,"y":70,"src":"ches","prot":35,"eu":10,"env":-32,"note":"Nemuno aušra · sans famille"},
-      {"name":"NS","x":-12,"y":88,"src":"ches","prot":49,"eu":-19,"env":-32,"note":"Nacionalinis susivienijimas · droite radicale"},
-      {"name":"DSVL","x":-7,"y":1,"src":"ches","prot":-7,"eu":77,"env":11,"note":"Demokratų sąjunga „Vardan Lietuvos“ · écologistes"},
-      {"name":"PLT","x":16,"y":20,"src":"ches","prot":-17,"eu":40,"env":5,"note":"Laisvė ir Teisingumas · libéraux"},
-      {"name":"TS-LKD","x":17,"y":0,"src":"ches","prot":-20,"eu":93,"env":17,"pop":-20,"note":"Tėvynės Sąjunga · conservateurs"},
-      {"name":"LS","x":53,"y":-46,"src":"ches","prot":-33,"eu":93,"env":25,"pop":-60,"note":"Liberalų Sąjūdis · libéraux"},
-      {"name":"Laisvės","x":61,"y":-87,"src":"ches","prot":-49,"eu":93,"env":54,"pop":-50,"note":"Laisvės partija · libéraux"}
+      {"name":"LLRA","x":-31,"y":81,"src":"ches","prot":27,"eu":14,"env":-22,"pop":-10,"full":"Lietuvos lenkų rinkimų akcija","note":"Régionalistes"},
+      {"name":"LSDP","x":-28,"y":4,"src":"ches","prot":-7,"eu":86,"env":13,"pop":-29,"full":"Lietuvos socialdemokratų partija","note":"Sociaux-démocrates"},
+      {"name":"LVZS","x":-22,"y":69,"src":"ches","prot":40,"eu":35,"env":-38,"pop":54,"full":"Lietuvos valstiečių sąjunga","note":"Agrariens et centre"},
+      {"name":"PPNA","x":-17,"y":70,"src":"ches","prot":35,"eu":10,"env":-32,"full":"Nemuno aušra","note":"Sans famille"},
+      {"name":"NS","x":-12,"y":88,"src":"ches","prot":49,"eu":-19,"env":-32,"full":"Nacionalinis susivienijimas","note":"Droite radicale"},
+      {"name":"DSVL","x":-7,"y":1,"src":"ches","prot":-7,"eu":77,"env":11,"full":"Demokratų sąjunga „Vardan Lietuvos“","note":"Écologistes"},
+      {"name":"PLT","x":16,"y":20,"src":"ches","prot":-17,"eu":40,"env":5,"full":"Laisvė ir Teisingumas","note":"Libéraux"},
+      {"name":"TS-LKD","x":17,"y":0,"src":"ches","prot":-20,"eu":93,"env":17,"pop":-20,"full":"Tėvynės Sąjunga","note":"Conservateurs"},
+      {"name":"LS","x":53,"y":-46,"src":"ches","prot":-33,"eu":93,"env":25,"pop":-60,"full":"Liberalų Sąjūdis","note":"Libéraux"},
+      {"name":"Laisvės","x":61,"y":-87,"src":"ches","prot":-49,"eu":93,"env":54,"pop":-50,"full":"Laisvės partija","note":"Libéraux"}
     ]
   },
   {
     code: "mt", name: "Malte",
     parties: [
-      {"name":"PN","x":-20,"y":27,"src":"ches","eu":67,"env":25,"pop":26,"note":"Partit Nazzjonalista · conservateurs"},
-      {"name":"PL","x":13,"y":-33,"src":"ches","eu":56,"env":0,"pop":11,"note":"Partit Laburista · sociaux-démocrates"}
+      {"name":"PN","x":-20,"y":27,"src":"ches","eu":67,"env":25,"pop":26,"full":"Partit Nazzjonalista","note":"Conservateurs"},
+      {"name":"PL","x":13,"y":-33,"src":"ches","eu":56,"env":0,"pop":11,"full":"Partit Laburista","note":"Sociaux-démocrates"}
     ]
   },
   {
     code: "no", name: "Norvège",
     parties: [
-      {"name":"R","x":-91,"y":-40,"src":"ches","prot":55,"eu":-95,"env":42,"note":"Rød Valgallianse · gauche radicale"},
-      {"name":"SV","x":-62,"y":-62,"src":"ches","prot":35,"eu":-67,"env":57,"pop":-57,"note":"Sosialistisk Venstreparti · gauche radicale"},
-      {"name":"Ap","x":-26,"y":-25,"src":"ches","prot":-25,"eu":41,"env":7,"note":"Arbeiderpartiet · sociaux-démocrates"},
-      {"name":"MDG","x":-12,"y":-63,"src":"ches","prot":-45,"eu":46,"env":75,"pop":-68,"note":"Miljøpartiet De Grønne · écologistes"},
-      {"name":"Sp","x":-9,"y":31,"src":"ches","prot":70,"eu":-90,"env":-18,"pop":-16,"note":"Senterpartiet · agrariens et centre"},
-      {"name":"KrF","x":6,"y":50,"src":"ches","prot":5,"eu":-14,"env":20,"pop":-47,"note":"Kristelig Folkeparti · démocrates-chrétiens"},
-      {"name":"V","x":25,"y":-62,"src":"ches","prot":-80,"eu":90,"env":58,"pop":-68,"note":"Venstre · libéraux"},
-      {"name":"H","x":37,"y":-5,"src":"ches","prot":-60,"eu":74,"env":-10,"pop":-75,"note":"Høyre · conservateurs"},
-      {"name":"FrP","x":54,"y":48,"src":"ches","prot":-35,"eu":-56,"env":-53,"pop":33,"note":"Fremskrittspartiet · droite radicale"}
+      {"name":"R","x":-91,"y":-40,"src":"ches","prot":55,"eu":-95,"env":42,"full":"Rød Valgallianse","note":"Gauche radicale"},
+      {"name":"SV","x":-62,"y":-62,"src":"ches","prot":35,"eu":-67,"env":57,"pop":-57,"full":"Sosialistisk Venstreparti","note":"Gauche radicale"},
+      {"name":"Ap","x":-26,"y":-25,"src":"ches","prot":-25,"eu":41,"env":7,"full":"Arbeiderpartiet","note":"Sociaux-démocrates"},
+      {"name":"MDG","x":-12,"y":-63,"src":"ches","prot":-45,"eu":46,"env":75,"pop":-68,"full":"Miljøpartiet De Grønne","note":"Écologistes"},
+      {"name":"Sp","x":-9,"y":31,"src":"ches","prot":70,"eu":-90,"env":-18,"pop":-16,"full":"Senterpartiet","note":"Agrariens et centre"},
+      {"name":"KrF","x":6,"y":50,"src":"ches","prot":5,"eu":-14,"env":20,"pop":-47,"full":"Kristelig Folkeparti","note":"Démocrates-chrétiens"},
+      {"name":"V","x":25,"y":-62,"src":"ches","prot":-80,"eu":90,"env":58,"pop":-68,"full":"Venstre","note":"Libéraux"},
+      {"name":"H","x":37,"y":-5,"src":"ches","prot":-60,"eu":74,"env":-10,"pop":-75,"full":"Høyre","note":"Conservateurs"},
+      {"name":"FrP","x":54,"y":48,"src":"ches","prot":-35,"eu":-56,"env":-53,"pop":33,"full":"Fremskrittspartiet","note":"Droite radicale"}
     ]
   },
   {
     code: "nl", name: "Pays-Bas",
     parties: [
-      {"name":"SP","x":-73,"y":-7,"src":"ches","prot":73,"eu":-33,"env":18,"pop":38,"note":"Socialistische Partij · gauche radicale"},
-      {"name":"PvdD","x":-55,"y":-55,"src":"ches","prot":50,"eu":-17,"env":73,"pop":-9,"note":"Partij voor de Dieren · écologistes"},
-      {"name":"GL","x":-50,"y":-82,"src":"ches","prot":33,"eu":78,"env":74,"pop":-60,"note":"GroenLinks · écologistes"},
-      {"name":"PvdA","x":-42,"y":-48,"src":"ches","prot":0,"eu":72,"env":55,"pop":-51,"note":"Partij van de Arbeid · sociaux-démocrates"},
-      {"name":"DENK","x":-28,"y":26,"src":"ches","prot":0,"eu":10,"env":0,"pop":-7,"note":"Beweging DENK · sans famille"},
-      {"name":"CU","x":-13,"y":38,"src":"ches","prot":13,"eu":19,"env":32,"pop":-60,"note":"ChristenUnie · confessionnels"},
-      {"name":"Volt","x":-6,"y":-78,"src":"ches","prot":-53,"eu":100,"env":54,"pop":-52,"note":"Volt Nederland · libéraux"},
-      {"name":"D66","x":10,"y":-73,"src":"ches","prot":-47,"eu":97,"env":56,"pop":-56,"note":"Democraten 66 · libéraux"},
-      {"name":"CDA","x":15,"y":30,"src":"ches","prot":0,"eu":47,"env":4,"pop":-42,"note":"Christen-Democratisch Appèl · démocrates-chrétiens"},
-      {"name":"NSC","x":20,"y":33,"src":"ches","prot":27,"eu":0,"env":-8,"note":"Nieuw Sociaal Contract · démocrates-chrétiens"},
-      {"name":"PVV","x":27,"y":62,"src":"ches","prot":60,"eu":-83,"env":-64,"pop":99,"note":"Partij voor de Vrijheid · droite radicale"},
-      {"name":"BBB","x":40,"y":53,"src":"ches","prot":73,"eu":-47,"env":-59,"pop":55,"note":"BoerBurgerBeweging · sans famille"},
-      {"name":"SGP","x":44,"y":88,"src":"ches","prot":20,"eu":-42,"env":-22,"pop":-26,"note":"Staatkundig Gereformeerde Partij · confessionnels"},
-      {"name":"VVD","x":53,"y":18,"src":"ches","prot":-47,"eu":39,"env":-7,"pop":-33,"note":"Volkspartij voor Vrijheid en Democratie · libéraux"},
-      {"name":"FvD","x":76,"y":97,"src":"ches","prot":-20,"eu":-97,"env":-76,"pop":86,"note":"Forum voor Vrijheid en Democratie · droite radicale"}
+      {"name":"SP","x":-73,"y":-7,"src":"ches","prot":73,"eu":-33,"env":18,"pop":38,"full":"Socialistische Partij","note":"Gauche radicale"},
+      {"name":"PvdD","x":-55,"y":-55,"src":"ches","prot":50,"eu":-17,"env":73,"pop":-9,"full":"Partij voor de Dieren","note":"Écologistes"},
+      {"name":"GL","x":-50,"y":-82,"src":"ches","prot":33,"eu":78,"env":74,"pop":-60,"full":"GroenLinks","note":"Écologistes"},
+      {"name":"PvdA","x":-42,"y":-48,"src":"ches","prot":0,"eu":72,"env":55,"pop":-51,"full":"Partij van de Arbeid","note":"Sociaux-démocrates"},
+      {"name":"DENK","x":-28,"y":26,"src":"ches","prot":0,"eu":10,"env":0,"pop":-7,"full":"Beweging DENK","note":"Sans famille"},
+      {"name":"CU","x":-13,"y":38,"src":"ches","prot":13,"eu":19,"env":32,"pop":-60,"full":"ChristenUnie","note":"Confessionnels"},
+      {"name":"Volt","x":-6,"y":-78,"src":"ches","prot":-53,"eu":100,"env":54,"pop":-52,"full":"Volt Nederland","note":"Libéraux"},
+      {"name":"D66","x":10,"y":-73,"src":"ches","prot":-47,"eu":97,"env":56,"pop":-56,"full":"Democraten 66","note":"Libéraux"},
+      {"name":"CDA","x":15,"y":30,"src":"ches","prot":0,"eu":47,"env":4,"pop":-42,"full":"Christen-Democratisch Appèl","note":"Démocrates-chrétiens"},
+      {"name":"NSC","x":20,"y":33,"src":"ches","prot":27,"eu":0,"env":-8,"full":"Nieuw Sociaal Contract","note":"Démocrates-chrétiens"},
+      {"name":"PVV","x":27,"y":62,"src":"ches","prot":60,"eu":-83,"env":-64,"pop":99,"full":"Partij voor de Vrijheid","note":"Droite radicale"},
+      {"name":"BBB","x":40,"y":53,"src":"ches","prot":73,"eu":-47,"env":-59,"pop":55,"full":"BoerBurgerBeweging","note":"Sans famille"},
+      {"name":"SGP","x":44,"y":88,"src":"ches","prot":20,"eu":-42,"env":-22,"pop":-26,"full":"Staatkundig Gereformeerde Partij","note":"Confessionnels"},
+      {"name":"VVD","x":53,"y":18,"src":"ches","prot":-47,"eu":39,"env":-7,"pop":-33,"full":"Volkspartij voor Vrijheid en Democratie","note":"Libéraux"},
+      {"name":"FvD","x":76,"y":97,"src":"ches","prot":-20,"eu":-97,"env":-76,"pop":86,"full":"Forum voor Vrijheid en Democratie","note":"Droite radicale"}
     ]
   },
   {
     code: "pl", name: "Pologne",
     parties: [
-      {"name":"Razem","x":-83,"y":-80,"src":"ches","prot":0,"eu":81,"env":76,"pop":-14,"note":"Razem · gauche radicale"},
-      {"name":"Nowa Lewica","x":-54,"y":-65,"src":"ches","prot":-12,"eu":97,"env":58,"note":"Nowa Lewica · sociaux-démocrates"},
-      {"name":"PiS","x":-50,"y":69,"src":"ches","prot":46,"eu":-30,"env":-57,"pop":74,"note":"Prawo i Sprawiedliwość · droite radicale"},
-      {"name":"PSL","x":-17,"y":39,"src":"ches","prot":42,"eu":46,"env":-17,"note":"Polskie Stronnictwo Ludowe · agrariens et centre"},
-      {"name":"PO","x":23,"y":-27,"src":"ches","prot":-38,"eu":88,"env":28,"pop":-26,"note":"Platforma Obywatelska · démocrates-chrétiens"},
-      {"name":"Polska 2050","x":26,"y":-2,"src":"ches","prot":-7,"eu":77,"env":33,"pop":-35,"note":"Polska 2050 Szymona Hołowni · libéraux"},
-      {"name":"Konfederacja","x":79,"y":68,"src":"ches","prot":-4,"eu":-83,"env":-80,"pop":-6,"note":"Konfederacja Wolność i Niepodległość · droite radicale"}
+      {"name":"Razem","x":-83,"y":-80,"src":"ches","prot":0,"eu":81,"env":76,"pop":-14,"note":"Gauche radicale"},
+      {"name":"Nowa Lewica","x":-54,"y":-65,"src":"ches","prot":-12,"eu":97,"env":58,"note":"Sociaux-démocrates"},
+      {"name":"PiS","x":-50,"y":69,"src":"ches","prot":46,"eu":-30,"env":-57,"pop":74,"full":"Prawo i Sprawiedliwość","note":"Droite radicale"},
+      {"name":"PSL","x":-17,"y":39,"src":"ches","prot":42,"eu":46,"env":-17,"full":"Polskie Stronnictwo Ludowe","note":"Agrariens et centre"},
+      {"name":"PO","x":23,"y":-27,"src":"ches","prot":-38,"eu":88,"env":28,"pop":-26,"full":"Platforma Obywatelska","note":"Démocrates-chrétiens"},
+      {"name":"Polska 2050","x":26,"y":-2,"src":"ches","prot":-7,"eu":77,"env":33,"pop":-35,"full":"Polska 2050 Szymona Hołowni","note":"Libéraux"},
+      {"name":"Konfederacja","x":79,"y":68,"src":"ches","prot":-4,"eu":-83,"env":-80,"pop":-6,"full":"Konfederacja Wolność i Niepodległość","note":"Droite radicale"}
     ]
   },
   {
     code: "pt", name: "Portugal",
     protWhy: "pour ce pays, la moitié au moins des positions du CHES 2024 sur le protectionnisme sont des nombres entiers : vraisemblablement un ou deux experts, trop peu pour placer les partis.",
     parties: [
-      {"name":"CDU","x":-88,"y":-30,"src":"ches","eu":-67,"env":16,"pop":-3,"note":"Coligação Democrática Unitária · gauche radicale"},
-      {"name":"BE","x":-75,"y":-85,"src":"ches","eu":-12,"env":56,"pop":-26,"note":"Bloco de Esquerda · gauche radicale"},
-      {"name":"PAN","x":-32,"y":-67,"src":"ches","eu":71,"env":53,"pop":-46,"note":"Pessosas - Animais - Natureza · écologistes"},
-      {"name":"L","x":-32,"y":-73,"src":"ches","eu":83,"env":50,"note":"Livre · écologistes"},
-      {"name":"PS","x":-16,"y":-44,"src":"ches","eu":100,"env":46,"pop":-62,"note":"Partido Socialista · sociaux-démocrates"},
-      {"name":"PPD/PSD","x":35,"y":35,"src":"ches","eu":100,"env":26,"pop":-68,"note":"Partido Popular Democrático / Partido Social Democrata · libéraux"},
-      {"name":"CDS-PP","x":47,"y":62,"src":"ches","eu":82,"env":-14,"pop":-52,"note":"Centro Democrático e Social--Partido Poplar · conservateurs"},
-      {"name":"IL","x":62,"y":-33,"src":"ches","eu":70,"env":-3,"pop":-36,"note":"Iniciativa Liberal · libéraux"},
-      {"name":"Chega","x":62,"y":93,"src":"ches","eu":-24,"env":-33,"pop":67,"note":"Chega · droite radicale"}
+      {"name":"CDU","x":-88,"y":-30,"src":"ches","eu":-67,"env":16,"pop":-3,"full":"Coligação Democrática Unitária","note":"Gauche radicale"},
+      {"name":"BE","x":-75,"y":-85,"src":"ches","eu":-12,"env":56,"pop":-26,"full":"Bloco de Esquerda","note":"Gauche radicale"},
+      {"name":"PAN","x":-32,"y":-67,"src":"ches","eu":71,"env":53,"pop":-46,"full":"Pessosas - Animais - Natureza","note":"Écologistes"},
+      {"name":"L","x":-32,"y":-73,"src":"ches","eu":83,"env":50,"full":"Livre","note":"Écologistes"},
+      {"name":"PS","x":-16,"y":-44,"src":"ches","eu":100,"env":46,"pop":-62,"full":"Partido Socialista","note":"Sociaux-démocrates"},
+      {"name":"PPD/PSD","x":35,"y":35,"src":"ches","eu":100,"env":26,"pop":-68,"full":"Partido Popular Democrático / Partido Social Democrata","note":"Libéraux"},
+      {"name":"CDS-PP","x":47,"y":62,"src":"ches","eu":82,"env":-14,"pop":-52,"full":"Centro Democrático e Social--Partido Poplar","note":"Conservateurs"},
+      {"name":"IL","x":62,"y":-33,"src":"ches","eu":70,"env":-3,"pop":-36,"full":"Iniciativa Liberal","note":"Libéraux"},
+      {"name":"Chega","x":62,"y":93,"src":"ches","eu":-24,"env":-33,"pop":67,"note":"Droite radicale"}
     ]
   },
   {
     code: "ro", name: "Roumanie",
     parties: [
-      {"name":"SOS RO","x":-25,"y":93,"src":"ches","prot":88,"eu":-82,"env":-58,"note":"SOS România · droite radicale"},
-      {"name":"PSD","x":-19,"y":33,"src":"ches","prot":18,"eu":74,"env":12,"pop":7,"note":"Partidul Social Democrat · sociaux-démocrates"},
-      {"name":"POT","x":-16,"y":97,"src":"ches","prot":100,"eu":-87,"env":-76,"note":"Partidul Oamenilor Tineri · droite radicale"},
-      {"name":"AUR","x":-7,"y":88,"src":"ches","prot":82,"eu":-55,"env":-46,"pop":93,"note":"Alianța pentru Unirea Românilor · droite radicale"},
-      {"name":"UDMR","x":9,"y":20,"src":"ches","prot":6,"eu":74,"env":11,"pop":-17,"note":"Uniunea Democrată Maghiară din România · régionalistes"},
-      {"name":"PNL","x":36,"y":10,"src":"ches","prot":-18,"eu":86,"env":16,"pop":-8,"note":"Partidul Naţional Liberal · libéraux"},
-      {"name":"USR","x":41,"y":-42,"src":"ches","prot":-36,"eu":88,"env":41,"pop":25,"note":"Uniunea Salvați România · libéraux"}
+      {"name":"SOS RO","x":-25,"y":93,"src":"ches","prot":88,"eu":-82,"env":-58,"full":"SOS România","note":"Droite radicale"},
+      {"name":"PSD","x":-19,"y":33,"src":"ches","prot":18,"eu":74,"env":12,"pop":7,"full":"Partidul Social Democrat","note":"Sociaux-démocrates"},
+      {"name":"POT","x":-16,"y":97,"src":"ches","prot":100,"eu":-87,"env":-76,"full":"Partidul Oamenilor Tineri","note":"Droite radicale"},
+      {"name":"AUR","x":-7,"y":88,"src":"ches","prot":82,"eu":-55,"env":-46,"pop":93,"full":"Alianța pentru Unirea Românilor","note":"Droite radicale"},
+      {"name":"UDMR","x":9,"y":20,"src":"ches","prot":6,"eu":74,"env":11,"pop":-17,"full":"Uniunea Democrată Maghiară din România","note":"Régionalistes"},
+      {"name":"PNL","x":36,"y":10,"src":"ches","prot":-18,"eu":86,"env":16,"pop":-8,"full":"Partidul Naţional Liberal","note":"Libéraux"},
+      {"name":"USR","x":41,"y":-42,"src":"ches","prot":-36,"eu":88,"env":41,"pop":25,"full":"Uniunea Salvați România","note":"Libéraux"}
     ]
   },
   {
     code: "sk", name: "Slovaquie",
     parties: [
-      {"name":"Smer-SD","x":-51,"y":79,"src":"ches","prot":65,"eu":-32,"env":-46,"pop":69,"note":"Smer – sociálna demokracia · sociaux-démocrates"},
-      {"name":"Hlas","x":-29,"y":22,"src":"ches","prot":40,"eu":24,"env":-14,"note":"Hlas – sociálna demokracia · sociaux-démocrates"},
-      {"name":"SNS","x":-12,"y":91,"src":"ches","prot":78,"eu":-67,"env":-67,"pop":50,"note":"Slovenská národná strana · droite radicale"},
-      {"name":"PS","x":1,"y":-65,"src":"ches","prot":-35,"eu":98,"env":78,"pop":-62,"note":"Progresívne Slovensko · libéraux"},
-      {"name":"Republika","x":1,"y":97,"src":"ches","prot":78,"eu":-87,"env":-70,"note":"Hnutie Republika · droite radicale"},
-      {"name":"OLaNO","x":2,"y":47,"src":"ches","prot":16,"eu":26,"env":-12,"pop":61,"note":"Obyčajní ľudia a nezávislé osobnosti · conservateurs"},
-      {"name":"Aliancia","x":3,"y":58,"src":"ches","prot":29,"eu":-7,"env":-41,"note":"Aliancia – Szövetség · régionalistes"},
-      {"name":"KDH","x":13,"y":62,"src":"ches","prot":20,"eu":51,"env":-1,"pop":-26,"note":"Kresťanskodemokratické hnutie · conservateurs"},
-      {"name":"SaS","x":60,"y":-56,"src":"ches","prot":-67,"eu":44,"env":-24,"pop":-51,"note":"Sloboda a solidarita · libéraux"}
+      {"name":"Smer-SD","x":-51,"y":79,"src":"ches","prot":65,"eu":-32,"env":-46,"pop":69,"full":"Smer – sociálna demokracia","note":"Sociaux-démocrates"},
+      {"name":"Hlas","x":-29,"y":22,"src":"ches","prot":40,"eu":24,"env":-14,"full":"Hlas – sociálna demokracia","note":"Sociaux-démocrates"},
+      {"name":"SNS","x":-12,"y":91,"src":"ches","prot":78,"eu":-67,"env":-67,"pop":50,"full":"Slovenská národná strana","note":"Droite radicale"},
+      {"name":"PS","x":1,"y":-65,"src":"ches","prot":-35,"eu":98,"env":78,"pop":-62,"full":"Progresívne Slovensko","note":"Libéraux"},
+      {"name":"Republika","x":1,"y":97,"src":"ches","prot":78,"eu":-87,"env":-70,"full":"Hnutie Republika","note":"Droite radicale"},
+      {"name":"OLaNO","x":2,"y":47,"src":"ches","prot":16,"eu":26,"env":-12,"pop":61,"full":"Obyčajní ľudia a nezávislé osobnosti","note":"Conservateurs"},
+      {"name":"Aliancia","x":3,"y":58,"src":"ches","prot":29,"eu":-7,"env":-41,"full":"Aliancia – Szövetség","note":"Régionalistes"},
+      {"name":"KDH","x":13,"y":62,"src":"ches","prot":20,"eu":51,"env":-1,"pop":-26,"full":"Kresťanskodemokratické hnutie","note":"Conservateurs"},
+      {"name":"SaS","x":60,"y":-56,"src":"ches","prot":-67,"eu":44,"env":-24,"pop":-51,"full":"Sloboda a solidarita","note":"Libéraux"}
     ]
   },
   {
     code: "si", name: "Slovénie",
     parties: [
-      {"name":"Levica","x":-82,"y":-69,"src":"ches","prot":23,"eu":16,"env":62,"note":"Levica · sociaux-démocrates"},
-      {"name":"SD","x":-44,"y":-48,"src":"ches","prot":10,"eu":76,"env":37,"pop":-24,"note":"Socialni demokrati · sociaux-démocrates"},
-      {"name":"Vesna","x":-35,"y":-47,"src":"ches","prot":27,"eu":62,"env":76,"note":"VESNA – zelena stranka · écologistes"},
-      {"name":"GS","x":-32,"y":-37,"src":"ches","prot":3,"eu":71,"env":36,"pop":-18,"note":"Gibanje Svoboda · libéraux"},
-      {"name":"SLS","x":37,"y":50,"src":"ches","prot":30,"eu":35,"env":-22,"note":"Slovenska ljudska stranka · démocrates-chrétiens"},
-      {"name":"NSi","x":52,"y":58,"src":"ches","prot":3,"eu":73,"env":-27,"pop":-35,"note":"Nova Slovenija – Krščanski demokrati · démocrates-chrétiens"},
-      {"name":"Resni.ca","x":54,"y":68,"src":"ches","prot":28,"eu":-36,"env":-33,"note":"Resni.ca · droite radicale"},
-      {"name":"SDS","x":61,"y":71,"src":"ches","prot":7,"eu":35,"env":-44,"pop":28,"note":"Slovenska demokratska stranka · conservateurs"}
+      {"name":"Levica","x":-82,"y":-69,"src":"ches","prot":23,"eu":16,"env":62,"note":"Sociaux-démocrates"},
+      {"name":"SD","x":-44,"y":-48,"src":"ches","prot":10,"eu":76,"env":37,"pop":-24,"full":"Socialni demokrati","note":"Sociaux-démocrates"},
+      {"name":"Vesna","x":-35,"y":-47,"src":"ches","prot":27,"eu":62,"env":76,"full":"VESNA – zelena stranka","note":"Écologistes"},
+      {"name":"GS","x":-32,"y":-37,"src":"ches","prot":3,"eu":71,"env":36,"pop":-18,"full":"Gibanje Svoboda","note":"Libéraux"},
+      {"name":"SLS","x":37,"y":50,"src":"ches","prot":30,"eu":35,"env":-22,"full":"Slovenska ljudska stranka","note":"Démocrates-chrétiens"},
+      {"name":"NSi","x":52,"y":58,"src":"ches","prot":3,"eu":73,"env":-27,"pop":-35,"full":"Nova Slovenija – Krščanski demokrati","note":"Démocrates-chrétiens"},
+      {"name":"Resni.ca","x":54,"y":68,"src":"ches","prot":28,"eu":-36,"env":-33,"note":"Droite radicale"},
+      {"name":"SDS","x":61,"y":71,"src":"ches","prot":7,"eu":35,"env":-44,"pop":28,"full":"Slovenska demokratska stranka","note":"Conservateurs"}
     ]
   },
   {
     code: "se", name: "Suède",
     parties: [
-      {"name":"V","x":-62,"y":-52,"src":"ches","prot":11,"eu":-23,"env":64,"pop":21,"note":"Vänsterpartiet · gauche radicale"},
-      {"name":"MP","x":-37,"y":-61,"src":"ches","prot":-15,"eu":44,"env":95,"pop":-19,"note":"Miljöpartiet de Gröna · écologistes"},
-      {"name":"SAP","x":-26,"y":-5,"src":"ches","prot":-31,"eu":58,"env":32,"pop":-6,"note":"Sveriges Socialdemokratiska Arbetarpartiet · sociaux-démocrates"},
-      {"name":"SD","x":26,"y":80,"src":"ches","prot":25,"eu":-44,"env":-71,"pop":82,"note":"Sverigedemokraterna · droite radicale"},
-      {"name":"KD","x":45,"y":56,"src":"ches","prot":-29,"eu":45,"env":-33,"pop":22,"note":"Kristdemokraterna · démocrates-chrétiens"},
-      {"name":"L","x":46,"y":-11,"src":"ches","prot":-71,"eu":95,"env":-3,"pop":-35,"note":"Liberalerna · libéraux"},
-      {"name":"C","x":57,"y":-41,"src":"ches","prot":-76,"eu":70,"env":46,"pop":-30,"note":"Centerpartiet · agrariens et centre"},
-      {"name":"M","x":58,"y":29,"src":"ches","prot":-56,"eu":58,"env":-37,"pop":-13,"note":"Moderaterna · conservateurs"}
+      {"name":"V","x":-62,"y":-52,"src":"ches","prot":11,"eu":-23,"env":64,"pop":21,"full":"Vänsterpartiet","note":"Gauche radicale"},
+      {"name":"MP","x":-37,"y":-61,"src":"ches","prot":-15,"eu":44,"env":95,"pop":-19,"full":"Miljöpartiet de Gröna","note":"Écologistes"},
+      {"name":"SAP","x":-26,"y":-5,"src":"ches","prot":-31,"eu":58,"env":32,"pop":-6,"full":"Sveriges Socialdemokratiska Arbetarpartiet","note":"Sociaux-démocrates"},
+      {"name":"SD","x":26,"y":80,"src":"ches","prot":25,"eu":-44,"env":-71,"pop":82,"full":"Sverigedemokraterna","note":"Droite radicale"},
+      {"name":"KD","x":45,"y":56,"src":"ches","prot":-29,"eu":45,"env":-33,"pop":22,"full":"Kristdemokraterna","note":"Démocrates-chrétiens"},
+      {"name":"L","x":46,"y":-11,"src":"ches","prot":-71,"eu":95,"env":-3,"pop":-35,"full":"Liberalerna","note":"Libéraux"},
+      {"name":"C","x":57,"y":-41,"src":"ches","prot":-76,"eu":70,"env":46,"pop":-30,"full":"Centerpartiet","note":"Agrariens et centre"},
+      {"name":"M","x":58,"y":29,"src":"ches","prot":-56,"eu":58,"env":-37,"pop":-13,"full":"Moderaterna","note":"Conservateurs"}
     ]
   },
   {
     code: "ch", name: "Suisse",
     protWhy: "pour ce pays, la moitié au moins des positions du CHES 2024 sur le protectionnisme sont des nombres entiers : vraisemblablement un ou deux experts, trop peu pour placer les partis.",
     parties: [
-      {"name":"GPS/PES","x":-75,"y":-80,"src":"ches","eu":29,"env":95,"pop":-17,"note":"Grüne – Écologiste · écologistes"},
-      {"name":"SP/PS","x":-68,"y":-76,"src":"ches","eu":53,"env":81,"pop":11,"note":"Sozialdemokratische Partei der Schweiz – Parti Socialiste Suisse · sociaux-démocrates"},
-      {"name":"EVP/PEV","x":2,"y":45,"src":"ches","eu":-3,"env":9,"note":"Evangelische Volkspartei der Schweiz / Parti Populaire Evangélique Suisse · confessionnels"},
-      {"name":"DM/LC/AdC","x":4,"y":17,"src":"ches","eu":2,"env":13,"note":"Die Mitte · démocrates-chrétiens"},
-      {"name":"MCG","x":20,"y":55,"src":"ches","eu":-91,"env":-57,"note":"Mouvement Citoyens Genevois · droite radicale"},
-      {"name":"GPL/PVL","x":25,"y":-56,"src":"ches","eu":67,"env":77,"pop":-54,"note":"Grünliberale Partei der Schweiz – Parti Vert-Libéral · écologistes"},
-      {"name":"Lega","x":36,"y":72,"src":"ches","eu":-92,"env":-68,"note":"Lega dei Ticinesi · régionalistes"},
-      {"name":"EDU/UDF","x":44,"y":85,"src":"ches","eu":-72,"env":-37,"note":"Eidgenössisch-Demokratische Union / Union Démocratique Fédérale · confessionnels"},
-      {"name":"FDP/PLR","x":63,"y":3,"src":"ches","eu":4,"env":-19,"pop":-42,"note":"Freisinnig-Demokratische Partei der Schweiz – Parti Radical-Democratique Suisse · libéraux"},
-      {"name":"SVP/UDC","x":67,"y":81,"src":"ches","eu":-98,"env":-68,"pop":86,"note":"Schweizerische Volkspartei – Union Démocratique du Centre · droite radicale"}
+      {"name":"GPS/PES","x":-75,"y":-80,"src":"ches","eu":29,"env":95,"pop":-17,"full":"Grüne – Écologiste","note":"Écologistes"},
+      {"name":"SP/PS","x":-68,"y":-76,"src":"ches","eu":53,"env":81,"pop":11,"full":"Sozialdemokratische Partei der Schweiz – Parti Socialiste Suisse","note":"Sociaux-démocrates"},
+      {"name":"EVP/PEV","x":2,"y":45,"src":"ches","eu":-3,"env":9,"full":"Evangelische Volkspartei der Schweiz / Parti Populaire Evangélique Suisse","note":"Confessionnels"},
+      {"name":"DM/LC/AdC","x":4,"y":17,"src":"ches","eu":2,"env":13,"full":"Die Mitte","note":"Démocrates-chrétiens"},
+      {"name":"MCG","x":20,"y":55,"src":"ches","eu":-91,"env":-57,"full":"Mouvement Citoyens Genevois","note":"Droite radicale"},
+      {"name":"GPL/PVL","x":25,"y":-56,"src":"ches","eu":67,"env":77,"pop":-54,"full":"Grünliberale Partei der Schweiz – Parti Vert-Libéral","note":"Écologistes"},
+      {"name":"Lega","x":36,"y":72,"src":"ches","eu":-92,"env":-68,"full":"Lega dei Ticinesi","note":"Régionalistes"},
+      {"name":"EDU/UDF","x":44,"y":85,"src":"ches","eu":-72,"env":-37,"full":"Eidgenössisch-Demokratische Union / Union Démocratique Fédérale","note":"Confessionnels"},
+      {"name":"FDP/PLR","x":63,"y":3,"src":"ches","eu":4,"env":-19,"pop":-42,"full":"Freisinnig-Demokratische Partei der Schweiz – Parti Radical-Democratique Suisse","note":"Libéraux"},
+      {"name":"SVP/UDC","x":67,"y":81,"src":"ches","eu":-98,"env":-68,"pop":86,"full":"Schweizerische Volkspartei – Union Démocratique du Centre","note":"Droite radicale"}
     ]
   },
   {
     code: "cz", name: "Tchéquie",
     parties: [
-      {"name":"KSCM","x":-85,"y":60,"src":"ches","prot":79,"eu":-84,"env":-65,"pop":7,"note":"Komunistická strana Cech a Moravy · gauche radicale"},
-      {"name":"SOCDEM","x":-52,"y":-4,"src":"ches","prot":32,"eu":36,"env":-6,"pop":-32,"note":"Česká strana sociálně demokratická · sociaux-démocrates"},
-      {"name":"ANO2011","x":-24,"y":39,"src":"ches","prot":35,"eu":-31,"env":-51,"pop":51,"note":"Akce nespokojených ob˘canů · sans famille"},
-      {"name":"SPD","x":-18,"y":89,"src":"ches","prot":79,"eu":-96,"env":-77,"pop":89,"note":"Svoboda a p˘rímá demokracie Tomio Okamura · droite radicale"},
-      {"name":"Pirates","x":-11,"y":-68,"src":"ches","prot":-34,"eu":80,"env":52,"pop":-33,"note":"Ceska piratska strana · écologistes"},
-      {"name":"KDU-CSL","x":7,"y":57,"src":"ches","prot":11,"eu":64,"env":1,"pop":-59,"note":"Křesťanská a demokratická unie – Československá strana lidová · démocrates-chrétiens"},
-      {"name":"STAN","x":17,"y":-19,"src":"ches","prot":-26,"eu":88,"env":24,"pop":-56,"note":"Starostové a nezávislí · libéraux"},
-      {"name":"Přísaha","x":17,"y":51,"src":"ches","prot":42,"eu":-59,"env":-64,"note":"Přísaha · sans famille"},
-      {"name":"ODS","x":45,"y":30,"src":"ches","prot":-23,"eu":0,"env":-31,"pop":-62,"note":"Občanská demokratická strana · conservateurs"},
-      {"name":"TOP09","x":46,"y":-15,"src":"ches","prot":-39,"eu":83,"env":20,"pop":-55,"note":"Tradice Odpovědnost Prosperita 09 · conservateurs"},
-      {"name":"MOTO","x":48,"y":65,"src":"ches","prot":24,"eu":-81,"env":-81,"note":"Motoristé sobě · droite radicale"}
+      {"name":"KSCM","x":-85,"y":60,"src":"ches","prot":79,"eu":-84,"env":-65,"pop":7,"full":"Komunistická strana Cech a Moravy","note":"Gauche radicale"},
+      {"name":"SOCDEM","x":-52,"y":-4,"src":"ches","prot":32,"eu":36,"env":-6,"pop":-32,"full":"Česká strana sociálně demokratická","note":"Sociaux-démocrates"},
+      {"name":"ANO2011","x":-24,"y":39,"src":"ches","prot":35,"eu":-31,"env":-51,"pop":51,"full":"Akce nespokojených ob˘canů","note":"Sans famille"},
+      {"name":"SPD","x":-18,"y":89,"src":"ches","prot":79,"eu":-96,"env":-77,"pop":89,"full":"Svoboda a p˘rímá demokracie Tomio Okamura","note":"Droite radicale"},
+      {"name":"Pirates","x":-11,"y":-68,"src":"ches","prot":-34,"eu":80,"env":52,"pop":-33,"full":"Ceska piratska strana","note":"Écologistes"},
+      {"name":"KDU-CSL","x":7,"y":57,"src":"ches","prot":11,"eu":64,"env":1,"pop":-59,"full":"Křesťanská a demokratická unie – Československá strana lidová","note":"Démocrates-chrétiens"},
+      {"name":"STAN","x":17,"y":-19,"src":"ches","prot":-26,"eu":88,"env":24,"pop":-56,"full":"Starostové a nezávislí","note":"Libéraux"},
+      {"name":"Přísaha","x":17,"y":51,"src":"ches","prot":42,"eu":-59,"env":-64,"note":"Sans famille"},
+      {"name":"ODS","x":45,"y":30,"src":"ches","prot":-23,"eu":0,"env":-31,"pop":-62,"full":"Občanská demokratická strana","note":"Conservateurs"},
+      {"name":"TOP09","x":46,"y":-15,"src":"ches","prot":-39,"eu":83,"env":20,"pop":-55,"full":"Tradice Odpovědnost Prosperita 09","note":"Conservateurs"},
+      {"name":"MOTO","x":48,"y":65,"src":"ches","prot":24,"eu":-81,"env":-81,"full":"Motoristé sobě","note":"Droite radicale"}
     ]
   },
   {
     code: "tr", name: "Turquie",
     protWhy: "pour ce pays, la moitié au moins des positions du CHES 2024 sur le protectionnisme sont des nombres entiers : vraisemblablement un ou deux experts, trop peu pour placer les partis.",
     parties: [
-      {"name":"TiP","x":-87,"y":-72,"src":"ches","eu":4,"env":64,"note":"Türkiye İşçi Partisi · gauche radicale"},
-      {"name":"DEM","x":-47,"y":-66,"src":"ches","eu":77,"env":58,"note":"Halkların Eşitlik ve Demokrasi Partisi · écologistes"},
-      {"name":"CHP","x":-30,"y":-44,"src":"ches","eu":79,"env":47,"note":"Cumhuriyet Halk Partisi · sociaux-démocrates"},
-      {"name":"IYI","x":6,"y":20,"src":"ches","eu":26,"env":15,"note":"Iyi Parti · libéraux"},
-      {"name":"MHP","x":20,"y":90,"src":"ches","eu":-69,"env":-31,"note":"Milliyetci Hareket Partisi · droite radicale"},
-      {"name":"YRP","x":23,"y":96,"src":"ches","eu":-92,"env":-23,"note":"Yeniden Refah Partisi · confessionnels"},
-      {"name":"AKP","x":34,"y":87,"src":"ches","eu":-12,"env":-38,"note":"Adalet ve Kalkinma Partisi · conservateurs"}
+      {"name":"TiP","x":-87,"y":-72,"src":"ches","eu":4,"env":64,"full":"Türkiye İşçi Partisi","note":"Gauche radicale"},
+      {"name":"DEM","x":-47,"y":-66,"src":"ches","eu":77,"env":58,"full":"Halkların Eşitlik ve Demokrasi Partisi","note":"Écologistes"},
+      {"name":"CHP","x":-30,"y":-44,"src":"ches","eu":79,"env":47,"full":"Cumhuriyet Halk Partisi","note":"Sociaux-démocrates"},
+      {"name":"IYI","x":6,"y":20,"src":"ches","eu":26,"env":15,"full":"Iyi Parti","note":"Libéraux"},
+      {"name":"MHP","x":20,"y":90,"src":"ches","eu":-69,"env":-31,"full":"Milliyetci Hareket Partisi","note":"Droite radicale"},
+      {"name":"YRP","x":23,"y":96,"src":"ches","eu":-92,"env":-23,"full":"Yeniden Refah Partisi","note":"Confessionnels"},
+      {"name":"AKP","x":34,"y":87,"src":"ches","eu":-12,"env":-38,"full":"Adalet ve Kalkinma Partisi","note":"Conservateurs"}
     ]
   }
   ];
