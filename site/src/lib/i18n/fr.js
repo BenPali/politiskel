@@ -687,10 +687,10 @@ export const LOCALES = {
     backToThemes: "← Tous les thèmes", otherThemes: "Autres thèmes",
     hubEyebrow: "Questionnaire Politiskel",
     hubLead: "Le questionnaire est découpé en thèmes, que vous remplissez dans l'ordre que "
-      + "vous voulez. Chacun remplace un axe de PolitiScales ou ajoute une lecture de votre profil.",
+      + "vous voulez. Chacun remplace un axe de la boussole ou ajoute une lecture de votre profil.",
     hubPlanned: "À venir",
     hubTitle: "Répondez par thèmes, dans l'ordre que vous voulez.",
-    hubLeadShort: "Chacun remplace un axe de PolitiScales ou ajoute une lecture de votre profil.",
+    hubLeadShort: "Chacun remplace un axe de la boussole ou ajoute une lecture de votre profil.",
     hubSources: "Aucune question n'est écrite pour Politiskel : chacune est citée d'une grande enquête publique — ESS, ISSP, EVS, Eurobaromètre — dans sa version française officielle, avec sa source.",
     hubMethod: "Lire la méthode",
     hubProgress: (n, m) => n + " / " + m + " réponses",
@@ -720,11 +720,9 @@ export const LOCALES = {
         salienceAfter: "Maintenant que vous avez répondu : quelle place les questions de "
           + "société tiennent-elles dans vos choix politiques ?" },
       europe: { name: "Europe et monde",
-        desc: "Intégration européenne, rapport à la Russie et aux instances internationales, que "
-          + "PolitiScales ne demande pas. Des lectures à part de la boussole, et une de plus : "
-          + "Économie × Europe.",
-        lead: "PolitiScales ne pose aucune question sur l'Europe. Celles-ci mesurent trois choses "
-          + "à part : l'intégration européenne, sur l'échelle qu'utilisent les experts du CHES pour "
+        desc: "Intégration européenne, rapport à la Russie et aux instances internationales : des "
+          + "lectures à part de la boussole, et une de plus, Économie × Europe.",
+        lead: "Ces questions mesurent trois choses à part : l'intégration européenne, sur l'échelle qu'utilisent les experts du CHES pour "
           + "les partis, le rapport à la Russie, et l'autorité des instances internationales. "
           + "Aucune ne déplace votre point sur la boussole principale.",
         leadNative: "Ces questions mesurent trois choses à part : l'intégration européenne, sur "
@@ -764,7 +762,7 @@ export const LOCALES = {
         group: { title: "Votre groupe", text: "Le groupe affiché, ses membres, et les trois choix qui cadrent la boussole : le groupe, le pays de référence, la lecture. Inviter copie le lien du groupe." },
         compass: { title: "La boussole", text: "Chaque point est un membre, chaque losange un parti placé par les experts du CHES. Changez de lecture : les points se déplacent.", hint: "Cliquez un point pour le suivre" },
         profiles: { title: "Les profils", text: "Les positions de chacun et le repère le plus proche — une proximité, pas une appartenance. La fiche d'un profil détaille ses lectures et son drapeau." },
-        themes: { title: "Le questionnaire", text: "Des questions tirées des grandes enquêtes publiques, par thèmes, dans l'ordre que vous voulez. Chaque thème remplace un axe de PolitiScales ou ajoute une lecture ; vos réponses s'enregistrent en passant à la suivante." },
+        themes: { title: "Le questionnaire", text: "Des questions tirées des grandes enquêtes publiques, par thèmes, dans l'ordre que vous voulez. Chaque thème remplace un axe de la boussole ou ajoute une lecture ; vos réponses s'enregistrent en passant à la suivante." },
         groups: { title: "Vos groupes", text: "Créez un groupe et partagez son lien, ou rejoignez-en un. Un groupe peut aussi apparaître dans l'annuaire, où l'on demande à entrer." },
         display: { title: "L'affichage", text: "Neuf palettes, chacune en clair, en sombre ou selon le système. Les animations se réduisent depuis votre compte." },
         account: { title: "Votre compte", text: "Votre résultat PolitiScales, l'export de toutes vos données, le mot de passe, et la suppression du compte, qui efface tout." },
@@ -795,7 +793,7 @@ export const LOCALES = {
     resultCount: (t, n, m) => t + " · " + n + " / " + m + " réponses",
     resultLead: { x: "Vos réponses remplacent l'axe économique de PolitiScales, qui ne posait rien sur la redistribution. Votre point se déplace sur la boussole.",
                   y: "Vos réponses remplacent l'axe sociétal de PolitiScales, question par question tirées des enquêtes publiques. Votre point se déplace sur la boussole.",
-                  europe: "Une lecture que PolitiScales n'avait pas : votre position sur l'intégration européenne, parmi les partis que le CHES place sur la même échelle. Elle se lit aussi sur la boussole, dans la lecture « Économie × Europe »." },
+                  europe: "Votre position sur l'intégration européenne, parmi les partis que le CHES place sur la même échelle. Elle se lit aussi sur la boussole, dans la lecture « Économie × Europe »." },
     resultLeadNative: "Vos réponses placent votre point sur cet axe de la boussole.",
     resultWasPs: v => "était " + v + " avec PolitiScales", resultNativeNote: "mesuré par le questionnaire",
     resultOwnNote: "positif = pour l'intégration, sur l'échelle eu_position du CHES",
