@@ -115,7 +115,7 @@
 	.dot i.me { background: var(--dot-me); }
 	.dot span { position: absolute; left: 14px; top: -13px; padding: 3px 10px; border-radius: var(--r-pill); background: var(--surface);
 		box-shadow: var(--shadow-1); font-size: 13px; font-weight: 650; white-space: nowrap; }
-	.cap { position: absolute; font-size: 11.5px; font-weight: 650; letter-spacing: .05em; color: var(--text-3); }
+	.cap { position: absolute; font-size: 13px; font-weight: 600; color: var(--text-3); }
 	.cap.t { left: 10px; top: 8px; }
 	.cap.b { left: 10px; bottom: 8px; }
 	.cap.l { left: 10px; top: calc(50% + 8px); }

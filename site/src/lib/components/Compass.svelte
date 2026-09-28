@@ -335,7 +335,7 @@
 	.plane { fill: var(--quad); }
 	.grid-line { stroke: var(--grid); stroke-width: 1; }
 	.axis-line { stroke: var(--axis); stroke-width: 1.6; }
-	.cap { fill: var(--text-2); font-weight: 650; letter-spacing: .05em; }
+	.cap { fill: var(--text-2); font-weight: 600; }
 	.quad { fill: var(--text-3); font-style: italic; }
 	.tick { fill: var(--text-3); font-variant-numeric: tabular-nums; }
 
