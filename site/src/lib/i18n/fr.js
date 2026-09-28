@@ -175,13 +175,18 @@ export const LOCALES = {
       title: "Lectures",
       lead: "Chaque ligne est une lecture indépendante ; X et Y placent le profil sur la boussole.",
       label: { x: "Économie (X)", y: "Société (Y)", protectionism: "Protectionnisme", class: "Classe (Wright)",
-               conflict: "Conflit de classe perçu", labour: "Capital / travail" },
+               conflict: "Conflit de classe perçu", labour: "Capital / travail",
+               europe: "Europe", russia: "Russie", world: "Instances internationales" },
       hintQuiz: { x: "Questionnaire · échelle CHES", y: "Questionnaire · GAL-TAN" },
       hintPs: "D'après PolitiScales",
       hint: { protectionism: "À part de X, comme dans le CHES", class: "Lecture rivale de X",
-              conflict: "ISSP", labour: "Syndicats, pouvoir des patrons · ESS, ISSP" },
+              conflict: "ISSP", labour: "Syndicats, pouvoir des patrons · ESS, ISSP",
+              europe: "Questionnaire · échelle CHES", russia: "Eurobaromètre · sans repère de parti",
+              world: "ISSP · sans repère de parti" },
       ends: { x: ["Gauche", "Droite"], y: ["Ouverture", "Tradition"], protectionism: ["Libre-échange", "Protection"],
-              class: ["Pro-capitaliste", "Anticapitaliste"], conflict: ["Faible", "Fort"], labour: ["Côté capital", "Côté travail"] }
+              class: ["Pro-capitaliste", "Anticapitaliste"], conflict: ["Faible", "Fort"], labour: ["Côté capital", "Côté travail"],
+              europe: ["Souveraineté", "Intégration"], russia: ["Fermeté", "Conciliation"],
+              world: ["Intérêt national", "Autorité internationale"] }
     },
     partiesTitle: "Partis, du plus proche au plus lointain",
     partiesScope: (country, view) => country + " · " + view,
@@ -323,26 +328,27 @@ export const LOCALES = {
       sections: [
         { id: "mesure", title: "Ce que mesure Politiskel", paras: [
           "La boussole croise deux axes. L'axe horizontal est l'économie, de la gauche à la droite : redistribution, services publics et impôts, régulation des marchés. L'axe vertical est celui que les politistes appellent GAL-TAN — écologie, alternatives, libertés en bas ; tradition, autorité, nation en haut. C'est l'espace dans lequel le <em>Chapel Hill Expert Survey</em> (CHES) place les partis européens depuis vingt ans.",
-          "GAL-TAN mesure des valeurs culturelles, pas le rapport à l'État : on peut être tout en bas et demander plus d'État, pour l'économie comme pour les services publics. Deux axes compressent forcément ; Politiskel propose donc plusieurs <em>lectures</em> — celle du questionnaire, celle de PolitiScales d'origine, l'économie croisée avec le protectionnisme — et la fiche d'un profil décompose le reste lecture par lecture."
+          "GAL-TAN mesure des valeurs culturelles, pas le rapport à l'État : on peut être tout en bas et demander plus d'État, pour l'économie comme pour les services publics. Deux axes compressent forcément ; Politiskel propose donc plusieurs <em>lectures</em> — celle du questionnaire, celle de PolitiScales d'origine, l'économie croisée avec le protectionnisme ou avec l'Europe — et la fiche d'un profil décompose le reste lecture par lecture."
         ] },
         { id: "sources", title: "Les deux sources d'un profil", paras: [
           "Un profil a deux sources possibles : un résultat PolitiScales, lu sur une capture, et le questionnaire Politiskel. Quand un thème du questionnaire est répondu, l'axe qu'il mesure <strong>remplace entièrement</strong> celui de PolitiScales — les deux ne sont jamais moyennés. Chaque coordonnée a donc une seule source, et le tableau la signale.",
           "Depuis PolitiScales, X est une moyenne pondérée de Capitalisme − Communisme (<code>0,45</code>) et de Laissez-faire − Régulation (<code>0,35</code>) ; Y, de Essentialisme − Constructivisme (<code>0,30</code>), Justice punitive − réhabilitative (<code>0,25</code>), Conservatisme − Progressisme (<code>0,25</code>) et Nationalisme − Internationalisme (<code>0,20</code>). Les poids sont renormalisés sur les seules composantes renseignées. Écologie ↔ Productivisme n'entre pas dans X : l'échelle économique du CHES exclut l'environnement.",
-          "Depuis le questionnaire, X est la moyenne simple de trois sous-dimensions — redistribution, services publics contre impôts, régulation des marchés —, les trois sous-échelles économiques du CHES, dont la moyenne reproduit son axe <code>lrecon</code> à <code>r = 0,96</code>. Y suit le même principe sur les sept sous-dimensions sociétales du CHES ; leur moyenne reproduit <code>galtan</code> à <code>r = 0,97</code>. Le protectionnisme est lu à part, jamais dans X : dans le CHES il va contre la gauche-droite économique (<code>r = −0,37</code>)."
+          "Depuis le questionnaire, X est la moyenne simple de trois sous-dimensions — redistribution, services publics contre impôts, régulation des marchés —, les trois sous-échelles économiques du CHES, dont la moyenne reproduit son axe <code>lrecon</code> à <code>r = 0,96</code>. Y suit le même principe sur les sept sous-dimensions sociétales du CHES ; leur moyenne reproduit <code>galtan</code> à <code>r = 0,97</code>. Le protectionnisme est lu à part, jamais dans X : dans le CHES il va contre la gauche-droite économique (<code>r = −0,37</code>).",
+          "Le thème Europe et monde ne touche à aucun des deux axes. Il donne trois lectures à part : l'intégration européenne, moyenne de trois groupes de questions — l'appartenance à l'Union, ses pouvoirs face aux gouvernements nationaux, ses politiques communes —, sur l'échelle <code>eu_position</code> du CHES ; le rapport à la Russie ; l'autorité des instances internationales face à l'intérêt national. Seule la première est comparée aux partis. Le CHES note bien le rapport des partis à la Russie, mais en France chaque position n'y repose que sur deux ou trois experts, en Italie sur un seul au plus : trop peu pour servir de repère."
         ] },
         { id: "questions", title: "D'où viennent les questions", paras: [
-          "Aucune question n'est écrite pour Politiskel. Chacune est citée d'une enquête publique éprouvée — l'<em>European Social Survey</em>, l'<em>International Social Survey Programme</em>, l'<em>European Values Study</em> — dans sa version française officielle, avec sa source jusqu'à la variable. On peut donc vérifier chaque formulation.",
+          "Aucune question n'est écrite pour Politiskel. Chacune est citée d'une enquête publique éprouvée — l'<em>European Social Survey</em>, l'<em>International Social Survey Programme</em>, l'<em>European Values Study</em>, et l'<em>Eurobaromètre</em> pour la Russie et les politiques communes de l'Union, dont les trois autres ne parlent pas — dans sa version française officielle, avec sa source jusqu'à la variable. On peut donc vérifier chaque formulation.",
           "Les exceptions sont signalées sur la question même : l'échelle de classe d'Erik Olin Wright, qui n'existe pas en français et est traduite, et les deux bornes d'une échelle de l'ESS dont la carte n'a pas été retrouvée. Seule la consigne change : écrite pour une série de questions posées à la suite, elle est mise au singulier, puisqu'ici chaque écran n'en pose qu'une, dans un ordre mélangé mais identique pour tout le monde."
         ], quote: ["« Le gouvernement devrait prendre des mesures pour réduire les différences de revenu. »", "ESS, variable <code>gincdif</code> — questionnaire français officiel"] },
         { id: "partis", title: "Comment les partis sont placés", paras: [
-          "Les repères viennent du CHES 2024 : 609 politologues notent 279 partis européens sur les échelles <code>lrecon</code> et <code>galtan</code>, exactement les deux dimensions de cette boussole, ramenées de −100 à +100 : position = (note sur 10 − 5) × 20. Ce ne sont pas des scores PolitiScales ; les distances profil-parti gardent donc une part d'approximation."
+          "Les repères viennent du CHES 2024 : 609 politologues notent 279 partis européens sur les échelles <code>lrecon</code> et <code>galtan</code>, exactement les deux dimensions de cette boussole, ramenées de −100 à +100 : position = (note sur 10 − 5) × 20. La position sur l'Europe vient de son échelle <code>eu_position</code>, notée de 1 à 7 : position = (note − 4) / 3 × 100. Ce ne sont pas des scores PolitiScales ; les distances profil-parti gardent donc une part d'approximation."
         ] },
         { id: "distance", title: "Une proximité, pas une appartenance", paras: [
           "La distance entre un profil et un parti est mesurée sur les deux axes de la lecture choisie. Les seuils ne sont pas fixés à la main : on mesure l'espacement médian entre un parti et son voisin le plus proche, puis <em>proche</em> vaut jusqu'à cet espacement, <em>modérée</em> jusqu'à une fois et demie. Au-delà, le parti le moins lointain reste nommé, mais la page dit qu'aucun n'est vraiment proche. Le repère le plus proche n'est pas une famille politique : c'est le point le moins éloigné, et il peut être loin."
         ] },
         { id: "limites", title: "Limites", paras: [
           "Un groupe d'amis est un petit échantillon : il montre où ses membres divergent, il ne dit rien de la population. L'import PolitiScales lit une capture d'écran ; si sa mise en page change, la lecture peut échouer, et Politiskel le dit plutôt que de deviner.",
-          "Deux axes ne voient ni le populisme — peuple contre élites — ni l'intégration européenne, dont les deux axes n'expliquent pas même la moitié dans le CHES. Ce sont des thèmes à venir du questionnaire. Le drapeau, enfin, est une illustration : il suit les conventions des drapeaux politiques, et sa légende dit ce que chaque élément représente."
+          "Deux axes ne voient ni le populisme — peuple contre élites — ni l'intégration européenne, dont les deux axes n'expliquent pas même la moitié dans le CHES. L'Europe a désormais son thème et sa lecture ; le populisme attend le thème Institutions. Le drapeau, enfin, est une illustration : il suit les conventions des drapeaux politiques, et sa légende dit ce que chaque élément représente."
         ] },
         { id: "donnees", title: "Vos données", paras: [
           "Vos réponses sont des opinions politiques — des données sensibles au sens de l'article 9 du RGPD. Elles ne sont enregistrées qu'avec votre consentement explicite, sur ce serveur seulement, et ne sont montrées qu'aux membres des groupes que vous avez rejoints. Les captures PolitiScales ne quittent jamais votre navigateur. Aucun traceur, aucun e-mail. Vous pouvez tout exporter ou tout effacer depuis votre compte."
@@ -379,10 +385,10 @@ export const LOCALES = {
         crown: ["Couronne", "le monarchisme"], fleur: ["Fleur de lys", "un monarchisme légitimiste"],
         hammer: ["Faucille et marteau", "le communisme"], rose: ["Rose", "la social-démocratie"],
         lorraine: ["Croix de Lorraine", "le gaullisme"], cog: ["Roue dentée", "le syndicalisme"],
-        dove: ["Colombe", "le pacifisme · thème Europe et monde"], wheat: ["Épi de blé", "l'agrarisme · à venir"],
+        dove: ["Colombe", "le pacifisme · à venir"], wheat: ["Épi de blé", "l'agrarisme · à venir"],
         snail: ["Escargot", "la décroissance · thème Écologie"], turbine: ["Éolienne", "la transition énergétique · thème Écologie"],
-        atom: ["Atome", "le nucléaire civil · thème Écologie"], eustars: ["Cercle d'étoiles", "le fédéralisme européen · thème Europe"],
-        wall: ["Rempart", "la souveraineté nationale · thème Europe"], vote: ["Urne", "la démocratie directe · thème Institutions"],
+        atom: ["Atome", "le nucléaire civil · thème Écologie"], eustars: ["Cercle d'étoiles", "le fédéralisme européen"],
+        wall: ["Rempart", "la souveraineté nationale"], vote: ["Urne", "la démocratie directe · thème Institutions"],
         megaphone: ["Mégaphone", "le populisme · thème Institutions"], ermine: ["Hermine", "le régionalisme · thème Institutions"]
       },
       coloursTitle: "Les couleurs",
@@ -642,6 +648,14 @@ export const LOCALES = {
     viewNoteOff: n => n + " profil" + (n > 1 ? "s" : "") + " sans réponse au questionnaire "
       + "économie " + (n > 1 ? "ne sont" : "n'est") + " pas placé" + (n > 1 ? "s" : "")
       + " : c'est lui qui mesure le protectionnisme.",
+    viewNoteAllEstimatedEu: "Aucun repère dans cette lecture : ceux de ce pays sont tous des "
+      + "estimations à la main, et il n'y a rien sur quoi estimer leur position sur l'Europe.",
+    viewNoteDroppedEu: n => n + " repère" + (n > 1 ? "s" : "") + " placé" + (n > 1 ? "s" : "")
+      + " à la main n'" + (n > 1 ? "ont" : "a") + " pas de position CHES sur l'Europe "
+      + "et n'" + (n > 1 ? "apparaissent" : "apparaît") + " pas.",
+    viewNoteNoEurope: n => n + " profil" + (n > 1 ? "s" : "") + " sans réponse au thème "
+      + "Europe et monde " + (n > 1 ? "ne sont" : "n'est") + " pas placé" + (n > 1 ? "s" : "")
+      + " : c'est lui qui mesure l'intégration européenne.",
     viewNoteSkippedProt: n => n + " profil" + (n > 1 ? "s ont" : " a") + " passé les deux "
       + "questions sur le protectionnisme, et " + (n > 1 ? "ne sont" : "n'est") + " donc pas "
       + "placé" + (n > 1 ? "s" : "") + ".",
@@ -658,6 +672,14 @@ export const LOCALES = {
         colY: "Y protect.",
         titleY: "Positif = protectionniste (haut) · négatif = libre-échangiste (bas)",
         tipSocial: "Protectionnisme", suffixAuthor: " protect.", suffixLibert: " libre-éch." },
+      europe: { name: "Économie × Europe",
+        axisTop: "EUROPÉEN — approfondir l'intégration",
+        axisBottom: "SOUVERAINISTE — rendre le pouvoir aux États",
+        quadTopLeft: "Gauche européenne", quadTopRight: "Droite européenne",
+        quadBottomLeft: "Gauche souverainiste", quadBottomRight: "Droite souverainiste",
+        colY: "Y Europe",
+        titleY: "Positif = pour l'intégration européenne (haut) · négatif = souverainiste (bas)",
+        tipSocial: "Europe", suffixAuthor: " europ.", suffixLibert: " souv." },
       populist: { name: "Lecture populiste — thème Institutions, à venir" }
     },
     quizOpen: "Compléter mon profil", quizEdit: "Modifier mes réponses",
@@ -665,12 +687,11 @@ export const LOCALES = {
     backToThemes: "← Tous les thèmes", otherThemes: "Autres thèmes",
     hubEyebrow: "Questionnaire Politiskel",
     hubLead: "Le questionnaire est découpé en thèmes, que vous remplissez dans l'ordre que "
-      + "vous voulez. Chacun remplace ou ajoute une lecture de votre profil ; l'économie est la "
-      + "première disponible, pas la seule.",
+      + "vous voulez. Chacun remplace un axe de PolitiScales ou ajoute une lecture de votre profil.",
     hubPlanned: "À venir",
     hubTitle: "Répondez par thèmes, dans l'ordre que vous voulez.",
-    hubLeadShort: "Chacun remplace ou ajoute une lecture de votre profil. L'économie est la première disponible, pas la seule.",
-    hubSources: "Aucune question n'est écrite pour Politiskel : chacune est citée d'une grande enquête publique — ESS, ISSP, EVS — dans sa version française officielle, avec sa source.",
+    hubLeadShort: "Chacun remplace un axe de PolitiScales ou ajoute une lecture de votre profil.",
+    hubSources: "Aucune question n'est écrite pour Politiskel : chacune est citée d'une grande enquête publique — ESS, ISSP, EVS, Eurobaromètre — dans sa version française officielle, avec sa source.",
     hubMethod: "Lire la méthode",
     hubProgress: (n, m) => n + " / " + m + " réponses",
     themes: {
@@ -699,8 +720,20 @@ export const LOCALES = {
         salienceAfter: "Maintenant que vous avez répondu : quelle place les questions de "
           + "société tiennent-elles dans vos choix politiques ?" },
       europe: { name: "Europe et monde",
-        desc: "Intégration européenne et rapport à la Russie, que PolitiScales ne demande pas : "
-          + "de quoi faire enfin une vraie lecture de la souveraineté." },
+        desc: "Intégration européenne, rapport à la Russie et aux instances internationales, que "
+          + "PolitiScales ne demande pas. Des lectures à part de la boussole, et une de plus : "
+          + "Économie × Europe.",
+        lead: "PolitiScales ne pose aucune question sur l'Europe. Celles-ci mesurent trois choses "
+          + "à part : l'intégration européenne, sur l'échelle qu'utilisent les experts du CHES pour "
+          + "les partis, le rapport à la Russie, et l'autorité des instances internationales. "
+          + "Aucune ne déplace votre point sur la boussole principale.",
+        leadNative: "Ces questions mesurent trois choses à part : l'intégration européenne, sur "
+          + "l'échelle qu'utilisent les experts du CHES pour les partis, le rapport à la Russie, "
+          + "et l'autorité des instances internationales.",
+        salience: "Quelle place l'Europe et les relations internationales tiennent-elles dans vos "
+          + "choix politiques ?",
+        salienceAfter: "Maintenant que vous avez répondu : quelle place l'Europe et les relations "
+          + "internationales tiennent-elles dans vos choix politiques ?" },
       ecology: { name: "Écologie",
         desc: "Environnement et climat, lus à part de l'économie, comme le fait le CHES." },
       institutions: { name: "Institutions",
@@ -714,7 +747,7 @@ export const LOCALES = {
       + (t > 1 ? "de chaque thème" : "du thème") + " · environ " + Math.max(5, Math.round(n / 3.5))
       + " minutes",
     quizHint: "Chaque question est reprise telle quelle d'une grande enquête publique (ESS, ISSP, "
-      + "EVS), dans sa version française officielle, avec sa source. Les exceptions sont "
+      + "EVS, Eurobaromètre), dans sa version française officielle, avec sa source. Les exceptions sont "
       + "signalées : l'échelle de classe d'Erik Olin Wright n'existe pas en français, elle est "
       + "traduite ici. Seule la consigne est mise au singulier : l'enquête pose ses questions en "
       + "série, ici chaque écran n'en pose qu'une. Vous pouvez passer une question ; vos réponses "
@@ -731,7 +764,7 @@ export const LOCALES = {
         group: { title: "Votre groupe", text: "Le groupe affiché, ses membres, et les trois choix qui cadrent la boussole : le groupe, le pays de référence, la lecture. Inviter copie le lien du groupe." },
         compass: { title: "La boussole", text: "Chaque point est un membre, chaque losange un parti placé par les experts du CHES. Changez de lecture : les points se déplacent.", hint: "Cliquez un point pour le suivre" },
         profiles: { title: "Les profils", text: "Les positions de chacun et le repère le plus proche — une proximité, pas une appartenance. La fiche d'un profil détaille ses lectures et son drapeau." },
-        themes: { title: "Le questionnaire", text: "Des questions tirées des grandes enquêtes publiques, par thèmes, dans l'ordre que vous voulez. Chaque thème remplace un axe de PolitiScales ; vos réponses s'enregistrent en passant à la suivante." },
+        themes: { title: "Le questionnaire", text: "Des questions tirées des grandes enquêtes publiques, par thèmes, dans l'ordre que vous voulez. Chaque thème remplace un axe de PolitiScales ou ajoute une lecture ; vos réponses s'enregistrent en passant à la suivante." },
         groups: { title: "Vos groupes", text: "Créez un groupe et partagez son lien, ou rejoignez-en un. Un groupe peut aussi apparaître dans l'annuaire, où l'on demande à entrer." },
         display: { title: "L'affichage", text: "Neuf palettes, chacune en clair, en sombre ou selon le système. Les animations se réduisent depuis votre compte." },
         account: { title: "Votre compte", text: "Votre résultat PolitiScales, l'export de toutes vos données, le mot de passe, et la suppression du compte, qui efface tout." },
@@ -761,9 +794,13 @@ export const LOCALES = {
     journeyWas: v => "PolitiScales " + v, journeyNow: v => "Questionnaire " + v,
     resultCount: (t, n, m) => t + " · " + n + " / " + m + " réponses",
     resultLead: { x: "Vos réponses remplacent l'axe économique de PolitiScales, qui ne posait rien sur la redistribution. Votre point se déplace sur la boussole.",
-                  y: "Vos réponses remplacent l'axe sociétal de PolitiScales, question par question tirées des enquêtes publiques. Votre point se déplace sur la boussole." },
+                  y: "Vos réponses remplacent l'axe sociétal de PolitiScales, question par question tirées des enquêtes publiques. Votre point se déplace sur la boussole.",
+                  europe: "Une lecture que PolitiScales n'avait pas : votre position sur l'intégration européenne, parmi les partis que le CHES place sur la même échelle. Elle se lit aussi sur la boussole, dans la lecture « Économie × Europe »." },
     resultLeadNative: "Vos réponses placent votre point sur cet axe de la boussole.",
     resultWasPs: v => "était " + v + " avec PolitiScales", resultNativeNote: "mesuré par le questionnaire",
+    resultOwnNote: "positif = pour l'intégration, sur l'échelle eu_position du CHES",
+    resultNoReading: theme => "Aucune réponse au thème " + theme + " pour l'instant.",
+    groupNote: "groupe de questions",
     nextTheme: n => "Thème suivant : " + n, dimNote: "sous-dimension du CHES",
     resultEnds: { x: ["gauche", "droite"], y: ["ouverture", "tradition"] },
     backToCompass: "Voir sur la boussole", quizReview: "Revoir mes réponses",
@@ -781,8 +818,9 @@ export const LOCALES = {
             deregulation: "Régulation des marchés",
             immigration: "Immigration", multiculturalism: "Multiculturalisme / assimilation",
             laworder: "Libertés / ordre", women: "Droits des femmes", lgbt: "Droits LGBT",
-            religion: "Religion et politique", nationalism: "Nationalisme" },
-    readingAxis: { x: "Économie (X)", y: "Société (Y)" },
+            religion: "Religion et politique", nationalism: "Nationalisme",
+            membership: "Appartenance à l'UE", powers: "Pouvoirs de l'UE", common: "Politiques communes" },
+    readingAxis: { x: "Économie (X)", y: "Société (Y)", europe: "Europe" },
     readingProtectionism: "Protectionnisme",
     readingClass: "Classe (Wright)",
     readingConflict: "Conflit de classe perçu",

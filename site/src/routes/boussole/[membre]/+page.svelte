@@ -95,7 +95,7 @@
 					<section class="card" aria-label={L.bands.title}>
 						<h2>{L.bands.title}</h2>
 						<p class="sub">{L.bands.lead}</p>
-						<ReadingBands {c} {q} />
+						<ReadingBands {c} {q} eu={(c.base || c).eu} />
 					</section>
 					<section class="card" aria-label={L.partiesTitle}>
 						<div class="head">

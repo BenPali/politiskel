@@ -15,7 +15,14 @@ export const COUNTRIES = PolitiModel.COUNTRIES;
 
 /* Readings of the compass: the same profiles and parties, along other axes.
    A reading with no party counterpart does not belong here. */
-export const VIEWS = [{ key: 'politiskel' }, { key: 'politiscales' }, { key: 'protectionism' }, { key: 'populist', planned: true }];
+export const VIEWS = [{ key: 'politiskel' }, { key: 'politiscales' }, { key: 'protectionism' }, { key: 'europe' }, { key: 'populist', planned: true }];
+
+/* The readings drawn as y against the economy, and where each is found:
+   on the profile's score for a theme, and on each party. */
+const SIDE = {
+	protectionism: { of: (c) => c.quiz?.protectionism, ref: 'prot' },
+	europe: { of: (c) => c.eu?.europe, ref: 'eu' }
+};
 
 /* Copy for a reading, falling back on the default wording. */
 export const copyOf = (viewKey) => Object.assign({}, L, L.views[viewKey] || {});
@@ -42,6 +49,9 @@ function withQuiz(p, c) {
 	if (!answers || !Object.keys(answers).length) return c;
 	c.quiz = PolitiQuiz.score(answers, 'economy');
 	c.soc = PolitiQuiz.score(answers, 'society');
+	c.eu = PolitiQuiz.score(answers, 'europe');
+	/* readings by name, for the flag */
+	c.readings = { europe: c.eu.europe };
 	const ps = { x: c.x, y: c.y };
 	if (c.quiz.x !== null) {
 		c.x = c.quiz.x;
@@ -75,10 +85,12 @@ export function project(p, viewKey) {
 		v.x = c.native ? null : c.psX !== undefined ? c.psX : c.x;
 		v.y = c.native ? null : c.psY !== undefined ? c.psY : c.y;
 		v.xSrc = v.ySrc = null;
-	} else if (viewKey === 'protectionism') {
-		const y = c.quiz ? c.quiz.protectionism : null;
+	} else if (SIDE[viewKey]) {
+		const y = SIDE[viewKey].of(c);
 		v.y = y === undefined ? null : y;
 		v.ySrc = null;
+		/* y is not the society axis here: a profile's own bands read `base` */
+		v.side = viewKey;
 	}
 	if (v.x === null || v.y === null) v.off = true;
 	return v;
@@ -86,8 +98,9 @@ export function project(p, viewKey) {
 
 /* The parties a reading keeps: those measured on its axes. */
 export function referencesOf(country, viewKey) {
-	if (viewKey !== 'protectionism') return country.parties;
-	return country.parties.filter((r) => r.prot !== undefined).map((r) => ({ ...r, y: r.prot }));
+	const side = SIDE[viewKey];
+	if (!side) return country.parties;
+	return country.parties.filter((r) => r[side.ref] !== undefined).map((r) => ({ ...r, y: r[side.ref] }));
 }
 
 export const limitsOf = (refs) => PolitiModel.limitsFor(refs);
@@ -141,6 +154,16 @@ export function viewNotes(viewKey, country, refs, computed) {
 		const noX = offs.filter((c) => econ(c) && c.y !== null && c.x === null).length;
 		if (none) parts.push(L.viewNoteOff(none));
 		if (noProt) parts.push(L.viewNoteSkippedProt(noProt));
+		if (noX) parts.push(L.viewNoteNoX(noX));
+	}
+	if (viewKey === 'europe') {
+		const dropped = country.parties.length - refs.length;
+		if (!refs.length) parts.push(L.viewNoteAllEstimatedEu);
+		else if (dropped) parts.push(L.viewNoteDroppedEu(dropped));
+		const offs = computed.map((r) => r.c).filter((c) => c.off);
+		const none = offs.filter((c) => c.y === null).length;
+		const noX = offs.filter((c) => c.y !== null && c.x === null).length;
+		if (none) parts.push(L.viewNoteNoEurope(none));
 		if (noX) parts.push(L.viewNoteNoX(noX));
 	}
 	return parts;

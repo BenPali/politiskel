@@ -160,7 +160,8 @@ function questionnaireChecks() {
     const p = a.source && profiles.find(q => q.source === a.source);
     return { alias: a.alias, answers: a.answers,
              ps: p ? M.coords(p.values) : null,
-             eco: Q.score(a.answers, "economy"), soc: Q.score(a.answers, "society") };
+             eco: Q.score(a.answers, "economy"), soc: Q.score(a.answers, "society"),
+             eu: Q.score(a.answers, "europe") };
   });
   console.log("\nQuestionnaire: " + rows.length + " answer file(s) in politi-results/answers/");
   if (rows.length < 4) {
@@ -185,7 +186,7 @@ function questionnaireChecks() {
 
   /* Each sub-dimension against the mean of the others on its axis. */
   for (const theme of Q.THEMES.filter(t => !t.planned)) {
-    const axis = theme.axis, sc = theme.key === "economy" ? "eco" : "soc";
+    const axis = theme.axis || theme.reading, sc = { economy: "eco", society: "soc", europe: "eu" }[theme.key];
     console.log("\n" + theme.key + ": each sub-dimension against the rest of " + axis);
     for (const d of theme.dims) {
       const rest = rows.map(r => {
@@ -203,7 +204,7 @@ function questionnaireChecks() {
   console.log("\nItems against the rest of their axis:");
   const tally = { goes: 0, open: 0, thin: 0 };
   for (const theme of Q.THEMES.filter(t => !t.planned)) {
-    const items = Q.askedItems(theme.key).filter(i => i.reading === theme.axis);
+    const items = Q.askedItems(theme.key).filter(i => i.reading === (theme.axis || theme.reading));
     const val = (r, i) => Q.itemValue(i, r.answers[i.id]);
     for (const it of items) {
       const own = rows.map(r => val(r, it));

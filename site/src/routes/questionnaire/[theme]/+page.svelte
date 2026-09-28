@@ -98,16 +98,22 @@
 	const progress = $derived(progressOf(theme, mine.answers));
 	const salienceLevels = PolitiQuiz.SCALES.salience.fr;
 	const val = (v) => (v === null || v === undefined ? '—' : signed(v));
-	/* one block per theme of the flow: its axis journey, then its readings as cards */
+	/* one block per theme of the flow: its journey along its main reading —
+	   a compass axis, or Europe's own — then its readings as cards */
 	const results = $derived.by(() => {
 		if (!c) return [];
 		return flowThemes(theme).map((k) => {
 			const t = PolitiQuiz.THEMES.find((x) => x.key === k);
 			const q = scoreOf(c, k);
 			const name = L.themes[k].name;
-			if (!q || q[t.axis] === null) return { key: k, name, none: true };
-			const axisNote = c.native || !c.from ? L.resultNativeNote : L.resultWasPs(signed(c.from[t.axis]));
-			const cards = [{ label: L.readingAxis[t.axis], value: val(q[t.axis]), note: axisNote }];
+			const main = t.axis || t.reading;
+			if (!q || q[main] === null) return { key: k, name, none: true, axis: t.axis };
+			/* a reading of its own has no PolitiScales past: it lands, among the parties CHES rates on it */
+			const journey = t.axis
+				? { c, axis: t.axis, country }
+				: { c: { [main]: q[main], from: null }, axis: main, country: { parties: country.parties.filter((r) => r.eu !== undefined).map((r) => ({ ...r, [main]: r.eu })) } };
+			const mainNote = !t.axis ? L.resultOwnNote : c.native || !c.from ? L.resultNativeNote : L.resultWasPs(signed(c.from[t.axis]));
+			const cards = [{ label: L.readingAxis[main], value: val(q[main]), note: mainNote }];
 			if (k === 'economy')
 				for (const r of ['protectionism', 'class', 'conflict', 'labour'])
 					cards.push({
@@ -115,14 +121,15 @@
 						value: r === 'class' && q.class === null && q.n.class ? '—' : val(q[r]),
 						note: r === 'class' && q.class === null && q.n.class ? L.readingClassIncomplete(q.n.class) : L.bands.hint[r]
 					});
-			else for (const d of t.dims) cards.push({ label: L.dims[d], value: val(q.dims[d]), note: L.dimNote });
+			else for (const d of t.dims) cards.push({ label: L.dims[d], value: val(q.dims[d]), note: t.axis ? L.dimNote : L.groupNote });
+			for (const r of t.readings || []) if (r !== main && k !== 'economy') cards.push({ label: L.bands.label[r], value: val(q[r]), note: L.bands.hint[r] });
 			const salience =
 				q.salience !== null && q.salienceAfter !== null
 					? L.salienceMoved(salienceLevels[q.salience], salienceLevels[q.salienceAfter], q.salienceAfter - q.salience)
 					: q.salience !== null || q.salienceAfter !== null
 						? L.salienceOf(salienceLevels[q.salience ?? q.salienceAfter])
 						: null;
-			return { key: k, name, axis: t.axis, cards, salience };
+			return { key: k, name, axis: t.axis, journey, cards, salience };
 		});
 	});
 	/* the next open theme not yet answered, to go on with */
@@ -174,18 +181,18 @@
 					<div class="result">
 						<div class="result-head">
 							<p class="eyebrow">{L.resultCount(themeName(theme), progress.done, progress.total)}</p>
-							<h1>{c.native ? L.resultTitleNative : L.resultTitle}</h1>
+							<h1>{c.native || !flowThemes(theme).some((k) => PolitiQuiz.THEMES.find((t) => t.key === k).axis) ? L.resultTitleNative : L.resultTitle}</h1>
 							{#if flowThemes(theme).length === 1}
-								{@const axis = PolitiQuiz.THEMES.find((t) => t.key === theme).axis}
-								<p class="lead">{c.native ? L.resultLeadNative : L.resultLead[axis]}</p>
+								{@const t = PolitiQuiz.THEMES.find((t) => t.key === theme)}
+								<p class="lead">{!t.axis ? L.resultLead[t.reading] : c.native ? L.resultLeadNative : L.resultLead[t.axis]}</p>
 							{/if}
 						</div>
 						{#each results as r (r.key)}
 							{#if flowThemes(theme).length > 1}<h2 class="theme-h">{r.name}</h2>{/if}
 							{#if r.none}
-								<p class="lead">{L.resultNoAxis(r.name, c.native)}</p>
+								<p class="lead">{r.axis ? L.resultNoAxis(r.name, c.native) : L.resultNoReading(r.name)}</p>
 							{:else}
-								<JourneyStrip {c} axis={r.axis} {country} />
+								<JourneyStrip c={r.journey.c} axis={r.journey.axis} country={r.journey.country} />
 								<div class="result-cards">
 									{#each r.cards as card, i (card.label)}
 										<div class="reading" style="--i: {i + 1}">

@@ -1,26 +1,32 @@
 <!-- A profile's readings as bands, after the design: each on its own track
      from −100 to +100, the dot sliding in to its value. X and Y are the
-     reading on show; the others come from the economy questionnaire. -->
+     reading on show; the others come from the economy and Europe
+     questionnaires. -->
 <script>
 	import { onMount } from 'svelte';
 	import { L } from '$lib/i18n/fr.js';
 	import { signed } from '$lib/format.js';
 
-	/** c: the profile projected on the reading on show; q: its economy questionnaire score, if any */
-	let { c, q = null } = $props();
+	/** c: the profile projected on the reading on show; q, eu: its economy and Europe scores, if any */
+	let { c, q = null, eu = null } = $props();
 
 	let arrived = $state(false);
 	onMount(() => requestAnimationFrame(() => (arrived = true)));
 
 	const B = L.bands;
+	/* a reading that draws another y against X still has the profile's own Y to show */
+	const xy = $derived(c.side ? c.base : c);
 	const bands = $derived(
 		[
-			{ k: 'x', v: c.x, hint: c.xSrc === 'quiz' ? B.hintQuiz.x : B.hintPs },
-			{ k: 'y', v: c.y, hint: c.ySrc === 'quiz' ? B.hintQuiz.y : B.hintPs },
+			{ k: 'x', v: xy.x, hint: xy.xSrc === 'quiz' ? B.hintQuiz.x : B.hintPs },
+			{ k: 'y', v: xy.y, hint: xy.ySrc === 'quiz' ? B.hintQuiz.y : B.hintPs },
 			{ k: 'protectionism', v: q?.protectionism ?? null },
 			{ k: 'class', v: q?.class ?? null },
 			{ k: 'conflict', v: q?.conflict ?? null },
-			{ k: 'labour', v: q?.labour ?? null }
+			{ k: 'labour', v: q?.labour ?? null },
+			{ k: 'europe', v: eu?.europe ?? null },
+			{ k: 'russia', v: eu?.russia ?? null },
+			{ k: 'world', v: eu?.world ?? null }
 		]
 			.filter((b) => b.k === 'x' || b.k === 'y' || b.v !== null)
 			.map((b) => ({ ...b, label: B.label[b.k], hint: b.hint || B.hint[b.k], ends: B.ends[b.k] }))
@@ -37,7 +43,7 @@
 					<div class="rail"></div>
 					<div class="zero"></div>
 					{#if b.v !== null}
-						<div class="mover" style="transform: translateX({pct(b.v)}%)"><div class="dot"></div></div>
+						<div class="mover" style="left: {pct(b.v)}%"><div class="dot"></div></div>
 					{/if}
 				</div>
 				<div class="ends"><span>{b.ends[0]}</span><span>{b.ends[1]}</span></div>
@@ -55,7 +61,8 @@
 	.track { position: relative; height: 24px; }
 	.rail { position: absolute; left: 0; right: 0; top: 11px; height: 2px; border-radius: 1px; background: var(--border); }
 	.zero { position: absolute; left: 50%; top: 4px; width: 1.5px; height: 16px; background: var(--axis); }
-	.mover { position: absolute; inset: 0; transition: transform var(--dur-deliberate) var(--ease-move); }
+	/* a zero-width anchor that slides: a full-width box moved by a transform ran past the screen's edge */
+	.mover { position: absolute; top: 0; bottom: 0; width: 0; transition: left var(--dur-deliberate) var(--ease-move); }
 	.dot { position: absolute; left: -8px; top: 4px; width: 16px; height: 16px; border-radius: 50%; background: var(--dot-me); box-shadow: 0 0 0 3px var(--surface); }
 	.ends { display: flex; justify-content: space-between; font-size: 12.5px; color: var(--text-3); margin-top: 2px; }
 	.val { text-align: right; font-size: 17px; font-weight: 650; font-variant-numeric: tabular-nums; }

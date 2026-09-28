@@ -7,8 +7,10 @@
    no state.
 
    Every item is quoted, not written. The wording comes from a field-tested
-   survey (ESS, ISSP, EVS), in the official French questionnaire of that
-   survey, and each item carries where it comes from. The one exception is
+   survey (ESS, ISSP, EVS — and the Eurobarometer for Russia and the EU's
+   common policies, which the other three never ask about), in the official
+   French questionnaire of that survey, and each item carries where it comes
+   from. The one exception is
    Wright's class scale, which has no French version at all — France was not in
    his project — so its items are translated here and marked `translated`, and
    the page has to say so. Item text is French because it is quoted material,
@@ -29,6 +31,14 @@
      labour         the balance of power between capital and labour — unions,
                     business — which is an attitude to that balance, not a
                     perception of conflict, so it gets its own reading
+   The Europe theme feeds three readings, none of them a compass axis:
+     europe  integration against national sovereignty, on the scale of CHES
+             `eu_position`, the one party comparison the theme makes
+     russia  the stance towards Russia (CHES `eu_russia`). Measured, but not
+             set against the parties: in CHES 2024 the French positions rest
+             on two or three experts each, the Italian ones on one at most
+     world   the authority of international bodies against the nation's own
+             interest, which CHES does not rate at all
    Salience is asked per theme, twice: before the items and after them. The
    first records the weight the theme had coming in, the second whether
    answering moved it; both are returned as is, never folded into a score. */
@@ -234,6 +244,41 @@
            "Elle ne doit autoriser aucun d'entre eux"]
     },
 
+    /* ---- Europe ---- */
+    /* ESS 11, C43: the referendum. Its other codes (blank, spoilt, would not
+       vote) were the interviewer's, never read out. */
+    remainEss: {
+      values: [1, -1],
+      fr: ["Rester membre de l'Union européenne", "Quitter l'Union européenne"]
+    },
+    /* ISSP National Identity, France, 2013, Q17. */
+    benefitIssp: {
+      values: [1, 0.5, 0, -0.5, -1],
+      fr: ["Elle en bénéficie beaucoup", "Elle en bénéficie largement", "Elle en bénéficie un peu",
+           "Elle n'en bénéficie pas beaucoup", "Elle n'en bénéficie pas du tout"],
+      dk: "Je ne sais pas"
+    },
+    /* ISSP 2013, Q19. */
+    euPowerIssp: {
+      values: [1, 0.5, 0, -0.5, -1],
+      fr: ["Beaucoup plus", "Plus", "Autant", "Moins", "Beaucoup moins"],
+      dk: "Ne peut choisir"
+    },
+    /* ISSP 2023, the French national block, OF26. */
+    morePowerIssp: {
+      values: [-1, -0.5, 0, 0.5, 1],
+      fr: ["Beaucoup moins de pouvoir", "Un peu moins de pouvoir", "Ni plus ni moins de pouvoir",
+           "Un peu plus de pouvoir", "Beaucoup plus de pouvoir"],
+      dk: "Ne peut choisir"
+    },
+    /* Eurobarometer 100.2, France: four points and for/against. Its "don't
+       know" was hidden from the respondent online, so it is not offered. */
+    agreeEb: {
+      values: [1, 1 / 3, -1 / 3, -1],
+      fr: ["Tout à fait d'accord", "Plutôt d'accord", "Plutôt pas d'accord", "Pas du tout d'accord"]
+    },
+    forEb: { values: [1, -1], fr: ["Pour", "Contre"] },
+
     /* Salience. Not a survey item — no field-tested per-theme importance
        question exists; the surveys ask for "the most important problem"
        instead. Four labelled points rather than CHES's expert 0-10: a
@@ -302,6 +347,16 @@
   const FAMILIES_STEM = "Les enfants grandissent dans différents types de familles. Dans quelle mesure êtes-vous d'accord ou pas d'accord avec les affirmations suivantes ?";
   const NI_AGREE_STEM = "Êtes-vous d'accord ou pas d'accord avec les affirmations suivantes ?";
   const NI13_AGREE_STEM = "Etes-vous d'accord ou pas d'accord avec les propositions suivantes ?";
+  const NI23_PROP_STEM = "Êtes-vous d'accord ou pas d'accord avec les propositions suivantes ?";
+
+  /* Europe: `eu` builds an item of the theme. */
+  const eu = (id, reading, dim, scale, pole, extra, src) =>
+    Object.assign({ id, theme: "europe", reading, dim, scale, pole }, extra, { src });
+  const EB100 = v => ({ survey: "Eurobaromètre", wave: "100.2, automne 2023", variable: v, url: GESIS(77823) });
+  const EB_POLICY_STEM = "Quelle est votre opinion sur chacune des propositions suivantes ? Veuillez dire, pour chaque proposition, si vous êtes pour ou si vous êtes contre.";
+  const EB_UKRAINE_STEM = "L'UE a pris une série de mesures en réponse à l'invasion de l'Ukraine par la Russie. Dans quelle mesure êtes-vous d'accord ou pas d'accord avec chacune de ces mesures ?";
+  const EB_AGREE_STEM = "Veuillez indiquer dans quelle mesure vous êtes d'accord ou pas d'accord avec chacune des affirmations suivantes ?";
+  const OF26_STEM = "Et selon vous, pour que la démocratie fonctionne mieux en France, il faudrait donner plus ou moins de pouvoir pour prendre les décisions politiques les plus importantes…";
 
   const ITEMS = [
     /* --- x: redistribution (CHES `redistribution`, r = 0.96 with lrecon) --- */
@@ -651,7 +706,106 @@
       NI23("Q04")),
     soc("issp.born.important", "nationalism", "importanceIssp", 1, { reserve: "asks again what Q04 asks",
       stem: "Certaines personnes estiment que pour être vraiment français, il est important de posséder certaines des caractéristiques suivantes. Pour d'autres, cela n'est pas important. À votre avis, pour être vraiment français, est-il important… ?",
-      fr: "…d'être né en France" }, NI23("Q01_A"))
+      fr: "…d'être né en France" }, NI23("Q01_A")),
+
+    /* ===== Europe =====
+       +1 means: for European integration (europe), conciliatory towards
+       Russia (russia), for the authority of international bodies (world).
+       `europe` is the mean of three groups of items, each the mean of its
+       own: membership, the EU's powers, its common policies. CHES rates one
+       overall position, so the groups are how the questions divide, not
+       expert sub-scales as for the other themes. */
+
+    /* --- membership: whether to be in it, and whether it should go further --- */
+    eu("ess.euftf", "europe", "membership", "bipolar11", 1, {
+      fr: "Nous allons parler maintenant de l'Union européenne. Pour certains, l'unification européenne devrait être renforcée. Pour d'autres, elle a déjà été poussée trop loin. Sur une échelle de 0 à 10, dites-moi quelle est votre opinion ?",
+      left: "L'unification a déjà été poussée trop loin", right: "L'unification devrait être renforcée" },
+      ESS11("B37 euftf")),
+    eu("ess.vteurmmb", "europe", "membership", "remainEss", 1, {
+      fr: "Imaginez qu'un referendum ait lieu dimanche prochain en France sur l'appartenance à l'Union européenne. Voteriez-vous pour que la France reste un membre de l'Union européenne ou pour qu'elle quitte l'Union européenne ?" },
+      ESS11("C43 vteurmmb")),
+    eu("issp.eu.benefit", "europe", "membership", "benefitIssp", 1, {
+      fr: "D'une manière générale, diriez-vous que la France bénéficie ou ne bénéficie pas de son appartenance à l'Union européenne ?" },
+      NI13("Q17")),
+    eu("issp.eu.referendum", "europe", "membership", "remainEss", 1, { reserve: "asks again what ESS C43 asks",
+      fr: "S'il y avait aujourd'hui un référendum pour décider si la France doit ou ne doit pas rester membre de l'Union européenne, voteriez-vous pour ou voteriez-vous contre ?" },
+      NI13("Q20")),
+    eu("evs.v198", "europe", "membership", "bipolar10", -1, { reserve: "widening, not deepening: a federalist can oppose it",
+      fr: "Certains pensent que l'élargissement de l'Union européenne devrait continuer. D'autres estiment qu'on est déjà allé trop loin. Situez votre opinion sur cette échelle :",
+      left: "L'élargissement devrait continuer", right: "L'élargissement est allé trop loin" },
+      EVS("v198")),
+
+    /* --- powers: the EU's against the national government's --- */
+    eu("issp.eu.follow", "europe", "powers", "agreeIssp", 1, {
+      stem: "Etes-vous d'accord ou pas d'accord avec la proposition suivante ?",
+      fr: "La France devrait suivre les décisions de l'Union européenne, même lorsqu'elle n'est pas d'accord avec ses décisions" },
+      NI13("Q18")),
+    eu("issp.eu.power", "europe", "powers", "euPowerIssp", 1, {
+      fr: "D'une manière générale, pensez-vous que l'Union européenne devrait avoir plus ou moins de pouvoir que les gouvernements nationaux de ses pays membres ?" },
+      NI13("Q19")),
+    eu("issp.power.eu", "europe", "powers", "morePowerIssp", 1, { stem: OF26_STEM,
+      fr: "… à l'Union européenne" }, NI23("OF26_I")),
+
+    /* --- common policies (CHES eu_foreign for the first two) --- */
+    eu("eb.policy.foreign", "europe", "common", "forEb", 1, { stem: EB_POLICY_STEM,
+      fr: "Une politique étrangère commune aux États membres de l'Union européenne" }, EB100("QB2.1")),
+    eu("eb.policy.defence", "europe", "common", "forEb", 1, { stem: EB_POLICY_STEM,
+      fr: "Une politique de sécurité et de défense commune des Etats membres de l'Union européenne" }, EB100("QB2.2")),
+    eu("eb.policy.trade", "europe", "common", "forEb", 1, { stem: EB_POLICY_STEM,
+      fr: "La politique commerciale commune de l'Union européenne" }, EB100("QB2.3")),
+    eu("eb.policy.migration", "europe", "common", "forEb", 1, { stem: EB_POLICY_STEM,
+      fr: "Une politique européenne commune en matière de migration" }, EB100("QB2.4")),
+    eu("eb.policy.energy", "europe", "common", "forEb", 1, { stem: EB_POLICY_STEM,
+      fr: "Une politique énergétique commune des Etats membres de l'Union européenne" }, EB100("QB2.5")),
+    eu("eb.defence.coop", "europe", "common", "agreeEb", 1, { stem: EB_AGREE_STEM,
+      fr: "La coopération dans le domaine de la défense devrait être renforcée au niveau de l'UE" }, EB100("QD3.4")),
+    eu("eb.defence.budget", "europe", "common", "agreeEb", 1, { reserve: "measures the will to arm, not to integrate",
+      stem: EB_AGREE_STEM,
+      fr: "Le budget de la défense devrait être augmenté dans l'UE" }, EB100("QD3.5")),
+    eu("ess.eusclbf", "europe", "common", "favourIssp", 1, { reserve: "needs the card that describes the scheme, and reads redistribution as much as Europe",
+      fr: "Dans l'ensemble, seriez-vous défavorable ou favorable à un tel dispositif de prestations sociales à l'échelle de l'Union européenne ?" },
+      ESS8("E37 eusclbf")),
+
+    /* --- russia: every item runs the same way, agreeing is opposing Russia,
+       as the Eurobarometer asked them; there is no reversed item to set
+       against a tendency to agree --- */
+    eu("eb.ukraine.sanctions", "russia", null, "agreeEb", -1, { stem: EB_UKRAINE_STEM,
+      fr: "Imposer des sanctions économiques au gouvernement, à des entreprises et des personnalités russes" }, EB100("QD2.1")),
+    eu("eb.ukraine.media", "russia", null, "agreeEb", -1, { stem: EB_UKRAINE_STEM,
+      fr: "Interdire aux médias détenus par l'État comme Sputnik et Russia Today de diffuser dans l'UE" }, EB100("QD2.2")),
+    eu("eb.ukraine.arms", "russia", null, "agreeEb", -1, { stem: EB_UKRAINE_STEM,
+      fr: "Financer l'achat et la livraison d'équipements militaires en Ukraine" }, EB100("QD2.3")),
+    eu("eb.ukraine.money", "russia", null, "agreeEb", -1, { stem: EB_UKRAINE_STEM,
+      fr: "Fournir une aide financière à l'Ukraine" }, EB100("QD2.6")),
+    eu("eb.ukraine.candidate", "russia", null, "agreeEb", -1, { stem: EB_UKRAINE_STEM,
+      fr: "Accorder à l'Ukraine le statut de pays candidat à l'adhésion à l'UE" }, EB100("QD2.7")),
+    eu("eb.ukraine.aid", "russia", null, "agreeEb", -1, { reserve: "humanitarian aid, which nearly everyone approves",
+      stem: EB_UKRAINE_STEM,
+      fr: "Fournir une aide humanitaire aux personnes frappées par la guerre" }, EB100("QD2.4")),
+    eu("eb.ukraine.refugees", "russia", null, "agreeEb", -1, { reserve: "reads the welcome of refugees more than a stance on Russia",
+      stem: EB_UKRAINE_STEM,
+      fr: "Accueillir dans l'UE les personnes fuyant la guerre" }, EB100("QD2.5")),
+    eu("eb.ukraine.threat", "russia", null, "agreeEb", -1, { reserve: "a perception of threat, not a position",
+      stem: EB_AGREE_STEM,
+      fr: "L'invasion russe de l'Ukraine est une menace pour la sécurité de l'UE" }, EB100("QD3.1")),
+
+    /* --- world: international bodies against the nation's own interest --- */
+    eu("issp.intl.impose", "world", null, "agreeIssp", 1, { stem: NI23_PROP_STEM,
+      fr: "Pour certains problèmes, comme la pollution de l'environnement, les instances internationales devraient avoir le droit d'imposer des solutions" },
+      NI23("Q06_B")),
+    eu("issp.own.interests", "world", null, "agreeIssp", -1, { stem: NI23_PROP_STEM,
+      fr: "La France doit défendre ses propres intérêts, même si cela engendre des conflits avec d'autres nations" },
+      NI23("Q06_C")),
+    eu("issp.intl.follow", "world", null, "agreeIssp", 1, { stem: NI13_AGREE_STEM,
+      fr: "En général, la France doit suivre les décisions des organisations internationales auxquelles elle appartient, même lorsque le gouvernement n'est pas d'accord avec ces décisions" },
+      NI13("Q6c")),
+    eu("issp.intl.power", "world", null, "agreeIssp", -1, { stem: NI13_AGREE_STEM,
+      fr: "Les organisations internationales enlèvent trop de pouvoir au gouvernement français" },
+      NI13("Q6d")),
+    eu("issp.own.country", "world", null, "agreeIssp", -1, { reserve: "self-determination, which the anti-imperialist left and the nationalist right both claim",
+      stem: "De manière générale, en pensant aux peuples et aux pays du monde entier, dans quelle mesure êtes-vous d'accord ou pas d'accord avec l'affirmation suivante ?",
+      fr: "Il serait préférable que chaque peuple ait son propre pays où il pourrait prendre ses propres décisions." },
+      NI23("Q03"))
   ];
 
   /* What a screen shows above its question. A survey's stem introduces a
@@ -695,6 +849,11 @@
       + "tout avec la phrase suivante ?"],
     [FAMILIES_STEM, "Les enfants grandissent dans différents types de familles. Dans quelle mesure êtes-vous "
       + "d'accord ou pas d'accord avec l'affirmation suivante ?"],
+    [NI23_PROP_STEM, "Êtes-vous d'accord ou pas d'accord avec la proposition suivante ?"],
+    [EB_POLICY_STEM, "Quelle est votre opinion sur la proposition suivante ? Êtes-vous pour ou contre ?"],
+    [EB_UKRAINE_STEM, "L'UE a pris une série de mesures en réponse à l'invasion de l'Ukraine par la "
+      + "Russie. Dans quelle mesure êtes-vous d'accord ou pas d'accord avec la mesure suivante ?"],
+    [EB_AGREE_STEM, "Dans quelle mesure êtes-vous d'accord ou pas d'accord avec l'affirmation suivante ?"],
     ["Voici plusieurs affirmations : pouvez-vous me dire si vous êtes d'accord ou pas d'accord avec elles ?", AGREE_ONE]
   ]);
   for (const item of ITEMS) if (item.stem) item.ask = SCREEN_STEMS.get(item.stem) || item.stem;
@@ -711,7 +870,9 @@
     { key: "society", axis: "y", readings: ["y"],
       dims: ["immigration", "multiculturalism", "laworder", "women", "lgbt", "religion",
              "nationalism"] },
-    { key: "europe", planned: true },        /* eu_position, eu_russia */
+    /* no compass axis: `reading` is the one built from `dims` */
+    { key: "europe", reading: "europe", readings: ["europe", "russia", "world"],
+      dims: ["membership", "powers", "common"] },
     { key: "ecology", planned: true },       /* environment, climate_change */
     { key: "institutions", planned: true }   /* executive_power, judicial_independence,
                                                 regions, and people_v_elite */
@@ -800,7 +961,7 @@
       .filter(a => a.v !== null);
 
     const out = { n: {} };
-    const axis = theme.axis;
+    const axis = theme.axis || theme.reading;
 
     const dims = {};
     for (const d of theme.dims) {
