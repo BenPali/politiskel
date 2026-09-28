@@ -6,7 +6,7 @@
 //! accepts it (the requester becomes a member, and their profile is then
 //! shown to the group, as for anyone who joins) or declines it.
 
-use axum::extract::{Path, State};
+use axum::extract::State;
 use axum::http::StatusCode;
 use axum::Json;
 use axum_extra::extract::cookie::CookieJar;
@@ -15,15 +15,15 @@ use serde_json::{json, Value};
 
 use crate::auth::current_user;
 use crate::error::{ApiError, ApiResult};
-use crate::groups::{is_member, owned_group};
+use crate::groups::{is_member, owned_group, Gid};
 use crate::now;
 use crate::state::AppState;
 
 /// Listed groups, with where the viewer stands in each.
 pub(crate) async fn directory(State(state): State<AppState>, jar: CookieJar) -> ApiResult<Json<Value>> {
     let (user, _) = current_user(&state, &jar).await?;
-    let rows: Vec<(i64, String, i64, bool, bool)> = sqlx::query_as(
-        "SELECT g.id, g.name,
+    let rows: Vec<(String, String, i64, bool, bool)> = sqlx::query_as(
+        "SELECT g.public_id, g.name,
                 (SELECT COUNT(*) FROM members m WHERE m.group_id = g.id),
                 EXISTS (SELECT 1 FROM members m WHERE m.group_id = g.id AND m.user_id = ?),
                 EXISTS (SELECT 1 FROM join_requests r WHERE r.group_id = g.id AND r.user_id = ?)
@@ -42,7 +42,7 @@ async fn listed_group(state: &AppState, gid: i64) -> ApiResult<()> {
     row.map(|_| ()).ok_or(ApiError(StatusCode::NOT_FOUND, "no_such_group"))
 }
 
-pub(crate) async fn ask_to_join(State(state): State<AppState>, jar: CookieJar, Path(gid): Path<i64>)
+pub(crate) async fn ask_to_join(State(state): State<AppState>, jar: CookieJar, Gid(gid): Gid)
     -> ApiResult<StatusCode>
 {
     let (user, _) = current_user(&state, &jar).await?;
@@ -55,7 +55,7 @@ pub(crate) async fn ask_to_join(State(state): State<AppState>, jar: CookieJar, P
     Ok(StatusCode::NO_CONTENT)
 }
 
-pub(crate) async fn withdraw_request(State(state): State<AppState>, jar: CookieJar, Path(gid): Path<i64>)
+pub(crate) async fn withdraw_request(State(state): State<AppState>, jar: CookieJar, Gid(gid): Gid)
     -> ApiResult<StatusCode>
 {
     let (user, _) = current_user(&state, &jar).await?;
@@ -65,7 +65,7 @@ pub(crate) async fn withdraw_request(State(state): State<AppState>, jar: CookieJ
 }
 
 /// The requests waiting on a group, for its owner.
-pub(crate) async fn requests(State(state): State<AppState>, jar: CookieJar, Path(gid): Path<i64>)
+pub(crate) async fn requests(State(state): State<AppState>, jar: CookieJar, Gid(gid): Gid)
     -> ApiResult<Json<Value>>
 {
     let (user, _) = current_user(&state, &jar).await?;
@@ -88,7 +88,7 @@ async fn requester(state: &AppState, gid: i64, name: &str) -> ApiResult<i64> {
     row.map(|r| r.0).ok_or(ApiError(StatusCode::NOT_FOUND, "no_such_request"))
 }
 
-pub(crate) async fn accept_request(State(state): State<AppState>, jar: CookieJar, Path(gid): Path<i64>,
+pub(crate) async fn accept_request(State(state): State<AppState>, jar: CookieJar, Gid(gid): Gid,
                                    Json(body): Json<Requester>) -> ApiResult<StatusCode>
 {
     let (user, _) = current_user(&state, &jar).await?;
@@ -103,7 +103,7 @@ pub(crate) async fn accept_request(State(state): State<AppState>, jar: CookieJar
     Ok(StatusCode::NO_CONTENT)
 }
 
-pub(crate) async fn decline_request(State(state): State<AppState>, jar: CookieJar, Path(gid): Path<i64>,
+pub(crate) async fn decline_request(State(state): State<AppState>, jar: CookieJar, Gid(gid): Gid,
                                     Json(body): Json<Requester>) -> ApiResult<StatusCode>
 {
     let (user, _) = current_user(&state, &jar).await?;
@@ -119,7 +119,7 @@ pub(crate) struct Listing { listed: bool }
 
 /// Lists a group in the directory, or takes it out. Taken out, the requests
 /// waiting on it go: nobody can find it to ask any more.
-pub(crate) async fn set_listed(State(state): State<AppState>, jar: CookieJar, Path(gid): Path<i64>,
+pub(crate) async fn set_listed(State(state): State<AppState>, jar: CookieJar, Gid(gid): Gid,
                                Json(body): Json<Listing>) -> ApiResult<StatusCode>
 {
     let (user, _) = current_user(&state, &jar).await?;

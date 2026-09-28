@@ -129,7 +129,7 @@ async fn groups_show_profiles_to_members_only() {
 
     let (s, g) = a.call("POST", "/api/groups", Some(json!({ "name": "Les copains" }))).await;
     assert_eq!(s, StatusCode::CREATED);
-    let (gid, invite) = (g["id"].as_i64().unwrap(), g["invite"].as_str().unwrap().to_string());
+    let (gid, invite) = (g["id"].as_str().unwrap().to_string(), g["invite"].as_str().unwrap().to_string());
     assert_eq!(invite.len(), 32);
 
     a.call("PUT", "/api/me/profile",
@@ -216,7 +216,7 @@ async fn export_and_deletion_cover_everything() {
     assert_eq!(a.call("GET", "/api/me", None).await.0, StatusCode::UNAUTHORIZED);
 
     // gone from the group, and the name is free again
-    let gid = g["id"].as_i64().unwrap();
+    let gid = g["id"].as_str().unwrap().to_string();
     let (_, list) = b.call("GET", &format!("/api/groups/{gid}/profiles"), None).await;
     assert_eq!(list.as_array().unwrap().len(), 1);
     assert_eq!(Client::new(&app).register("Theo").await, StatusCode::CREATED);
@@ -366,7 +366,7 @@ async fn writes_from_another_origin_are_refused() {
     let mut c = Client::new(&app);
     c.register("Hippo").await;
     let (_, g) = c.call("POST", "/api/groups", Some(json!({ "name": "G" }))).await;
-    let gid = g["id"].as_i64().unwrap();
+    let gid = g["id"].as_str().unwrap().to_string();
     let mut evil = Client { app: app.clone(), cookie: c.cookie.clone(),
         headers: vec![("host", "politiskel.example.org".into()), ("origin", "https://evil.example.org".into())] };
     let (s, b) = evil.call("POST", &format!("/api/groups/{gid}/leave"), None).await;
@@ -409,9 +409,9 @@ async fn site_paths_serve_the_page_and_unknown_api_paths_do_not() {
 }
 
 /// A group created by `owner`, joined by the others; returns (id, invite).
-async fn group_of(owner: &mut Client, others: &mut [&mut Client]) -> (i64, String) {
+async fn group_of(owner: &mut Client, others: &mut [&mut Client]) -> (String, String) {
     let (_, g) = owner.call("POST", "/api/groups", Some(json!({ "name": "Les copains" }))).await;
-    let (id, invite) = (g["id"].as_i64().unwrap(), g["invite"].as_str().unwrap().to_string());
+    let (id, invite) = (g["id"].as_str().unwrap().to_string(), g["invite"].as_str().unwrap().to_string());
     for c in others.iter_mut() {
         assert_eq!(c.call("POST", "/api/groups/join", Some(json!({ "code": invite }))).await.0, StatusCode::OK);
     }
@@ -715,4 +715,31 @@ async fn the_model_check_is_for_admins_and_only_counts_consenting_members() {
     // and an admin removed is refused at once
     set_admin(&db, "admin", false).await.unwrap();
     assert_eq!(admin.call("GET", "/api/admin/model-check", None).await.0, StatusCode::FORBIDDEN);
+}
+
+#[tokio::test]
+async fn groups_go_by_a_uuid_and_their_owner_can_rename_them() {
+    let app = server().await;
+    let (mut ben, mut zoe) = (Client::new(&app), Client::new(&app));
+    ben.register("Ben").await;
+    zoe.register("Zoe").await;
+    let (gid, _) = group_of(&mut ben, &mut [&mut zoe]).await;
+    // a version-4 UUID, never the row number
+    assert_eq!(gid.len(), 36);
+    assert_eq!(&gid[14..15], "4");
+    assert_eq!(ben.call("GET", "/api/groups/1/profiles", None).await.0, StatusCode::NOT_FOUND);
+    assert_eq!(ben.call("GET", "/api/groups/00000000-0000-4000-8000-000000000000/profiles", None).await.0,
+               StatusCode::NOT_FOUND);
+    assert_eq!(ben.call("GET", &format!("/api/groups/{gid}/profiles"), None).await.0, StatusCode::OK);
+    assert_eq!(ben.call("GET", "/api/me", None).await.1["groups"][0]["id"], json!(gid));
+
+    // the owner renames it; a member cannot; the name is checked as at creation
+    let uri = format!("/api/groups/{gid}/name");
+    assert_eq!(zoe.call("POST", &uri, Some(json!({ "name": "Chez Zoé" }))).await.0, StatusCode::FORBIDDEN);
+    let (s, b) = ben.call("POST", &uri, Some(json!({ "name": "   " }))).await;
+    assert_eq!((s, b["error"].as_str()), (StatusCode::BAD_REQUEST, Some("group_name_length")));
+    let (s, b) = ben.call("POST", &uri, Some(json!({ "name": "  Le jeudi  " }))).await;
+    assert_eq!((s, b["name"].as_str()), (StatusCode::OK, Some("Le jeudi")));
+    let (_, me) = zoe.call("GET", "/api/me", None).await;
+    assert_eq!((me["groups"][0]["name"].as_str(), me["groups"][0]["id"].as_str()), (Some("Le jeudi"), Some(gid.as_str())));
 }

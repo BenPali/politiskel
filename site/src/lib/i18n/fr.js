@@ -624,6 +624,8 @@ export const LOCALES = {
     ownerNewLinkConfirm: "Changer le lien ? L'ancien cessera de fonctionner aussitôt ; les membres "
       + "actuels restent dans le groupe.",
     ownerNewLinkDone: "Nouveau lien créé : l'ancien ne fonctionne plus.",
+    ownerRename: "Renommer", groupNameLabel: "Nom du groupe", renameSave: "Enregistrer",
+    groupRenamed: n => "Le groupe s'appelle maintenant « " + n + " ».",
     ownerRemove: "Retirer", ownerRemoveConfirm: (m, g) => "Retirer " + m + " de « " + g + " » ? Il ou elle "
       + "ne verra plus le groupe. Pensez à changer le lien s'il circule encore.",
     ownerHandOver: "Transmettre", ownerHandOverConfirm: (m, g) => "Transmettre « " + g + " » à " + m

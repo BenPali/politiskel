@@ -76,7 +76,8 @@ export function chooseGroup(id) {
 	/* "alone" is remembered as such, so a reload keeps one's profile alone */
 	if (want === undefined) {
 		const kept = read(KEYS.group);
-		want = kept === 'alone' ? null : Number(kept);
+		/* a group's id is its public UUID; a row number kept from before matches none */
+		want = kept === 'alone' ? null : kept;
 	}
 	const found = groups.find((g) => g.id === want);
 	board.groupId = found ? found.id : want === null ? null : groups[0] ? groups[0].id : null;

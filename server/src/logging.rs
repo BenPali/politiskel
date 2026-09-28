@@ -3,8 +3,8 @@
 //!
 //!   http 403 POST /api/groups/{id}/remove 4ms not_owner
 //!
-//! The path is the route's shape: a number reads {id} and an invitation code
-//! {code}, so no group, member or invitation can be read off the log. No
+//! The path is the route's shape: a number or a group's UUID reads {id} and
+//! an invitation code {code}, so no group, member or invitation can be read off the log. No
 //! address, no name, no body. Left out as noise: the 401 every signed-out
 //! visit gets from /api/me, and a missing file outside the API (robots
 //! probing for /wp-login.php).
@@ -28,6 +28,8 @@ pub(crate) struct ErrorCode(pub(crate) &'static str);
 pub(crate) fn route_of(path: &str) -> String {
     let parts: Vec<String> = path.split('/').map(|seg| {
         if !seg.is_empty() && seg.bytes().all(|b| b.is_ascii_digit()) {
+            "{id}".to_string()
+        } else if crate::groups::is_public_id(seg) {
             "{id}".to_string()
         } else if seg.len() >= 16 && seg.bytes().all(|b| b.is_ascii_hexdigit()) {
             "{code}".to_string()
@@ -81,6 +83,7 @@ mod tests {
     #[test]
     fn a_route_keeps_nothing_that_identifies() {
         assert_eq!(route_of("/api/groups/42/remove"), "/api/groups/{id}/remove");
+        assert_eq!(route_of("/api/groups/1b4e28ba-2fa1-41d2-883f-0016d3cca427/remove"), "/api/groups/{id}/remove");
         assert_eq!(route_of("/api/invites/0123456789abcdef0123456789abcdef"), "/api/invites/{code}");
         assert_eq!(route_of("/boussole/jean.dupont"), "/boussole/…");
         assert_eq!(route_of("/rejoindre/0123456789abcdef0123456789abcdef"), "/rejoindre/…");

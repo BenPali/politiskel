@@ -17,7 +17,8 @@
 	import SignedIn from '$lib/components/SignedIn.svelte';
 	import MemberFlag from '$lib/components/MemberFlag.svelte';
 
-	const id = $derived(Number(page.params.id));
+	/* the group's public id, a UUID */
+	const id = $derived(page.params.id);
 	const g = $derived(session.me ? session.me.groups.find((x) => x.id === id) || null : null);
 
 	let members = $state(null);
@@ -84,6 +85,22 @@
 	const newLink = () => run('POST', '/api/groups/' + id + '/invite', null, () => toast(L.ownerNewLinkDone));
 	const remove = () => run('DELETE', '/api/groups/' + id, null, () => goto('/groupes'));
 	const leave = () => run('POST', '/api/groups/' + id + '/leave', null, () => goto('/groupes'));
+	/* the owner renames the group in place; its address and link stay */
+	let renaming = $state(false);
+	let newName = $state('');
+	function startRename() {
+		newName = g.name;
+		renaming = true;
+	}
+	function saveRename(e) {
+		e.preventDefault();
+		const name = newName.trim();
+		if (name === g.name) return (renaming = false);
+		run('POST', '/api/groups/' + id + '/name', { name }, (r) => {
+			renaming = false;
+			toast(L.groupRenamed(r.data.name));
+		});
+	}
 	const ask = (kind, name = null) => (asking = { kind, name });
 	const isAsking = (kind, name = null) => asking && asking.kind === kind && asking.name === name;
 </script>
@@ -97,8 +114,19 @@
 			<p class="card lead">{L.groupNotFound}</p>
 		{:else}
 			<div class="head">
-				<div>
-					<h1>{g.name}</h1>
+				<div class="title">
+					{#if renaming}
+						<form class="rename" onsubmit={saveRename}>
+							<label class="sr-only" for="group-name">{L.groupNameLabel}</label>
+							<!-- svelte-ignore a11y_autofocus -->
+							<input id="group-name" type="text" maxlength="60" required autofocus bind:value={newName}
+								onkeydown={(e) => e.key === 'Escape' && (renaming = false)} />
+							<button type="submit" class="primary" disabled={!newName.trim()}>{L.renameSave}</button>
+							<button type="button" class="ghost" onclick={() => (renaming = false)}>{L.confirmCancel}</button>
+						</form>
+					{:else}
+						<h1>{g.name}{#if g.owner}<button type="button" class="skip rename-btn" onclick={startRename}>{L.ownerRename}</button>{/if}</h1>
+					{/if}
 					<p class="meta">
 						{L.memberCount(g.members)}
 						{#if g.owner}<span class="badge">{L.ownerYou}</span>{:else if g.owner_name} · {L.ownerIs(g.owner_name)}{/if}
@@ -233,6 +261,11 @@
 	.back { display: inline-flex; align-items: center; min-height: 44px; color: var(--text-2); font-size: 15px; text-decoration: none; margin-bottom: 8px; }
 	.back:hover { color: var(--text); }
 	.head { display: flex; justify-content: space-between; align-items: flex-end; gap: 20px; flex-wrap: wrap; margin-bottom: 24px; }
+	.title { min-width: 0; flex: 1 1 320px; }
+	.rename-btn { margin-left: 12px; vertical-align: middle; font-family: var(--font-sans); font-size: 14px; font-weight: 650; }
+	.rename { display: flex; gap: 8px; flex-wrap: wrap; align-items: center; margin: 4px 0 8px; }
+	.rename input { flex: 1 1 240px; min-width: 0; min-height: 44px; font-size: 20px; font-weight: 650; }
+	.sr-only { position: absolute; width: 1px; height: 1px; overflow: hidden; clip: rect(0 0 0 0); white-space: nowrap; }
 	h1 { font-family: var(--font-display); font-size: clamp(28px, 4vw, 38px); font-weight: 700; letter-spacing: -0.02em; margin: 0 0 6px; line-height: 1.1; }
 	.meta { margin: 0; color: var(--text-2); font-size: 14.5px; display: flex; gap: 10px; align-items: center; flex-wrap: wrap; }
 	.cols { display: grid; grid-template-columns: minmax(0, 1.3fr) minmax(0, 1fr); gap: 24px; align-items: start; }

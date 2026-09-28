@@ -19,7 +19,7 @@
 	async function switchTo(e) {
 		const v = e.currentTarget.value;
 		busy = true;
-		chooseGroup(v === 'alone' ? null : Number(v));
+		chooseGroup(v === 'alone' ? null : v);
 		await loadMembers();
 		busy = false;
 	}

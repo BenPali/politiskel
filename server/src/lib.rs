@@ -51,7 +51,7 @@ use crate::security::{same_origin_writes, security_headers};
 use crate::site::site_page;
 use crate::account::{me, put_profile, export, delete_me, set_tour, set_model_check};
 use crate::directory::{directory, ask_to_join, withdraw_request, requests, accept_request, decline_request, set_listed};
-use crate::groups::{create_group, invite_preview, join_group, leave_group, new_invite, remove_member, hand_over_group, delete_group, group_profiles};
+use crate::groups::{create_group, invite_preview, join_group, leave_group, new_invite, remove_member, hand_over_group, delete_group, group_profiles, rename_group};
 
 pub async fn migrate(db: &SqlitePool) -> Result<(), sqlx::migrate::MigrateError> {
     sqlx::migrate!("./migrations").run(db).await
@@ -81,6 +81,7 @@ pub fn app(state: AppState) -> Router {
         .route("/api/groups/{id}/invite", post(new_invite))
         .route("/api/groups/{id}/remove", post(remove_member))
         .route("/api/groups/{id}/owner", post(hand_over_group))
+        .route("/api/groups/{id}/name", post(rename_group))
         .route("/api/groups/{id}/profiles", get(group_profiles))
         .route("/api/directory", get(directory))
         .route("/api/groups/{id}/request", post(ask_to_join).delete(withdraw_request))

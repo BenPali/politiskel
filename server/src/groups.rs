@@ -1,6 +1,7 @@
 //! Groups on invitation, their owners, and what members see of each other.
 
-use axum::extract::{Path, State};
+use axum::extract::{FromRequestParts, Path, State};
+use axum::http::request::Parts;
 use axum::http::StatusCode;
 use axum::Json;
 use axum_extra::extract::cookie::CookieJar;
@@ -11,6 +12,41 @@ use crate::state::AppState;
 use crate::error::{ApiError, ApiResult, bad};
 use crate::auth::{random_hex, current_user};
 use crate::{now, parse_json, validate};
+
+/// A group named in the address by its public id (a UUID), as its row id.
+/// An id that names no group is the 404 of a group that does not exist, the
+/// same answer as for a group one is not in.
+pub(crate) struct Gid(pub(crate) i64);
+
+impl FromRequestParts<AppState> for Gid {
+    type Rejection = ApiError;
+    async fn from_request_parts(parts: &mut Parts, state: &AppState) -> Result<Self, Self::Rejection> {
+        let missing = || ApiError(StatusCode::NOT_FOUND, "no_such_group");
+        let Path(public): Path<String> = Path::from_request_parts(parts, state).await.map_err(|_| missing())?;
+        if !is_public_id(&public) { return Err(missing()); }
+        let row: Option<(i64,)> = sqlx::query_as("SELECT id FROM groups WHERE public_id = ?")
+            .bind(&public).fetch_optional(&state.db).await?;
+        row.map(|(id,)| Gid(id)).ok_or_else(missing)
+    }
+}
+
+/// The canonical lower-case form, 8-4-4-4-12 hex digits.
+pub(crate) fn is_public_id(s: &str) -> bool {
+    s.len() == 36 && s.bytes().enumerate().all(|(i, b)| match i {
+        8 | 13 | 18 | 23 => b == b'-',
+        _ => b.is_ascii_digit() || (b'a'..=b'f').contains(&b),
+    })
+}
+
+/// A new version-4 UUID, from the system's random source.
+fn new_public_id() -> String {
+    let mut b = [0u8; 16];
+    rand::RngCore::fill_bytes(&mut rand::rngs::OsRng, &mut b);
+    b[6] = (b[6] & 0x0f) | 0x40;
+    b[8] = (b[8] & 0x3f) | 0x80;
+    let h: String = b.iter().map(|x| format!("{x:02x}")).collect();
+    format!("{}-{}-{}-{}-{}", &h[0..8], &h[8..12], &h[12..16], &h[16..20], &h[20..32])
+}
 
 /// Passes for the group's owner; a member who is not gets 403, anyone else
 /// the 404 of a group that does not exist.
@@ -49,8 +85,8 @@ pub(crate) async fn is_member(state: &AppState, group: i64, user: i64) -> ApiRes
 }
 
 pub(crate) async fn groups_of(state: &AppState, user: i64) -> ApiResult<Vec<Value>> {
-    let rows: Vec<(i64, String, String, i64, Option<i64>, Option<String>, bool, i64)> = sqlx::query_as(
-        "SELECT g.id, g.name, g.invite_code,
+    let rows: Vec<(String, String, String, i64, Option<i64>, Option<String>, bool, i64)> = sqlx::query_as(
+        "SELECT g.public_id, g.name, g.invite_code,
                 (SELECT COUNT(*) FROM members m2 WHERE m2.group_id = g.id), g.owner_id,
                 (SELECT u.username FROM users u WHERE u.id = g.owner_id), g.listed,
                 (SELECT COUNT(*) FROM join_requests r WHERE r.group_id = g.id)
@@ -78,13 +114,14 @@ pub(crate) async fn create_group(State(state): State<AppState>, jar: CookieJar, 
     let name = validate::group_name(&body.name).map_err(bad)?;
     let t = now();
     let invite = random_hex(16);
+    let public = new_public_id();
     let mut tx = state.db.begin().await?;
-    let gid = sqlx::query("INSERT INTO groups (name, invite_code, created_at, owner_id) VALUES (?, ?, ?, ?)")
-        .bind(&name).bind(&invite).bind(t).bind(user).execute(&mut *tx).await?.last_insert_rowid();
+    let gid = sqlx::query("INSERT INTO groups (name, invite_code, created_at, owner_id, public_id) VALUES (?, ?, ?, ?, ?)")
+        .bind(&name).bind(&invite).bind(t).bind(user).bind(&public).execute(&mut *tx).await?.last_insert_rowid();
     sqlx::query("INSERT INTO members (group_id, user_id, joined_at) VALUES (?, ?, ?)")
         .bind(gid).bind(user).bind(t).execute(&mut *tx).await?;
     tx.commit().await?;
-    Ok((StatusCode::CREATED, Json(json!({ "id": gid, "name": name, "invite": invite, "members": 1,
+    Ok((StatusCode::CREATED, Json(json!({ "id": public, "name": name, "invite": invite, "members": 1,
                                           "owner": true }))))
 }
 
@@ -95,12 +132,12 @@ pub(crate) async fn invite_preview(State(state): State<AppState>, jar: CookieJar
     -> ApiResult<Json<Value>>
 {
     let (user, _) = current_user(&state, &jar).await?;
-    let row: Option<(i64, String, i64)> = sqlx::query_as(
-        "SELECT g.id, g.name, (SELECT COUNT(*) FROM members m WHERE m.group_id = g.id)
+    let row: Option<(i64, String, String, i64)> = sqlx::query_as(
+        "SELECT g.id, g.public_id, g.name, (SELECT COUNT(*) FROM members m WHERE m.group_id = g.id)
          FROM groups g WHERE g.invite_code = ?")
         .bind(code.trim()).fetch_optional(&state.db).await?;
-    let (gid, name, n) = row.ok_or(ApiError(StatusCode::NOT_FOUND, "no_such_invite"))?;
-    Ok(Json(json!({ "id": gid, "name": name, "members": n,
+    let (gid, public, name, n) = row.ok_or(ApiError(StatusCode::NOT_FOUND, "no_such_invite"))?;
+    Ok(Json(json!({ "id": public, "name": name, "members": n,
                     "member": is_member(&state, gid, user).await? })))
 }
 
@@ -111,18 +148,32 @@ pub(crate) async fn join_group(State(state): State<AppState>, jar: CookieJar, Js
     -> ApiResult<Json<Value>>
 {
     let (user, _) = current_user(&state, &jar).await?;
-    let row: Option<(i64, String)> = sqlx::query_as("SELECT id, name FROM groups WHERE invite_code = ?")
+    let row: Option<(i64, String, String)> = sqlx::query_as("SELECT id, public_id, name FROM groups WHERE invite_code = ?")
         .bind(body.code.trim()).fetch_optional(&state.db).await?;
-    let (gid, name) = row.ok_or(ApiError(StatusCode::NOT_FOUND, "no_such_invite"))?;
+    let (gid, public, name) = row.ok_or(ApiError(StatusCode::NOT_FOUND, "no_such_invite"))?;
     sqlx::query("INSERT OR IGNORE INTO members (group_id, user_id, joined_at) VALUES (?, ?, ?)")
         .bind(gid).bind(user).bind(now()).execute(&state.db).await?;
     // joined by the link: a request of theirs waiting on the group is moot
     sqlx::query("DELETE FROM join_requests WHERE group_id = ? AND user_id = ?")
         .bind(gid).bind(user).execute(&state.db).await?;
-    Ok(Json(json!({ "id": gid, "name": name })))
+    Ok(Json(json!({ "id": public, "name": name })))
 }
 
-pub(crate) async fn leave_group(State(state): State<AppState>, jar: CookieJar, Path(gid): Path<i64>)
+#[derive(Deserialize)]
+pub(crate) struct Rename { name: String }
+
+/// The owner renames the group; its address and invitation stay.
+pub(crate) async fn rename_group(State(state): State<AppState>, jar: CookieJar, Gid(gid): Gid, Json(body): Json<Rename>)
+    -> ApiResult<Json<Value>>
+{
+    let (user, _) = current_user(&state, &jar).await?;
+    owned_group(&state, gid, user).await?;
+    let name = validate::group_name(&body.name).map_err(bad)?;
+    sqlx::query("UPDATE groups SET name = ? WHERE id = ?").bind(&name).bind(gid).execute(&state.db).await?;
+    Ok(Json(json!({ "name": name })))
+}
+
+pub(crate) async fn leave_group(State(state): State<AppState>, jar: CookieJar, Gid(gid): Gid)
     -> ApiResult<StatusCode>
 {
     let (user, _) = current_user(&state, &jar).await?;
@@ -136,7 +187,7 @@ pub(crate) async fn leave_group(State(state): State<AppState>, jar: CookieJar, P
 
 /// A new invitation link: the old one stops working at once. For when a link
 /// went further than meant.
-pub(crate) async fn new_invite(State(state): State<AppState>, jar: CookieJar, Path(gid): Path<i64>)
+pub(crate) async fn new_invite(State(state): State<AppState>, jar: CookieJar, Gid(gid): Gid)
     -> ApiResult<Json<Value>>
 {
     let (user, _) = current_user(&state, &jar).await?;
@@ -162,7 +213,7 @@ pub(crate) async fn member_named(state: &AppState, gid: i64, user: i64, name: &s
 
 /// Shows a member out. They lose sight of the group at once; with the link
 /// changed as well, they cannot come back on their own.
-pub(crate) async fn remove_member(State(state): State<AppState>, jar: CookieJar, Path(gid): Path<i64>,
+pub(crate) async fn remove_member(State(state): State<AppState>, jar: CookieJar, Gid(gid): Gid,
                        Json(body): Json<Member>) -> ApiResult<StatusCode>
 {
     let (user, _) = current_user(&state, &jar).await?;
@@ -174,7 +225,7 @@ pub(crate) async fn remove_member(State(state): State<AppState>, jar: CookieJar,
 }
 
 /// Hands the group to another member, who becomes its owner.
-pub(crate) async fn hand_over_group(State(state): State<AppState>, jar: CookieJar, Path(gid): Path<i64>,
+pub(crate) async fn hand_over_group(State(state): State<AppState>, jar: CookieJar, Gid(gid): Gid,
                          Json(body): Json<Member>) -> ApiResult<StatusCode>
 {
     let (user, _) = current_user(&state, &jar).await?;
@@ -187,7 +238,7 @@ pub(crate) async fn hand_over_group(State(state): State<AppState>, jar: CookieJa
 
 /// Deletes the group for everyone. Profiles stay with their accounts: only
 /// the memberships go.
-pub(crate) async fn delete_group(State(state): State<AppState>, jar: CookieJar, Path(gid): Path<i64>)
+pub(crate) async fn delete_group(State(state): State<AppState>, jar: CookieJar, Gid(gid): Gid)
     -> ApiResult<StatusCode>
 {
     let (user, _) = current_user(&state, &jar).await?;
@@ -198,7 +249,7 @@ pub(crate) async fn delete_group(State(state): State<AppState>, jar: CookieJar, 
 
 /// A group's profiles, for its members only. A non-member gets the same 404
 /// as a group that does not exist, so group ids reveal nothing.
-pub(crate) async fn group_profiles(State(state): State<AppState>, jar: CookieJar, Path(gid): Path<i64>)
+pub(crate) async fn group_profiles(State(state): State<AppState>, jar: CookieJar, Gid(gid): Gid)
     -> ApiResult<Json<Value>>
 {
     let (user, _) = current_user(&state, &jar).await?;
