@@ -4,7 +4,7 @@
 	import { goto } from '$app/navigation';
 	import { page } from '$app/state';
 	import { L } from '$lib/i18n/fr.js';
-	import { toast } from '$lib/toast.svelte.js';
+	import { toast, dismissErrors } from '$lib/toast.svelte.js';
 	import { api, apiError } from '$lib/api.js';
 	import { session, refresh } from '$lib/session.svelte.js';
 
@@ -27,7 +27,9 @@
 		busy = true;
 		const r = await api('POST', '/api/login', { username, password });
 		busy = false;
-		if (!r.ok) return toast(apiError(r), { kind: 'error' });
+		/* about what was just typed: it goes after a while, and on success */
+		if (!r.ok) return toast(apiError(r), { kind: 'error', ms: 7000 });
+		dismissErrors();
 		await refresh();
 		goto(next());
 	}

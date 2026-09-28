@@ -592,6 +592,9 @@ export const LOCALES = {
     myProfile: "Mon profil", myData: "Mes données", deleteTitle: "Supprimer mon compte",
     savedPolitiscales: "Pourcentages PolitiScales enregistrés.",
     username: "Pseudonyme", password: "Mot de passe", passwordNew: "Mot de passe (10 caractères ou plus)",
+    passwordRule: "10 caractères au moins.",
+    passwordMissing: n => "Encore " + n + " caractère" + (n > 1 ? "s" : "") + " : il en faut 10 au moins.",
+    passwordLongEnough: "Longueur suffisante.",
     signInTitle: "Se connecter", signIn: "Connexion", registerTitle: "Créer un compte",
     register: "Créer mon compte", signOut: "Se déconnecter", signedInAs: "Connecté : ",
     consent: "J'accepte que mes réponses, qui sont des opinions politiques, soient enregistrées sur "

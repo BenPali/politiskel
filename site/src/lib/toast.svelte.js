@@ -1,7 +1,7 @@
 /* Passing messages — "X fait maintenant partie du groupe", "Mot de passe
    changé" — shown a few seconds at the bottom of the screen, then gone.
    They survive a page change, so a page can say what the last one did.
-   An error stays until closed. */
+   An error stays until closed, unless its page gives it a time. */
 
 export const toasts = $state({ list: [] });
 let next = 1;
@@ -17,4 +17,9 @@ export function toast(text, { kind = 'info', ms = kind === 'error' ? 0 : 4500, a
 
 export function dismiss(id) {
 	toasts.list = toasts.list.filter((t) => t.id !== id);
+}
+
+/* Signed in at last: what went wrong before no longer applies. */
+export function dismissErrors() {
+	toasts.list = toasts.list.filter((t) => t.kind !== 'error');
 }

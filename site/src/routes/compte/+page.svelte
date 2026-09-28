@@ -5,6 +5,7 @@
 	import { onMount } from 'svelte';
 	import { goto } from '$app/navigation';
 	import { L } from '$lib/i18n/fr.js';
+	import { passwordMissing } from '$lib/password.js';
 	import { api, apiError } from '$lib/api.js';
 	import { session, refresh, signOut } from '$lib/session.svelte.js';
 	import { PALETTES, MODES, MOTIONS, readDisplay, applyDisplay } from '$lib/theme.js';
@@ -196,9 +197,10 @@
 					<h2>{L.passwordTitle}</h2>
 					<form onsubmit={changePassword}>
 						<label>{L.passwordCurrent}<input type="password" autocomplete="current-password" required bind:value={current} /></label>
-						<label>{L.passwordNewLabel}<input type="password" autocomplete="new-password" minlength="10" required bind:value={next} /><small>{L.passwordHint}</small></label>
+						<label>{L.passwordNewLabel}<input type="password" autocomplete="new-password" minlength="10" required bind:value={next}
+							aria-invalid={next && passwordMissing(next) ? 'true' : undefined} /><small aria-live="polite">{next && passwordMissing(next) ? L.passwordMissing(passwordMissing(next)) : L.passwordHint}</small></label>
 						<div class="actions">
-							<button type="submit" class="primary">{L.passwordChange}</button>
+							<button type="submit" class="primary" disabled={!current || passwordMissing(next) > 0}>{L.passwordChange}</button>
 							<button type="button" class="ghost" onclick={endOthers}>{L.signOutOthers}</button>
 						</div>
 					</form>
