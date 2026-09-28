@@ -48,7 +48,7 @@
 				</div>
 				<div class="ends"><span>{b.ends[0]}</span><span>{b.ends[1]}</span></div>
 			</div>
-			<div class="val">{b.v === null ? '—' : signed(b.v)}</div>
+			<div class="val">{b.v === null ? '–' : signed(b.v)}</div>
 		</div>
 	{/each}
 </div>

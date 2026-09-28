@@ -113,7 +113,7 @@
 			const x = X(r.x), y = Y(r.y);
 			const near = nearParties.includes(r.name);
 			parties[ri] = {
-				ri, x, y, name: r.name, title: r.name + ' — ' + noteOf(r), near,
+				ri, x, y, name: r.name, title: r.name + ' : ' + noteOf(r), near,
 				dim: (sel || selRef) && !near,
 				place: show.refLabels || near ? place(taken, x, y, r.name, F.ref, near ? 650 : 500, 11, false, true) : null
 			};
@@ -163,7 +163,7 @@
 			rows: [
 				[L.tipEcon, signed(c.x)],
 				[W.tipSocial, signed(c.y) + (c.y > 0 ? W.suffixAuthor : c.y < 0 ? W.suffixLibert : '')],
-				[L.tipEcol, c.ecol === null ? '—' : signed(c.ecol)],
+				[L.tipEcol, c.ecol === null ? '–' : signed(c.ecol)],
 				...(c.method ? [[L.tipMethod, c.method]] : [])
 			],
 			concepts: PolitiExtract.keyConcepts(p, 3).map((k) => L.pole[k.key]).join(' · ') || L.noMarkedAxis,

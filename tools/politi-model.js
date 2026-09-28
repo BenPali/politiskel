@@ -85,27 +85,27 @@
         { name: "PCF",                x: -75, y: -29, src: "ches", prot: 56, eu: -30, note: "Étatisme économique, sensibilité souverainiste" },
         { name: "Les Écologistes",    x: -54, y: -66, src: "ches", prot: 15, eu: 73, note: "Écologie politique, libéralisme culturel" },
         { name: "Parti socialiste",   x: -33, y: -45, src: "ches", prot: 8, eu: 76, note: "Social-démocratie réformiste" },
-        { name: "La France humaniste",x: -15, y: -22, src: "est",  note: "Villepin, 2025 — gaullisme social : patrimoine et successions taxés, mais déficit sous 3 %, simplification par ordonnances. Postérieur au CHES, placement incertain" },
+        { name: "La France humaniste",x: -15, y: -22, src: "est",  note: "Villepin, 2025. Gaullisme social : patrimoine et successions taxés, mais déficit sous 3 %, simplification par ordonnances. Postérieur au CHES, placement incertain" },
         { name: "MoDem",              x:  14, y: -10, src: "ches", prot: -24, eu: 94, note: "Centrisme social, europhilie" },
         { name: "Rassemblement national", x: 20, y: 67, src: "ches", prot: 70, eu: -61, note: "Étatisme social ciblé, nationalisme" },
         { name: "Renaissance",        x:  24, y: -18, src: "ches", prot: -24, eu: 76, note: "Libéralisme économique, centre-droit" },
         { name: "Horizons",           x:  36, y:   6, src: "ches", prot: -28, eu: 81, note: "Droite libérale gestionnaire" },
         { name: "Debout la France",   x:  38, y:  62, src: "est",  note: "Souverainisme gaulliste" },
         { name: "Les Républicains",   x:  56, y:  44, src: "ches", prot: -12, eu: 42, note: "Droite conservatrice, ordre et marché" },
-        { name: "Nouvelle Énergie",   x:  62, y:  32, src: "est",  note: "Lisnard — droite libérale et décentralisatrice : choc de dérégulation, retraite par capitalisation, migration hors contrôle des cours européennes" },
+        { name: "Nouvelle Énergie",   x:  62, y:  32, src: "est",  note: "Lisnard, droite libérale et décentralisatrice : choc de dérégulation, retraite par capitalisation, migration hors contrôle des cours européennes" },
         { name: "Reconquête",         x:  67, y:  82, src: "ches", prot: 37, eu: -79, note: "Libéralisme économique, national-conservatisme" }
       ]
     },
     {
       code: "de", name: "Allemagne", parties: [
         { name: "Die Linke",          x: -73, y: -54, src: "ches", prot: 60, eu: -9, note: "Gauche radicale, redistribution et ouverture sociétale" },
-        { name: "BSW",                x: -44, y:  41, src: "ches", prot: 63, eu: -53, note: "Scission de Die Linke — étatisme économique et conservatisme culturel, le quadrant que l'échiquier français laisse vide" },
+        { name: "BSW",                x: -44, y:  41, src: "ches", prot: 63, eu: -53, note: "Scission de Die Linke : étatisme économique et conservatisme culturel, le quadrant que l'échiquier français laisse vide" },
         { name: "Grüne",              x: -33, y: -68, src: "ches", prot: -6, eu: 93, note: "Écologie politique, libéralisme culturel" },
         { name: "SPD",                x: -31, y: -28, src: "ches", prot: 6, eu: 79, note: "Social-démocratie de gouvernement" },
         { name: "Freie Wähler",       x:  29, y:  34, src: "ches", prot: 10, eu: 0, note: "Centre-droit localiste, ancré en Bavière" },
         { name: "CDU",                x:  32, y:  31, src: "ches", prot: -29, eu: 81, note: "Démocratie chrétienne, centre-droit de gouvernement" },
         { name: "CSU",                x:  35, y:  51, src: "ches", prot: 0, eu: 50, note: "Aile bavaroise de la CDU, nettement plus conservatrice" },
-        { name: "FDP",                x:  52, y: -36, src: "ches", prot: -63, eu: 61, note: "Libéralisme de marché ET libéralisme culturel — sans équivalent français de ce poids" },
+        { name: "FDP",                x:  52, y: -36, src: "ches", prot: -63, eu: 61, note: "Libéralisme de marché ET libéralisme culturel, sans équivalent français de ce poids" },
         { name: "AfD",                x:  53, y:  88, src: "ches", prot: 40, eu: -70, note: "Droite radicale nationaliste" }
       ]
     },
@@ -117,7 +117,7 @@
       parties: [
         { name: "Sinistra Italiana",  x: -72, y: -66, src: "ches", eu: 28, note: "Gauche radicale, composante de l'alliance AVS" },
         { name: "Europa Verde",       x: -56, y: -66, src: "ches", eu: 57, note: "Écologistes, composante de l'alliance AVS" },
-        { name: "M5S",                x: -43, y: -35, src: "ches", eu: 2, note: "Mouvement 5 étoiles — populisme devenu social, longtemps hors du clivage" },
+        { name: "M5S",                x: -43, y: -35, src: "ches", eu: 2, note: "Mouvement 5 étoiles : populisme devenu social, longtemps hors du clivage" },
         { name: "Partito Democratico",x: -41, y: -53, src: "ches", eu: 93, note: "Centre-gauche social-démocrate" },
         { name: "SVP",                x:   0, y:   2, src: "ches", eu: 52, note: "Parti régionaliste sud-tyrolien, au centre des deux axes" },
         { name: "Azione",             x:   4, y: -31, src: "ches", eu: 93, note: "Centre libéral réformateur" },
@@ -149,11 +149,11 @@
          + "part. À lire comme un ordre de grandeur, pas comme une mesure.",
       parties: [
         { name: "Green Party",              x: -65, y: -62, src: "est", note: "Écosocialisme, hors des deux grands partis" },
-        { name: "Démocrates progressistes", x: -52, y: -52, src: "est", note: "Sanders, Ocasio-Cortez — assurance maladie publique, Green New Deal" },
+        { name: "Démocrates progressistes", x: -52, y: -52, src: "est", note: "Sanders, Ocasio-Cortez : assurance maladie publique, Green New Deal" },
         { name: "Parti démocrate",          x: -16, y: -30, src: "est", note: "Centre-gauche à l'échelle européenne : le marché y est peu contesté, le libéralisme culturel assumé" },
         { name: "Républicains modérés",     x:  55, y:  30, src: "est", note: "Républicanisme d'avant 2016 : marché, défense, conservatisme social tempéré" },
         { name: "Parti républicain",        x:  62, y:  72, src: "est", note: "Marché, conservatisme social et national" },
-        { name: "Parti libertarien",        x:  88, y: -32, src: "est", note: "Marché sans entrave et libertés individuelles — quadrant que personne n'occupe en Europe à ce niveau" }
+        { name: "Parti libertarien",        x:  88, y: -32, src: "est", note: "Marché sans entrave et libertés individuelles, quadrant que personne n'occupe en Europe à ce niveau" }
       ]
     }
   ];

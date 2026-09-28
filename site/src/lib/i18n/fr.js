@@ -37,7 +37,7 @@ export const LOCALES = {
     proximity: "proximité ",
     noCloseParty: "aucun parti vraiment proche",
     nearest: "Le plus proche : ",
-    nearestFar: "Aucun parti vraiment proche — le moins lointain : ",
+    nearestFar: "Aucun parti vraiment proche. Le moins lointain : ",
     method: { revolutionary: "Révolutionnaire", reformist: "Réformiste", neither: "Ni l'un ni l'autre" },
 
     axisTop: "TRADITION · AUTORITÉ · NATION",
@@ -56,7 +56,7 @@ export const LOCALES = {
     profilesNear: "Profils proches de ",
     colParty: "Parti", colProfile: "Profil",
     nothingToCompare: "Aucun profil à comparer.",
-    groupHere: n => n + " profils à cette position — cliquez celui à suivre",
+    groupHere: n => n + " profils à cette position : cliquez celui à suivre",
 
     flagAlt: a => "Drapeau PolitiScales de " + a,
     deleteProfile: a => "Supprimer " + a,
@@ -72,11 +72,11 @@ export const LOCALES = {
     stripsHint: "Chaque ligne est un axe PolitiScales, chaque point un profil. Les axes sont "
       + "triés par dispersion (σ) : en haut ceux qui vous séparent le plus, en bas ceux sur "
       + "lesquels vous êtes d'accord. Survolez un point pour voir le détail et sa zone "
-      + "d'incertitude — la part de réponses neutres, donc la marge où il glisserait si son "
+      + "d'incertitude, c'est-à-dire la part de réponses neutres, donc la marge où il glisserait si son "
       + "indécision basculait. Un liseré double signale deux profils exactement superposés : "
       + "l'infobulle les liste tous les deux. « Moyenne du groupe » ajoute un repère par axe.",
 
-    formAxisHead: "Axe — gauche du ↔ tire vers ◄ / ▼",
+    formAxisHead: "Axe : gauche du ↔ tire vers ◄ / ▼",
     formColLeft: "◄ ▼", formColRight: "► ▲",
     errNoAlias: "Renseignez un alias.",
     errDuplicate: a => "Un profil porte déjà l'alias « " + a + " ».",
@@ -87,8 +87,8 @@ export const LOCALES = {
     errNotImage: "Ce fichier n'est pas une image exploitable.",
     errPixels: "Lecture des pixels refusée par le navigateur.",
     errExtract: m => "Échec de l'extraction : " + m,
-    errUnrecognised: w => "Capture non reconnue — " + w,
-    captureOk: (a, c) => a + " — " + (c || "profil équilibré") + " · vérifiez puis validez",
+    errUnrecognised: w => "Capture non reconnue : " + w,
+    captureOk: (a, c) => a + " : " + (c || "profil équilibré") + " · vérifiez puis validez",
 
     noMotto: "Devise non disponible (profil saisi à la main)",
     stripDetail: (ln, l, n, rn, r) => ln + " " + l + " % · neutre " + n + " % · " + rn + " " + r + " %",
@@ -96,15 +96,15 @@ export const LOCALES = {
     /* static markup, applied through data-i18n */
     brandTag: "Votre squelette politique",
     navTest: "Passer le test", navSource: "Code source",
-    subtitle: "Placez un profil — depuis un résultat PolitiScales, ou avec le questionnaire "
-      + "Politiskel — sur plusieurs lectures de l'espace politique, et comparez-le aux principales "
+    subtitle: "Placez un profil, depuis un résultat PolitiScales ou avec le questionnaire "
+      + "Politiskel, sur plusieurs lectures de l'espace politique, et comparez-le aux principales "
       + "forces du pays choisi, placées d'après les experts du CHES.",
     optCountry: "Pays de référence",
     optRefs: "Repères partis", optRefLabels: "Étiquettes des repères",
     optLabels: "Étiquettes des profils",
     optMean: "Moyenne du groupe", optMeanWhere: "(carte et axes)",
     chartTitle: "Positions calculées",
-    legendProfiles: "Profils", legendParties: (c, est) => "Partis — " + c + " (CHES 2024" + (est ? ", " + est + " estimé" + (est > 1 ? "s" : "") : "") + ")",
+    legendProfiles: "Profils", legendParties: (c, est) => "Partis : " + c + " (CHES 2024" + (est ? ", " + est + " estimé" + (est > 1 ? "s" : "") : "") + ")",
     partyAria: n => "Parti " + n,
     /* Written from the tables rather than by hand: the previous copy claimed
        "dix des quatorze partis" against a list that held fifteen. */
@@ -112,8 +112,8 @@ export const LOCALES = {
       "Les " + n + " repères " + country + " sont tous placés d'après le CHES 2024.",
     methodRefsMixed: (country, ches, est, names) =>
       "Sur les " + (ches + est) + " repères " + country + ", " + ches + " sont placés d'après le "
-      + "CHES 2024. Les " + est + " autres (" + names + ") n'y figurent pas — trop petits, plus "
-      + "récents, ou hors du champ de l'enquête — et restent des estimations à la main, calées "
+      + "CHES 2024. Les " + est + " autres (" + names + ") n'y figurent pas (trop petits, plus "
+      + "récents, ou hors du champ de l'enquête) et restent des estimations à la main, calées "
       + "sur l'échelle des premiers.",
     methodRefsEstimated: (country, n, why) =>
       "Les " + n + " repères " + country + " sont tous des estimations à la main, calées sur "
@@ -123,7 +123,7 @@ export const LOCALES = {
        going to carry its own elision. */
     methodTie: n => "Un troisième seuil en découle : quand le second repère est à moins de " + n
       + " points du premier, les deux sont affichés. À marge aussi courte, lequel arrive premier "
-      + "dépend des pondérations d'axes, qui n'ont rien d'évident — mesuré sur 4 000 profils "
+      + "dépend des pondérations d'axes, qui n'ont rien d'évident. Mesuré sur 4 000 profils "
       + "synthétiques et l'échiquier français, un tiers à une moitié d'entre eux changent de "
       + "repère sous des pondérations tout aussi défendables, contre 6 % au-delà de dix points "
       + "de marge. Le seuil des autres pays est mis à la même échelle que leurs repères, non mesuré.",
@@ -135,7 +135,7 @@ export const LOCALES = {
     stripsTitle: "Seconde lecture : les huit axes",
     stripsLead: "La boussole compresse huit axes en deux, et cette compression est un choix, "
       + "pas une évidence : elle rapproche des profils que ces huit axes séparent. Ici rien "
-      + "n'est compressé — même profils, une ligne par axe. Les deux lectures ne disent pas "
+      + "n'est compressé : mêmes profils, une ligne par axe. Les deux lectures ne disent pas "
       + "la même chose, et l'écart entre elles est ce qu'il y a de plus instructif.",
     dropTitle: "Déposer une capture PolitiScales",
     dropHint: "Ou cliquez pour choisir un fichier PNG",
@@ -191,7 +191,7 @@ export const LOCALES = {
     partiesTitle: "Partis, du plus proche au plus lointain",
     partiesScope: (country, view) => country + " · " + view,
     nearestLine: (name, fit, d) => "Le plus proche : " + name + ", proximité " + fit + " (" + d + " pts)",
-    nearestTie: (name, margin) => " — ou " + name + (margin === 0 ? ", à égalité." : ", à " + margin + (margin > 1 ? " points" : " point") + " près."),
+    nearestTie: (name, margin) => ", ou " + name + (margin === 0 ? ", à égalité." : ", à " + margin + (margin > 1 ? " points" : " point") + " près."),
     memberUnknown: n => "« " + n + " » n'est pas dans le groupe affiché.",
     brandHome: "Politiskel, accueil", navMain: "Navigation principale", navMenu: "Ouvrir le menu",
     displayPalette: "Palette", displayMode: "Mode",
@@ -212,7 +212,7 @@ export const LOCALES = {
     navSignIn: "Se connecter", navSignUp: "Créer un compte",
     homeTitle: "Voyez où vous divergez vraiment, entre amis.",
     homeLead: "Politiskel place votre profil sur une boussole, le compare aux partis de votre pays, placés "
-      + "d'après une enquête d'experts, et le décompose axe par axe — pour voir, dans un groupe, où l'on "
+      + "d'après une enquête d'experts, et le décompose axe par axe, pour voir, dans un groupe, où l'on "
       + "diverge plutôt que seulement où tombe la moyenne.",
     homeTry: "Essayer sans compte →",
     homePrivacy: "Aucun e-mail demandé · aucun traceur · vos réponses ne sont vues que de vos groupes.",
@@ -220,7 +220,7 @@ export const LOCALES = {
     /* the hero's illustration: invented names, placed by hand */
     homeSample: [["Camille", -38, -52], ["Inès", -74, -61], ["Jules", 14, -26], ["Sacha", 46, 22]],
     homePoints: [
-      ["Un questionnaire sourcé", "Chaque question vient d'une grande enquête publique — ESS, ISSP, EVS — "
+      ["Un questionnaire sourcé", "Chaque question vient d'une grande enquête publique (ESS, ISSP, EVS, Eurobaromètre), "
         + "dans sa version française officielle, avec sa variable."],
       ["Des repères réels", "Les partis sont placés par les experts du Chapel Hill Expert Survey, pays par "
         + "pays. Les rares estimations à la main sont signalées."],
@@ -267,7 +267,7 @@ export const LOCALES = {
     manualEntry: "Saisir les pourcentages à la main",
     dropTitleShort: "Déposez la capture ici, ou choisissez-la",
     dropFormats: "PNG ou JPEG · la capture entière du résultat",
-    captureRead: c => "Capture lue — " + (c || "profil équilibré") + ". Vérifiez les pourcentages, puis enregistrez.",
+    captureRead: c => "Capture lue : " + (c || "profil équilibré") + ". Vérifiez les pourcentages, puis enregistrez.",
     psTitle: "Résultat PolitiScales",
     captureSave: "Enregistrer ce résultat", captureSaved: "Résultat PolitiScales enregistré.",
     guestName: "Vous",
@@ -289,9 +289,9 @@ export const LOCALES = {
       + "sur ce serveur et visibles des seuls membres de vos groupes. Les captures ne quittent "
       + "jamais votre navigateur. Aucun traceur, aucun e-mail demandé ; vous pouvez exporter vos "
       + "données ou supprimer votre compte à tout moment.",
-    flagInTriangle: "Dans le triangle — ", flagOnBand: "Sur la bande — ",
+    flagInTriangle: "Dans le triangle : ", flagOnBand: "Sur la bande : ",
     flagEnlarge: "Agrandir", flagShrink: "Taille par défaut",
-    flagFigureTitle: "Drapeau Politiskel — tiré des lectures, selon les conventions des drapeaux "
+    flagFigureTitle: "Drapeau Politiskel, tiré des lectures, selon les conventions des drapeaux "
       + "politiques :",
     flagCredit: "Symboles : game-icons.net (Lorc, Delapouite), licence CC BY 3.0.",
     flagLayouts: {
@@ -303,7 +303,7 @@ export const LOCALES = {
         ? "Champ blanc et bordure d'or : la famille des drapeaux royaux, pour un monarchisme marqué ("
           + signed(Math.round(t.monarchy)) + ")."
         : "Champ blanc et bordure d'or : ordre (Y " + signed(t.y) + ") et tradition marqués.",
-      centred: t => "Croix centrée liserée : deux axes qui se croisent à rebours de l'habitude — "
+      centred: t => "Croix centrée liserée : deux axes qui se croisent à rebours de l'habitude, "
         + (t.x < 0 ? "une gauche traditionaliste" : "une droite d'ouverture") + " (X " + signed(t.x) + ", Y " + signed(t.y) + ").",
       disc: t => "Croix nordique à disque : une cause au-dessus de toutes les autres, portée au croisement ("
         + Math.round(t.syms[0].s) + ").",
@@ -327,19 +327,19 @@ export const LOCALES = {
       toc: "Sommaire",
       sections: [
         { id: "mesure", title: "Ce que mesure Politiskel", paras: [
-          "La boussole croise deux axes. L'axe horizontal est l'économie, de la gauche à la droite : redistribution, services publics et impôts, régulation des marchés. L'axe vertical est celui que les politistes appellent GAL-TAN — écologie, alternatives, libertés en bas ; tradition, autorité, nation en haut. C'est l'espace dans lequel le <em>Chapel Hill Expert Survey</em> (CHES) place les partis européens depuis vingt ans.",
-          "GAL-TAN mesure des valeurs culturelles, pas le rapport à l'État : on peut être tout en bas et demander plus d'État, pour l'économie comme pour les services publics. Deux axes compressent forcément ; Politiskel propose donc plusieurs <em>lectures</em> — celle du questionnaire, celle de PolitiScales d'origine, l'économie croisée avec le protectionnisme ou avec l'Europe — et la fiche d'un profil décompose le reste lecture par lecture."
+          "La boussole croise deux axes. L'axe horizontal est l'économie, de la gauche à la droite : redistribution, services publics et impôts, régulation des marchés. L'axe vertical est celui que les politistes appellent GAL-TAN : écologie, alternatives, libertés en bas ; tradition, autorité, nation en haut. C'est l'espace dans lequel le <em>Chapel Hill Expert Survey</em> (CHES) place les partis européens depuis vingt ans.",
+          "GAL-TAN mesure des valeurs culturelles, pas le rapport à l'État : on peut être tout en bas et demander plus d'État, pour l'économie comme pour les services publics. Deux axes compressent forcément ; Politiskel propose donc plusieurs <em>lectures</em> (celle du questionnaire, celle de PolitiScales d'origine, l'économie croisée avec le protectionnisme ou avec l'Europe), et la fiche d'un profil décompose le reste lecture par lecture."
         ] },
         { id: "sources", title: "Les deux sources d'un profil", paras: [
-          "Un profil a deux sources possibles : un résultat PolitiScales, lu sur une capture, et le questionnaire Politiskel. Quand un thème du questionnaire est répondu, l'axe qu'il mesure <strong>remplace entièrement</strong> celui de PolitiScales — les deux ne sont jamais moyennés. Chaque coordonnée a donc une seule source, et le tableau la signale.",
+          "Un profil a deux sources possibles : un résultat PolitiScales, lu sur une capture, et le questionnaire Politiskel. Quand un thème du questionnaire est répondu, l'axe qu'il mesure <strong>remplace entièrement</strong> celui de PolitiScales : les deux ne sont jamais moyennés. Chaque coordonnée a donc une seule source, et le tableau la signale.",
           "Depuis PolitiScales, X est une moyenne pondérée de Capitalisme − Communisme (<code>0,45</code>) et de Laissez-faire − Régulation (<code>0,35</code>) ; Y, de Essentialisme − Constructivisme (<code>0,30</code>), Justice punitive − réhabilitative (<code>0,25</code>), Conservatisme − Progressisme (<code>0,25</code>) et Nationalisme − Internationalisme (<code>0,20</code>). Les poids sont renormalisés sur les seules composantes renseignées. Écologie ↔ Productivisme n'entre pas dans X : l'échelle économique du CHES exclut l'environnement.",
-          "Depuis le questionnaire, X est la moyenne simple de trois sous-dimensions — redistribution, services publics contre impôts, régulation des marchés —, les trois sous-échelles économiques du CHES, dont la moyenne reproduit son axe <code>lrecon</code> à <code>r = 0,96</code>. Y suit le même principe sur les sept sous-dimensions sociétales du CHES ; leur moyenne reproduit <code>galtan</code> à <code>r = 0,97</code>. Le protectionnisme est lu à part, jamais dans X : dans le CHES il va contre la gauche-droite économique (<code>r = −0,37</code>).",
-          "Le thème Europe et monde ne touche à aucun des deux axes. Il donne trois lectures à part : l'intégration européenne, moyenne de trois groupes de questions — l'appartenance à l'Union, ses pouvoirs face aux gouvernements nationaux, ses politiques communes —, sur l'échelle <code>eu_position</code> du CHES ; le rapport à la Russie ; l'autorité des instances internationales face à l'intérêt national. Seule la première est comparée aux partis. Le CHES note bien le rapport des partis à la Russie, mais en France chaque position n'y repose que sur deux ou trois experts, en Italie sur un seul au plus : trop peu pour servir de repère."
+          "Depuis le questionnaire, X est la moyenne simple de trois sous-dimensions (redistribution, services publics contre impôts, régulation des marchés), les trois sous-échelles économiques du CHES, dont la moyenne reproduit son axe <code>lrecon</code> à <code>r = 0,96</code>. Y suit le même principe sur les sept sous-dimensions sociétales du CHES ; leur moyenne reproduit <code>galtan</code> à <code>r = 0,97</code>. Le protectionnisme est lu à part, jamais dans X : dans le CHES il va contre la gauche-droite économique (<code>r = −0,37</code>).",
+          "Le thème Europe et monde ne touche à aucun des deux axes. Il donne trois lectures à part : l'intégration européenne, moyenne de trois groupes de questions (l'appartenance à l'Union, ses pouvoirs face aux gouvernements nationaux, ses politiques communes), sur l'échelle <code>eu_position</code> du CHES ; le rapport à la Russie ; l'autorité des instances internationales face à l'intérêt national. Seule la première est comparée aux partis. Le CHES note bien le rapport des partis à la Russie, mais en France chaque position n'y repose que sur deux ou trois experts, en Italie sur un seul au plus : trop peu pour servir de repère."
         ] },
         { id: "questions", title: "D'où viennent les questions", paras: [
-          "Aucune question n'est écrite pour Politiskel. Chacune est citée d'une enquête publique éprouvée — l'<em>European Social Survey</em>, l'<em>International Social Survey Programme</em>, l'<em>European Values Study</em>, et l'<em>Eurobaromètre</em> pour la Russie et les politiques communes de l'Union, dont les trois autres ne parlent pas — dans sa version française officielle, avec sa source jusqu'à la variable. On peut donc vérifier chaque formulation.",
+          "Aucune question n'est écrite pour Politiskel. Chacune est citée d'une enquête publique éprouvée, dans sa version française officielle, avec sa source jusqu'à la variable. On peut donc vérifier chaque formulation. Ces enquêtes sont l'<em>European Social Survey</em>, l'<em>International Social Survey Programme</em>, l'<em>European Values Study</em>, et l'<em>Eurobaromètre</em> pour la Russie et les politiques communes de l'Union, dont les trois autres ne parlent pas.",
           "Les exceptions sont signalées sur la question même : l'échelle de classe d'Erik Olin Wright, qui n'existe pas en français et est traduite, et les deux bornes d'une échelle de l'ESS dont la carte n'a pas été retrouvée. Seule la consigne change : écrite pour une série de questions posées à la suite, elle est mise au singulier, puisqu'ici chaque écran n'en pose qu'une, dans un ordre mélangé mais identique pour tout le monde."
-        ], quote: ["« Le gouvernement devrait prendre des mesures pour réduire les différences de revenu. »", "ESS, variable <code>gincdif</code> — questionnaire français officiel"] },
+        ], quote: ["« Le gouvernement devrait prendre des mesures pour réduire les différences de revenu. »", "ESS, variable <code>gincdif</code>, questionnaire français officiel"] },
         { id: "partis", title: "Comment les partis sont placés", paras: [
           "Les repères viennent du CHES 2024 : 609 politologues notent 279 partis européens sur les échelles <code>lrecon</code> et <code>galtan</code>, exactement les deux dimensions de cette boussole, ramenées de −100 à +100 : position = (note sur 10 − 5) × 20. La position sur l'Europe vient de son échelle <code>eu_position</code>, notée de 1 à 7 : position = (note − 4) / 3 × 100. Ce ne sont pas des scores PolitiScales ; les distances profil-parti gardent donc une part d'approximation."
         ] },
@@ -348,10 +348,10 @@ export const LOCALES = {
         ] },
         { id: "limites", title: "Limites", paras: [
           "Un groupe d'amis est un petit échantillon : il montre où ses membres divergent, il ne dit rien de la population. L'import PolitiScales lit une capture d'écran ; si sa mise en page change, la lecture peut échouer, et Politiskel le dit plutôt que de deviner.",
-          "Deux axes ne voient ni le populisme — peuple contre élites — ni l'intégration européenne, dont les deux axes n'expliquent pas même la moitié dans le CHES. L'Europe a désormais son thème et sa lecture ; le populisme attend le thème Institutions. Le drapeau, enfin, est une illustration : il suit les conventions des drapeaux politiques, et sa légende dit ce que chaque élément représente."
+          "Deux axes ne voient ni le populisme (le peuple contre les élites) ni l'intégration européenne, dont les deux axes n'expliquent pas même la moitié dans le CHES. L'Europe a désormais son thème et sa lecture ; le populisme attend le thème Institutions. Le drapeau, enfin, est une illustration : il suit les conventions des drapeaux politiques, et sa légende dit ce que chaque élément représente."
         ] },
         { id: "donnees", title: "Vos données", paras: [
-          "Vos réponses sont des opinions politiques — des données sensibles au sens de l'article 9 du RGPD. Elles ne sont enregistrées qu'avec votre consentement explicite, sur ce serveur seulement, et ne sont montrées qu'aux membres des groupes que vous avez rejoints. Les captures PolitiScales ne quittent jamais votre navigateur. Aucun traceur, aucun e-mail. Vous pouvez tout exporter ou tout effacer depuis votre compte."
+          "Vos réponses sont des opinions politiques, donc des données sensibles au sens de l'article 9 du RGPD. Elles ne sont enregistrées qu'avec votre consentement explicite, sur ce serveur seulement, et ne sont montrées qu'aux membres des groupes que vous avez rejoints. Les captures PolitiScales ne quittent jamais votre navigateur. Aucun traceur, aucun e-mail. Vous pouvez tout exporter ou tout effacer depuis votre compte."
         ] }
       ],
       limitsCaption: "Seuils de proximité par pays, en points sur l'échelle −100 … +100",
@@ -421,8 +421,8 @@ export const LOCALES = {
       },
       example: n => "Exemple : " + n,
       asideTitle: "Écartés volontairement",
-      aside: "Les logos de partis, les emblèmes religieux, et tout symbole de haine — la croix de fer, la croix gammée "
-        + "et leurs dérivés parmi eux ; la croix de guerre porte le patriotisme martial sans cette charge. Les symboles marqués "
+      aside: "Les logos de partis, les emblèmes religieux, et tout symbole de haine, dont la croix de fer, la croix gammée "
+        + "et leurs dérivés ; la croix de guerre porte le patriotisme martial sans cette charge. Les symboles marqués "
         + "d'un thème à venir ne sont pas encore dessinés : ils attendent la lecture qui les justifie."
     },
     flagColourLines: {
@@ -432,7 +432,7 @@ export const LOCALES = {
       /* purple is openness, and feminism's too: the line says which one it is here */
       purple: (v, t) => t && t.trait("feminism") && t.trait("feminism").v >= v
         ? "Violet, la couleur des suffragettes : le féminisme (" + v + ")."
-        : "Violet : l'ouverture — écologie, alternatives, libertés, le bas de l'axe sociétal (" + v + ").",
+        : "Violet : l'ouverture (écologie, alternatives, libertés), le bas de l'axe sociétal (" + v + ").",
       pink: v => "Rose, celle des socialistes : la social-démocratie (" + v + ").",
       navy: v => "Bleu marine : le national-conservatisme, nation et ordre ensemble (" + v + ").",
       brown: v => "Brun, la couleur que l'histoire a donnée à l'extrême droite autoritaire : nation, ordre et refus de l'égalité des droits, tous très marqués (" + v + ").",
@@ -443,7 +443,7 @@ export const LOCALES = {
       black: v => "Noir : le rejet de l'État, dans la tradition anarchiste (" + v + ").",
       steel: v => "Acier : le productivisme, d'après PolitiScales (" + v + ")."
     },
-    flagSecond: "Et, plus petit — ",
+    flagSecond: "Et, plus petit : ",
     flagBorder: v => "Bordure sombre : un protectionnisme très marqué (" + v + ").",
     flagRevolutionStar: v => "Étoile : la révolution (" + v + ").",
     flagRainbow: v => "Barre arc-en-ciel : un soutien marqué aux droits des personnes LGBT (" + v + ").",
@@ -469,7 +469,7 @@ export const LOCALES = {
       phrygian: v => "Bonnet phrygien : la révolution et la liberté (" + v + ").",
       croix: v => "Croix de guerre : le patriotisme martial, nation et ordre ensemble (" + v + ").",
       crown: v => "Couronne : le monarchisme (" + v + ").",
-      equality: v => "Signe égal : l'égalité des droits pour tous — personnes LGBT, femmes, minorités — plutôt qu'une cause parmi d'autres (" + v + ").",
+      equality: v => "Signe égal : l'égalité des droits pour tous (personnes LGBT, femmes, minorités) plutôt qu'une cause parmi d'autres (" + v + ").",
       fleur: v => "Fleur de lys : un monarchisme légitimiste (" + v + ").",
       hammer: v => "Faucille et marteau : le communisme, l'alliance des ouvriers et des paysans (" + v + ").",
       rose: v => "Rose : la social-démocratie, le socialisme qui réforme (" + v + ").",
@@ -489,7 +489,7 @@ export const LOCALES = {
     tabCompass: "Boussole", tabQuiz: "Questionnaire", tabGroups: "Groupes", tabAccount: "Mon compte",
     welcomeTitle: "Politiskel, en groupe",
     welcomeLead: "Chaque membre a son compte et son profil, et voit ceux des groupes qu'il a "
-      + "rejoints — et d'eux seuls.",
+      + "rejoints, et d'eux seuls.",
     loading: "Chargement…", you: "vous",
     groupShown: "Groupe affiché", manageGroups: "Gérer mes groupes →",
     groupSwitch: "Changer de groupe…", manageGroupsShort: "Gérer les groupes",
@@ -510,7 +510,7 @@ export const LOCALES = {
     joinTitle: "Rejoindre un groupe", joinPlaceholder: "Lien ou code d'invitation",
     joinGo: "Voir l'invitation",
     groupsTitle: "Mes groupes",
-    groupsLeadShort: "Un groupe ne se voit que de l'intérieur : sans invitation, personne ne sait qu'il existe — sauf si son propriétaire le met dans l'annuaire.",
+    groupsLeadShort: "Un groupe ne se voit que de l'intérieur : sans invitation, personne ne sait qu'il existe, sauf si son propriétaire le met dans l'annuaire.",
     groupNotFound: "Ce groupe n'existe pas, ou vous n'en êtes pas membre.",
     memberSource: (ps, quiz) => ps && quiz ? "Questionnaire + PolitiScales" : ps ? "PolitiScales" : quiz ? "Questionnaire" : "Pas encore de réponses",
     youOwner: "vous · propriétaire", youTag: "vous", ownerTag: "propriétaire",
@@ -550,7 +550,7 @@ export const LOCALES = {
     username: "Pseudonyme", password: "Mot de passe", passwordNew: "Mot de passe (10 caractères ou plus)",
     signInTitle: "Se connecter", signIn: "Connexion", registerTitle: "Créer un compte",
     register: "Créer mon compte", signOut: "Se déconnecter", signedInAs: "Connecté : ",
-    consent: "J'accepte que mes réponses — des opinions politiques — soient enregistrées sur "
+    consent: "J'accepte que mes réponses, qui sont des opinions politiques, soient enregistrées sur "
       + "ce serveur et montrées aux membres des groupes que je rejoins, et à eux seuls. Je peux "
       + "exporter mes données ou supprimer mon compte à tout moment, ce qui efface tout.",
     serverNote: "Choisissez un pseudonyme plutôt que votre nom : c'est lui que verront les "
@@ -662,25 +662,25 @@ export const LOCALES = {
     viewNoteNoX: n => n + " profil" + (n > 1 ? "s" : "") + " sans réponse sur l'axe économique "
       + (n > 1 ? "ne sont" : "n'est") + " pas placé" + (n > 1 ? "s" : "") + ".",
     views: {
-      politiskel: { name: "Politiskel — économie × société" },
+      politiskel: { name: "Politiskel : économie × société" },
       politiscales: { name: "PolitiScales d'origine" },
       protectionism: { name: "Économie × protectionnisme",
-        axisTop: "PROTECTIONNISTE — protéger les producteurs",
-        axisBottom: "LIBRE-ÉCHANGISTE — ouvrir les échanges",
+        axisTop: "PROTECTIONNISTE : protéger les producteurs",
+        axisBottom: "LIBRE-ÉCHANGISTE : ouvrir les échanges",
         quadTopLeft: "Gauche protectionniste", quadTopRight: "Droite protectionniste",
         quadBottomLeft: "Gauche libre-échangiste", quadBottomRight: "Droite libre-échangiste",
         colY: "Y protect.",
         titleY: "Positif = protectionniste (haut) · négatif = libre-échangiste (bas)",
         tipSocial: "Protectionnisme", suffixAuthor: " protect.", suffixLibert: " libre-éch." },
       europe: { name: "Économie × Europe",
-        axisTop: "EUROPÉEN — approfondir l'intégration",
-        axisBottom: "SOUVERAINISTE — rendre le pouvoir aux États",
+        axisTop: "EUROPÉEN : approfondir l'intégration",
+        axisBottom: "SOUVERAINISTE : rendre le pouvoir aux États",
         quadTopLeft: "Gauche européenne", quadTopRight: "Droite européenne",
         quadBottomLeft: "Gauche souverainiste", quadBottomRight: "Droite souverainiste",
         colY: "Y Europe",
         titleY: "Positif = pour l'intégration européenne (haut) · négatif = souverainiste (bas)",
         tipSocial: "Europe", suffixAuthor: " europ.", suffixLibert: " souv." },
-      populist: { name: "Lecture populiste — thème Institutions, à venir" }
+      populist: { name: "Lecture populiste (thème Institutions, à venir)" }
     },
     quizOpen: "Compléter mon profil", quizEdit: "Modifier mes réponses",
     quizBack: "← Retour à la boussole",
@@ -691,13 +691,13 @@ export const LOCALES = {
     hubPlanned: "À venir",
     hubTitle: "Répondez par thèmes, dans l'ordre que vous voulez.",
     hubLeadShort: "Chacun remplace un axe de la boussole ou ajoute une lecture de votre profil.",
-    hubSources: "Aucune question n'est écrite pour Politiskel : chacune est citée d'une grande enquête publique — ESS, ISSP, EVS, Eurobaromètre — dans sa version française officielle, avec sa source.",
+    hubSources: "Aucune question n'est écrite pour Politiskel : chacune est citée d'une grande enquête publique (ESS, ISSP, EVS, Eurobaromètre), dans sa version française officielle, avec sa source.",
     hubMethod: "Lire la méthode",
     hubProgress: (n, m) => n + " / " + m + " réponses",
     themes: {
       economy: { name: "Économie",
-        desc: "Redistribution, impôts et services publics, régulation des marchés — qui remplacent "
-          + "l'axe X de PolitiScales — et, à part, le protectionnisme et trois lectures de classe.",
+        desc: "Redistribution, impôts et services publics, régulation des marchés, qui remplacent "
+          + "l'axe X de PolitiScales, et, à part, le protectionnisme et trois lectures de classe.",
         lead: "Ces questions remplacent l'axe économique de PolitiScales, qui ne repose que sur "
           + "deux de ses axes et ne pose rien sur la redistribution.",
         leadNative: "Ces questions placent votre profil sur l'axe économique, sur l'échelle "
@@ -708,12 +708,12 @@ export const LOCALES = {
           + "dans vos choix politiques ?" },
       society: { name: "Société",
         desc: "Immigration, multiculturalisme, ordre et libertés, droits des femmes et des "
-          + "personnes LGBT, religion, nation — qui remplacent l'axe Y de PolitiScales.",
+          + "personnes LGBT, religion, nation, qui remplacent l'axe Y de PolitiScales.",
         lead: "Ces questions remplacent l'axe sociétal de PolitiScales par les sept dimensions "
           + "sur lesquelles les experts du CHES placent les partis, de l'immigration à la "
           + "place de la religion.",
-        leadNative: "Ces questions placent votre profil sur l'axe sociétal — tradition, autorité et "
-          + "nation contre écologie, alternatives et libertés —, sur l'échelle qu'utilisent les "
+        leadNative: "Ces questions placent votre profil sur l'axe sociétal (tradition, autorité et "
+          + "nation contre écologie, alternatives et libertés), sur l'échelle qu'utilisent les "
           + "experts du CHES pour les partis.",
         salience: "Quelle place les questions de société tiennent-elles dans vos choix "
           + "politiques ?",
@@ -735,8 +735,8 @@ export const LOCALES = {
       ecology: { name: "Écologie",
         desc: "Environnement et climat, lus à part de l'économie, comme le fait le CHES." },
       institutions: { name: "Institutions",
-        desc: "Pouvoir exécutif, indépendance de la justice, régions — et la lecture populiste, "
-          + "peuple contre élites, présentée comme telle." }
+        desc: "Pouvoir exécutif, indépendance de la justice, régions, et la lecture populiste, "
+          + "le peuple contre les élites, présentée comme telle." }
     },
     quizCount: (i, n) => i + " / " + n,
     quizIntroEyebrow: "Questionnaire Politiskel · Économie",
@@ -761,7 +761,7 @@ export const LOCALES = {
         welcome: { title: "Bienvenue sur Politiskel", text: "En quelques étapes : où se trouve chaque chose, et comment on s'en sert. Vous pouvez passer la visite à tout moment, et la revoir depuis votre compte." },
         group: { title: "Votre groupe", text: "Le groupe affiché, ses membres, et les trois choix qui cadrent la boussole : le groupe, le pays de référence, la lecture. Inviter copie le lien du groupe." },
         compass: { title: "La boussole", text: "Chaque point est un membre, chaque losange un parti placé par les experts du CHES. Changez de lecture : les points se déplacent.", hint: "Cliquez un point pour le suivre" },
-        profiles: { title: "Les profils", text: "Les positions de chacun et le repère le plus proche — une proximité, pas une appartenance. La fiche d'un profil détaille ses lectures et son drapeau." },
+        profiles: { title: "Les profils", text: "Les positions de chacun et le repère le plus proche : une proximité, pas une appartenance. La fiche d'un profil détaille ses lectures et son drapeau." },
         themes: { title: "Le questionnaire", text: "Des questions tirées des grandes enquêtes publiques, par thèmes, dans l'ordre que vous voulez. Chaque thème remplace un axe de la boussole ou ajoute une lecture ; vos réponses s'enregistrent en passant à la suivante." },
         groups: { title: "Vos groupes", text: "Créez un groupe et partagez son lien, ou rejoignez-en un. Un groupe peut aussi apparaître dans l'annuaire, où l'on demande à entrer." },
         display: { title: "L'affichage", text: "Neuf palettes, chacune en clair, en sombre ou selon le système. Les animations se réduisent depuis votre compte." },
@@ -804,7 +804,7 @@ export const LOCALES = {
     backToCompass: "Voir sur la boussole", quizReview: "Revoir mes réponses",
     quizSourceLabel: "Source : ",
     quizTranslated: { item: "traduction Politiskel", anchors: "bornes traduites par Politiskel" },
-    quizSalienceSrc: "Question Politiskel — aucune enquête publique ne mesure l'importance "
+    quizSalienceSrc: "Question Politiskel : aucune enquête publique ne mesure l'importance "
       + "d'un thème sur une échelle.",
     fromQuiz: from => "X tiré du questionnaire (PolitiScales : " + from + ")",
     fromQuizY: from => "Y tiré du questionnaire (PolitiScales : " + from + ")",
@@ -823,28 +823,28 @@ export const LOCALES = {
     readingClass: "Classe (Wright)",
     readingConflict: "Conflit de classe perçu",
     readingLabour: "Rapport capital / travail",
-    readingNone: "—",
-    readingClassIncomplete: n => "incomplète (" + n + "/5) — l'échelle ne vaut que complète",
+    readingNone: "–",
+    readingClassIncomplete: n => "incomplète (" + n + "/5), l'échelle ne vaut que complète",
     answeredOf: (n, m) => n + "/" + m + " réponses",
     readingNotes: {
       x: "négatif = gauche, positif = droite, sur l'échelle lrecon du CHES",
-      y: "négatif = écologie, alternatives, libertés ; positif = tradition, autorité, nation — le GAL-TAN du CHES",
+      y: "négatif = écologie, alternatives, libertés ; positif = tradition, autorité, nation (le GAL-TAN du CHES)",
       protectionism: "hors de l'axe X : dans le CHES, il va contre la gauche-droite économique",
-      class: "anticapitaliste si positif — une lecture rivale de X, pas une composante",
+      class: "anticapitaliste si positif : une lecture rivale de X, pas une composante",
       conflict: "à côté de l'échelle de Wright, pas dedans",
-      labour: "du côté du travail si positif — syndicats, pouvoir des patrons"
+      labour: "du côté du travail si positif : syndicats, pouvoir des patrons"
     },
     salienceOf: s => "Importance déclarée : " + s,
     salienceMoved: (a, b, d) => "Importance déclarée : " + a + " au début, " + b + " à la fin"
-      + (d === 0 ? " — inchangée" : d > 0 ? " — en hausse" : " — en baisse"),
+      + (d === 0 ? ", inchangée" : d > 0 ? ", en hausse" : ", en baisse"),
     nativeLead: "Pas de résultat PolitiScales ? Partez d'ici :",
     nativeStart: "Commencer le questionnaire",
     nativeTitle: a => "Le profil de " + a,
     nativeMotto: "Profil Politiskel, sans résultat PolitiScales",
     nativeEmpty: "questionnaire pas encore commencé",
-    nativeNoY: "pas encore de Y — répondez au thème Société",
-    nativeNoX: "pas encore de X — répondez au thème Économie",
-    nativeNoXY: "pas encore de position — répondez aux thèmes Économie et Société",
+    nativeNoY: "pas encore de Y : répondez au thème Société",
+    nativeNoX: "pas encore de X : répondez au thème Économie",
+    nativeNoXY: "pas encore de position : répondez aux thèmes Économie et Société",
     nativeOffDetail: missing => missing.length > 1
       ? "Ce profil n'a encore ni X ni Y : ils viendront des thèmes Économie et Société du "
         + "questionnaire. En attendant, il n'est pas placé sur cette boussole."
@@ -859,8 +859,8 @@ export const LOCALES = {
     allName: "Questionnaire complet",
     allDesc: names => "Toutes les questions de tous les thèmes disponibles, mélangées dans un "
       + "ordre fixe, le même pour tout le monde. Pour l'instant : " + names.join(", ") + ".",
-    allLead: (n, m) => "Toutes les questions des thèmes disponibles — " + n + " sur " + m
-      + " pour l'instant — mélangées dans un ordre fixe, le même pour tout le monde : une suite "
+    allLead: (n, m) => "Toutes les questions des thèmes disponibles (" + n + " sur " + m
+      + " pour l'instant), mélangées dans un ordre fixe, le même pour tout le monde : une suite "
       + "de questions sur un même sujet laisse deviner ce qu'elle mesure. Les réponses sont les "
       + "mêmes que thème par thème : ce qui est déjà répondu d'un côté l'est de l'autre."
   }

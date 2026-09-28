@@ -49,10 +49,10 @@
 							</span>
 						</td>
 						<td class="num" data-label={L.colX} class:quiz={c.xSrc === 'quiz'} title={c.xSrc === 'quiz' ? (c.native ? L.fromQuizNative : L.fromQuiz(signed(c.psX))) : undefined}>
-							{c.x === null ? '—' : signed(c.x)}
+							{c.x === null ? '–' : signed(c.x)}
 						</td>
 						<td class="num" data-label={W.colY} class:quiz={c.ySrc === 'quiz' && c.y !== null} title={c.ySrc === 'quiz' && c.y !== null ? (c.native ? L.fromQuizNativeY : L.fromQuizY(signed(c.psY))) : undefined}>
-							{c.y === null ? '—' : signed(c.y)}
+							{c.y === null ? '–' : signed(c.y)}
 						</td>
 						<td class="near">
 							{#if nearest}

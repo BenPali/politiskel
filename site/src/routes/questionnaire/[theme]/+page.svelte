@@ -97,7 +97,7 @@
 
 	const progress = $derived(progressOf(theme, mine.answers));
 	const salienceLevels = PolitiQuiz.SCALES.salience.fr;
-	const val = (v) => (v === null || v === undefined ? '—' : signed(v));
+	const val = (v) => (v === null || v === undefined ? '–' : signed(v));
 	/* one block per theme of the flow: its journey along its main reading —
 	   a compass axis, or Europe's own — then its readings as cards */
 	const results = $derived.by(() => {
@@ -118,7 +118,7 @@
 				for (const r of ['protectionism', 'class', 'conflict', 'labour'])
 					cards.push({
 						label: L.bands.label[r],
-						value: r === 'class' && q.class === null && q.n.class ? '—' : val(q[r]),
+						value: r === 'class' && q.class === null && q.n.class ? '–' : val(q[r]),
 						note: r === 'class' && q.class === null && q.n.class ? L.readingClassIncomplete(q.n.class) : L.bands.hint[r]
 					});
 			else for (const d of t.dims) cards.push({ label: L.dims[d], value: val(q.dims[d]), note: t.axis ? L.dimNote : L.groupNote });

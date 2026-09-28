@@ -1,4 +1,4 @@
-# Mentions légales et confidentialité — modèle
+# Mentions légales et confidentialité (modèle)
 
 > Modèle à compléter par la personne qui héberge l'instance : c'est elle le
 > **responsable du traitement**. Les passages entre crochets sont à remplacer.
@@ -15,10 +15,10 @@ e-mail ou autre]. Hébergement : [hébergeur, pays].
 Le site enregistre, pour chaque compte :
 
 - un **pseudonyme**, visible des membres des groupes que vous rejoignez ;
-- l'**empreinte** de votre mot de passe (argon2id) — jamais le mot de passe lui-même ;
+- l'**empreinte** de votre mot de passe (argon2id), jamais le mot de passe lui-même ;
 - la **date** à laquelle vous avez donné votre consentement ;
 - les **groupes** que vous avez rejoints ;
-- vos **pourcentages PolitiScales**, déjà lus dans votre navigateur — la capture d'écran, elle, n'est jamais envoyée ;
+- vos **pourcentages PolitiScales**, déjà lus dans votre navigateur ; la capture d'écran, elle, n'est jamais envoyée ;
 - vos **réponses au questionnaire**.
 
 Aucune adresse e-mail n'est demandée. Aucun traceur, aucune mesure d'audience,

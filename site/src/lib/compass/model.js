@@ -29,7 +29,7 @@ export const copyOf = (viewKey) => Object.assign({}, L, L.views[viewKey] || {});
 
 /* Provenance is shown, not hidden: a hand estimate and a surveyed position
    should not look alike. */
-export const noteOf = (r) => r.note + (r.src === 'ches' ? ' — CHES 2024' : ' — estimation');
+export const noteOf = (r) => r.note + (r.src === 'ches' ? ' (CHES 2024)' : ' (estimation)');
 
 /* A member as the server sends it, as the compass reads it. */
 export function fromMember(m) {
