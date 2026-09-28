@@ -591,6 +591,13 @@ export const LOCALES = {
                    r_shift_x: "Corrélation avec le décalage sur X", r_shift_y: "Corrélation avec le décalage sur Y" },
       none: "–"
     },
+    accountSections: { profile: "Profil", display: "Affichage", data: "Données", security: "Sécurité", danger: "Effacer" },
+    accountQuiz: "Questionnaire", accountCard: "Ma fiche",
+    accountCardLead: "Votre profil tel que vos groupes le voient : drapeau, lectures, partis les plus proches.",
+    psImport: "Importer", psUpdate: "Mettre à jour", accountRestart: "Relancer",
+    accountExport: "Exporter mes données", accountExportDo: "Exporter",
+    accountSessions: "Autres appareils", accountSessionsLead: "Ferme votre session sur tous les autres navigateurs et appareils.",
+    accountErase: "Effacer",
     myProfile: "Mon profil", myData: "Mes données", deleteTitle: "Supprimer mon compte",
     savedPolitiscales: "Pourcentages PolitiScales enregistrés.",
     username: "Pseudonyme", password: "Mot de passe", passwordNew: "Mot de passe (10 caractères ou plus)",

@@ -42,7 +42,7 @@
 		<div class="band">
 			<div class="lab"><div class="l">{b.label}</div><div class="h">{b.hint}</div></div>
 			<div>
-				<div class="track" aria-hidden="true">
+				<div class="band-track" aria-hidden="true">
 					<div class="rail"></div>
 					<div class="zero"></div>
 					{#if b.v !== null}
@@ -61,7 +61,7 @@
 	.lab { line-height: 1.3; }
 	.l { font-size: 15px; font-weight: 650; }
 	.h { font-size: 12.5px; color: var(--text-3); }
-	.track { position: relative; height: 24px; }
+	.band-track { position: relative; height: 24px; }
 	.rail { position: absolute; left: 0; right: 0; top: 11px; height: 2px; border-radius: 1px; background: var(--border); }
 	.zero { position: absolute; left: 50%; top: 4px; width: 1.5px; height: 16px; background: var(--axis); }
 	/* a zero-width anchor that slides: a full-width box moved by a transform ran past the screen's edge */

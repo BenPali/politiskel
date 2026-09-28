@@ -51,6 +51,8 @@
 		setTimeout(() => URL.revokeObjectURL(a.href), 1000);
 	}
 	let erasing = $state(false);
+	/* the PolitiScales import opens in place, under its row */
+	let psOpen = $state(false);
 	const hasAnswers = $derived(!!session.me && Object.keys(session.me.profile.answers || {}).length > 0);
 	async function eraseAnswers() {
 		erasing = false;
@@ -110,33 +112,111 @@
 
 <SignedIn>
 	<div class="account-page">
-		<div class="head">
+		<header class="head">
 			<div>
 				<h1>{L.tabAccount}</h1>
 				<p class="who">{L.accountSignedIn(session.me.username, session.me.groups.length)}</p>
 			</div>
 			<button type="button" class="ghost" onclick={leave}>{L.signOut}</button>
-		</div>
+		</header>
 
-		<div class="cols">
-			<div class="col">
-				<section class="card">
-					<h2>{L.myProfile}</h2>
-					<dl>
-						<dt>{L.profilePs}</dt>
-						<dd>{me && hasPolitiscales(me) ? L.profilePsYes : L.profilePsNo}</dd>
+		<!-- One column of settings, row by row: what it is on the left, the control on the right. -->
+		<section>
+			<h2>{L.accountSections.profile}</h2>
+			<div class="row">
+				<div class="lab"><h3>{L.profilePs}</h3><p>{me && hasPolitiscales(me) ? L.profilePsYes : L.profilePsNo}</p></div>
+				<div class="ctl"><button type="button" class="ghost" aria-expanded={psOpen} onclick={() => (psOpen = !psOpen)}>{psOpen ? L.confirmCancel : me && hasPolitiscales(me) ? L.psUpdate : L.psImport}</button></div>
+			</div>
+			{#if psOpen}
+				<div class="inset">
+					<p class="note">{L.guestFromPsLead}</p>
+					<CaptureImport initial={session.me.profile.politiscales} onsave={savePs} />
+				</div>
+			{/if}
+			<div class="row">
+				<div class="lab">
+					<h3>{L.accountQuiz}</h3>
+					<ul class="progress-list">
 						{#each themes as t (t.key)}
-							<dt>{t.name}</dt>
-							<dd><span class="bar"><span style="transform: scaleX({t.total ? t.done / t.total : 0})"></span></span>{t.done} / {t.total}</dd>
+							<li><span class="t">{t.name}</span><span class="bar" aria-hidden="true"><span style="transform: scaleX({t.total ? t.done / t.total : 0})"></span></span><span class="n">{t.done} / {t.total}</span></li>
 						{/each}
-					</dl>
-					<div class="actions">
-						<a href="/questionnaire" class="button primary">{L.quizEdit}</a>
-						{#if hasAnswers}<button type="button" class="skip warn" onclick={() => (erasing = true)}>{L.eraseAllTitle}</button>{/if}
-						<a href="/boussole/{encodeURIComponent(session.me.username)}" class="button ghost">{L.openCard(session.me.username)}</a>
-					</div>
-				</section>
+					</ul>
+				</div>
+				<div class="ctl"><a href="/questionnaire" class="button ghost">{L.quizEdit}</a></div>
+			</div>
+			<div class="row">
+				<div class="lab"><h3>{L.accountCard}</h3><p>{L.accountCardLead}</p></div>
+				<div class="ctl"><a href="/boussole/{encodeURIComponent(session.me.username)}" class="button ghost">{L.openCard(session.me.username)}</a></div>
+			</div>
+		</section>
 
+		<section>
+			<h2>{L.accountSections.display}</h2>
+			<div class="row stack">
+				<div class="lab"><h3>{L.displayPalette}</h3><p>{L.paletteHints[display.palette]}</p></div>
+				<div class="palettes" role="radiogroup" aria-label={L.displayPalette}>
+					{#each PALETTES as p (p)}
+						<button type="button" role="radio" aria-checked={display.palette === p} data-theme={p} data-mode={display.mode} title={L.paletteHints[p]} onclick={() => set('palette', p)}>
+							<span class="swatch" aria-hidden="true"><span></span></span>{L.palettes[p]}
+						</button>
+					{/each}
+				</div>
+			</div>
+			<div class="row">
+				<div class="lab"><h3>{L.displayMode}</h3></div>
+				<div class="ctl segmented" role="radiogroup" aria-label={L.displayMode}>
+					{#each MODES as m (m)}<button type="button" role="radio" aria-checked={display.mode === m} onclick={() => set('mode', m)}>{L.modes[m]}</button>{/each}
+				</div>
+			</div>
+			<div class="row">
+				<div class="lab"><h3>{L.displayMotion}</h3></div>
+				<div class="ctl segmented" role="radiogroup" aria-label={L.displayMotion}>
+					{#each MOTIONS as m (m)}<button type="button" role="radio" aria-checked={display.motion === m} onclick={() => set('motion', m)}>{L.motions[m]}</button>{/each}
+				</div>
+			</div>
+			<div class="row">
+				<div class="lab"><h3>{L.tour.restart}</h3><p>{L.tour.restartLead}</p></div>
+				<div class="ctl"><button type="button" class="ghost" onclick={startTour}>{L.accountRestart}</button></div>
+			</div>
+		</section>
+
+		<section>
+			<h2>{L.accountSections.data}</h2>
+			<div class="row">
+				<div class="lab"><h3>{L.accountExport}</h3><p>{L.exportLead}</p></div>
+				<div class="ctl"><button type="button" class="ghost" onclick={exportAll}>{L.accountExportDo}</button></div>
+			</div>
+			<div class="row">
+				<label class="lab" for="model-check"><h3>{L.modelCheck.title}</h3><p>{L.modelCheck.consent}</p>
+					{#if session.me.admin}<p><a href="/admin/modele">{L.modelCheck.adminLink}</a></p>{/if}</label>
+				<div class="ctl"><span class="switch"><input id="model-check" type="checkbox" role="switch" checked={session.me.model_check} onchange={setModelCheck} /><span class="sw-track" aria-hidden="true"></span></span></div>
+			</div>
+		</section>
+
+		<section>
+			<h2>{L.accountSections.security}</h2>
+			<form class="row stack" onsubmit={changePassword}>
+				<div class="lab"><h3>{L.passwordTitle}</h3><p>{L.passwordHint}</p></div>
+				<div class="fields">
+					<label>{L.passwordCurrent}<input type="password" autocomplete="current-password" required bind:value={current} /></label>
+					<label>{L.passwordNewLabel}<input type="password" autocomplete="new-password" minlength="10" required bind:value={next}
+						aria-invalid={next && passwordMissing(next) ? 'true' : undefined} />{#if next && passwordMissing(next)}<small aria-live="polite">{L.passwordMissing(passwordMissing(next))}</small>{/if}</label>
+					<button type="submit" class="primary" disabled={!current || passwordMissing(next) > 0}>{L.passwordChange}</button>
+				</div>
+			</form>
+			<div class="row">
+				<div class="lab"><h3>{L.accountSessions}</h3><p>{L.accountSessionsLead}</p></div>
+				<div class="ctl"><button type="button" class="ghost" onclick={endOthers}>{L.signOutOthers}</button></div>
+			</div>
+		</section>
+
+		<section class="danger-zone">
+			<h2>{L.accountSections.danger}</h2>
+			{#if hasAnswers}
+				<div class="row">
+					<div class="lab"><h3>{L.eraseAllTitle}</h3><p>{L.eraseAllLead}</p></div>
+					<div class="ctl"><button type="button" class="ghost warn" onclick={() => (erasing = true)}>{L.accountErase}</button></div>
+				</div>
 				{#if erasing}
 					<div class="confirm" role="alertdialog" aria-label={L.eraseAllTitle}>
 						<p>{L.eraseAllConfirm}</p>
@@ -146,128 +226,81 @@
 						</div>
 					</div>
 				{/if}
-
-				<section class="card">
-					<h2>{L.psTitle}</h2>
-					<p class="note">{L.guestFromPsLead}</p>
-					<CaptureImport initial={session.me.profile.politiscales} onsave={savePs} />
-				</section>
-
-				<section class="card">
-					<h2>{L.themeLabel}</h2>
-					<p class="note">{L.displayLead}</p>
-					<div class="palettes" role="radiogroup" aria-label={L.displayPalette}>
-						{#each PALETTES as p (p)}
-							<button type="button" role="radio" aria-checked={display.palette === p} data-theme={p} data-mode={display.mode} onclick={() => set('palette', p)}>
-								<span class="swatch" aria-hidden="true"><span></span></span>
-								<span class="txt"><b>{L.palettes[p]}</b><small>{L.paletteHints[p]}</small></span>
-							</button>
-						{/each}
+			{/if}
+			<form class="row stack" onsubmit={askDelete}>
+				<div class="lab"><h3>{L.deleteTitle}</h3><p>{L.deleteWarn}</p></div>
+				<div class="fields">
+					<label>{L.password}<input type="password" autocomplete="current-password" required bind:value={delPassword} /></label>
+					<button type="submit" class="ghost warn">{L.deleteForever}</button>
+				</div>
+			</form>
+			{#if deleting}
+				<div class="confirm" role="alertdialog" aria-label={L.deleteTitle}>
+					<p>{L.deleteConfirm}</p>
+					<div class="actions">
+						<button type="button" class="danger" onclick={deleteAccount}>{L.deleteForever}</button>
+						<button type="button" class="ghost" onclick={() => (deleting = false)}>{L.confirmCancel}</button>
 					</div>
-					<p class="eyebrow">{L.displayMode}</p>
-					<div class="segmented" role="radiogroup" aria-label={L.displayMode}>
-						{#each MODES as m (m)}<button type="button" role="radio" aria-checked={display.mode === m} onclick={() => set('mode', m)}>{L.modes[m]}</button>{/each}
-					</div>
-					<p class="eyebrow">{L.displayMotion}</p>
-					<div class="segmented" role="radiogroup" aria-label={L.displayMotion}>
-						{#each MOTIONS as m (m)}<button type="button" role="radio" aria-checked={display.motion === m} onclick={() => set('motion', m)}>{L.motions[m]}</button>{/each}
-					</div>
-				</section>
-			</div>
-
-			<div class="col">
-				<section class="card">
-					<h2>{L.tour.restart}</h2>
-					<p class="note">{L.tour.restartLead}</p>
-					<button type="button" class="ghost" onclick={startTour}>{L.tour.restart}</button>
-				</section>
-
-				<section class="card">
-					<h2>{L.myData}</h2>
-					<p class="note">{L.exportLead}</p>
-					<button type="button" class="ghost" onclick={exportAll}>{L.exportAccount}</button>
-				</section>
-
-				<section class="card">
-					<h2>{L.modelCheck.title}</h2>
-					<p class="note">{L.modelCheck.lead}</p>
-					<label class="consent"><input type="checkbox" checked={session.me.model_check} onchange={setModelCheck} /><span>{L.modelCheck.consent}</span></label>
-					{#if session.me.admin}<p class="note admin"><a href="/admin/modele">{L.modelCheck.adminLink}</a></p>{/if}
-				</section>
-
-				<section class="card">
-					<h2>{L.passwordTitle}</h2>
-					<form onsubmit={changePassword}>
-						<label>{L.passwordCurrent}<input type="password" autocomplete="current-password" required bind:value={current} /></label>
-						<label>{L.passwordNewLabel}<input type="password" autocomplete="new-password" minlength="10" required bind:value={next}
-							aria-invalid={next && passwordMissing(next) ? 'true' : undefined} /><small aria-live="polite">{next && passwordMissing(next) ? L.passwordMissing(passwordMissing(next)) : L.passwordHint}</small></label>
-						<div class="actions">
-							<button type="submit" class="primary" disabled={!current || passwordMissing(next) > 0}>{L.passwordChange}</button>
-							<button type="button" class="ghost" onclick={endOthers}>{L.signOutOthers}</button>
-						</div>
-					</form>
-				</section>
-
-				<section class="card">
-					<h2>{L.deleteTitle}</h2>
-					<p class="note">{L.deleteWarn}</p>
-					<form onsubmit={askDelete}>
-						<label>{L.password}<input type="password" autocomplete="current-password" required bind:value={delPassword} /></label>
-						<button type="submit" class="ghost warn">{L.deleteForever}</button>
-					</form>
-					{#if deleting}
-						<div class="confirm" role="alertdialog" aria-label={L.deleteTitle}>
-							<p>{L.deleteConfirm}</p>
-							<div class="actions">
-								<button type="button" class="danger" onclick={deleteAccount}>{L.deleteForever}</button>
-								<button type="button" class="ghost" onclick={() => (deleting = false)}>{L.confirmCancel}</button>
-							</div>
-						</div>
-					{/if}
-				</section>
-			</div>
-		</div>
+				</div>
+			{/if}
+		</section>
 	</div>
 </SignedIn>
 
 <style>
-	.account-page { max-width: 1080px; margin: 0 auto; padding: 16px 0 32px; }
-	.head { display: flex; justify-content: space-between; align-items: flex-end; gap: 16px; flex-wrap: wrap; margin-bottom: 24px; }
+	.account-page { max-width: 820px; margin: 0 auto; padding: 16px 0 48px; }
+	.head { display: flex; justify-content: space-between; align-items: flex-end; gap: 16px; flex-wrap: wrap; margin-bottom: 8px; }
 	h1 { font-family: var(--font-display); font-size: clamp(30px, 4vw, 40px); font-weight: 700; letter-spacing: -0.02em; margin: 0 0 6px; }
 	.who { margin: 0; color: var(--text-2); }
-	.cols { display: grid; grid-template-columns: minmax(0, 1fr) minmax(0, 1fr); gap: 24px; align-items: start; }
-	.col { min-width: 0; display: flex; flex-direction: column; gap: 16px; }
-	.card + .card { margin-top: 0; }
-	h2 { font-family: var(--font-sans); font-size: 18px; font-weight: 650; margin: 0 0 10px; }
-	.note { margin: 0 0 14px; font-size: 14.5px; color: var(--text-2); }
-	.note.admin { margin: 14px 0 0; }
-	dl { display: grid; grid-template-columns: max-content 1fr; gap: 10px 20px; margin: 0 0 18px; font-size: 15px; }
-	dt { color: var(--text-2); }
-	dd { margin: 0; display: flex; align-items: center; gap: 10px; font-variant-numeric: tabular-nums; }
-	.bar { width: 120px; height: 6px; border-radius: 3px; background: var(--surface-sunk); overflow: hidden; }
+	section { margin-top: 36px; }
+	h2 { font-family: var(--font-sans); font-size: 13px; font-weight: 700; letter-spacing: var(--tracking-caps, .06em); text-transform: uppercase;
+		color: var(--text-3); margin: 0; padding-bottom: 10px; border-bottom: 1px solid var(--border-strong); }
+	/* a setting: what it is, then its control; a hairline between settings */
+	.row { display: grid; grid-template-columns: minmax(0, 1fr) auto; gap: 8px 32px; align-items: center; padding: 18px 0; border-bottom: 1px solid var(--border); }
+	.row.stack { grid-template-columns: minmax(0, 1fr); align-items: start; }
+	.lab { min-width: 0; display: block; }
+	.lab h3 { font-family: var(--font-sans); font-size: 15.5px; font-weight: 650; margin: 0; text-transform: none; letter-spacing: 0; color: var(--text); }
+	.lab p { margin: 3px 0 0; font-size: 14px; line-height: 1.45; color: var(--text-2); max-width: 60ch; }
+	.ctl { justify-self: end; }
+	.inset { padding: 4px 0 18px; border-bottom: 1px solid var(--border); }
+	.note { margin: 0 0 12px; font-size: 14px; color: var(--text-2); }
+	.progress-list { list-style: none; margin: 8px 0 0; padding: 0; display: grid; gap: 6px; }
+	.progress-list li { display: grid; grid-template-columns: minmax(0, 11em) minmax(60px, 160px) auto; gap: 12px; align-items: center; font-size: 14px; }
+	.progress-list .t { color: var(--text-2); }
+	.progress-list .n { font-variant-numeric: tabular-nums; color: var(--text-3); }
+	.bar { height: 5px; border-radius: 3px; background: var(--surface-sunk); overflow: hidden; }
 	.bar span { display: block; height: 100%; background: var(--accent); transform-origin: left; }
-	.actions { display: flex; flex-wrap: wrap; gap: 10px; }
-	.palettes { display: grid; grid-template-columns: repeat(auto-fill, minmax(190px, 1fr)); gap: 8px; margin-bottom: 18px; }
-	.palettes button { justify-content: flex-start; gap: 12px; min-height: 56px; padding: 8px 12px; text-align: left; white-space: normal; min-width: 0;
-		background: var(--surface); color: var(--text); border: 1px solid var(--border); border-radius: var(--r-md); }
-	.palettes button[aria-checked='true'] { border-color: var(--accent-strong); box-shadow: inset 0 0 0 1px var(--accent-strong); }
-	/* each swatch shows its own palette: data-theme on the button scopes the tokens */
-	.swatch { flex: none; width: 34px; height: 34px; border-radius: 50%; background: var(--bg); box-shadow: 0 0 0 1px var(--border-strong);
-		display: grid; place-items: center; }
-	.swatch span { width: 14px; height: 14px; border-radius: 50%; background: var(--accent); }
-	.txt { min-width: 0; }
-	.txt b { display: block; font-size: 14.5px; }
-	.txt small { display: block; font-size: 12.5px; color: var(--text-3); font-weight: 400; }
-	.eyebrow { margin: 0 0 8px; }
-	.segmented { display: inline-flex; gap: 4px; padding: 4px; border-radius: var(--r-sm); background: var(--surface-2); margin-bottom: 16px; }
-	.segmented button { min-height: 36px; padding: 0 14px; border: none; background: transparent; font-weight: 500; font-size: var(--fs-sm); }
-	.segmented button[aria-checked='true'] { background: var(--surface); box-shadow: var(--shadow-1); font-weight: var(--fw-bold); }
-	form label { display: flex; flex-direction: column; gap: 6px; font-size: 14px; font-weight: 650; color: var(--text-2); margin-bottom: 12px; }
-	form label small { font-weight: 400; color: var(--text-3); font-size: 13px; }
-	form input { font-weight: 400; width: 100%; box-sizing: border-box; }
+	/* palettes as a line of chips, each showing its own colours */
+	.palettes { display: flex; flex-wrap: wrap; gap: 8px; }
+	.palettes button { gap: 8px; min-height: 38px; padding: 0 12px 0 8px; font-size: 14px; font-weight: 550;
+		background: var(--surface); color: var(--text); border: 1px solid var(--border); border-radius: var(--r-pill); }
+	.palettes button[aria-checked='true'] { border-color: var(--accent-strong); box-shadow: inset 0 0 0 1px var(--accent-strong); font-weight: 700; }
+	.swatch { flex: none; width: 22px; height: 22px; border-radius: 50%; background: var(--bg); box-shadow: 0 0 0 1px var(--border-strong); display: grid; place-items: center; }
+	.swatch span { width: 9px; height: 9px; border-radius: 50%; background: var(--accent); }
+	.segmented { display: inline-flex; gap: 4px; padding: 4px; border-radius: var(--r-sm); background: var(--surface-2); }
+	.segmented button { min-height: 34px; padding: 0 14px; border: none; background: transparent; font-weight: 500; font-size: 14px; }
+	.segmented button[aria-checked='true'] { background: var(--surface); box-shadow: var(--shadow-1); font-weight: 700; }
+	/* a switch: the real checkbox, invisible over a drawn track and knob */
+	.switch { position: relative; display: inline-block; width: 46px; height: 26px; }
+	.switch input { position: absolute; inset: 0; width: 100%; height: 100%; margin: 0; opacity: 0; cursor: pointer; z-index: 1; }
+	.sw-track { position: absolute; inset: 0; border-radius: 13px; background: var(--border-strong); transition: background-color var(--dur-instant) var(--ease-out); }
+	.sw-track::after { content: ''; position: absolute; top: 3px; left: 3px; width: 20px; height: 20px; border-radius: 50%; background: var(--surface);
+		box-shadow: 0 1px 2px rgba(0,0,0,.25); transition: transform var(--dur-instant) var(--ease-out); }
+	.switch input:checked + .sw-track { background: var(--accent-strong); }
+	.switch input:checked + .sw-track::after { transform: translateX(20px); }
+	.switch input:focus-visible + .sw-track { box-shadow: var(--focus-ring); }
+	.fields { display: flex; flex-wrap: wrap; gap: 12px; align-items: flex-end; }
+	.fields label { display: flex; flex-direction: column; gap: 6px; font-size: 13.5px; font-weight: 650; color: var(--text-2); flex: 1 1 220px; min-width: 0; }
+	.fields label small { font-weight: 400; color: var(--danger); font-size: 13px; }
+	.fields input { font-weight: 400; width: 100%; box-sizing: border-box; }
+	.danger-zone h2 { color: var(--danger); border-color: var(--danger); }
 	.warn { color: var(--danger); border-color: var(--danger); }
-	.confirm { margin-top: 14px; padding: 14px 16px; border-radius: var(--r-md); background: var(--danger-soft); }
+	.actions { display: flex; flex-wrap: wrap; gap: 10px; }
+	.confirm { margin: 12px 0 0; padding: 14px 16px; border-radius: var(--r-md); background: var(--danger-soft); }
 	.confirm p { margin: 0 0 10px; }
-	.status { margin-bottom: 16px; }
-	@media (max-width: 860px) { .cols { grid-template-columns: minmax(0, 1fr); } }
+	@media (max-width: 640px) {
+		.row { grid-template-columns: minmax(0, 1fr); align-items: start; }
+		.ctl { justify-self: start; }
+		.progress-list li { grid-template-columns: minmax(0, 1fr) 80px auto; }
+	}
 </style>
