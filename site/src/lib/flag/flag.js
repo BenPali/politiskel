@@ -160,6 +160,7 @@ export function flagTraits(c, p) {
        all very marked; brown, the colour history gave it */
     { k: "farright",    s: has(nat) && has(ord) && eq ? Math.min(nat, ord, -eq.mean) : null, min: 70, colour: "brown", bonus: 5 },
     /* from the ecology theme */
+    { k: "degrowth",    s: futureReading(c, "degrowth"),        min: 60, colour: "green", symbol: "snail" },
     { k: "transition",  s: futureReading(c, "transition"),      min: 60, colour: "green", symbol: "turbine" },
     { k: "nuclear",     s: futureReading(c, "nuclear"),         min: 60, symbol: "atom" },
     /* Europe, either way; and from the institutions theme */
@@ -170,7 +171,6 @@ export function flagTraits(c, p) {
     /* readings the coming themes will measure: until then, never drawn */
     { k: "pacifism",    s: futureReading(c, "pacifism"),        min: 60, symbol: "dove" },
     { k: "rural",       s: futureReading(c, "rural"),           min: 60, symbol: "wheat" },
-    { k: "degrowth",    s: futureReading(c, "degrowth"),        min: 60, colour: "green", symbol: "snail" },
     { k: "regionalism", s: futureReading(c, "regionalism"),     min: 60, symbol: "ermine" },
     { k: "anarchy",     s: antistate,                   min: 80, symbol: "anarchy", bonus: 12 },
     /* no bonus: it takes a place at its own strength, never ahead of a

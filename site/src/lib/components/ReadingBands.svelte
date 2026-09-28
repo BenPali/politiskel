@@ -33,6 +33,7 @@
 			{ k: 'ecology', v: ecology?.ecology ?? null },
 			{ k: 'transition', v: ecology?.transition ?? null },
 			{ k: 'nuclear', v: ecology?.nuclear ?? null },
+			{ k: 'degrowth', v: ecology?.degrowth ?? null },
 			{ k: 'people', v: inst?.people ?? null },
 			{ k: 'executive', v: inst?.executive ?? null }
 		]

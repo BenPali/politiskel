@@ -58,6 +58,8 @@
                  electricity: not compared
      nuclear     how much of it should be nuclear: not compared, and apart
                  from ecology, since it splits the left
+     degrowth    whether growth itself must go (the French block of the ISSP
+                 2020): not compared
    Judicial independence and decentralisation, which CHES also rates, have
    no field-tested French question: the surveys ask about attachment to
    one's region, not about its powers.
@@ -335,6 +337,37 @@
            "On devrait donner la priorité à la croissance économique et à la création d'emplois, même si l'environnement en souffre d'une manière ou d'une autre"]
     },
 
+    /* ISSP Environment 2020, France, Q11. The questionnaire prints "Ni prêt·e ,"
+       with a stray space: corrected. */
+    willingIssp: {
+      values: [1, 0.5, 0, -0.5, -1],
+      fr: ["Tout à fait prêt·e", "Plutôt prêt·e", "Ni prêt·e, ni pas prêt·e", "Plutôt pas prêt·e", "Vraiment pas prêt·e"],
+      dk: "Ne peut choisir"
+    },
+    /* ISSP 2020, Q13. */
+    dangerIssp: {
+      values: [1, 0.5, 0, -0.5, -1],
+      fr: ["Extrêmement dangereuses pour l'environnement", "Très dangereuses", "Assez dangereuses", "Peu dangereuses",
+           "Pas du tout dangereuses pour l'environnement"],
+      dk: "Ne peut choisir"
+    },
+    /* ISSP 2020, the French block: ENE1, four points, no "can't choose". */
+    favourFr: {
+      values: [1, 1 / 3, -1 / 3, -1],
+      fr: ["Tout à fait favorable", "Plutôt favorable", "Plutôt opposé", "Tout à fait opposé"]
+    },
+    /* ISSP 2020, the French block: DROIT1. */
+    libertiesFr: {
+      values: [-1, 1],
+      fr: ["On devrait préserver tous nos droits et libertés individuelles, même si cela dégrade l'environnement",
+           "On devrait donner la priorité à la protection de l'environnement même si cela réduit certains droits et libertés individuelles"]
+    },
+    /* ISSP 2020, the French block: VARIA5, four points, no "can't choose". */
+    agree4Fr: {
+      values: [1, 1 / 3, -1 / 3, -1],
+      fr: ["Tout à fait d'accord", "Plutôt d'accord", "Plutôt pas d'accord", "Pas d'accord du tout"]
+    },
+
     /* ---- Institutions ---- */
     /* EVS 2017, Q43: four points; "NSP" was the interviewer's. */
     goodEvs: {
@@ -429,6 +462,10 @@
     Object.assign({ id, theme: "ecology", reading, dim, scale, pole }, extra, { src });
   const CLIMATE_STEM = "Dans quelle mesure êtes-vous pour ou contre la mise en œuvre en France des politiques suivantes afin d'atténuer le changement climatique ?";
   const ENV_AGREE_STEM = "Je vais maintenant vous lire plusieurs affirmations au sujet de l'environnement. Pour chacune d'entre elles, pourriez-vous me dire dans quelle mesure vous êtes d'accord ou pas d'accord ?";
+  const ENV20 = v => ({ survey: "ISSP", wave: "Environnement 2020, France", variable: v,
+                        url: "https://search.gesis.org/research_data/ZA7650" });
+  const ENV20_AGREE_STEM = "Dans quelle mesure êtes-vous d'accord ou pas d'accord avec chacune des affirmations suivantes ?";
+  const VARIA5_STEM = "Et pour chacune de ces phrases, pouvez-vous dire si vous êtes d'accord ou pas d'accord ?";
   const inst = (id, reading, dim, scale, pole, extra, src) =>
     Object.assign({ id, theme: "institutions", reading, dim, scale, pole }, extra, { src });
   const IMPORTANT = { left: "Pas du tout important pour la démocratie en général",
@@ -922,6 +959,54 @@
       fr: "Vous avez peut-être déjà entendu dire que le climat de la planète est en train de changer en raison d'une hausse des températures depuis une centaine d'années. Quelle est votre opinion sur ce sujet ? Pensez-vous que le climat de la planète est en train de changer ?" },
       ESS8("D19 clmchng")),
 
+    /* --- more of the priority, from the ISSP 2020 (France) --- */
+    eco("issp20.science", "ecology", "priority", "agreeIssp", -1, { stem: ENV20_AGREE_STEM,
+      fr: "La science moderne résoudra nos problèmes d'environnement, sans avoir trop à changer notre façon de vivre" },
+      ENV20("v20 · Q10_a")),
+    eco("issp20.prices.jobs", "ecology", "priority", "agreeIssp", -1, { stem: ENV20_AGREE_STEM,
+      fr: "Nous nous inquiétons trop au sujet de l'avenir de l'environnement et pas assez des prix et des emplois actuels" },
+      ENV20("v21 · Q10_b")),
+    eco("issp20.progress", "ecology", "priority", "agreeIssp", -1, { stem: ENV20_AGREE_STEM,
+      fr: "Les gens s'inquiètent trop des nuisances du progrès sur l'environnement" }, ENV20("v23 · Q10_d")),
+    eco("issp20.liberties", "ecology", "priority", "libertiesFr", 1, {
+      fr: "S'il fallait choisir, laquelle des déclarations suivantes correspondrait le plus à votre opinion ?" },
+      ENV20("DROIT1")),
+    eco("issp20.modern.life", "ecology", "priority", "agreeIssp", 1, { reserve: "a belief about modern life, not a position",
+      stem: ENV20_AGREE_STEM,
+      fr: "Presque tout ce que nous faisons dans la vie moderne nuit à l'environnement" }, ENV20("v22 · Q10_c")),
+    eco("issp20.eco1", "ecology", "priority", "growthEvs", 1, { reserve: "asks again what EVS v204 asks",
+      fr: "Parmi les déclarations suivantes, si vous deviez choisir, laquelle correspondrait le plus à votre opinion ?" },
+      ENV20("ECO1")),
+
+    /* --- ecology · the efforts one would make (ISSP 2020) --- */
+    eco("issp20.prices", "ecology", "efforts", "willingIssp", 1, {
+      fr: "Dans quelle mesure seriez-vous prêt·e à payer des prix beaucoup plus élevés pour protéger l'environnement ?" },
+      ENV20("v26 · Q11_a")),
+    eco("issp20.taxes", "ecology", "efforts", "willingIssp", 1, {
+      fr: "Et dans quelle mesure seriez-vous prêt·e à payer des impôts beaucoup plus élevés pour protéger l'environnement ?" },
+      ENV20("v27 · Q11_b")),
+    eco("issp20.living", "ecology", "efforts", "willingIssp", 1, {
+      fr: "Et dans quelle mesure seriez-vous prêt(e) à accepter une réduction de votre niveau de vie afin de protéger l'environnement ?" },
+      ENV20("v28 · Q11_c")),
+
+    /* --- degrowth: whether growth itself must go (ISSP 2020, France) --- */
+    eco("issp20.degrowth", "degrowth", null, "agree4Fr", 1, { stem: VARIA5_STEM,
+      fr: "Pour résoudre la crise environnementale, il est nécessaire d'abandonner l'objectif de croissance économique" },
+      ENV20("VARIA5_5")),
+    eco("issp20.limit.buying", "degrowth", null, "agree4Fr", 1, { stem: VARIA5_STEM,
+      fr: "Il serait acceptable d'instaurer une politique de limitation des achats des individus pour éviter la surconsommation" },
+      ENV20("VARIA5_3")),
+    eco("issp20.growth.harms", "degrowth", null, "agreeIssp", 1, { stem: ENV20_AGREE_STEM,
+      fr: "La croissance économique nuit toujours à l'environnement" }, ENV20("v25 · Q10_f")),
+    eco("issp20.needs.growth", "degrowth", null, "agreeIssp", -1, { stem: ENV20_AGREE_STEM,
+      fr: "Pour protéger l'environnement, la France a besoin de la croissance économique" }, ENV20("v24 · Q10_e")),
+
+    /* --- nuclear, from the ISSP 2020 --- */
+    eco("issp20.nuclear", "nuclear", null, "favourFr", 1, {
+      fr: "Quelle est votre opinion sur la production d'énergie par des centrales nucléaires ?" }, ENV20("ENE1")),
+    eco("issp20.nuclear.danger", "nuclear", null, "dangerIssp", -1, {
+      fr: "Et pensez-vous que les centrales nucléaires sont…" }, ENV20("v43 · Q13_g")),
+
     /* --- transition and nuclear: France's electricity (ESS 8, D4-D10). The
        survey asks them in a row, each after the one before ("Et à partir
        du gaz naturel ?"), so they travel in the same blocks here. --- */
@@ -1050,6 +1135,8 @@
     [NI23_PROP_STEM, "Êtes-vous d'accord ou pas d'accord avec la proposition suivante ?"],
     [DEMOCRACY_STEM, "Dans quelle mesure pensez-vous qu'il est important pour la démocratie en général…"],
     [DEMOCRACY_STEM_2, "De façon générale et non par rapport à la France, diriez-vous qu'il est important pour la démocratie en général…"],
+    [ENV20_AGREE_STEM, "Dans quelle mesure êtes-vous d'accord ou pas d'accord avec l'affirmation suivante ?"],
+    [VARIA5_STEM, "Êtes-vous d'accord ou pas d'accord avec la phrase suivante ?"],
     [CLIMATE_STEM, "Dans quelle mesure êtes-vous pour ou contre la mise en œuvre en France de la politique "
       + "suivante afin d'atténuer le changement climatique ?"],
     [ENV_AGREE_STEM, "Voici une affirmation au sujet de l'environnement. Dans quelle mesure êtes-vous d'accord ou pas d'accord ?"],
@@ -1077,8 +1164,8 @@
     /* no compass axis: `reading` is the one built from `dims` */
     { key: "europe", reading: "europe", readings: ["europe", "russia", "world"],
       dims: ["membership", "powers", "common"] },
-    { key: "ecology", reading: "ecology", readings: ["ecology", "transition", "nuclear"],
-      dims: ["climate", "priority"] },
+    { key: "ecology", reading: "ecology", readings: ["ecology", "transition", "nuclear", "degrowth"],
+      dims: ["climate", "priority", "efforts"] },
     { key: "institutions", reading: "people", readings: ["people", "executive"],
       dims: ["direct", "sovereign"] }
   ];

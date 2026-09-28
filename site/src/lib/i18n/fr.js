@@ -179,7 +179,7 @@ export const LOCALES = {
                conflict: "Conflit de classe perçu", labour: "Capital / travail",
                europe: "Europe", russia: "Russie", world: "Instances internationales",
                people: "Peuple / élus", executive: "Pouvoir exécutif",
-               ecology: "Écologie", transition: "Transition énergétique", nuclear: "Nucléaire" },
+               ecology: "Écologie", transition: "Transition énergétique", nuclear: "Nucléaire", degrowth: "Décroissance" },
       hintQuiz: { x: "Questionnaire · échelle CHES", y: "Questionnaire · GAL-TAN" },
       hintPs: "D'après PolitiScales",
       hintPending: (n, ps) => (ps ? "D'après PolitiScales · " : "") + "questionnaire en cours, encore "
@@ -188,14 +188,15 @@ export const LOCALES = {
               conflict: "ISSP", labour: "Syndicats, pouvoir des patrons · ESS, ISSP",
               europe: "Questionnaire · échelle CHES", russia: "Eurobaromètre · sans repère de parti",
               people: "Questionnaire · échelle POPPA", executive: "ESS, ISSP, EVS · sans repère de parti",
-              ecology: "Questionnaire · échelle CHES", transition: "ESS · sans repère de parti", nuclear: "ESS · sans repère de parti",
+              ecology: "Questionnaire · échelle CHES", transition: "ESS · sans repère de parti", nuclear: "ESS, ISSP · sans repère de parti",
+              degrowth: "ISSP · sans repère de parti",
               world: "ISSP · sans repère de parti" },
       ends: { x: ["Gauche", "Droite"], y: ["Ouverture", "Tradition"], protectionism: ["Libre-échange", "Protection"],
               class: ["Pro-capitaliste", "Anticapitaliste"], conflict: ["Faible", "Fort"], labour: ["Côté capital", "Côté travail"],
               europe: ["Souveraineté", "Intégration"], russia: ["Fermeté", "Conciliation"],
               people: ["Les élus décident", "Le peuple décide"], executive: ["Parlement", "Exécutif fort"],
               ecology: ["Croissance d'abord", "Environnement d'abord"], transition: ["Fossiles", "Renouvelables"],
-              nuclear: ["Sans nucléaire", "Beaucoup de nucléaire"],
+              nuclear: ["Sans nucléaire", "Beaucoup de nucléaire"], degrowth: ["Croissance", "Décroissance"],
               world: ["Intérêt national", "Autorité internationale"] }
     },
     partiesTitle: "Partis, du plus proche au plus lointain",
@@ -344,7 +345,7 @@ export const LOCALES = {
           "Depuis PolitiScales, X est une moyenne pondérée de Capitalisme − Communisme (<code>0,45</code>) et de Laissez-faire − Régulation (<code>0,35</code>) ; Y, de Essentialisme − Constructivisme (<code>0,30</code>), Justice punitive − réhabilitative (<code>0,25</code>), Conservatisme − Progressisme (<code>0,25</code>) et Nationalisme − Internationalisme (<code>0,20</code>). Les poids sont renormalisés sur les seules composantes renseignées. Écologie ↔ Productivisme n'entre pas dans X : l'échelle économique du CHES exclut l'environnement.",
           "Depuis le questionnaire, X est la moyenne simple de trois sous-dimensions (redistribution, services publics contre impôts, régulation des marchés), les trois sous-échelles économiques du CHES, dont la moyenne reproduit son axe <code>lrecon</code> à <code>r = 0,96</code>. Y suit le même principe sur les sept sous-dimensions sociétales du CHES ; leur moyenne reproduit <code>galtan</code> à <code>r = 0,97</code>. Le protectionnisme est lu à part, jamais dans X : dans le CHES il va contre la gauche-droite économique (<code>r = −0,37</code>).",
           "Le thème Europe et monde ne touche à aucun des deux axes. Il donne trois lectures à part : l'intégration européenne, moyenne de trois groupes de questions (l'appartenance à l'Union, ses pouvoirs face aux gouvernements nationaux, ses politiques communes), sur l'échelle <code>eu_position</code> du CHES ; le rapport à la Russie ; l'autorité des instances internationales face à l'intérêt national. Seule la première est comparée aux partis. Le CHES note bien le rapport des partis à la Russie, mais en France chaque position n'y repose que sur deux ou trois experts, en Italie sur un seul au plus : trop peu pour servir de repère.",
-          "Le thème Écologie donne trois lectures à part. La première, la place donnée à l'environnement face à la croissance, est comparée aux partis sur la moyenne des échelles <code>environment</code> et <code>climate_change</code> du CHES, qui vont ensemble (<code>r = 0,86</code>) ; elle a deux groupes de questions, les politiques climatiques et la priorité à l'environnement. Les deux autres, la transition vers les renouvelables et la place du nucléaire, sont mesurées sans repère de parti : le nucléaire est lu à part parce qu'il divise la gauche comme la droite. C'est le thème que les deux axes prédisent le mieux (73 à 80 % des positions des partis) : il sert moins à situer par rapport aux partis qu'à distinguer les gens entre eux.",
+          "Le thème Écologie donne quatre lectures à part. La première, la place donnée à l'environnement face à la croissance, est comparée aux partis sur la moyenne des échelles <code>environment</code> et <code>climate_change</code> du CHES, qui vont ensemble (<code>r = 0,86</code>) ; elle a trois groupes de questions : les politiques climatiques, la priorité à l'environnement et les efforts qu'on est prêt à faire. Les trois autres, la transition vers les renouvelables, la place du nucléaire et la décroissance, sont mesurées sans repère de parti : le nucléaire est lu à part parce qu'il divise la gauche comme la droite. Ses questions viennent de l'ESS, de l'EVS et du module Environnement de l'ISSP 2020, dont plusieurs, comme celles sur la décroissance, n'ont été posées qu'en France. C'est le thème que les deux axes prédisent le mieux (73 à 80 % des positions des partis) : il sert moins à situer par rapport aux partis qu'à distinguer les gens entre eux.",
           "Le thème Institutions donne deux lectures à part. La première, qui du peuple ou des élus doit décider, est comparée aux partis tels que les note l'enquête d'experts <em>POPPA</em> 2023 (<em>Populism and Political Parties Expert Survey</em>, données libres), sur son score de populisme, celui que ses auteurs valident par analyse factorielle à partir de cinq critères : place du peuple, rejet des élites, volonté générale, peuple indivisible, vision d'un combat entre bons et méchants (Andrej Zaslove, Maurits Meijers et Robert A. Huber, « <a href=\"https://doi.org/10.1177/13540688251361813\">The state of populism: Introducing the 2023 wave of the Populism and Political Parties Expert Survey</a> », <em>Party Politics</em>, 2025). C'est la lecture populiste, présentée comme telle, car opposer le peuple aux élites est une façon de lire le conflit politique parmi d'autres, pas une dimension neutre. Les deux axes n'en expliquent que 43 %. Le CHES a été essayé d'abord, mais son échelle <code>people_v_elite</code> oppose démocratie directe et représentative, pas le populisme : les partis suisses y sont en tête, le RN à peine au-dessus du milieu. La seconde, le poids donné à l'exécutif face au Parlement, suit déjà l'axe sociétal (<code>r = 0,75</code>) : elle est mesurée, pas comparée aux partis. L'indépendance de la justice et la décentralisation, que le CHES note aussi, n'ont pas de question éprouvée en français : les enquêtes demandent l'attachement à sa région, pas le partage des pouvoirs."
         ] },
         { id: "questions", title: "D'où viennent les questions", paras: [
@@ -398,7 +399,7 @@ export const LOCALES = {
         hammer: ["Faucille et marteau", "le communisme"], rose: ["Rose", "la social-démocratie"],
         lorraine: ["Croix de Lorraine", "le gaullisme"], cog: ["Roue dentée", "le syndicalisme"],
         dove: ["Colombe", "le pacifisme · à venir"], wheat: ["Épi de blé", "l'agrarisme · à venir"],
-        snail: ["Escargot", "la décroissance · à venir"], turbine: ["Éolienne", "la transition énergétique"],
+        snail: ["Escargot", "la décroissance"], turbine: ["Éolienne", "la transition énergétique"],
         atom: ["Atome", "le nucléaire civil"], eustars: ["Cercle d'étoiles", "le fédéralisme européen"],
         wall: ["Rempart", "la souveraineté nationale"], vote: ["Urne", "la démocratie directe"],
         megaphone: ["Mégaphone", "le populisme"], ermine: ["Hermine", "le régionalisme · à venir"]
@@ -844,15 +845,15 @@ export const LOCALES = {
         salienceAfter: "Maintenant que vous avez répondu : quelle place l'Europe et les relations "
           + "internationales tiennent-elles dans vos choix politiques ?" },
       ecology: { name: "Écologie",
-        desc: "Climat, environnement ou croissance, et l'électricité de demain : renouvelables, fossiles, "
-          + "nucléaire. Lus à part de l'économie, comme le fait le CHES.",
-        lead: "Ces questions mesurent trois choses à part : la place donnée à l'environnement face à la "
+        desc: "Climat, environnement ou croissance, décroissance, et l'électricité de demain : "
+          + "renouvelables, fossiles, nucléaire. Lus à part de l'économie, comme le fait le CHES.",
+        lead: "Ces questions mesurent quatre choses à part : la place donnée à l'environnement face à la "
           + "croissance, sur l'échelle qu'utilisent les experts du CHES pour les partis, la transition vers "
-          + "les renouvelables, et le nucléaire, qui divise la gauche comme la droite. Aucune ne déplace "
-          + "votre point sur la boussole principale.",
-        leadNative: "Ces questions mesurent trois choses à part : la place donnée à l'environnement face "
+          + "les renouvelables, le nucléaire, qui divise la gauche comme la droite, et la décroissance. "
+          + "Aucune ne déplace votre point sur la boussole principale.",
+        leadNative: "Ces questions mesurent quatre choses à part : la place donnée à l'environnement face "
           + "à la croissance, sur l'échelle qu'utilisent les experts du CHES pour les partis, la transition "
-          + "vers les renouvelables, et le nucléaire.",
+          + "vers les renouvelables, le nucléaire et la décroissance.",
         salience: "Quelle place l'écologie tient-elle dans vos choix politiques ?",
         salienceAfter: "Maintenant que vous avez répondu : quelle place l'écologie tient-elle dans vos "
           + "choix politiques ?" },
@@ -981,6 +982,8 @@ export const LOCALES = {
         def: "Des sources qui se renouvellent à l'échelle humaine : soleil, vent, eau des rivières, biomasse. Le solaire et l'éolien produisent selon la météo." },
       { term: "Nucléaire", match: /nucléaire/i,
         def: "L'électricité produite par la fission de l'uranium dans des réacteurs. Elle émet très peu de gaz carbonique, et laisse des déchets radioactifs à stocker. Elle fournit environ les deux tiers de l'électricité française." },
+      { term: "Croissance économique", match: /croissance économique|objectif de croissance/i,
+        def: "L'augmentation, d'une année sur l'autre, de la production de biens et de services d'un pays, mesurée par son PIB." },
       { term: "Retraites", match: /\bretraites?\b/i,
         def: "Les pensions versées à ceux qui ont cessé de travailler. En France, elles sont surtout payées par les cotisations de ceux qui travaillent aujourd'hui." },
       { term: "Allocations de chômage", match: /allocations de chômage/i,
@@ -1029,7 +1032,7 @@ export const LOCALES = {
             religion: "Religion et politique", nationalism: "Nationalisme",
             membership: "Appartenance à l'UE", powers: "Pouvoirs de l'UE", common: "Politiques communes",
             direct: "Démocratie directe", sovereign: "Volonté du peuple",
-            climate: "Politiques climatiques", priority: "Priorité à l'environnement" },
+            climate: "Politiques climatiques", priority: "Priorité à l'environnement", efforts: "Efforts consentis" },
     readingAxis: { x: "Économie (X)", y: "Société (Y)", europe: "Europe", people: "Peuple / élus", ecology: "Écologie" },
     readingProtectionism: "Protectionnisme",
     readingClass: "Classe (Wright)",

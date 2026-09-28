@@ -67,7 +67,7 @@ function withQuiz(p, c) {
 	c.ecology = PolitiQuiz.score(answers, 'ecology');
 	/* readings by name, for the flag */
 	c.readings = { europe: c.eu.europe, populism: c.inst.people, directdemocracy: c.inst.dims.direct,
-		ecology: c.ecology.ecology, transition: c.ecology.transition, nuclear: c.ecology.nuclear };
+		ecology: c.ecology.ecology, transition: c.ecology.transition, nuclear: c.ecology.nuclear, degrowth: c.ecology.degrowth };
 	/* the questionnaire's ecology replaces PolitiScales's in the readout, as an axis does */
 	if (c.ecology.ecology !== null) c.ecol = c.ecology.ecology;
 	const ps = { x: c.x, y: c.y };
