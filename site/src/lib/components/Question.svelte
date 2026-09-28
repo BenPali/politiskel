@@ -10,6 +10,16 @@
 
 	const bipolar = $derived(!!q.scale.bipolar);
 	const first = $derived(q.scale.values.length === 11 ? 0 : 1);
+	/* the glossary's terms found on this screen, in order, three at most */
+	const defs = $derived.by(() => {
+		const text = [q.stem, q.text, q.left, q.right].filter(Boolean).join(' ');
+		return L.glossary
+			.map((g) => ({ g, at: text.search(g.match) }))
+			.filter((x) => x.at >= 0)
+			.sort((a, b) => a.at - b.at)
+			.slice(0, 3)
+			.map((x) => x.g);
+	});
 	const src = $derived(q.src ? [q.src.survey, q.src.wave, q.src.variable].filter(Boolean).join(' · ') : null);
 	/* the key each choice answers to: 1-9 in order; on a ladder its own
 	   number, 0 standing for 10 on a 1-10 card */
@@ -58,6 +68,16 @@
 </div>
 
 {#if q.note}<p class="q-note">{q.note}</p>{/if}
+{#if defs.length && !q.salience}
+	<!-- folded: the question stays as the survey asked it; context only when asked for -->
+	<details class="defs">
+		<summary>{L.quizDefsLabel(defs.length)}</summary>
+		<dl>
+			{#each defs as d (d.term)}<dt>{d.term}</dt><dd>{d.def}</dd>{/each}
+		</dl>
+		<p class="defs-note">{L.quizDefsNote}</p>
+	</details>
+{/if}
 {#if q.salience}
 	<p class="q-src">{L.quizSalienceSrc}</p>
 {:else if src}
@@ -65,3 +85,17 @@
 		{L.quizSourceLabel}<a href={q.src.url} target="_blank" rel="noopener noreferrer">{src}</a>{#if q.translated}<br /><span class="tr">{L.quizTranslated[q.translated]}</span>{/if}
 	</p>
 {/if}
+
+<style>
+	.defs { margin: 18px 0 0; font-size: 14.5px; }
+	.defs summary { cursor: pointer; color: var(--accent-ink); font-weight: 600; min-height: 32px; display: inline-flex; align-items: center; gap: 8px; list-style: none; }
+	.defs summary::-webkit-details-marker { display: none; }
+	/* a plus that turns to a minus: it says the line unfolds */
+	.defs summary::before { content: '+'; display: inline-grid; place-items: center; width: 20px; height: 20px; border-radius: 50%;
+		border: 1.5px solid currentColor; font-size: 15px; line-height: 1; font-weight: 700; }
+	.defs[open] summary::before { content: '\2212'; }
+	.defs dl { margin: 8px 0 0; display: grid; gap: 10px; }
+	.defs dt { font-weight: 650; color: var(--text); }
+	.defs dd { margin: 2px 0 0; color: var(--text-2); line-height: 1.5; }
+	.defs-note { margin: 10px 0 0; font-size: 13px; color: var(--text-3); }
+</style>
