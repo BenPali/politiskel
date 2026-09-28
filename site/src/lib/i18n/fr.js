@@ -354,7 +354,7 @@ export const LOCALES = {
         ] },
         { id: "donnees", title: "Vos données", paras: [
           "Vos réponses sont des opinions politiques, donc des données sensibles au sens de l'article 9 du RGPD. Elles ne sont enregistrées qu'avec votre consentement explicite, sur ce serveur seulement, et ne sont montrées qu'aux membres des groupes que vous avez rejoints. Les captures PolitiScales ne quittent jamais votre navigateur. Aucun traceur, aucun e-mail. Vous pouvez tout exporter ou tout effacer depuis votre compte.",
-          "Un second consentement, distinct et facultatif, se donne dans votre compte : le contrôle du modèle. Vos réponses servent alors aussi à vérifier que les questions mesurent ce qu'elles doivent mesurer. Le calcul se fait sur le serveur, il n'en sort que des chiffres d'ensemble (rien en dessous de 30 profils, aucune réponse, aucun nom), et seuls les administrateurs du site les voient. Il se retire à tout moment."
+          "Si vous l'acceptez dans votre compte, vos réponses servent aussi à améliorer le modèle."
         ] }
       ],
       limitsCaption: "Seuils de proximité par pays, en points sur l'échelle −100 … +100",
@@ -549,16 +549,11 @@ export const LOCALES = {
       + "visibles de ses membres. Vous pourrez le quitter à tout moment.",
     alreadyMember: g => "Vous êtes déjà membre de « " + g + " ».",
     modelCheck: {
-      title: "Contrôle du modèle",
-      lead: "Politiskel peut vérifier, sur les réponses de ceux qui l'acceptent, que ses questions "
-        + "mesurent ce qu'elles doivent mesurer : qu'aucune ne tire à contre-sens, que le "
-        + "questionnaire ne décale pas tout le monde du même côté. Le calcul se fait sur ce serveur. "
-        + "Seuls des chiffres d'ensemble en sortent, jamais une réponse, un profil ou un nom, et rien "
-        + "du tout en dessous de 30 profils. Seuls les administrateurs du site les voient.",
-      consent: "J'accepte que mes réponses comptent dans ces calculs. Je peux retirer mon accord à "
-        + "tout moment : elles cessent aussitôt d'y compter.",
-      on: "Vos réponses comptent désormais dans le contrôle du modèle.",
-      off: "Vos réponses ne comptent plus dans le contrôle du modèle.",
+      title: "Améliorer le modèle",
+      lead: "Politiskel peut améliorer son modèle grâce aux profils de ceux qui l'acceptent.",
+      consent: "J'accepte que mes réponses servent à améliorer le modèle.",
+      on: "Merci : vos réponses serviront à améliorer le modèle.",
+      off: "Vos réponses ne servent plus à améliorer le modèle.",
       adminLink: "Voir le contrôle du modèle (administrateurs) →"
     },
     adminCheck: {
