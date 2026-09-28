@@ -39,6 +39,11 @@
              on two or three experts each, the Italian ones on one at most
      world   the authority of international bodies against the nation's own
              interest, which CHES does not rate at all
+     defence military strength against pacifism: spending on the army, a
+             bigger defence budget and more arms production in the EU,
+             being ready to fight for one's country. CHES has no defence
+             variable; eu_russia, which opposes defence against Russia to
+             trade and diplomacy with it, is Russia's, and too thin
    The Institutions theme feeds two readings, neither a compass axis:
      people     whether the people or those they elect should decide, on the
                 scale of CHES `people_v_elite`: the "lecture populiste",
@@ -302,6 +307,8 @@
       fr: ["Tout à fait d'accord", "Plutôt d'accord", "Plutôt pas d'accord", "Pas du tout d'accord"]
     },
     forEb: { values: [1, -1], fr: ["Pour", "Contre"] },
+    /* EVS 2017, Q36: yes or no; "NSP" was the interviewer's. */
+    yesNoEvs: { values: [1, -1], fr: ["Oui", "Non"] },
 
     /* ---- Ecology ---- */
     /* ESS 8, D30-D32. */
@@ -875,9 +882,18 @@
       fr: "Une politique énergétique commune des Etats membres de l'Union européenne" }, EB100("QB2.5")),
     eu("eb.defence.coop", "europe", "common", "agreeEb", 1, { stem: EB_AGREE_STEM,
       fr: "La coopération dans le domaine de la défense devrait être renforcée au niveau de l'UE" }, EB100("QD3.4")),
-    eu("eb.defence.budget", "europe", "common", "agreeEb", 1, { reserve: "measures the will to arm, not to integrate",
-      stem: EB_AGREE_STEM,
+    /* --- defence: military strength against pacifism --- */
+    eu("eb.defence.budget", "defence", null, "agreeEb", 1, { stem: EB_AGREE_STEM,
       fr: "Le budget de la défense devrait être augmenté dans l'UE" }, EB100("QD3.5")),
+    eu("eb.defence.production", "defence", null, "agreeEb", 1, { stem: EB_AGREE_STEM,
+      fr: "L'UE doit renforcer ses capacités de production d'équipements militaires" }, EB100("QD3.7")),
+    eu("issp.spend.defence", "defence", null, "spendIssp", -1, { stem: SPEND_STEM,
+      fr: "L'armée et la défense" }, { survey: "ISSP", wave: "Rôle de l'État 2016", variable: "Q6", url: GESIS(63847) }),
+    eu("evs.v112", "defence", null, "yesNoEvs", 1, {
+      fr: "Naturellement, nous espérons tous qu'il n'y aura pas d'autre guerre ; mais si cela devait arriver, seriez-vous prêt à vous battre pour votre pays ?" },
+      EVS("v112")),
+    eu("evs.v108", "defence", null, "yesNoEvs", 1, { reserve: "one aim chosen among four, not a scale",
+      fr: "Assurer à notre pays une armée forte pour se défendre" }, EVS("v108")),
     eu("ess.eusclbf", "europe", "common", "favourIssp", 1, { reserve: "needs the card that describes the scheme, and reads redistribution as much as Europe",
       fr: "Dans l'ensemble, seriez-vous défavorable ou favorable à un tel dispositif de prestations sociales à l'échelle de l'Union européenne ?" },
       ESS8("E37 eusclbf")),
@@ -1162,7 +1178,7 @@
       dims: ["immigration", "multiculturalism", "laworder", "women", "lgbt", "religion",
              "nationalism"] },
     /* no compass axis: `reading` is the one built from `dims` */
-    { key: "europe", reading: "europe", readings: ["europe", "russia", "world"],
+    { key: "europe", reading: "europe", readings: ["europe", "russia", "world", "defence"],
       dims: ["membership", "powers", "common"] },
     { key: "ecology", reading: "ecology", readings: ["ecology", "transition", "nuclear", "degrowth"],
       dims: ["climate", "priority", "efforts"] },

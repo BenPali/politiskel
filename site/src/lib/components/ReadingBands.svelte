@@ -30,6 +30,7 @@
 			{ k: 'europe', v: eu?.europe ?? null },
 			{ k: 'russia', v: eu?.russia ?? null },
 			{ k: 'world', v: eu?.world ?? null },
+			{ k: 'defence', v: eu?.defence ?? null },
 			{ k: 'ecology', v: ecology?.ecology ?? null },
 			{ k: 'transition', v: ecology?.transition ?? null },
 			{ k: 'nuclear', v: ecology?.nuclear ?? null },
