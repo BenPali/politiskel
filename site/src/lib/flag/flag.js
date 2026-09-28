@@ -108,6 +108,9 @@ export function flagTraits(c, p) {
     { k: "left",        s: neg(x),                      min: 34, colour: "red" },
     { k: "market",      s: x,                           min: 34, colour: "gold" },
     { k: "order",       s: y,                           min: 34, colour: "blue" },
+    /* the other side of y — ecology, alternatives, liberties — had no colour,
+       and a profile marked there alone drew a white flag */
+    { k: "openness",    s: neg(y),                      min: 34, colour: "purple" },
     { k: "class",       s: first(cls, ps.com),          min: 50, colour: "red", symbol: "fist" },
     { k: "redistribution", s: neg(d.redistribution),    min: 60, colour: "red", symbol: "scales" },
     { k: "deregulation", s: first(d.deregulation, ps.laf), min: 60, colour: "gold", symbol: "swallow" },
@@ -132,7 +135,9 @@ export function flagTraits(c, p) {
     { k: "revolution",  s: ps.rev,                      min: 65, symbol: "star" },
     { k: "reform",      s: ps.ref,                      min: 65, symbol: "handshake" },
     { k: "progress",    s: ps.prg,                      min: 70, symbol: "torch" },
-    { k: "centre",      s: has(x) && has(y) && Math.abs(x) < 25 && Math.abs(y) < 25
+    /* centre up to where the axes' colours start (34): between 25 and 34 no
+       colour applied, and a moderate profile drew a white flag */
+    { k: "centre",      s: has(x) && has(y) && Math.abs(x) < 34 && Math.abs(y) < 34
                              ? 60 - Math.max(Math.abs(x), Math.abs(y)) : null, min: 1, colour: "orange" },
     /* the side of labour against capital: unions, workers' power */
     { k: "syndicalism", s: labour,                      min: 60, symbol: "cog" },

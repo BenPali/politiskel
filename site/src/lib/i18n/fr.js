@@ -389,7 +389,7 @@ export const LOCALES = {
       coloursLead: "Les couleurs politiques conventionnelles, d'après l'usage français et européen.",
       colours: {
         red: ["Rouge", "la gauche économique"], gold: ["Or", "le libéralisme économique"], blue: ["Bleu", "l'ordre"],
-        purple: ["Violet", "le féminisme"], pink: ["Rose", "la social-démocratie"], green: ["Vert", "l'écologie"],
+        purple: ["Violet", "l'ouverture, et le féminisme"], pink: ["Rose", "la social-démocratie"], green: ["Vert", "l'écologie"],
         steel: ["Acier", "le productivisme"], sky: ["Bleu ciel", "le cosmopolitisme"], orange: ["Orange", "le centre"],
         black: ["Noir", "le rejet de l'État"], navy: ["Bleu marine", "le national-conservatisme"],
         brown: ["Brun", "l'extrême droite autoritaire"], white: ["Blanc", "aucune lecture marquée"]
@@ -423,7 +423,10 @@ export const LOCALES = {
       red: v => "Rouge : la gauche économique (" + v + ").",
       gold: v => "Or : le libéralisme économique (" + v + ").",
       blue: v => "Bleu : l'ordre (" + v + ").",
-      purple: v => "Violet, la couleur des suffragettes : le féminisme (" + v + ").",
+      /* purple is openness, and feminism's too: the line says which one it is here */
+      purple: (v, t) => t && t.trait("feminism") && t.trait("feminism").v >= v
+        ? "Violet, la couleur des suffragettes : le féminisme (" + v + ")."
+        : "Violet : l'ouverture — écologie, alternatives, libertés, le bas de l'axe sociétal (" + v + ").",
       pink: v => "Rose, celle des socialistes : la social-démocratie (" + v + ").",
       navy: v => "Bleu marine : le national-conservatisme, nation et ordre ensemble (" + v + ").",
       brown: v => "Brun, la couleur que l'histoire a donnée à l'extrême droite autoritaire : nation, ordre et refus de l'égalité des droits, tous très marqués (" + v + ").",
