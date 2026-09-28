@@ -23,13 +23,14 @@ pub(crate) async fn profile_of(state: &AppState, user: i64) -> ApiResult<Value> 
 
 pub(crate) async fn me(State(state): State<AppState>, jar: CookieJar) -> ApiResult<Json<Value>> {
     let (id, name) = current_user(&state, &jar).await?;
-    let (tour_seen, model_check): (bool, bool) = sqlx::query_as("SELECT tour_seen, model_check FROM users WHERE id = ?")
-        .bind(id).fetch_one(&state.db).await?;
+    let (tour_seen, model_check, admin): (bool, bool, bool) =
+        sqlx::query_as("SELECT tour_seen, model_check, is_admin FROM users WHERE id = ?")
+            .bind(id).fetch_one(&state.db).await?;
     Ok(Json(json!({
         "username": name,
         "tour_seen": tour_seen,
         "model_check": model_check,
-        "admin": state.is_admin(&name),
+        "admin": admin,
         "groups": groups_of(&state, id).await?,
         "profile": profile_of(&state, id).await?,
     })))

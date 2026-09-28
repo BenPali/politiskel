@@ -104,12 +104,20 @@ one stops working at once. That is the answer to a link that went too far.
 
 ### The model check
 
-`POLITISKEL_ADMINS=name1,name2` names the accounts that may open
-`/admin/modele`: how the questionnaire behaves on the answers of the members
-who ticked "Contrôle du modèle" on their account page. The server computes
+`/admin/modele` shows how the questionnaire behaves on the answers of the
+members who ticked "Contrôle du modèle" on their account page. The host
+names who may open it, beside the service, on the same database:
+
+```
+politiskel-server admin add <username>
+politiskel-server admin remove <username>
+politiskel-server admin list
+```
+
+The site has no way to make an account an admin. The server computes
 it itself, from the `model.json` the site build writes, and returns
 aggregates only: nothing under 30 consenting profiles, no figure on fewer
-than 10, no answer, no name. Without the variable, nobody can open it.
+than 10, no answer, no name. With no admin named, nobody can open it.
 Members who have not ticked the box never count, whatever the setting.
 
 ## 5. Backups

@@ -11,16 +11,16 @@
 //!                                   needed when the proxy rewrites Host
 //!   POLITISKEL_SIGNUP=invite        accounts only from an invitation link
 //!                                   (default: open to anyone)
-//!   POLITISKEL_ADMINS=a,b           the usernames that may read the model
-//!                                   check (aggregates only)
 //!
-//! Two maintenance commands, run beside the service on the same database:
+//! Maintenance commands, run beside the service on the same database:
 //!   politiskel-server reset-password <username>
 //!       sets a new random password, prints it once, and signs the account
 //!       out everywhere — there is no e-mail, so this is how a lost password
 //!       is recovered, by whoever runs the server;
 //!   politiskel-server backup <file>
-//!       writes a consistent copy of the database, safe while it runs.
+//!       writes a consistent copy of the database, safe while it runs;
+//!   politiskel-server admin add|remove <username>, admin list
+//!       who may open the model check, /admin/modele.
 //!
 //! It listens on localhost by default: put it behind a reverse proxy that
 //! terminates HTTPS. Session cookies are marked Secure, so over plain http a
@@ -28,7 +28,7 @@
 
 use std::str::FromStr;
 
-use politiskel_server::{app, hash_password, migrate, AppState, Signup};
+use politiskel_server::{app, hash_password, migrate, set_admin, AppState, Signup};
 use sqlx::sqlite::{SqliteConnectOptions, SqliteJournalMode, SqlitePoolOptions};
 
 #[tokio::main]
@@ -53,8 +53,9 @@ async fn main() {
     match args.first().map(String::as_str) {
         Some("reset-password") => return reset_password(&db, args.get(1)).await,
         Some("backup") => return backup(&db, args.get(1)).await,
+        Some("admin") => return admin(&db, args.get(1).map(String::as_str), args.get(2)).await,
         Some(other) => {
-            eprintln!("unknown command {other:?}: expected reset-password <username> or backup <file>");
+            eprintln!("unknown command {other:?}: expected reset-password <username>, backup <file> or admin add|remove|list");
             std::process::exit(2);
         }
         None => {}
@@ -77,8 +78,7 @@ async fn main() {
     eprintln!("politiskel-server listening on http://{addr}  (database {db_path})");
     let origin = std::env::var("POLITISKEL_ORIGIN").ok().filter(|v| !v.is_empty());
     let state = AppState::new(db, site_dir, !insecure).trusting_proxy(trust_proxy).with_origin(origin)
-        .with_signup(signup)
-        .with_admins(&env("POLITISKEL_ADMINS", "").split(',').collect::<Vec<_>>());
+        .with_signup(signup);
     if signup == Signup::Invite {
         eprintln!("sign-up: by invitation only");
     }
@@ -113,6 +113,30 @@ async fn reset_password(db: &sqlx::SqlitePool, name: Option<&String>) {
     tx.commit().await.expect("database");
     println!("new password for {username}: {password}");
     println!("(signed out everywhere; they should change it from their account page)");
+}
+
+/// Who may read the model check (/admin/modele): set here, on the host, and
+/// never from the site, so that no account can make itself an admin.
+async fn admin(db: &sqlx::SqlitePool, action: Option<&str>, name: Option<&String>) {
+    match (action, name) {
+        (Some("list"), _) => {
+            let rows: Vec<(String,)> = sqlx::query_as("SELECT username FROM users WHERE is_admin = 1 ORDER BY username")
+                .fetch_all(db).await.expect("database");
+            if rows.is_empty() { println!("no admin"); }
+            for (n,) in rows { println!("{n}"); }
+        }
+        (Some(a @ ("add" | "remove")), Some(name)) => {
+            match set_admin(db, name, a == "add").await.expect("database") {
+                Some(username) if a == "add" => println!("{username} is now an admin"),
+                Some(username) => println!("{username} is no longer an admin"),
+                None => { eprintln!("no account named {name:?}"); std::process::exit(1); }
+            }
+        }
+        _ => {
+            eprintln!("usage: politiskel-server admin add <username> | admin remove <username> | admin list");
+            std::process::exit(2);
+        }
+    }
 }
 
 async fn backup(db: &sqlx::SqlitePool, file: Option<&String>) {

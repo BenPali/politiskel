@@ -4,7 +4,7 @@
 use axum::body::Body;
 use axum::http::{header, Request, StatusCode};
 use http_body_util::BodyExt;
-use politiskel_server::{app, migrate, AppState, Signup};
+use politiskel_server::{app, migrate, set_admin, AppState, Signup};
 use serde_json::{json, Value};
 use sqlx::sqlite::SqlitePoolOptions;
 use tower::ServiceExt;
@@ -673,10 +673,13 @@ async fn the_model_check_is_for_admins_and_only_counts_consenting_members() {
     let fixture: Value = serde_json::from_str(include_str!("fixtures/scoring.json")).unwrap();
     let site = test_site();
     std::fs::write(site.join("model.json"), fixture["model"].to_string()).unwrap();
-    let app = app(AppState::new(db, site, true).with_admins(&["Admin"]));
+    let app = app(AppState::new(db.clone(), site, true));
 
     let mut admin = Client::new(&app);
-    admin.register("admin").await;                       // matched however it is typed
+    admin.register("admin").await;
+    // named from the host's command line, matched however it is typed
+    assert_eq!(set_admin(&db, "Admin", true).await.unwrap().as_deref(), Some("admin"));
+    assert_eq!(set_admin(&db, "nobody", true).await.unwrap(), None);
     let mut member = Client::new(&app);
     member.register("Zoé").await;
 
@@ -708,4 +711,8 @@ async fn the_model_check_is_for_admins_and_only_counts_consenting_members() {
     assert_eq!(admin.call("GET", "/api/admin/model-check", None).await.1["consenting"], json!(0));
     let (_, ex) = member.call("GET", "/api/me/export", None).await;
     assert!(ex["model_check_consent_at"].is_null());
+
+    // and an admin removed is refused at once
+    set_admin(&db, "admin", false).await.unwrap();
+    assert_eq!(admin.call("GET", "/api/admin/model-check", None).await.0, StatusCode::FORBIDDEN);
 }

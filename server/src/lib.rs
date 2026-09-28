@@ -33,6 +33,7 @@ mod site;
 mod state;
 
 pub use auth::hash_password;
+pub use model_check::set_admin;
 pub use error::ApiError;
 pub use groups::settle_groups;
 pub use state::{AppState, ClientIp, Signup};

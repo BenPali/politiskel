@@ -1,6 +1,6 @@
 //! The model check: how the scoring behaves on real answers, from the members
-//! who agreed to it (users.model_check), for the admins named in
-//! POLITISKEL_ADMINS.
+//! who agreed to it (users.model_check), for the admins the host named with
+//! `politiskel-server admin add` (users.is_admin).
 //!
 //! Answers never leave the server for it. The scoring is done here, from the
 //! model the site was built with (site/build/model.json, exported from
@@ -248,10 +248,24 @@ pub(crate) fn aggregate(model: &Model, profiles: &[(Value, Value)]) -> Value {
             "axes": axes, "agree": tendency })
 }
 
+/// Makes an account an admin, or no longer one, found the way sign-in finds
+/// it; its username as stored, or None when there is no such account. For
+/// the host's command line only: the site has no way to call it.
+pub async fn set_admin(db: &sqlx::SqlitePool, name: &str, on: bool) -> Result<Option<String>, sqlx::Error> {
+    let key = crate::validate::username_key(name);
+    let row: Option<(i64, String)> = sqlx::query_as("SELECT id, username FROM users WHERE username_key = ?")
+        .bind(&key).fetch_optional(db).await?;
+    let Some((id, username)) = row else { return Ok(None) };
+    sqlx::query("UPDATE users SET is_admin = ? WHERE id = ?").bind(on).bind(id).execute(db).await?;
+    Ok(Some(username))
+}
+
 /// GET /api/admin/model-check
 pub(crate) async fn report(State(state): State<AppState>, jar: CookieJar) -> ApiResult<Json<Value>> {
-    let (_, name) = current_user(&state, &jar).await?;
-    if !state.is_admin(&name) {
+    let (id, _) = current_user(&state, &jar).await?;
+    let (admin,): (bool,) = sqlx::query_as("SELECT is_admin FROM users WHERE id = ?")
+        .bind(id).fetch_one(&state.db).await?;
+    if !admin {
         return Err(ApiError(StatusCode::FORBIDDEN, "not_admin"));
     }
     let text = std::fs::read_to_string(state.site_dir.join("model.json"))
