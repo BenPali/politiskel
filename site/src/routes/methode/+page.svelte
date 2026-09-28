@@ -55,7 +55,6 @@
 		</ol>
 	</nav>
 	<article>
-		<p class="eyebrow kicker">{M.eyebrow}</p>
 		<h1>{M.title}</h1>
 		<p class="standfirst">{M.standfirst}</p>
 		{#each M.sections as s (s.id)}
@@ -109,7 +108,7 @@
 	figure { margin: 24px 0 8px; font-family: var(--font-sans); }
 	table { width: 100%; border-collapse: collapse; font-size: 15px; background: var(--surface); border: 1px solid var(--border); border-radius: var(--r-md); overflow: hidden; }
 	caption { text-align: left; font-size: 13.5px; color: var(--text-3); padding: 0 0 8px; }
-	th { text-align: left; padding: 10px 14px; font-size: 12px; letter-spacing: var(--tracking-caps); text-transform: uppercase; color: var(--text-3);
+	th { text-align: left; padding: 10px 14px; font-size: 13px; color: var(--text-3);
 		border-bottom: 1px solid var(--border); white-space: normal; }
 	td { padding: 10px 14px; border-top: 1px solid var(--border); font-variant-numeric: tabular-nums; white-space: normal; }
 	td:first-child { font-weight: 650; }

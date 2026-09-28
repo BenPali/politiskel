@@ -171,7 +171,6 @@
 				{#if step <= n}
 					<section class="quiz-card screen" style="--dx: {dir * 20}px">
 						{#if step === 0}
-							<p class="eyebrow">{L.hubEyebrow} · {themeName(theme)}</p>
 							<h2>{native ? L.nativeTitle(me.alias) : L.quizIntroTitle(me.alias)}</h2>
 							<p class="lead">
 								{theme === ALL ? L.allLead(openThemes().length, PolitiQuiz.THEMES.length) : native ? L.themes[theme].leadNative : L.themes[theme].lead}

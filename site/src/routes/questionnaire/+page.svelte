@@ -34,7 +34,6 @@
 
 <SignedIn guest>
 	<div class="hub">
-		<p class="eyebrow">{L.hubEyebrow}</p>
 		<h1>{L.hubTitle}</h1>
 		<p class="lead">{L.hubLeadShort}</p>
 		<div class="sources">
@@ -126,7 +125,7 @@
 	.confirm { padding: 14px 16px; border-radius: var(--r-md); background: var(--danger-soft); color: var(--text); }
 	.confirm p { margin: 0 0 10px; }
 	.actions { display: flex; flex-wrap: wrap; gap: 10px; }
-	.soon { font-family: var(--font-sans); font-size: 13px; letter-spacing: var(--tracking-caps); text-transform: uppercase; color: var(--text-3);
+	.soon { font-family: var(--font-sans); font-size: 13px; color: var(--text-3);
 		font-weight: 650; margin: 32px 0 12px; }
 	.planned { display: grid; grid-template-columns: repeat(auto-fit, minmax(220px, 1fr)); gap: 12px; }
 	.planned article { padding: 16px 18px; border-radius: var(--r-lg); border: 1.5px dashed var(--border-strong); }

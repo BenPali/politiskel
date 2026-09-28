@@ -154,8 +154,7 @@
 		background: var(--surface); color: var(--text); border: 1px solid var(--border); box-shadow: var(--shadow-3);
 		opacity: 0; transform: translateY(6px); transition: opacity var(--dur-base) var(--ease-out), transform var(--dur-base) var(--ease-out); }
 	.ready .card-tour { opacity: 1; transform: none; }
-	.count { display: flex; justify-content: space-between; align-items: center; font-size: 12px; color: var(--text-3); font-weight: 650;
-		letter-spacing: var(--tracking-caps); text-transform: uppercase; margin-bottom: 8px; }
+	.count { display: flex; justify-content: space-between; align-items: center; font-size: 13px; color: var(--text-3); font-weight: 650; margin-bottom: 8px; }
 	.dots { display: flex; gap: 4px; }
 	.dots i { width: 6px; height: 6px; border-radius: 50%; background: var(--border-strong); opacity: .5; transition: all var(--dur-base) var(--ease-out); }
 	.dots i.past { opacity: 1; }

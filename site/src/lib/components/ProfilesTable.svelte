@@ -84,7 +84,7 @@
 	h2 { font-family: var(--font-sans); font-size: 17px; font-weight: 650; margin: 0 4px 4px; }
 	.lead { margin: 0 4px 14px; font-size: 14px; color: var(--text-2); }
 	table { width: 100%; border-collapse: collapse; font-size: 14px; }
-	th { text-align: left; padding: 10px 8px; font-size: 12px; letter-spacing: var(--tracking-caps); text-transform: uppercase;
+	th { text-align: left; padding: 10px 8px; font-size: 13px;
 		color: var(--text-3); font-weight: 650; border-bottom: 1px solid var(--border); white-space: nowrap; }
 	th.r { text-align: right; }
 	th.near-h, td.near { padding-left: 16px; }
@@ -111,8 +111,7 @@
 			padding: 10px 4px; border-bottom: 1px solid var(--border); }
 		td { display: block; padding: 0; border: 0; }
 		td.num { font-size: 13.5px; text-align: right; }
-		td.num::before { content: attr(data-label); display: block; font-size: 10.5px; letter-spacing: var(--tracking-caps);
-			text-transform: uppercase; color: var(--text-3); font-weight: 650; }
+		td.num::before { content: attr(data-label); display: block; font-size: 13px; color: var(--text-3); font-weight: 650; }
 		td.near { grid-column: 1 / -1; padding: 6px 0 0 43px; min-width: 0; }
 		tbody tr:hover td, tbody tr.sel td { background: none; }
 		tbody tr.sel { background: var(--accent-soft); border-radius: var(--r-sm); }

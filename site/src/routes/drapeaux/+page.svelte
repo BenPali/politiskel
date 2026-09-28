@@ -39,7 +39,6 @@
 <svelte:head><title>{L.navFlags} · Politiskel</title></svelte:head>
 
 <div class="flags">
-	<p class="eyebrow">{F.eyebrow}</p>
 	<h1>{F.title}</h1>
 	<p class="lead">{F.lead}</p>
 

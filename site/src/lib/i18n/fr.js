@@ -166,7 +166,7 @@ export const LOCALES = {
     profilesTitle: "Profils du groupe",
     profilesHint: "Cliquez un profil pour le suivre sur la boussole ; ses repères proches s'entourent.",
     profilesFoot: "Une proximité mesurée sur deux axes, pas une appartenance.",
-    openCard: a => "Fiche de " + a + " →",
+    openCard: a => "Fiche de " + a,
     points: d => d + " pts",
     tieShort: (name, margin) => " · ou " + name + (margin === 0 ? ", à égalité" : ", à " + margin + (margin > 1 ? " pts" : " pt") + " près"),
     profileSource: (ps, quiz) => "Profil tiré de : " + (ps && quiz ? "Questionnaire + PolitiScales" : ps ? "PolitiScales" : quiz ? "Questionnaire" : "aucune réponse pour l'instant"),
@@ -216,7 +216,7 @@ export const LOCALES = {
     homeLead: "Politiskel place votre profil sur une boussole, le compare aux partis de votre pays, placés "
       + "d'après une enquête d'experts, et le décompose axe par axe, pour voir, dans un groupe, où l'on "
       + "diverge plutôt que seulement où tombe la moyenne.",
-    homeTry: "Essayer sans compte →",
+    homeTry: "Essayer sans compte",
     homePrivacy: "Aucun e-mail demandé · aucun traceur · vos réponses ne sont vues que de vos groupes.",
     homeAxes: { top: "TRADITION", bottom: "OUVERTURE", left: "GAUCHE", right: "DROITE" },
     /* the hero's illustration: invented names, placed by hand */
@@ -323,7 +323,6 @@ export const LOCALES = {
     /* The method page. Paragraphs are trusted markup (em, code, strong),
        written here, never taken from a profile. */
     methodPage: {
-      eyebrow: "Méthode",
       title: "Comment Politiskel mesure, et ce qu'il ne mesure pas",
       standfirst: "Une boussole est une réduction. Voici ce qu'elle garde, ce qu'elle perd, et d'où vient chaque chiffre.",
       toc: "Sommaire",
@@ -366,7 +365,6 @@ export const LOCALES = {
     flagWhich: "Drapeau affiché", flagPolitiskel: "Politiskel", flagPolitiscales: "PolitiScales",
     flagPsCaption: "Drapeau extrait du résultat PolitiScales, tel que PolitiScales l'a dessiné.",
     flagsPage: {
-      eyebrow: "Drapeaux",
       title: "Un drapeau tiré de vos positions",
       lead: "Chaque profil reçoit un drapeau, dans les conventions des drapeaux politiques : deux ou trois couleurs fortes, "
         + "un symbole, de grandes formes, aucune lettre. Rien n'est choisi dans une liste fixe : chaque trait porte sa "
@@ -494,7 +492,7 @@ export const LOCALES = {
     welcomeLead: "Chaque membre a son compte et son profil, et voit ceux des groupes qu'il a "
       + "rejoints, et d'eux seuls.",
     loading: "Chargement…", you: "vous",
-    groupShown: "Groupe affiché", manageGroups: "Gérer mes groupes →",
+    groupShown: "Groupe affiché", manageGroups: "Gérer mes groupes",
     groupSwitch: "Changer de groupe…", manageGroupsShort: "Gérer les groupes",
     inviteShort: "Inviter", memberShow: a => "Voir le profil de " + a,
     groupAloneShort: "Seul votre profil est affiché.",
@@ -554,7 +552,7 @@ export const LOCALES = {
       consent: "J'accepte que mes réponses servent à améliorer le modèle.",
       on: "Merci : vos réponses serviront à améliorer le modèle.",
       off: "Vos réponses ne servent plus à améliorer le modèle.",
-      adminLink: "Voir le contrôle du modèle (administrateurs) →"
+      adminLink: "Voir le contrôle du modèle (administrateurs)"
     },
     adminCheck: {
       title: "Contrôle du modèle",
@@ -747,7 +745,6 @@ export const LOCALES = {
     quizOpen: "Compléter mon profil", quizEdit: "Modifier mes réponses",
     quizBack: "← Retour à la boussole",
     backToThemes: "← Tous les thèmes", otherThemes: "Autres thèmes",
-    hubEyebrow: "Questionnaire Politiskel",
     hubLead: "Le questionnaire est découpé en thèmes, que vous remplissez dans l'ordre que "
       + "vous voulez. Chacun remplace un axe de la boussole ou ajoute une lecture de votre profil.",
     hubPlanned: "À venir",
@@ -801,7 +798,6 @@ export const LOCALES = {
           + "le peuple contre les élites, présentée comme telle." }
     },
     quizCount: (i, n) => i + " / " + n,
-    quizIntroEyebrow: "Questionnaire Politiskel · Économie",
     quizIntroTitle: a => "Compléter le profil de " + a,
     quizIntroMeta: (n, t) => n + " questions, et deux fois la même sur l'importance "
       + (t > 1 ? "de chaque thème" : "du thème") + " · environ " + Math.max(5, Math.round(n / 3.5))
@@ -845,7 +841,6 @@ export const LOCALES = {
       + "votre profil, et permet de tester le questionnaire sur de vraies réponses.",
     quizKeys: "Touches 1 à 9 pour répondre · ← → pour naviguer",
     quizPoleFull: n => "Tout à fait d'accord : " + n,
-    resultEyebrow: t => "Résultat · " + t,
     resultTitle: "D'où vous partiez, où vous arrivez",
     resultNoAxis: (theme, native) => "Aucune réponse au thème " + theme
       + (native ? " pour l'instant." : " : cet axe reste celui de PolitiScales."),

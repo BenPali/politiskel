@@ -24,7 +24,7 @@
   .wrap { max-width: 1440px; margin: 0 auto; }
   h1 { font-size: 1.5rem; margin: 0 0 4px; letter-spacing: -0.01em; }
   h2 { font-size: 0.95rem; margin: 0 0 12px; }
-  h3 { font-size: 0.8rem; text-transform: uppercase; letter-spacing: 0.06em;
+  h3 { font-size: 0.8rem;
        color: var(--text-3); font-weight: 600; margin: 0 0 10px; }
   p.subtitle { color: var(--text-2); margin: 0 0 20px; max-width: 70ch; }
 
@@ -51,7 +51,7 @@
     gap: 22px 32px;
   }
   footer.site h2 {
-    font-size: 0.7rem; text-transform: uppercase; letter-spacing: 0.07em;
+    font-size: 0.7rem;
     color: var(--text-3); font-weight: 600; margin: 0 0 7px;
   }
   footer.site p { margin: 0 0 6px; }
@@ -143,8 +143,7 @@
   table { width: 100%; border-collapse: collapse; font-size: 0.85rem; }
   th, td { padding: 8px 7px; text-align: left; border-bottom: 1px solid var(--border);
            white-space: nowrap; }
-  th { color: var(--text-3); font-weight: 600; font-size: 0.72rem;
-       text-transform: uppercase; letter-spacing: 0.05em; }
+  th { color: var(--text-3); font-weight: 600; font-size: 0.82rem; }
   td.num { text-align: right; font-variant-numeric: tabular-nums; }
   tbody tr:last-child td { border-bottom: none; }
   tbody tr.on td { background: var(--series-1-soft); }
@@ -291,8 +290,7 @@
   input[type=number] { text-align: right; font-variant-numeric: tabular-nums; }
   input:focus-visible { outline: 2px solid var(--focus); outline-offset: 1px; border-color: transparent; }
   .field { margin-bottom: 14px; }
-  .field label { display: block; font-size: 0.72rem; text-transform: uppercase;
-                 letter-spacing: 0.05em; color: var(--text-3); font-weight: 600; margin-bottom: 5px; }
+  .field label { display: block; font-size: 0.82rem; color: var(--text-3); font-weight: 600; margin-bottom: 5px; }
   .hint { font-size: 0.75rem; color: var(--text-3); margin: 0 0 12px; }
   /* what a section claims, above the smaller print explaining how to read it */
   .lead { font-size: 0.85rem; color: var(--text-2); margin: 0 0 10px; }
@@ -317,7 +315,7 @@
 
   /* The readings the questionnaire adds, in the distance panel. */
   .readings { border-top: 1px solid var(--border); margin: 0 0 14px; padding-top: 12px; }
-  .readings h3 { font-size: 0.75rem; text-transform: uppercase; letter-spacing: 0.05em;
+  .readings h3 { font-size: 0.82rem;
                  color: var(--text-3); margin: 0 0 8px; font-weight: 600; }
   .readings .journey { font-size: 0.85rem; margin: 0 0 10px; }
   .readings .readings-theme { font-size: 0.8rem; font-weight: 600; margin: 12px 0 6px; }
@@ -346,7 +344,7 @@
   @media (max-width: 640px) { .quiz-card { padding: 24px 18px 18px; min-height: 0; } }
   .quiz-card h2 { font-size: 1.4rem; line-height: 1.38; font-weight: 600; margin: 0 0 26px;
                   letter-spacing: -0.01em; }
-  .quiz-card .eyebrow { font-size: 0.72rem; text-transform: uppercase; letter-spacing: 0.06em;
+  .quiz-card .eyebrow { font-size: 0.82rem;
                         color: var(--text-3); font-weight: 600; margin: 0 0 12px; }
   .quiz-card .stem { font-size: 0.92rem; color: var(--text-2); margin: 0 0 10px; }
   .quiz-card .lead { font-size: 0.95rem; }
@@ -366,8 +364,7 @@
   /* scoped: the manual-entry form has its own .poles, a row label */
   .quiz-view .poles { display: grid; grid-template-columns: 1fr 1fr; gap: 24px; margin-bottom: 18px; }
   .pole { font-size: 1.08rem; line-height: 1.42; font-weight: 600; }
-  .pole small { display: block; font-size: 0.7rem; font-weight: 600; color: var(--text-3);
-                text-transform: uppercase; letter-spacing: 0.06em; margin-bottom: 5px; }
+  .pole small { display: block; font-size: 0.7rem; font-weight: 600; color: var(--text-3); margin-bottom: 5px; }
   .pole.r { text-align: right; }
   .ladder { display: grid; grid-auto-flow: column; grid-auto-columns: 1fr; gap: 6px; }
   .ladder .choice { justify-content: center; padding: 11px 0; font-variant-numeric: tabular-nums; }
@@ -473,8 +470,7 @@
   
   
   
-  .group-title .eyebrow { flex-basis: 100%; font-size: 0.68rem; font-weight: 600; letter-spacing: 0.07em;
-                          text-transform: uppercase; color: var(--text-3); }
+  .group-title .eyebrow { flex-basis: 100%; font-size: 0.82rem; font-weight: 600; color: var(--text-3); }
   
   .group-title .count { color: var(--text-3); font-size: 0.82rem; }
   

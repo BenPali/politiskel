@@ -253,16 +253,18 @@
 	h1 { font-family: var(--font-display); font-size: clamp(30px, 4vw, 40px); font-weight: 700; letter-spacing: -0.02em; margin: 0 0 6px; }
 	.who { margin: 0; color: var(--text-2); }
 	section { margin-top: 36px; }
-	h2 { font-family: var(--font-sans); font-size: 13px; font-weight: 700; letter-spacing: var(--tracking-caps, .06em); text-transform: uppercase;
-		color: var(--text-3); margin: 0; padding-bottom: 10px; border-bottom: 1px solid var(--border-strong); }
+	h2 { font-family: var(--font-display); font-size: 21px; font-weight: 700; letter-spacing: -0.01em; color: var(--text);
+		margin: 0 0 4px; }
 	/* a setting: what it is, then its control; a hairline between settings */
-	.row { display: grid; grid-template-columns: minmax(0, 1fr) auto; gap: 8px 32px; align-items: center; padding: 18px 0; border-bottom: 1px solid var(--border); }
+	.row { display: grid; grid-template-columns: minmax(0, 1fr) auto; gap: 8px 32px; align-items: center; padding: 16px 0; }
+	/* a line only between two settings, never under a title or after the last */
+	.row + .row, .inset + .row, .confirm + .row { border-top: 1px solid var(--border); }
 	.row.stack { grid-template-columns: minmax(0, 1fr); align-items: start; }
 	.lab { min-width: 0; display: block; }
 	.lab h3 { font-family: var(--font-sans); font-size: 15.5px; font-weight: 650; margin: 0; text-transform: none; letter-spacing: 0; color: var(--text); }
 	.lab p { margin: 3px 0 0; font-size: 14px; line-height: 1.45; color: var(--text-2); max-width: 60ch; }
 	.ctl { justify-self: end; }
-	.inset { padding: 4px 0 18px; border-bottom: 1px solid var(--border); }
+	.inset { padding: 0 0 16px; }
 	.note { margin: 0 0 12px; font-size: 14px; color: var(--text-2); }
 	.progress-list { list-style: none; margin: 8px 0 0; padding: 0; display: grid; gap: 6px; }
 	.progress-list li { display: grid; grid-template-columns: minmax(0, 11em) minmax(60px, 160px) auto; gap: 12px; align-items: center; font-size: 14px; }
@@ -293,7 +295,7 @@
 	.fields label { display: flex; flex-direction: column; gap: 6px; font-size: 13.5px; font-weight: 650; color: var(--text-2); flex: 1 1 220px; min-width: 0; }
 	.fields label small { font-weight: 400; color: var(--danger); font-size: 13px; }
 	.fields input { font-weight: 400; width: 100%; box-sizing: border-box; }
-	.danger-zone h2 { color: var(--danger); border-color: var(--danger); }
+	.danger-zone h2 { color: var(--danger); }
 	.warn { color: var(--danger); border-color: var(--danger); }
 	.actions { display: flex; flex-wrap: wrap; gap: 10px; }
 	.confirm { margin: 12px 0 0; padding: 14px 16px; border-radius: var(--r-md); background: var(--danger-soft); }
