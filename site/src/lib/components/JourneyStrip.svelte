@@ -57,7 +57,7 @@
 			<div class="jr-trail" class:on={moved} style="left: {Math.min(from, pct(now))}%; width: {Math.abs(pct(now) - from)}%; transform-origin: {rightward ? 'left' : 'right'} center">
 				<div class="jr-line"></div>
 				{#if moved}
-					<div class="jr-flow" style:transform={rightward ? null : 'scaleX(-1)'}><div class="jr-drop-move"><div class="jr-drop"></div></div></div>
+					<div class="jr-flow"><div class="jr-drop-move" class:back={!rightward}><div class="jr-drop"></div></div></div>
 				{/if}
 			</div>
 			<div class="jr-ghost" style="left: {from}%"></div>
@@ -88,7 +88,11 @@
 	.jr-line { position: absolute; inset: 0; border-radius: 2px; background: var(--accent); opacity: .45; }
 	.jr-flow, .jr-drop-move { position: absolute; inset: 0; }
 	.jr-drop-move { animation: drop-move 1800ms cubic-bezier(.45, .05, .3, 1) var(--dur-deliberate) infinite both; }
-	.jr-drop { position: absolute; left: -7px; top: -5px; width: 14px; height: 14px; border-radius: 50%; background: var(--dot-me);
+	/* right to left: its own keyframes, not the same ones under a scaleX(-1). A
+	   mirrored parent put the drop below the line and past the dot on a GPU
+	   compositor (seen in Arc on a Retina screen), though layout was right. */
+	.jr-drop-move.back { animation-name: drop-move-back; }
+	.jr-drop { position: absolute; left: -7px; top: -5px; width: 14px; height: 14px; border-radius: 50%; background: var(--dot-me); transform-origin: 50% 50%;
 		animation: drop-shape 1800ms linear var(--dur-deliberate) infinite both; }
 	.jr-ghost { position: absolute; top: 36px; width: 18px; height: 18px; margin-left: -9px; border-radius: 50%; border: 2px solid var(--text-3);
 		background: var(--surface); box-sizing: border-box; }
@@ -106,6 +110,7 @@
 	.jr-end.r { right: 0; }
 	@keyframes land { from { opacity: 0; transform: scale(.4); } }
 	@keyframes drop-move { 0% { transform: translateX(0); } 72%, 100% { transform: translateX(100%); } }
+	@keyframes drop-move-back { 0% { transform: translateX(100%); } 72%, 100% { transform: translateX(0); } }
 	@keyframes drop-shape {
 		0% { opacity: 0; transform: scale(.3); } 10% { opacity: 1; transform: scale(1); } 40% { opacity: 1; transform: scale(1.7, .75); }
 		64% { opacity: 1; transform: scale(1.1); } 72%, 100% { opacity: 0; transform: scale(.35); }
