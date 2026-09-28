@@ -6,6 +6,8 @@
 	import '../app.css';
 	import '../design.css';
 	import { onMount } from 'svelte';
+	import { beforeNavigate } from '$app/navigation';
+	import { updated } from '$app/state';
 	import { refresh } from '$lib/session.svelte.js';
 	import SiteHeader from '$lib/components/SiteHeader.svelte';
 	import SiteFooter from '$lib/components/SiteFooter.svelte';
@@ -15,6 +17,14 @@
 	import { readPrefs } from '$lib/compass/board.svelte.js';
 
 	let { children } = $props();
+
+	/* A new version is out: the next page is loaded afresh rather than drawn
+	   by the old code. A member who kept a tab open saw a page without a
+	   button the site had since gained. What waits to be saved goes with the
+	   page (flushOnExit, on pagehide). */
+	beforeNavigate(({ willUnload, to }) => {
+		if (updated.current && !willUnload && to?.url) location.href = to.url.href;
+	});
 
 	/* the session, then what waits for this owner; and again every minute */
 	onMount(() => {

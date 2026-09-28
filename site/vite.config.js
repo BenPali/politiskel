@@ -11,7 +11,10 @@ export default defineConfig({
 			},
 			// Pages are prerendered; addresses carrying an id fall back to
 			// 200.html, which the Rust server hands out for any unknown path.
-			adapter: adapter({ fallback: '200.html' })
+			adapter: adapter({ fallback: '200.html' }),
+			// A tab left open runs the code it loaded, for days: every minute
+			// it asks whether a new version is out (see +layout.svelte).
+			version: { pollInterval: 60_000 }
 		})
 	],
 	server: {
