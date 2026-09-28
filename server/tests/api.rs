@@ -640,3 +640,17 @@ async fn a_listed_group_can_be_asked_to_join_and_only_its_owner_answers() {
     assert_eq!(jc.call("GET", "/api/directory", None).await.1, json!([]));
     assert_eq!(ben.call("GET", &format!("/api/groups/{gid}/requests"), None).await.1, json!([]));
 }
+
+#[tokio::test]
+async fn the_tour_is_seen_once_per_account() {
+    let app = server().await;
+    let mut a = Client::new(&app);
+    a.register("Ana").await;
+    assert_eq!(a.call("GET", "/api/me", None).await.1["tour_seen"], json!(false));
+    assert_eq!(a.call("POST", "/api/me/tour", Some(json!({ "seen": true }))).await.0, StatusCode::NO_CONTENT);
+    assert_eq!(a.call("GET", "/api/me", None).await.1["tour_seen"], json!(true));
+    // another session of the same account knows it too
+    let mut again = Client::new(&app);
+    again.call("POST", "/api/login", Some(json!({ "username": "Ana", "password": "correct horse battery" }))).await;
+    assert_eq!(again.call("GET", "/api/me", None).await.1["tour_seen"], json!(true));
+}

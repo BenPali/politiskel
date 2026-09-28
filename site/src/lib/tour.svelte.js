@@ -1,9 +1,13 @@
 /* The guided tour for newcomers: a few steps across the site, each on its
    page, each pointing at one thing. It starts on its own the first time a
-   member is signed in, and again from the account page. Where it is kept:
-   this browser, under one key — "done" once finished or skipped. */
+   member is signed in, and again from the account page. Seen — finished or
+   skipped — is kept with the account, so it shows once per person on any
+   browser; this browser keeps it too, for guests and as the first
+   version's record, carried over to the account. */
 
 import { L } from '$lib/i18n/fr.js';
+import { api } from '$lib/api.js';
+import { session } from '$lib/session.svelte.js';
 
 const KEY = 'politiskel.tour.v1';
 
@@ -38,8 +42,34 @@ const write = (v) => {
 	}
 };
 
-/** whether the tour has yet to be seen in this browser */
-export const tourPending = () => read() !== 'done';
+/** whether the tour has yet to be seen: by this account, signed in */
+export function tourPending() {
+	if (!session.me) return read() !== 'done';
+	if (session.me.tour_seen) return false;
+	/* seen in this browser before accounts kept it: the first account signed
+	   in here takes it over, and the browser's record goes — another
+	   account on this browser has not seen it */
+	if (read() === 'done') {
+		forget();
+		markSeen();
+		return false;
+	}
+	return true;
+}
+function markSeen() {
+	if (!session.me) return write('done');
+	if (!session.me.tour_seen) {
+		session.me.tour_seen = true;
+		api('POST', '/api/me/tour', { seen: true });
+	}
+}
+const forget = () => {
+	try {
+		localStorage.removeItem(KEY);
+	} catch {
+		/* private browsing */
+	}
+};
 
 export function startTour() {
 	tour.step = 0;
@@ -47,7 +77,7 @@ export function startTour() {
 }
 export function endTour() {
 	tour.active = false;
-	write('done');
+	markSeen();
 }
 export function nextStep() {
 	if (tour.step >= STEPS.length - 1) return endTour();

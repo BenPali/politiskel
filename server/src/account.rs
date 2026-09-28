@@ -23,11 +23,26 @@ pub(crate) async fn profile_of(state: &AppState, user: i64) -> ApiResult<Value> 
 
 pub(crate) async fn me(State(state): State<AppState>, jar: CookieJar) -> ApiResult<Json<Value>> {
     let (id, name) = current_user(&state, &jar).await?;
+    let (tour_seen,): (bool,) = sqlx::query_as("SELECT tour_seen FROM users WHERE id = ?")
+        .bind(id).fetch_one(&state.db).await?;
     Ok(Json(json!({
         "username": name,
+        "tour_seen": tour_seen,
         "groups": groups_of(&state, id).await?,
         "profile": profile_of(&state, id).await?,
     })))
+}
+
+#[derive(Deserialize)]
+pub(crate) struct Tour { seen: bool }
+
+/// The guided tour seen — finished or skipped — or to be shown again.
+pub(crate) async fn set_tour(State(state): State<AppState>, jar: CookieJar, Json(body): Json<Tour>)
+    -> ApiResult<StatusCode>
+{
+    let (id, _) = current_user(&state, &jar).await?;
+    sqlx::query("UPDATE users SET tour_seen = ? WHERE id = ?").bind(body.seen).bind(id).execute(&state.db).await?;
+    Ok(StatusCode::NO_CONTENT)
 }
 
 #[derive(Deserialize)]

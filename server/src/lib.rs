@@ -43,7 +43,7 @@ use sqlx::SqlitePool;
 use crate::auth::{config, register, login, logout, change_password, end_other_sessions};
 use crate::security::{same_origin_writes, security_headers};
 use crate::site::site_page;
-use crate::account::{me, put_profile, export, delete_me};
+use crate::account::{me, put_profile, export, delete_me, set_tour};
 use crate::directory::{directory, ask_to_join, withdraw_request, requests, accept_request, decline_request, set_listed};
 use crate::groups::{create_group, invite_preview, join_group, leave_group, new_invite, remove_member, hand_over_group, delete_group, group_profiles};
 
@@ -61,6 +61,7 @@ pub fn app(state: AppState) -> Router {
         .route("/api/me", get(me).delete(delete_me))
         .route("/api/me/profile", put(put_profile))
         .route("/api/me/export", get(export))
+        .route("/api/me/tour", post(set_tour))
         .route("/api/me/password", post(change_password))
         .route("/api/me/sessions/others", axum::routing::delete(end_other_sessions))
         .route("/api/groups", post(create_group))
