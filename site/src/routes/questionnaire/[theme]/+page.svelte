@@ -107,7 +107,11 @@
 			const q = scoreOf(c, k);
 			const name = L.themes[k].name;
 			const main = t.axis || t.reading;
-			if (!q || q[main] === null) return { key: k, name, none: true, axis: t.axis };
+			if (!q || q.provisional === null) return { key: k, name, none: true, axis: t.axis };
+			/* begun, but too thin to count: what is missing, and the sub-dimensions so far */
+			if (q[main] === null)
+				return { key: k, name, axis: t.axis, pending: L.resultPending(q.missing, t.axis, c.native),
+					cards: t.dims.map((d) => ({ label: L.dims[d], value: val(q.dims[d]), note: t.axis ? L.dimNote : L.groupNote })) };
 			/* a reading of its own has no PolitiScales past: it lands, among the parties CHES rates on it */
 			const journey = t.axis
 				? { c, axis: t.axis, country }
@@ -132,6 +136,8 @@
 			return { key: k, name, axis: t.axis, journey, cards, salience };
 		});
 	});
+	/* nothing counts yet: the heading says so rather than promise a move */
+	const settled = $derived(results.some((r) => !r.none && !r.pending));
 	/* the next open theme not yet answered, to go on with */
 	const nextTheme = $derived(
 		theme === ALL ? null : openThemes().find((t) => t.key !== theme && screensFor(t.key).some((s) => s.kind === 'item' && mine.answers[screenKey(s)] === undefined)) || null
@@ -181,8 +187,8 @@
 					<div class="result">
 						<div class="result-head">
 							<p class="eyebrow">{L.resultCount(themeName(theme), progress.done, progress.total)}</p>
-							<h1>{c.native || !flowThemes(theme).some((k) => PolitiQuiz.THEMES.find((t) => t.key === k).axis) ? L.resultTitleNative : L.resultTitle}</h1>
-							{#if flowThemes(theme).length === 1}
+							<h1>{!settled ? L.resultTitlePending : c.native || !flowThemes(theme).some((k) => PolitiQuiz.THEMES.find((t) => t.key === k).axis) ? L.resultTitleNative : L.resultTitle}</h1>
+							{#if settled && flowThemes(theme).length === 1}
 								{@const t = PolitiQuiz.THEMES.find((t) => t.key === theme)}
 								<p class="lead">{!t.axis ? L.resultLead[t.reading] : c.native ? L.resultLeadNative : L.resultLead[t.axis]}</p>
 							{/if}
@@ -191,6 +197,17 @@
 							{#if flowThemes(theme).length > 1}<h2 class="theme-h">{r.name}</h2>{/if}
 							{#if r.none}
 								<p class="lead">{r.axis ? L.resultNoAxis(r.name, c.native) : L.resultNoReading(r.name)}</p>
+							{:else if r.pending}
+								<p class="lead">{r.pending}</p>
+								<div class="result-cards">
+									{#each r.cards as card, i (card.label)}
+										<div class="reading" style="--i: {i + 1}">
+											<div class="l">{card.label}</div>
+											<div class="v">{card.value}</div>
+											<div class="n">{card.note}</div>
+										</div>
+									{/each}
+								</div>
 							{:else}
 								<JourneyStrip c={r.journey.c} axis={r.journey.axis} country={r.journey.country} />
 								<div class="result-cards">

@@ -179,6 +179,8 @@ export const LOCALES = {
                europe: "Europe", russia: "Russie", world: "Instances internationales" },
       hintQuiz: { x: "Questionnaire · échelle CHES", y: "Questionnaire · GAL-TAN" },
       hintPs: "D'après PolitiScales",
+      hintPending: (n, ps) => (ps ? "D'après PolitiScales · " : "") + "questionnaire en cours, encore "
+        + n + " réponse" + (n > 1 ? "s" : "") + " au moins",
       hint: { protectionism: "À part de X, comme dans le CHES", class: "Lecture rivale de X",
               conflict: "ISSP", labour: "Syndicats, pouvoir des patrons · ESS, ISSP",
               europe: "Questionnaire · échelle CHES", russia: "Eurobaromètre · sans repère de parti",
@@ -798,6 +800,9 @@ export const LOCALES = {
     resultWasPs: v => "était " + v + " avec PolitiScales", resultNativeNote: "mesuré par le questionnaire",
     resultOwnNote: "positif = pour l'intégration, sur l'échelle eu_position du CHES",
     resultNoReading: theme => "Aucune réponse au thème " + theme + " pour l'instant.",
+    resultPending: (n, axis, native) => "Encore " + n + " réponse" + (n > 1 ? "s" : "") + " au moins : "
+      + "il en faut deux dans chaque groupe de questions pour que le résultat compte. "
+      + (axis && !native ? "D'ici là, l'axe reste celui de PolitiScales." : "D'ici là, il n'est pas placé."),
     groupNote: "groupe de questions",
     nextTheme: n => "Thème suivant : " + n, dimNote: "sous-dimension du CHES",
     resultEnds: { x: ["gauche", "droite"], y: ["ouverture", "tradition"] },
@@ -856,6 +861,7 @@ export const LOCALES = {
     fromQuizNativeY: "Y tiré du questionnaire",
     journeyNative: pair => "Politiskel " + pair,
     resultTitleNative: "Où vous placent vos réponses",
+    resultTitlePending: "Encore quelques questions",
     allName: "Questionnaire complet",
     allDesc: names => "Toutes les questions de tous les thèmes disponibles, mélangées dans un "
       + "ordre fixe, le même pour tout le monde. Pour l'instant : " + names.join(", ") + ".",

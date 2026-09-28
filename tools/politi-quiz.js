@@ -941,7 +941,15 @@
      sum of a five-item additive scale is not the scale.
 
      `n` counts the answers behind each reading, so the page can say how
-     thin it is. */
+     thin it is.
+
+     A theme's main reading only counts once every sub-dimension has
+     MIN_PER_DIM answers. Before that it is null, and `provisional` holds the
+     mean of what there is: simulated on 2,000 profiles, one answer moved X by
+     36 points in the median and 85 for one profile in ten, since a single
+     answer is ±100; two per sub-dimension bring it near what the full theme
+     gives. `missing` is how many answers, at the least, are still needed. */
+  const MIN_PER_DIM = 2;
   /* The items that ask about a group's rights, by group — not about a
      policy, an effect or a movement. "Immigration" in CHES mixes the rights
      of immigrants with immigration policy (how many, deportations, the
@@ -964,12 +972,16 @@
     const axis = theme.axis || theme.reading;
 
     const dims = {};
+    let missing = 0;
     for (const d of theme.dims) {
       const vs = answered.filter(a => a.i.reading === axis && a.i.dim === d).map(a => a.v);
       dims[d] = vs.length ? Math.round(100 * mean(vs)) : null;
+      missing += Math.max(0, MIN_PER_DIM - vs.length);
     }
     const present = theme.dims.filter(d => dims[d] !== null);
-    out[axis] = present.length ? Math.round(mean(present.map(d => dims[d]))) : null;
+    out.provisional = present.length ? Math.round(mean(present.map(d => dims[d]))) : null;
+    out[axis] = missing ? null : out.provisional;
+    out.missing = missing;
     out.dims = dims;
     out.n[axis] = answered.filter(a => a.i.reading === axis).length;
 
@@ -1013,7 +1025,7 @@
     return out;
   }
 
-  const api = { SCALES, ITEMS, THEMES, RIGHTS, itemById, itemValue, score, mixedOrder, askedItems };
+  const api = { SCALES, ITEMS, THEMES, RIGHTS, MIN_PER_DIM, itemById, itemValue, score, mixedOrder, askedItems };
   /* both: Node's tools require it, and the site imports it as a module,
      which may or may not see `module` depending on where it runs */
   if (typeof module !== "undefined" && module.exports) module.exports = api;

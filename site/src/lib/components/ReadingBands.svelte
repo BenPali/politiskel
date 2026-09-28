@@ -7,8 +7,8 @@
 	import { L } from '$lib/i18n/fr.js';
 	import { signed } from '$lib/format.js';
 
-	/** c: the profile projected on the reading on show; q, eu: its economy and Europe scores, if any */
-	let { c, q = null, eu = null } = $props();
+	/** c: the profile projected on the reading on show; q, soc, eu: its economy, society and Europe scores, if any */
+	let { c, q = null, soc = null, eu = null } = $props();
 
 	let arrived = $state(false);
 	onMount(() => requestAnimationFrame(() => (arrived = true)));
@@ -16,10 +16,13 @@
 	const B = L.bands;
 	/* a reading that draws another y against X still has the profile's own Y to show */
 	const xy = $derived(c.side ? c.base : c);
+	/* an axis the questionnaire has begun but cannot yet replace says how far it is */
+	const hintOf = (k, src, score) =>
+		src === 'quiz' ? B.hintQuiz[k] : score && score[k] === null && score.provisional !== null ? B.hintPending(score.missing, xy[k] !== null) : B.hintPs;
 	const bands = $derived(
 		[
-			{ k: 'x', v: xy.x, hint: xy.xSrc === 'quiz' ? B.hintQuiz.x : B.hintPs },
-			{ k: 'y', v: xy.y, hint: xy.ySrc === 'quiz' ? B.hintQuiz.y : B.hintPs },
+			{ k: 'x', v: xy.x, hint: hintOf('x', xy.xSrc, q) },
+			{ k: 'y', v: xy.y, hint: hintOf('y', xy.ySrc, soc) },
 			{ k: 'protectionism', v: q?.protectionism ?? null },
 			{ k: 'class', v: q?.class ?? null },
 			{ k: 'conflict', v: q?.conflict ?? null },
