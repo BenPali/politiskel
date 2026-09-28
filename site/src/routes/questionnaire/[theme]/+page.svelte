@@ -8,7 +8,7 @@
 	import { L } from '$lib/i18n/fr.js';
 	import { session } from '$lib/session.svelte.js';
 	import { PolitiQuiz } from '$lib/model.js';
-	import { coords, hasPolitiscales, fromMember, COUNTRIES } from '$lib/compass/model.js';
+	import { coords, hasPolitiscales, fromMember, COUNTRIES, THEME_REF } from '$lib/compass/model.js';
 	import { board, readPrefs } from '$lib/compass/board.svelte.js';
 	import { ALL, isFlow, flowThemes, screensFor, screenKey, scoreOf, openThemes, progressOf } from '$lib/quiz/flow.js';
 	import { mine, startMine, setAnswer, eraseKeys, flush, flushOnExit, guestMember } from '$lib/quiz/answers.svelte.js';
@@ -115,8 +115,9 @@
 			/* a reading of its own has no PolitiScales past: it lands, among the parties CHES rates on it */
 			const journey = t.axis
 				? { c, axis: t.axis, country }
-				: { c: { [main]: q[main], from: null }, axis: main, country: { parties: country.parties.filter((r) => r.eu !== undefined).map((r) => ({ ...r, [main]: r.eu })) } };
-			const mainNote = !t.axis ? L.resultOwnNote : c.native || !c.from ? L.resultNativeNote : L.resultWasPs(signed(c.from[t.axis]));
+				: { c: { [main]: q[main], from: null }, axis: main,
+					country: { parties: country.parties.filter((r) => r[THEME_REF[k]] !== undefined).map((r) => ({ ...r, [main]: r[THEME_REF[k]] })) } };
+			const mainNote = !t.axis ? L.resultOwnNote[main] : c.native || !c.from ? L.resultNativeNote : L.resultWasPs(signed(c.from[t.axis]));
 			const cards = [{ label: L.readingAxis[main], value: val(q[main]), note: mainNote }];
 			if (k === 'economy')
 				for (const r of ['protectionism', 'class', 'conflict', 'labour'])

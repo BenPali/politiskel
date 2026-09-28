@@ -15,14 +15,18 @@ export const COUNTRIES = PolitiModel.COUNTRIES;
 
 /* Readings of the compass: the same profiles and parties, along other axes.
    A reading with no party counterpart does not belong here. */
-export const VIEWS = [{ key: 'politiskel' }, { key: 'politiscales' }, { key: 'protectionism' }, { key: 'europe' }, { key: 'populist', planned: true }];
+export const VIEWS = [{ key: 'politiskel' }, { key: 'politiscales' }, { key: 'protectionism' }, { key: 'europe' }, { key: 'populist' }];
 
 /* The readings drawn as y against the economy, and where each is found:
    on the profile's score for a theme, and on each party. */
 const SIDE = {
 	protectionism: { of: (c) => c.quiz?.protectionism, ref: 'prot' },
-	europe: { of: (c) => c.eu?.europe, ref: 'eu' }
+	europe: { of: (c) => c.eu?.europe, ref: 'eu', score: (c) => c.eu, theme: 'europe' },
+	populist: { of: (c) => c.inst?.people, ref: 'pve', score: (c) => c.inst, theme: 'institutions' }
 };
+
+/* A theme's own reading, as each party carries it (CHES) */
+export const THEME_REF = { europe: 'eu', institutions: 'pve' };
 
 /* Copy for a reading, falling back on the default wording. */
 export const copyOf = (viewKey) => Object.assign({}, L, L.views[viewKey] || {});
@@ -50,8 +54,9 @@ function withQuiz(p, c) {
 	c.quiz = PolitiQuiz.score(answers, 'economy');
 	c.soc = PolitiQuiz.score(answers, 'society');
 	c.eu = PolitiQuiz.score(answers, 'europe');
+	c.inst = PolitiQuiz.score(answers, 'institutions');
 	/* readings by name, for the flag */
-	c.readings = { europe: c.eu.europe };
+	c.readings = { europe: c.eu.europe, populism: c.inst.people, directdemocracy: c.inst.dims.direct };
 	const ps = { x: c.x, y: c.y };
 	if (c.quiz.x !== null) {
 		c.x = c.quiz.x;
@@ -156,18 +161,20 @@ export function viewNotes(viewKey, country, refs, computed) {
 		if (noProt) parts.push(L.viewNoteSkippedProt(noProt));
 		if (noX) parts.push(L.viewNoteNoX(noX));
 	}
-	if (viewKey === 'europe') {
+	const side = SIDE[viewKey];
+	if (side?.theme) {
+		const N = L.viewNotesFor[viewKey];
 		const dropped = country.parties.length - refs.length;
-		if (!refs.length) parts.push(L.viewNoteAllEstimatedEu);
-		else if (dropped) parts.push(L.viewNoteDroppedEu(dropped));
+		if (!refs.length) parts.push(N.allEstimated);
+		else if (dropped) parts.push(N.dropped(dropped));
 		const offs = computed.map((r) => r.c).filter((c) => c.off);
 		/* begun but under the two-per-group threshold is not "no answer" */
-		const begun = (c) => (c.base || c).eu?.provisional != null;
+		const begun = (c) => side.score(c.base || c)?.provisional != null;
 		const none = offs.filter((c) => c.y === null && !begun(c)).length;
 		const pending = offs.filter((c) => c.y === null && begun(c)).length;
 		const noX = offs.filter((c) => c.y !== null && c.x === null).length;
-		if (none) parts.push(L.viewNoteNoEurope(none));
-		if (pending) parts.push(L.viewNoteEuropePending(pending));
+		if (none) parts.push(N.none(none));
+		if (pending) parts.push(N.pending(pending));
 		if (noX) parts.push(L.viewNoteNoX(noX));
 	}
 	return parts;

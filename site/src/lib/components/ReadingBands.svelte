@@ -8,7 +8,7 @@
 	import { signed } from '$lib/format.js';
 
 	/** c: the profile projected on the reading on show; q, soc, eu: its economy, society and Europe scores, if any */
-	let { c, q = null, soc = null, eu = null } = $props();
+	let { c, q = null, soc = null, eu = null, inst = null } = $props();
 
 	let arrived = $state(false);
 	onMount(() => requestAnimationFrame(() => (arrived = true)));
@@ -29,7 +29,9 @@
 			{ k: 'labour', v: q?.labour ?? null },
 			{ k: 'europe', v: eu?.europe ?? null },
 			{ k: 'russia', v: eu?.russia ?? null },
-			{ k: 'world', v: eu?.world ?? null }
+			{ k: 'world', v: eu?.world ?? null },
+			{ k: 'people', v: inst?.people ?? null },
+			{ k: 'executive', v: inst?.executive ?? null }
 		]
 			.filter((b) => b.k === 'x' || b.k === 'y' || b.v !== null)
 			.map((b) => ({ ...b, label: B.label[b.k], hint: b.hint || B.hint[b.k], ends: B.ends[b.k] }))

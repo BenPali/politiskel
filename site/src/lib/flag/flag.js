@@ -157,17 +157,17 @@ export function flagTraits(c, p) {
     /* the authoritarian far right: nation, order and the refusal of equal rights,
        all very marked; brown, the colour history gave it */
     { k: "farright",    s: has(nat) && has(ord) && eq ? Math.min(nat, ord, -eq.mean) : null, min: 70, colour: "brown", bonus: 5 },
-    /* Europe, either way */
+    /* Europe, either way; and from the institutions theme */
     { k: "federalism",  s: futureReading(c, "europe"),          min: 60, symbol: "eustars" },
     { k: "sovereignty", s: neg(futureReading(c, "europe")),     min: 60, symbol: "wall" },
+    { k: "direct",      s: futureReading(c, "directdemocracy"), min: 60, symbol: "vote" },
+    { k: "populism",    s: futureReading(c, "populism"),        min: 60, symbol: "megaphone" },
     /* readings the coming themes will measure: until then, never drawn */
     { k: "pacifism",    s: futureReading(c, "pacifism"),        min: 60, symbol: "dove" },
     { k: "rural",       s: futureReading(c, "rural"),           min: 60, symbol: "wheat" },
     { k: "degrowth",    s: futureReading(c, "degrowth"),        min: 60, colour: "green", symbol: "snail" },
     { k: "transition",  s: futureReading(c, "transition"),      min: 60, colour: "green", symbol: "turbine" },
     { k: "nuclear",     s: futureReading(c, "nuclear"),         min: 60, symbol: "atom" },
-    { k: "direct",      s: futureReading(c, "directdemocracy"), min: 60, symbol: "vote" },
-    { k: "populism",    s: futureReading(c, "populism"),        min: 60, symbol: "megaphone" },
     { k: "regionalism", s: futureReading(c, "regionalism"),     min: 60, symbol: "ermine" },
     { k: "anarchy",     s: antistate,                   min: 80, symbol: "anarchy", bonus: 12 },
     /* no bonus: it takes a place at its own strength, never ahead of a

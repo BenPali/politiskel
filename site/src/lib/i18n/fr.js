@@ -176,7 +176,8 @@ export const LOCALES = {
       lead: "Chaque ligne est une lecture indépendante ; X et Y placent le profil sur la boussole.",
       label: { x: "Économie (X)", y: "Société (Y)", protectionism: "Protectionnisme", class: "Classe (Wright)",
                conflict: "Conflit de classe perçu", labour: "Capital / travail",
-               europe: "Europe", russia: "Russie", world: "Instances internationales" },
+               europe: "Europe", russia: "Russie", world: "Instances internationales",
+               people: "Peuple / élus", executive: "Pouvoir exécutif" },
       hintQuiz: { x: "Questionnaire · échelle CHES", y: "Questionnaire · GAL-TAN" },
       hintPs: "D'après PolitiScales",
       hintPending: (n, ps) => (ps ? "D'après PolitiScales · " : "") + "questionnaire en cours, encore "
@@ -184,10 +185,12 @@ export const LOCALES = {
       hint: { protectionism: "À part de X, comme dans le CHES", class: "Lecture rivale de X",
               conflict: "ISSP", labour: "Syndicats, pouvoir des patrons · ESS, ISSP",
               europe: "Questionnaire · échelle CHES", russia: "Eurobaromètre · sans repère de parti",
+              people: "Questionnaire · échelle CHES", executive: "ESS, ISSP, EVS · sans repère de parti",
               world: "ISSP · sans repère de parti" },
       ends: { x: ["Gauche", "Droite"], y: ["Ouverture", "Tradition"], protectionism: ["Libre-échange", "Protection"],
               class: ["Pro-capitaliste", "Anticapitaliste"], conflict: ["Faible", "Fort"], labour: ["Côté capital", "Côté travail"],
               europe: ["Souveraineté", "Intégration"], russia: ["Fermeté", "Conciliation"],
+              people: ["Les élus décident", "Le peuple décide"], executive: ["Parlement", "Exécutif fort"],
               world: ["Intérêt national", "Autorité internationale"] }
     },
     partiesTitle: "Partis, du plus proche au plus lointain",
@@ -335,7 +338,8 @@ export const LOCALES = {
           "Un profil a deux sources possibles : un résultat PolitiScales, lu sur une capture, et le questionnaire Politiskel. Quand un thème du questionnaire est répondu, l'axe qu'il mesure <strong>remplace entièrement</strong> celui de PolitiScales : les deux ne sont jamais moyennés. Chaque coordonnée a donc une seule source, et le tableau la signale.",
           "Depuis PolitiScales, X est une moyenne pondérée de Capitalisme − Communisme (<code>0,45</code>) et de Laissez-faire − Régulation (<code>0,35</code>) ; Y, de Essentialisme − Constructivisme (<code>0,30</code>), Justice punitive − réhabilitative (<code>0,25</code>), Conservatisme − Progressisme (<code>0,25</code>) et Nationalisme − Internationalisme (<code>0,20</code>). Les poids sont renormalisés sur les seules composantes renseignées. Écologie ↔ Productivisme n'entre pas dans X : l'échelle économique du CHES exclut l'environnement.",
           "Depuis le questionnaire, X est la moyenne simple de trois sous-dimensions (redistribution, services publics contre impôts, régulation des marchés), les trois sous-échelles économiques du CHES, dont la moyenne reproduit son axe <code>lrecon</code> à <code>r = 0,96</code>. Y suit le même principe sur les sept sous-dimensions sociétales du CHES ; leur moyenne reproduit <code>galtan</code> à <code>r = 0,97</code>. Le protectionnisme est lu à part, jamais dans X : dans le CHES il va contre la gauche-droite économique (<code>r = −0,37</code>).",
-          "Le thème Europe et monde ne touche à aucun des deux axes. Il donne trois lectures à part : l'intégration européenne, moyenne de trois groupes de questions (l'appartenance à l'Union, ses pouvoirs face aux gouvernements nationaux, ses politiques communes), sur l'échelle <code>eu_position</code> du CHES ; le rapport à la Russie ; l'autorité des instances internationales face à l'intérêt national. Seule la première est comparée aux partis. Le CHES note bien le rapport des partis à la Russie, mais en France chaque position n'y repose que sur deux ou trois experts, en Italie sur un seul au plus : trop peu pour servir de repère."
+          "Le thème Europe et monde ne touche à aucun des deux axes. Il donne trois lectures à part : l'intégration européenne, moyenne de trois groupes de questions (l'appartenance à l'Union, ses pouvoirs face aux gouvernements nationaux, ses politiques communes), sur l'échelle <code>eu_position</code> du CHES ; le rapport à la Russie ; l'autorité des instances internationales face à l'intérêt national. Seule la première est comparée aux partis. Le CHES note bien le rapport des partis à la Russie, mais en France chaque position n'y repose que sur deux ou trois experts, en Italie sur un seul au plus : trop peu pour servir de repère.",
+          "Le thème Institutions donne deux lectures à part. La première, qui du peuple ou des élus doit décider, suit l'échelle <code>people_v_elite</code> du CHES : c'est la lecture populiste, présentée comme telle, car opposer le peuple aux élites est une façon de lire le conflit politique parmi d'autres, pas une dimension neutre. Elle est presque indépendante des deux axes (<code>r = 0,2</code>). La seconde, le poids donné à l'exécutif face au Parlement, suit déjà l'axe sociétal (<code>r = 0,75</code>) : elle est mesurée, pas comparée aux partis. L'indépendance de la justice et la décentralisation, que le CHES note aussi, n'ont pas de question éprouvée en français : les enquêtes demandent l'attachement à sa région, pas le partage des pouvoirs."
         ] },
         { id: "questions", title: "D'où viennent les questions", paras: [
           "Aucune question n'est écrite pour Politiskel. Chacune est citée d'une enquête publique éprouvée, dans sa version française officielle, avec sa source jusqu'à la variable. On peut donc vérifier chaque formulation. Ces enquêtes sont l'<em>European Social Survey</em>, l'<em>International Social Survey Programme</em>, l'<em>European Values Study</em>, et l'<em>Eurobaromètre</em> pour la Russie et les politiques communes de l'Union, dont les trois autres ne parlent pas.",
@@ -349,7 +353,7 @@ export const LOCALES = {
         ] },
         { id: "limites", title: "Limites", paras: [
           "Un groupe d'amis est un petit échantillon : il montre où ses membres divergent, il ne dit rien de la population. L'import PolitiScales lit une capture d'écran ; si sa mise en page change, la lecture peut échouer, et Politiskel le dit plutôt que de deviner.",
-          "Deux axes ne voient ni le populisme (le peuple contre les élites) ni l'intégration européenne, dont les deux axes n'expliquent pas même la moitié dans le CHES. L'Europe a désormais son thème et sa lecture ; le populisme attend le thème Institutions. Le drapeau, enfin, est une illustration : il suit les conventions des drapeaux politiques, et sa légende dit ce que chaque élément représente."
+          "Deux axes ne voient ni le populisme (le peuple contre les élites) ni l'intégration européenne, dont les deux axes n'expliquent pas même la moitié dans le CHES. L'Europe et le populisme ont désormais chacun leur thème et leur lecture ; le rapport centre-périphérie, lui, n'est toujours pas mesuré. Le drapeau, enfin, est une illustration : il suit les conventions des drapeaux politiques, et sa légende dit ce que chaque élément représente."
         ] },
         { id: "donnees", title: "Vos données", paras: [
           "Vos réponses sont des opinions politiques, donc des données sensibles au sens de l'article 9 du RGPD. Elles ne sont enregistrées qu'avec votre consentement explicite, sur ce serveur seulement, et ne sont montrées qu'aux membres des groupes que vous avez rejoints. Les captures PolitiScales ne quittent jamais votre navigateur. Aucun traceur, aucun e-mail. Vous pouvez tout exporter ou tout effacer depuis votre compte.",
@@ -389,8 +393,8 @@ export const LOCALES = {
         dove: ["Colombe", "le pacifisme · à venir"], wheat: ["Épi de blé", "l'agrarisme · à venir"],
         snail: ["Escargot", "la décroissance · thème Écologie"], turbine: ["Éolienne", "la transition énergétique · thème Écologie"],
         atom: ["Atome", "le nucléaire civil · thème Écologie"], eustars: ["Cercle d'étoiles", "le fédéralisme européen"],
-        wall: ["Rempart", "la souveraineté nationale"], vote: ["Urne", "la démocratie directe · thème Institutions"],
-        megaphone: ["Mégaphone", "le populisme · thème Institutions"], ermine: ["Hermine", "le régionalisme · thème Institutions"]
+        wall: ["Rempart", "la souveraineté nationale"], vote: ["Urne", "la démocratie directe"],
+        megaphone: ["Mégaphone", "le populisme"], ermine: ["Hermine", "le régionalisme · à venir"]
       },
       coloursTitle: "Les couleurs",
       coloursLead: "Les couleurs politiques conventionnelles, d'après l'usage français et européen.",
@@ -706,16 +710,32 @@ export const LOCALES = {
     viewNoteOff: n => n + " profil" + (n > 1 ? "s" : "") + " sans réponse au questionnaire "
       + "économie " + (n > 1 ? "ne sont" : "n'est") + " pas placé" + (n > 1 ? "s" : "")
       + " : c'est lui qui mesure le protectionnisme.",
-    viewNoteAllEstimatedEu: "Aucun repère dans cette lecture : ceux de ce pays sont tous des "
-      + "estimations à la main, et il n'y a rien sur quoi estimer leur position sur l'Europe.",
-    viewNoteDroppedEu: n => n + " repère" + (n > 1 ? "s" : "") + " placé" + (n > 1 ? "s" : "")
-      + " à la main n'" + (n > 1 ? "ont" : "a") + " pas de position CHES sur l'Europe "
-      + "et n'" + (n > 1 ? "apparaissent" : "apparaît") + " pas.",
-    viewNoteEuropePending: n => n + " profil" + (n > 1 ? "s ont" : " a") + " commencé le thème "
-      + "Europe et monde sans avoir encore assez de réponses pour être placé" + (n > 1 ? "s" : "") + ".",
-    viewNoteNoEurope: n => n + " profil" + (n > 1 ? "s" : "") + " sans réponse au thème "
-      + "Europe et monde " + (n > 1 ? "ne sont" : "n'est") + " pas placé" + (n > 1 ? "s" : "")
-      + " : c'est lui qui mesure l'intégration européenne.",
+    /* the notes under a reading drawn against the economy, per reading */
+    viewNotesFor: {
+      europe: {
+        allEstimated: "Aucun repère dans cette lecture : ceux de ce pays sont tous des estimations à la "
+          + "main, et il n'y a rien sur quoi estimer leur position sur l'Europe.",
+        dropped: n => n + " repère" + (n > 1 ? "s" : "") + " placé" + (n > 1 ? "s" : "") + " à la main n'"
+          + (n > 1 ? "ont" : "a") + " pas de position CHES sur l'Europe et n'" + (n > 1 ? "apparaissent" : "apparaît") + " pas.",
+        pending: n => n + " profil" + (n > 1 ? "s ont" : " a") + " commencé le thème Europe et monde sans "
+          + "avoir encore assez de réponses pour être placé" + (n > 1 ? "s" : "") + ".",
+        none: n => n + " profil" + (n > 1 ? "s" : "") + " sans réponse au thème Europe et monde "
+          + (n > 1 ? "ne sont" : "n'est") + " pas placé" + (n > 1 ? "s" : "") + " : c'est lui qui mesure "
+          + "l'intégration européenne."
+      },
+      populist: {
+        allEstimated: "Aucun repère dans cette lecture : ceux de ce pays sont tous des estimations à la "
+          + "main, et il n'y a rien sur quoi estimer leur position sur le peuple et les élus.",
+        dropped: n => n + " repère" + (n > 1 ? "s" : "") + " placé" + (n > 1 ? "s" : "") + " à la main n'"
+          + (n > 1 ? "ont" : "a") + " pas de position CHES sur le peuple et les élus et n'"
+          + (n > 1 ? "apparaissent" : "apparaît") + " pas.",
+        pending: n => n + " profil" + (n > 1 ? "s ont" : " a") + " commencé le thème Institutions sans "
+          + "avoir encore assez de réponses pour être placé" + (n > 1 ? "s" : "") + ".",
+        none: n => n + " profil" + (n > 1 ? "s" : "") + " sans réponse au thème Institutions "
+          + (n > 1 ? "ne sont" : "n'est") + " pas placé" + (n > 1 ? "s" : "") + " : c'est lui qui mesure "
+          + "qui, du peuple ou des élus, doit décider."
+      }
+    },
     viewNoteSkippedProt: n => n + " profil" + (n > 1 ? "s ont" : " a") + " passé les deux "
       + "questions sur le protectionnisme, et " + (n > 1 ? "ne sont" : "n'est") + " donc pas "
       + "placé" + (n > 1 ? "s" : "") + ".",
@@ -740,7 +760,13 @@ export const LOCALES = {
         colY: "Y Europe",
         titleY: "Positif = pour l'intégration européenne (haut) · négatif = souverainiste (bas)",
         tipSocial: "Europe", suffixAuthor: " europ.", suffixLibert: " souv." },
-      populist: { name: "Lecture populiste (thème Institutions, à venir)" }
+      populist: { name: "Lecture populiste : économie × peuple et élus",
+        axisTop: "Le peuple décide", axisBottom: "Les élus décident",
+        quadTopLeft: "Gauche populiste", quadTopRight: "Droite populiste",
+        quadBottomLeft: "Gauche représentative", quadBottomRight: "Droite représentative",
+        colY: "Y peuple",
+        titleY: "Positif = le peuple doit décider (haut) · négatif = les élus (bas)",
+        tipSocial: "Peuple / élus", suffixAuthor: " peuple", suffixLibert: " élus" }
     },
     quizOpen: "Compléter mon profil", quizEdit: "Modifier mes réponses",
     quizBack: "← Retour à la boussole",
@@ -794,8 +820,17 @@ export const LOCALES = {
       ecology: { name: "Écologie",
         desc: "Environnement et climat, lus à part de l'économie, comme le fait le CHES." },
       institutions: { name: "Institutions",
-        desc: "Pouvoir exécutif, indépendance de la justice, régions, et la lecture populiste, "
-          + "le peuple contre les élites, présentée comme telle." }
+        desc: "Référendum, peuple et élus, Président et Parlement : la lecture populiste, présentée "
+          + "comme telle, et le poids donné à l'exécutif.",
+        lead: "Ces questions mesurent deux choses à part : qui, du peuple ou des élus, doit décider, sur "
+          + "l'échelle qu'utilisent les experts du CHES pour les partis, et le poids donné à l'exécutif "
+          + "face au Parlement. Aucune ne déplace votre point sur la boussole principale.",
+        leadNative: "Ces questions mesurent deux choses à part : qui, du peuple ou des élus, doit décider, "
+          + "sur l'échelle qu'utilisent les experts du CHES pour les partis, et le poids donné à "
+          + "l'exécutif face au Parlement.",
+        salience: "Quelle place les institutions, la façon dont on décide, tiennent-elles dans vos choix politiques ?",
+        salienceAfter: "Maintenant que vous avez répondu : quelle place les institutions tiennent-elles "
+          + "dans vos choix politiques ?" }
     },
     quizCount: (i, n) => i + " / " + n,
     quizIntroTitle: a => "Compléter le profil de " + a,
@@ -850,10 +885,12 @@ export const LOCALES = {
     resultCount: (t, n, m) => t + " · " + n + " / " + m + " réponses",
     resultLead: { x: "Vos réponses remplacent l'axe économique de PolitiScales, qui ne posait rien sur la redistribution. Votre point se déplace sur la boussole.",
                   y: "Vos réponses remplacent l'axe sociétal de PolitiScales, question par question tirées des enquêtes publiques. Votre point se déplace sur la boussole.",
-                  europe: "Votre position sur l'intégration européenne, parmi les partis que le CHES place sur la même échelle. Elle se lit aussi sur la boussole, dans la lecture « Économie × Europe »." },
+                  europe: "Votre position sur l'intégration européenne, parmi les partis que le CHES place sur la même échelle. Elle se lit aussi sur la boussole, dans la lecture « Économie × Europe »." ,
+                  people: "Une lecture que la boussole n'a pas : qui, selon vous, doit décider, le peuple ou ceux qu'il élit, parmi les partis que le CHES place sur la même échelle. Elle se lit aussi sur la boussole, dans la lecture populiste." },
     resultLeadNative: "Vos réponses placent votre point sur cet axe de la boussole.",
     resultWasPs: v => "était " + v + " avec PolitiScales", resultNativeNote: "mesuré par le questionnaire",
-    resultOwnNote: "positif = pour l'intégration, sur l'échelle eu_position du CHES",
+    resultOwnNote: { europe: "positif = pour l'intégration, sur l'échelle eu_position du CHES",
+                     people: "positif = le peuple doit décider, sur l'échelle people_v_elite du CHES" },
     resultNoReading: theme => "Aucune réponse au thème " + theme + " pour l'instant.",
     resultPending: (n, axis, native) => "Encore " + n + " réponse" + (n > 1 ? "s" : "") + " au moins : "
       + "il en faut deux dans chaque groupe de questions pour que le résultat compte. "
@@ -877,8 +914,9 @@ export const LOCALES = {
             immigration: "Immigration", multiculturalism: "Multiculturalisme / assimilation",
             laworder: "Libertés / ordre", women: "Droits des femmes", lgbt: "Droits LGBT",
             religion: "Religion et politique", nationalism: "Nationalisme",
-            membership: "Appartenance à l'UE", powers: "Pouvoirs de l'UE", common: "Politiques communes" },
-    readingAxis: { x: "Économie (X)", y: "Société (Y)", europe: "Europe" },
+            membership: "Appartenance à l'UE", powers: "Pouvoirs de l'UE", common: "Politiques communes",
+            direct: "Démocratie directe", sovereign: "Volonté du peuple" },
+    readingAxis: { x: "Économie (X)", y: "Société (Y)", europe: "Europe", people: "Peuple / élus" },
     readingProtectionism: "Protectionnisme",
     readingClass: "Classe (Wright)",
     readingConflict: "Conflit de classe perçu",

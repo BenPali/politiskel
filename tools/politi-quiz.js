@@ -39,6 +39,19 @@
              on two or three experts each, the Italian ones on one at most
      world   the authority of international bodies against the nation's own
              interest, which CHES does not rate at all
+   The Institutions theme feeds two readings, neither a compass axis:
+     people     whether the people or those they elect should decide, on the
+                scale of CHES `people_v_elite`: the "lecture populiste",
+                named as such, since populism's people-against-elites is one
+                account of political conflict among others, not a neutral
+                dimension. It has two groups: direct democracy, and the
+                people's view prevailing over the elite's
+     executive  a strong executive against parliament (CHES
+                `executive_power`), which in CHES already runs with galtan
+                (r = 0.75): measured, not compared
+   Judicial independence and decentralisation, which CHES also rates, have
+   no field-tested French question: the surveys ask about attachment to
+   one's region, not about its powers.
    Salience is asked per theme, twice: before the items and after them. The
    first records the weight the theme had coming in, the second whether
    answering moved it; both are returned as is, never folded into a score. */
@@ -279,6 +292,13 @@
     },
     forEb: { values: [1, -1], fr: ["Pour", "Contre"] },
 
+    /* ---- Institutions ---- */
+    /* EVS 2017, Q43: four points; "NSP" was the interviewer's. */
+    goodEvs: {
+      values: [1, 1 / 3, -1 / 3, -1],
+      fr: ["Très bonne", "Assez bonne", "Assez mauvaise", "Très mauvaise"]
+    },
+
     /* Salience. Not a survey item — no field-tested per-theme importance
        question exists; the surveys ask for "the most important problem"
        instead. Four labelled points rather than CHES's expert 0-10: a
@@ -356,6 +376,16 @@
   const EB_POLICY_STEM = "Quelle est votre opinion sur chacune des propositions suivantes ? Veuillez dire, pour chaque proposition, si vous êtes pour ou si vous êtes contre.";
   const EB_UKRAINE_STEM = "L'UE a pris une série de mesures en réponse à l'invasion de l'Ukraine par la Russie. Dans quelle mesure êtes-vous d'accord ou pas d'accord avec chacune de ces mesures ?";
   const EB_AGREE_STEM = "Veuillez indiquer dans quelle mesure vous êtes d'accord ou pas d'accord avec chacune des affirmations suivantes ?";
+  const ESS10 = v => ({ survey: "ESS", wave: "round 10", variable: v,
+                        url: ESS_FR + "round10/fieldwork/france/ESS10_questionnaires_FR.pdf" });
+  const DEMOCRACY_STEM = "Veuillez m'indiquer à l'aide de cette liste de réponses dans quelle mesure vous pensez qu'il est important pour la démocratie en général...";
+  const DEMOCRACY_STEM_2 = "Et toujours de façon générale et non par rapport à la France, diriez-vous qu'il est important pour la démocratie en général…";
+  const OF32_STEM = "Dans quelle mesure êtes-vous d'accord ou pas d'accord avec les propositions suivantes ?";
+  const SYSTEMS_STEM = "Je vais vous décrire différents types de systèmes politiques et vous demander ce que vous en pensez pour gouverner ce pays. Pour chacun, veuillez me dire si cette façon de gouverner le pays serait très bonne, assez bonne, assez mauvaise ou très mauvaise.";
+  const inst = (id, reading, dim, scale, pole, extra, src) =>
+    Object.assign({ id, theme: "institutions", reading, dim, scale, pole }, extra, { src });
+  const IMPORTANT = { left: "Pas du tout important pour la démocratie en général",
+                      right: "Extrêmement important pour la démocratie en général" };
   const OF26_STEM = "Et selon vous, pour que la démocratie fonctionne mieux en France, il faudrait donner plus ou moins de pouvoir pour prendre les décisions politiques les plus importantes…";
 
   const ITEMS = [
@@ -807,7 +837,61 @@
     eu("issp.own.country", "world", null, "agreeIssp", -1, { reserve: "self-determination, which the anti-imperialist left and the nationalist right both claim",
       stem: "De manière générale, en pensant aux peuples et aux pays du monde entier, dans quelle mesure êtes-vous d'accord ou pas d'accord avec l'affirmation suivante ?",
       fr: "Il serait préférable que chaque peuple ait son propre pays où il pourrait prendre ses propres décisions." },
-      NI23("Q03"))
+      NI23("Q03")),
+
+    /* ===== Institutions =====
+       +1 means: the people decide (people), a strong executive (executive).
+       Every people item runs the same way, as the surveys asked them. */
+
+    /* --- people · direct democracy --- */
+    inst("ess.referendum", "people", "direct", "bipolar11", 1, { stem: DEMOCRACY_STEM, ...IMPORTANT,
+      fr: "… que les citoyens aient le dernier mot sur les enjeux politiques les plus importants en votant directement par référendum sur ces questions ?" },
+      ESS10("D5")),
+    inst("issp.ric", "people", "direct", "agreeIssp", 1, { stem: OF32_STEM,
+      fr: "Les citoyens devraient pouvoir proposer une loi ensuite soumise à référendum." }, NI23("OF32_F")),
+    inst("issp.recall", "people", "direct", "agreeIssp", 1, { stem: OF32_STEM,
+      fr: "Il faudrait pouvoir organiser un référendum pour renvoyer un élu en cours de mandat, si un certain nombre de citoyens en font la demande." },
+      NI23("OF32_B")),
+    inst("issp.power.citizens", "people", "direct", "morePowerIssp", 1, { stem: OF26_STEM,
+      fr: "… aux citoyens" }, NI23("OF26_D")),
+
+    /* --- people · the people's view over the elite's --- */
+    inst("ess.people.elite", "people", "sovereign", "bipolar11", 1, { stem: DEMOCRACY_STEM_2, ...IMPORTANT,
+      fr: "… que les points de vue des gens en général l'emportent sur ceux de l'élite politique ?" },
+      ESS10("D10")),
+    inst("ess.people.will", "people", "sovereign", "bipolar11", 1, { stem: DEMOCRACY_STEM_2, ...IMPORTANT,
+      fr: "… que la volonté du peuple s'impose toujours ?" }, ESS10("D11")),
+
+    inst("issp.sortition", "people", "direct", "agreeIssp", 1, { reserve: "sortition is deliberation among a few, not the people deciding",
+      stem: OF32_STEM,
+      fr: "Il faudrait tirer au sort un groupe de citoyens au sein de la population pour décider à la place des élus. Ils échangeraient pendant plusieurs jours pour prendre des décisions, comme le font les parlementaires." },
+      NI23("OF32_A")),
+    inst("issp.mp.pay", "people", "sovereign", "agreeIssp", 1, { reserve: "reads equality of pay as much as distrust of the elite",
+      stem: OF32_STEM,
+      fr: "Les élus nationaux devraient être payés au même niveau que le salaire moyen des Français." }, NI23("OF32_C")),
+    inst("issp.clean.record", "people", "sovereign", "agreeIssp", 1, { reserve: "nearly everyone agrees",
+      stem: OF32_STEM,
+      fr: "Pour pouvoir accéder à un mandat ou continuer à l'exercer, les élus devraient avoir un casier judiciaire vierge." },
+      NI23("OF32_D")),
+    inst("issp.term.limit", "people", "direct", "agreeIssp", 1, { reserve: "a rule on mandates, not on who decides",
+      stem: OF32_STEM,
+      fr: "Il ne faudrait pas pouvoir exercer le même mandat plus de deux fois de suite, quelle que soit la fonction à laquelle on est élu." },
+      NI23("OF32_G")),
+
+    /* --- executive: a strong executive against parliament --- */
+    inst("issp.power.president", "executive", null, "morePowerIssp", 1, { stem: OF26_STEM,
+      fr: "… au Président" }, NI23("OF26_A")),
+    inst("issp.power.parliament", "executive", null, "morePowerIssp", -1, { stem: OF26_STEM,
+      fr: "… au Parlement" }, NI23("OF26_C")),
+    inst("evs.v145", "executive", null, "goodEvs", 1, { stem: SYSTEMS_STEM,
+      fr: "Avoir à sa tête un homme fort qui n'a pas à se préoccuper du parlement ni des élections" }, EVS("v145")),
+    inst("issp.power.pm", "executive", null, "morePowerIssp", 1, { reserve: "the Prime Minister answers to parliament: more power to them is not a stronger executive alone",
+      stem: OF26_STEM, fr: "… au Premier Ministre" }, NI23("OF26_B")),
+    inst("evs.v146", "executive", null, "goodEvs", 1, { reserve: "technocracy, which CHES does not rate",
+      stem: SYSTEMS_STEM,
+      fr: "Que ce soient des experts et non un gouvernement qui décident ce qui leur semble le meilleur pour le pays" }, EVS("v146")),
+    inst("evs.v147", "executive", null, "goodEvs", 1, { reserve: "military rule, which nearly everyone rejects",
+      stem: SYSTEMS_STEM, fr: "Que l'armée dirige le pays" }, EVS("v147"))
   ];
 
   /* Agreeing is not neutral: many respondents lean towards "agree" whatever
@@ -858,6 +942,9 @@
     [FAMILIES_STEM, "Les enfants grandissent dans différents types de familles. Dans quelle mesure êtes-vous "
       + "d'accord ou pas d'accord avec l'affirmation suivante ?"],
     [NI23_PROP_STEM, "Êtes-vous d'accord ou pas d'accord avec la proposition suivante ?"],
+    [DEMOCRACY_STEM, "Dans quelle mesure pensez-vous qu'il est important pour la démocratie en général…"],
+    [DEMOCRACY_STEM_2, "De façon générale et non par rapport à la France, diriez-vous qu'il est important pour la démocratie en général…"],
+    [SYSTEMS_STEM, "Voici une façon de gouverner. Pour gouverner ce pays, serait-elle très bonne, assez bonne, assez mauvaise ou très mauvaise ?"],
     [EB_POLICY_STEM, "Quelle est votre opinion sur la proposition suivante ? Êtes-vous pour ou contre ?"],
     [EB_UKRAINE_STEM, "L'UE a pris une série de mesures en réponse à l'invasion de l'Ukraine par la "
       + "Russie. Dans quelle mesure êtes-vous d'accord ou pas d'accord avec la mesure suivante ?"],
@@ -882,8 +969,8 @@
     { key: "europe", reading: "europe", readings: ["europe", "russia", "world"],
       dims: ["membership", "powers", "common"] },
     { key: "ecology", planned: true },       /* environment, climate_change */
-    { key: "institutions", planned: true }   /* executive_power, judicial_independence,
-                                                regions, and people_v_elite */
+    { key: "institutions", reading: "people", readings: ["people", "executive"],
+      dims: ["direct", "sovereign"] }
   ];
 
   const itemById = id => ITEMS.find(i => i.id === id) || null;
