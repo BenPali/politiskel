@@ -1,3 +1,6 @@
+import { ART } from './base.js';
+import { star, person, cloud, blade, turbine, sky, starfield, tower } from '../draw.js';
+
 /* Badges, set C: class struggle, social democracy, market, liberties,
    tradition, nation, cosmopolitanism. Wrapped so its helpers never clash
    with the other art files. */

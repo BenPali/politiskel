@@ -73,7 +73,7 @@ const futureReading = (c, key) => (c.readings && Number.isFinite(c.readings[key]
    `min` is where a trait starts to count; `bonus` lifts a composite above
    the traits it is made of. `v` is what the legend reports. PolitiScales's
    own percentages stand in where the questionnaire has not been answered. */
-export function flagTraits(c, p) {
+export function flagTraits(c, p, raw = false) {
   const x = c.x, y = c.y;
   const d = Object.assign({}, (c.quiz && c.quiz.dims) || {}, (c.soc && c.soc.dims) || {});
   const ps = {};
@@ -105,7 +105,7 @@ export function flagTraits(c, p) {
   const labour = c.quiz ? c.quiz.labour : null;
   const notAnarchist = !has(antistate) || antistate < 60;
 
-  const T = [
+  const list = [
     { k: "left",        s: neg(x),                      min: 34, colour: "red" },
     { k: "market",      s: x,                           min: 34, colour: "gold" },
     { k: "order",       s: y,                           min: 34, colour: "blue" },
@@ -182,7 +182,10 @@ export function flagTraits(c, p) {
                              min: 60, symbol: "croix", bonus: 20, when: () => nat >= 70 },
     { k: "monarchy",    s: monarchy,                    min: 60, symbol: "crown", bonus: 20 },
     { k: "legitimism",  s: monarchy,                    min: 85, symbol: "fleur", bonus: 30 }
-  ].filter(t => has(t.s) && t.s >= t.min && (!t.when || t.when()))
+  ];
+  /* every trait's strength, before any threshold: what the badges read */
+  if (raw) return Object.fromEntries(list.filter(t => has(t.s)).map(t => [t.k, t.s]));
+  const T = list.filter(t => has(t.s) && t.s >= t.min && (!t.when || t.when()))
    .map(t => Object.assign(t, { v: Math.round(t.s), rank: t.s + (t.bonus || 0) }))
    .sort((a, b) => b.rank - a.rank);
   /* Equal rights for all says at once what LGBT rights and feminism said
@@ -212,6 +215,9 @@ export function flagTraits(c, p) {
            multi: (trait("multicultural") || {}).s || 0, lgbt: (trait("lgbt") || {}).s || 0,
            prot: has(prot) ? prot : 0 };
 }
+
+/* Each trait's strength (0-100) in a profile, thresholds aside. */
+export const traitStrengths = (c, p) => flagTraits(c, p, true);
 
 export function flagLayout(t) {
   const y = t.y === null ? 0 : t.y;

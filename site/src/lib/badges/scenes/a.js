@@ -1,3 +1,6 @@
+import { ART } from './base.js';
+import { star, person, cloud, blade, turbine, sky, starfield, tower } from '../draw.js';
+
 /* Level-dependent scenes: robin, hand, camarade, customs, factory, hussard. t is 1, 2 or 3. */
 (() => {
 const coin = (x, y, s = 1) => `<g transform="translate(${x} ${y}) scale(${s})"><ellipse rx="7" ry="4" fill="#f2c230" stroke="#a87a10"/><ellipse cy="-1" rx="4" ry="1.8" fill="#ffe27a"/></g>`;

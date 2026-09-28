@@ -34,7 +34,7 @@
 			<ul>
 				<li><a href="https://github.com/BenPali/politiskel" {...ext}>github.com/BenPali/politiskel</a></li>
 				<li>{L.footLicence}</li>
-				<li><a href="/methode">{L.navMethod}</a> · <a href="/drapeaux">{L.navFlags}</a></li>
+				<li><a href="/methode">{L.navMethod}</a> · <a href="/drapeaux">{L.navFlags}</a> · <a href="/badges">{L.navBadges}</a></li>
 			</ul>
 		</div>
 	</div>

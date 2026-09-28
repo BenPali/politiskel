@@ -1,3 +1,6 @@
+import { ART } from './base.js';
+import { star, person, cloud, blade, turbine, sky, starfield, tower } from '../draw.js';
+
 /* Level-dependent scenes: Centre, Transition, European federalism,
    Sovereignty, Direct democracy, Populism. t is 1, 2 or 3. */
 

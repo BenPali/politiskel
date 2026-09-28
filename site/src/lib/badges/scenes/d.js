@@ -1,3 +1,6 @@
+import { ART } from './base.js';
+import { star, person, cloud, blade, turbine, sky, starfield, tower } from '../draw.js';
+
 /* Badges, set D: multiculturalism, feminism, LGBT rights, reform, revolution, ecology, defence.
    Each scene grows with the level t (1, 2, 3). */
 (() => {

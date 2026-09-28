@@ -1,3 +1,6 @@
+import { ART } from './base.js';
+import { star, person, cloud, blade, turbine, sky, starfield, tower } from '../draw.js';
+
 /* ---------- set E: institutions and the journey badges ---------- */
 const lorraine = (cx, top, h, col, w = 1) => {
   const bw = h * 0.1 * w;

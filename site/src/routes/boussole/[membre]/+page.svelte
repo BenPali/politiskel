@@ -15,6 +15,8 @@
 	import MemberFlag from '$lib/components/MemberFlag.svelte';
 	import ReadingBands from '$lib/components/ReadingBands.svelte';
 	import PartyList from '$lib/components/PartyList.svelte';
+	import BadgeShelf from '$lib/components/BadgeShelf.svelte';
+	import { badgesOf, sortBadges } from '$lib/badges/badges.js';
 
 	$effect(() => {
 		if (session.ready) ensureBoard();
@@ -32,6 +34,10 @@
 	const psFlag = $derived(!!p?.flag && /^data:image\/(png|jpeg|webp);base64,/.test(p.flag));
 	let which = $state('politiskel');
 	const concepts = $derived(p && hasPolitiscales(p) ? PolitiExtract.keyConcepts(p, 3) : []);
+	/* badges read the profile itself, whatever reading is on show */
+	const base = $derived(p ? coords(p) : null);
+	const others = $derived(p?.me ? board.members.map((m) => { const k = coords(m); return { id: m.id, alias: m.alias, x: k.x, y: k.y }; }) : null);
+	const badges = $derived(p && base ? sortBadges(badgesOf(p, base, { country, members: others })) : []);
 	const source = $derived(p ? L.profileSource(hasPolitiscales(p), !!(q || c?.soc || c?.quiz)) : '');
 </script>
 
@@ -58,38 +64,52 @@
 	{:else}
 		{#key p.id}
 			<div class="sheet">
-				<section class="card flag-card" aria-label={L.flagFigureShort}>
-					<div class="name">
-						<h1>{p.alias}</h1>
-						{#if p.me}<span class="you">{L.you}</span>{/if}
-					</div>
-					<p class="source">{source}</p>
-					{#if concepts.length}
-						<ul class="concepts">
-							{#each concepts as k}<li><b>{L.pole[k.key]}</b> {k.intensity}</li>{/each}
-						</ul>
-					{/if}
-					{#if psFlag}
-						<div class="segmented flag-pick" role="radiogroup" aria-label={L.flagWhich}>
-							<button type="button" role="radio" aria-checked={which === 'politiskel'} onclick={() => (which = 'politiskel')}>{L.flagPolitiskel}</button>
-							<button type="button" role="radio" aria-checked={which === 'politiscales'} onclick={() => (which = 'politiscales')}>{L.flagPolitiscales}</button>
+				<div class="main">
+					<section class="card flag-card" aria-label={L.flagFigureShort}>
+						<div class="name">
+							<h1>{p.alias}</h1>
+							{#if p.me}<span class="you">{L.you}</span>{/if}
 						</div>
-					{/if}
-					{#if psFlag && which === 'politiscales'}
-						{#key which}<img class="hero ps" src={p.flag} alt={L.flagAlt(p.alias)} />{/key}
-						<p class="legend-head">{L.flagPsCaption}</p>
-					{:else if flag}
-						{#key which}<img class="hero" src={flag.url} alt={L.flagGeneratedAlt(p.alias)} width="432" height="288" />{/key}
-						<p class="legend-head">{L.flagFigureTitle}</p>
-						<ol class="legend">
-							{#each flag.legend as line, i}<li><span>{i + 1}</span><span>{line}</span></li>{/each}
-						</ol>
-						<p class="credit">{L.flagCredit} <a href="/drapeaux">{L.navFlags}</a></p>
-					{/if}
-					{#if p.me}
-						<a class="button {c.quiz ? 'ghost' : 'primary'} quiz" href="/questionnaire">{c.quiz ? L.quizEdit : L.quizOpen}</a>
-					{/if}
-				</section>
+						<p class="source">{source}</p>
+						{#if concepts.length}
+							<ul class="concepts">
+								{#each concepts as k}<li><b>{L.pole[k.key]}</b> {k.intensity}</li>{/each}
+							</ul>
+						{/if}
+						{#if psFlag}
+							<div class="segmented flag-pick" role="radiogroup" aria-label={L.flagWhich}>
+								<button type="button" role="radio" aria-checked={which === 'politiskel'} onclick={() => (which = 'politiskel')}>{L.flagPolitiskel}</button>
+								<button type="button" role="radio" aria-checked={which === 'politiscales'} onclick={() => (which = 'politiscales')}>{L.flagPolitiscales}</button>
+							</div>
+						{/if}
+						{#if psFlag && which === 'politiscales'}
+							{#key which}<img class="hero ps" src={p.flag} alt={L.flagAlt(p.alias)} />{/key}
+							<p class="legend-head">{L.flagPsCaption}</p>
+						{:else if flag}
+							{#key which}<img class="hero" src={flag.url} alt={L.flagGeneratedAlt(p.alias)} width="432" height="288" />{/key}
+							<p class="legend-head">{L.flagFigureTitle}</p>
+							<ol class="legend">
+								{#each flag.legend as line, i}<li><span>{i + 1}</span><span>{line}</span></li>{/each}
+							</ol>
+							<p class="credit">{L.flagCredit} <a href="/drapeaux">{L.navFlags}</a></p>
+						{/if}
+						{#if p.me}
+							<a class="button {c.quiz ? 'ghost' : 'primary'} quiz" href="/questionnaire">{c.quiz ? L.quizEdit : L.quizOpen}</a>
+						{/if}
+					</section>
+					<section class="card" aria-label={L.badges.title}>
+						<div class="head">
+							<h2>{L.badges.title}</h2>
+							<a href="/badges">{L.badges.seeAll}</a>
+						</div>
+						{#if badges.length}
+							<p class="sub">{L.badges.memberLead(p.me)}</p>
+							<BadgeShelf {badges} />
+						{:else}
+							<p class="sub">{L.badges.none}</p>
+						{/if}
+					</section>
+				</div>
 
 				<div class="side">
 					<section class="card" aria-label={L.bands.title}>
@@ -124,6 +144,8 @@
 	.tabs a:hover { border-color: var(--border-strong); }
 	.tabs a[aria-current='page'] { border-color: var(--accent); background: var(--accent-soft); font-weight: 650; }
 	.sheet { display: grid; grid-template-columns: 480px minmax(0, 1fr); gap: 32px; align-items: start; }
+	.main { display: flex; flex-direction: column; gap: 24px; min-width: 0; }
+	.head a { font-size: 14px; color: var(--text-2); }
 	.side { display: flex; flex-direction: column; gap: 24px; min-width: 0; }
 	.card { padding: 24px; }
 	.card + .card { margin-top: 0; }

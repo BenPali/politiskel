@@ -220,7 +220,7 @@ export const LOCALES = {
     exportLead: "Un fichier JSON avec votre compte, votre profil, vos réponses et vos groupes. Aucun traceur, aucune donnée ailleurs que sur ce serveur.",
     passwordHint: "10 caractères ou plus. Changer de mot de passe ferme toutes vos autres sessions.",
     deleteForever: "Supprimer définitivement",
-    navHome: "Accueil", navTry: "Essayer", navMethod: "Méthode", navFlags: "Drapeaux",
+    navHome: "Accueil", navTry: "Essayer", navMethod: "Méthode", navFlags: "Drapeaux", navBadges: "Badges",
     navSignIn: "Se connecter", navSignUp: "Créer un compte",
     homeTitle: "Voyez où vous divergez vraiment, entre amis.",
     homeLead: "Politiskel place votre profil sur une boussole, le compare aux partis de votre pays, placés "
@@ -1079,7 +1079,79 @@ export const LOCALES = {
     allLead: (n, m) => "Toutes les questions des thèmes disponibles (" + n + " sur " + m
       + " pour l'instant), mélangées dans un ordre fixe, le même pour tout le monde : une suite "
       + "de questions sur un même sujet laisse deviner ce qu'elle mesure. Les réponses sont les "
-      + "mêmes que thème par thème : ce qui est déjà répondu d'un côté l'est de l'autre."
+      + "mêmes que thème par thème : ce qui est déjà répondu d'un côté l'est de l'autre.",
+    /* the badges: a family, each badge's theme on its ribbon, and three names from
+       the mildest (60) to the most marked (90); a profile or journey badge has one */
+    badges: {
+      title: "Badges",
+      lead: "Un badge par trait marqué de ton profil, à trois niveaux : 60, 75 et 90 sur 100. Les badges de profil et de parcours n'en ont qu'un.",
+      memberLead: me => me ? "Ce que tes réponses font ressortir le plus nettement." : "Ce que ses réponses font ressortir le plus nettement.",
+      none: "Pas encore de badge : ils viennent des questionnaires.",
+      seeAll: "Tous les badges",
+      from: n => "à partir de " + n,
+      levelOf: (n, of) => "niveau " + n + " sur " + of,
+      privateNote: "Visible par toi seul",
+      soon: "Pas encore attribué",
+      catalogTitle: "Tous les badges",
+      catalogLead: "Chaque badge vient d'un trait de ton profil, calculé à partir de tes réponses aux questionnaires. Il a trois niveaux, avec un nom et une scène qui s'affirment à mesure que le trait est marqué. Les badges de profil et de parcours n'ont qu'un niveau.",
+      families: {
+        economy: "Économie",
+        society: "Société",
+        ecology: "Écologie",
+        world: "Europe et monde",
+        institutions: "Institutions",
+        profile: "Profil",
+        journey: "Parcours"
+      },
+      items: {
+        robin: { label: "Redistribution", names: ["Partageur", "Robin des bois", "Taxeur de milliardaires"] },
+        hand: { label: "Dérégulation", names: ["Allergique à la paperasse", "Main invisible", "Tronçonneuse administrative"] },
+        classstruggle: { label: "Lutte des classes", names: ["Conscience de classe", "Lutte des classes", "Grand Soir en vue"] },
+        camarade: { label: "Communisme", names: ["Camarade", "Commissaire du peuple", "Plan quinquennal"] },
+        rose: { label: "Social-démocratie", names: ["Réformiste du dimanche", "Rose au poing", "Éléphant du parti"] },
+        picket: { label: "Syndicalisme", names: ["Encarté", "Piquet de grève", "Grève générale"] },
+        customs: { label: "Protectionnisme", names: ["Acheteur local", "Douanier en chef", "Muraille douanière"] },
+        factory: { label: "Productivisme", names: ["Pragmatique industriel", "Cheminée qui fume", "Charbon à volonté"] },
+        market: { label: "Marché", names: ["Ami du marché", "Libre-échangiste", "Loup de Wall Street"] },
+        sheriff: { label: "Ordre", names: ["Respect des règles", "Shérif du quartier", "Tolérance zéro"] },
+        liberties: { label: "Libertés publiques", names: ["Vigilant des libertés", "Avocat des libertés", "Habeas corpus ambulant"] },
+        hussard: { label: "Laïcité", names: ["Laïque tranquille", "Hussard de la laïcité", "Bouffeur de curés"] },
+        temple: { label: "Tradition", names: ["Attaché aux racines", "Gardien du temple", "Croisé de la tradition"] },
+        cocarde: { label: "Nation", names: ["Patriote tranquille", "Cocardier", "Chauvin de compétition"] },
+        globe: { label: "Cosmopolitisme", names: ["Voyageur curieux", "Citoyen du monde", "Apatride heureux"] },
+        mosaic: { label: "Multiculturalisme", names: ["Curieux des cultures", "Mosaïque vivante", "Babel assumée"] },
+        feminism: { label: "Féminisme", names: ["Égalité d'abord", "Féministe de terrain", "Sorcière revendiquée"] },
+        pride: { label: "Droits LGBT", names: ["Allié arc-en-ciel", "Fier de la Pride", "Char de tête"] },
+        tightrope: { label: "Centre", names: ["Modéré", "Funambule du centre", "En même temps"] },
+        reform: { label: "Réforme", names: ["Pas à pas", "Maître du compromis", "Tiède professionnel"] },
+        barricade: { label: "Révolution", names: ["Impatient", "Révolutionnaire", "Barricadier"] },
+        forest: { label: "Écologie", names: ["Main verte", "Écolo convaincu", "Zadiste"] },
+        snail: { label: "Décroissance", names: ["Sobre heureux", "Escargot militant", "Retour à la lampe à huile"] },
+        turbines: { label: "Transition", names: ["Ami des éoliennes", "Électrifié", "Tout renouvelable"] },
+        atom: { label: "Nucléaire", names: ["Curieux de l'atome", "Défenseur de l'atome", "Moine de la fission"] },
+        eustars: { label: "Fédéralisme européen", names: ["Européen convaincu", "Citoyen des douze étoiles", "États-Unis d'Europe"] },
+        border: { label: "Souveraineté", names: ["Eurosceptique", "Gardien des frontières", "Frexiteur"] },
+        dove: { label: "Pacifisme", names: ["Diplomate", "Colombe de service", "Désarmement total"] },
+        defence: { label: "Défense", names: ["Réserviste", "Stratège de salon", "Va-t-en-guerre"] },
+        ironcurtain: { label: "Fermeté face à la Russie", names: ["Vigilant à l'Est", "Rideau de fer", "Guerre froide 2.0"] },
+        datcha: { label: "Conciliation avec la Russie", names: ["Partisan du dialogue", "Réaliste de chancellerie", "Ami de la datcha"] },
+        bluehelmet: { label: "Autorité internationale", names: ["Multilatéraliste", "Casque bleu", "Gouvernement mondial"] },
+        ballot: { label: "Démocratie directe", names: ["Consulté", "Accro au référendum", "RIC en toutes matières"] },
+        megaphone: { label: "Populisme", names: ["Méfiant des élites", "Porte-voix du peuple", "Tribun de la plèbe"] },
+        executive: { label: "Exécutif fort", names: ["Amateur d'autorité", "Partisan du chef", "Bonapartiste"] },
+        hemicycle: { label: "Parlement", names: ["Ami de l'hémicycle", "Parlementaire dans l'âme", "Nostalgique de la IVe"] },
+        colombey: { label: "Gaullisme", names: ["Gaulliste", "Héritier de Colombey", "Appel du 18 juin"] },
+        orphan: { label: null, rule: "Aucun parti proche", names: ["Orphelin politique"] },
+        loyal: { label: null, rule: "À moins de 5 points d'un parti", names: ["Fidèle au parti"] },
+        oddball: { label: null, rule: "Traits rarement réunis", names: ["Inclassable"] },
+        undecided: { label: null, rule: "Beaucoup de « je ne sais pas »", names: ["Sans avis"] },
+        weathervane: { label: null, rule: "Beaucoup de réponses changées", names: ["Girouette"] },
+        soulmate: { label: null, rule: "Un membre du groupe à moins de 5 points, visible par soi seul", names: ["Âme sœur"] },
+        firststep: { label: null, rule: "Premier pas", names: ["Première boussole"] },
+        explorer: { label: null, rule: "Tous les thèmes", names: ["Explorateur"] },
+        diligent: { label: null, rule: "Aucune question sautée", names: ["Consciencieux"] }
+      }
+    }
   }
 };
 
