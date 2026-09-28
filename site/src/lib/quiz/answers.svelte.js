@@ -10,8 +10,18 @@ import { session } from '$lib/session.svelte.js';
 import { board } from '$lib/compass/board.svelte.js';
 import { L } from '$lib/i18n/fr.js';
 import { toast } from '$lib/toast.svelte.js';
+import { CHANGES, isMeta } from '$lib/quiz/meta.js';
 
 const GUEST_KEY = 'politiskel.guest.v1';
+
+/* How many answers given on an earlier visit were changed since, kept among
+   the answers under a key no item has, so that the server and the guest's
+   browser keep it with them; the girouette badge reads it. Each question
+   counts once a visit, and the count stops at 20, the largest value the
+   server takes. */
+const CHANGES_MAX = 20;
+let before = {};
+let changed = new Set();
 
 export const mine = $state({
 	/** "server" or "guest" */
@@ -62,6 +72,8 @@ export function startMine(mode) {
 	if (mode === 'server' && mine.mode === 'server' && who && pendingFor === who && (pending || inflight)) return;
 	mine.mode = mode;
 	mine.answers = mode === 'server' ? { ...(session.me?.profile?.answers || {}) } : { ...(readGuest()?.answers || {}) };
+	before = { ...mine.answers };
+	changed = new Set();
 }
 
 /* Signing out: whatever was waiting belonged to that account, and goes. */
@@ -73,12 +85,19 @@ export function forgetPending() {
 }
 
 export function setAnswer(key, value) {
-	mine.answers = { ...mine.answers, [key]: value };
+	const a = { ...mine.answers, [key]: value };
+	if (before[key] !== undefined && before[key] !== value && !changed.has(key)) {
+		changed.add(key);
+		a[CHANGES] = Math.min(CHANGES_MAX, (a[CHANGES] || 0) + 1);
+	}
+	mine.answers = a;
 	persist();
 }
 export function eraseKeys(keys) {
 	const a = { ...mine.answers };
 	for (const k of keys) delete a[k];
+	/* the count alone is not an answer: with nothing else left, it goes too */
+	if (Object.keys(a).every(isMeta)) for (const k of Object.keys(a)) delete a[k];
 	mine.answers = a;
 	persist();
 }

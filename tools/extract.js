@@ -216,6 +216,7 @@ function readAnswers() {
     }
     const answers = {}, bad = [];
     for (const [k, v] of Object.entries(data.answers)) {
+      if (k.startsWith("meta.")) continue;          /* the site's own counters, not answers */
       const why = answerProblem(k, v);
       if (why) bad.push(k + " (" + why + ")"); else answers[k] = v;
     }

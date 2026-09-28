@@ -1145,7 +1145,7 @@ export const LOCALES = {
         loyal: { label: null, rule: "À moins de 5 points d'un parti", names: ["Fidèle au parti"] },
         oddball: { label: null, rule: "Traits rarement réunis", names: ["Inclassable"] },
         undecided: { label: null, rule: "Beaucoup de « je ne sais pas »", names: ["Sans avis"] },
-        weathervane: { label: null, rule: "Beaucoup de réponses changées", names: ["Girouette"] },
+        weathervane: { label: null, rule: "Au moins 10 réponses changées d'une visite à l'autre", names: ["Girouette"] },
         soulmate: { label: null, rule: "Un membre du groupe à moins de 5 points, visible par soi seul", names: ["Âme sœur"] },
         firststep: { label: null, rule: "Premier pas", names: ["Première boussole"] },
         explorer: { label: null, rule: "Tous les thèmes", names: ["Explorateur"] },

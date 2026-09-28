@@ -11,6 +11,10 @@
 import { traitStrengths } from '$lib/flag/flag.js';
 import { progressOf, ALL } from '$lib/quiz/flow.js';
 import { PolitiModel } from '$lib/model.js';
+import { CHANGES, isMeta } from '$lib/quiz/meta.js';
+
+/* a girouette changed this many answers given on earlier visits */
+const WEATHERVANE = 10;
 
 export const LEVELS = [60, 75, 90];
 export const levelOf = (s) => (s >= 90 ? 3 : s >= 75 ? 2 : s >= 60 ? 1 : 0);
@@ -26,9 +30,8 @@ export const FAMILIES = [
 	['journey', ['firststep', 'explorer', 'diligent']]
 ];
 export const SINGLE = new Set(['orphan', 'loyal', 'oddball', 'undecided', 'weathervane', 'soulmate', 'firststep', 'explorer', 'diligent']);
-/* A girouette needs to know how often answers changed, which nothing
-   records yet: the badge is drawn in the catalog and never awarded. */
-export const SOON = new Set(['weathervane']);
+/* drawn in the catalog, not awarded yet */
+export const SOON = new Set();
 /* shown to the member alone: it says where another member stands */
 export const PRIVATE = new Set(['soulmate']);
 
@@ -83,7 +86,7 @@ export function badgesOf(p, c, ctx = {}) {
 
 	const placed = num(c.x) !== null && num(c.y) !== null;
 	const answers = (p && p.answers) || {};
-	const values = Object.values(answers);
+	const values = Object.entries(answers).filter(([k]) => !isMeta(k)).map(([, v]) => v);
 	if (placed && ctx.country) {
 		const refs = ctx.country.parties;
 		const nearest = PolitiModel.rankParties(c, refs)[0];
@@ -93,6 +96,7 @@ export function badgesOf(p, c, ctx = {}) {
 	if ((any(OPEN) && any(ORDER)) || (any(LEFT) && any(RIGHT))) one('oddball');
 	const dk = values.filter((v) => v === 'dk').length;
 	if (values.length >= 20 && dk / values.length >= 0.25) one('undecided');
+	if ((answers[CHANGES] || 0) >= WEATHERVANE) one('weathervane');
 	if (placed && ctx.members && p.me) {
 		const near = ctx.members.filter((m) => m.id !== p.id && num(m.x) !== null && num(m.y) !== null
 			&& Math.hypot(m.x - c.x, m.y - c.y) <= 5);
