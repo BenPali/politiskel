@@ -145,6 +145,7 @@ export const LOCALES = {
     footSourceItems: {
       politiscales: "le questionnaire à huit axes",
       ches: "position des partis, pays par pays",
+      poppa: "populisme des partis, pour la lecture populiste",
       surveys: "les questions du questionnaire",
       wright: "l'échelle de classe",
       icons: "la plupart des symboles des drapeaux"
@@ -185,7 +186,7 @@ export const LOCALES = {
       hint: { protectionism: "À part de X, comme dans le CHES", class: "Lecture rivale de X",
               conflict: "ISSP", labour: "Syndicats, pouvoir des patrons · ESS, ISSP",
               europe: "Questionnaire · échelle CHES", russia: "Eurobaromètre · sans repère de parti",
-              people: "Questionnaire · échelle CHES", executive: "ESS, ISSP, EVS · sans repère de parti",
+              people: "Questionnaire · échelle POPPA", executive: "ESS, ISSP, EVS · sans repère de parti",
               world: "ISSP · sans repère de parti" },
       ends: { x: ["Gauche", "Droite"], y: ["Ouverture", "Tradition"], protectionism: ["Libre-échange", "Protection"],
               class: ["Pro-capitaliste", "Anticapitaliste"], conflict: ["Faible", "Fort"], labour: ["Côté capital", "Côté travail"],
@@ -339,7 +340,7 @@ export const LOCALES = {
           "Depuis PolitiScales, X est une moyenne pondérée de Capitalisme − Communisme (<code>0,45</code>) et de Laissez-faire − Régulation (<code>0,35</code>) ; Y, de Essentialisme − Constructivisme (<code>0,30</code>), Justice punitive − réhabilitative (<code>0,25</code>), Conservatisme − Progressisme (<code>0,25</code>) et Nationalisme − Internationalisme (<code>0,20</code>). Les poids sont renormalisés sur les seules composantes renseignées. Écologie ↔ Productivisme n'entre pas dans X : l'échelle économique du CHES exclut l'environnement.",
           "Depuis le questionnaire, X est la moyenne simple de trois sous-dimensions (redistribution, services publics contre impôts, régulation des marchés), les trois sous-échelles économiques du CHES, dont la moyenne reproduit son axe <code>lrecon</code> à <code>r = 0,96</code>. Y suit le même principe sur les sept sous-dimensions sociétales du CHES ; leur moyenne reproduit <code>galtan</code> à <code>r = 0,97</code>. Le protectionnisme est lu à part, jamais dans X : dans le CHES il va contre la gauche-droite économique (<code>r = −0,37</code>).",
           "Le thème Europe et monde ne touche à aucun des deux axes. Il donne trois lectures à part : l'intégration européenne, moyenne de trois groupes de questions (l'appartenance à l'Union, ses pouvoirs face aux gouvernements nationaux, ses politiques communes), sur l'échelle <code>eu_position</code> du CHES ; le rapport à la Russie ; l'autorité des instances internationales face à l'intérêt national. Seule la première est comparée aux partis. Le CHES note bien le rapport des partis à la Russie, mais en France chaque position n'y repose que sur deux ou trois experts, en Italie sur un seul au plus : trop peu pour servir de repère.",
-          "Le thème Institutions donne deux lectures à part. La première, qui du peuple ou des élus doit décider, suit l'échelle <code>people_v_elite</code> du CHES : c'est la lecture populiste, présentée comme telle, car opposer le peuple aux élites est une façon de lire le conflit politique parmi d'autres, pas une dimension neutre. Elle est presque indépendante des deux axes (<code>r = 0,2</code>). La seconde, le poids donné à l'exécutif face au Parlement, suit déjà l'axe sociétal (<code>r = 0,75</code>) : elle est mesurée, pas comparée aux partis. L'indépendance de la justice et la décentralisation, que le CHES note aussi, n'ont pas de question éprouvée en français : les enquêtes demandent l'attachement à sa région, pas le partage des pouvoirs."
+          "Le thème Institutions donne deux lectures à part. La première, qui du peuple ou des élus doit décider, est comparée aux partis tels que les note l'enquête d'experts <em>POPPA</em> 2023 (<em>Populism and Political Parties Expert Survey</em>, données libres), sur son score de populisme : place du peuple, rejet des élites, volonté générale. C'est la lecture populiste, présentée comme telle, car opposer le peuple aux élites est une façon de lire le conflit politique parmi d'autres, pas une dimension neutre. Les deux axes n'en expliquent que 43 %. Le CHES a été essayé d'abord, mais son échelle <code>people_v_elite</code> oppose démocratie directe et représentative, pas le populisme : les partis suisses y sont en tête, le RN à peine au-dessus du milieu. La seconde, le poids donné à l'exécutif face au Parlement, suit déjà l'axe sociétal (<code>r = 0,75</code>) : elle est mesurée, pas comparée aux partis. L'indépendance de la justice et la décentralisation, que le CHES note aussi, n'ont pas de question éprouvée en français : les enquêtes demandent l'attachement à sa région, pas le partage des pouvoirs."
         ] },
         { id: "questions", title: "D'où viennent les questions", paras: [
           "Aucune question n'est écrite pour Politiskel. Chacune est citée d'une enquête publique éprouvée, dans sa version française officielle, avec sa source jusqu'à la variable. On peut donc vérifier chaque formulation. Ces enquêtes sont l'<em>European Social Survey</em>, l'<em>International Social Survey Programme</em>, l'<em>European Values Study</em>, et l'<em>Eurobaromètre</em> pour la Russie et les politiques communes de l'Union, dont les trois autres ne parlent pas.",
@@ -724,11 +725,9 @@ export const LOCALES = {
           + "l'intégration européenne."
       },
       populist: {
-        allEstimated: "Aucun repère dans cette lecture : ceux de ce pays sont tous des estimations à la "
-          + "main, et il n'y a rien sur quoi estimer leur position sur le peuple et les élus.",
-        dropped: n => n + " repère" + (n > 1 ? "s" : "") + " placé" + (n > 1 ? "s" : "") + " à la main n'"
-          + (n > 1 ? "ont" : "a") + " pas de position CHES sur le peuple et les élus et n'"
-          + (n > 1 ? "apparaissent" : "apparaît") + " pas.",
+        allEstimated: "Aucun repère dans cette lecture : l'enquête POPPA ne note aucun des partis de ce pays.",
+        dropped: n => n + " repère" + (n > 1 ? "s" : "") + " n'" + (n > 1 ? "ont" : "a") + " pas de note de populisme "
+          + "dans l'enquête POPPA et n'" + (n > 1 ? "apparaissent" : "apparaît") + " pas.",
         pending: n => n + " profil" + (n > 1 ? "s ont" : " a") + " commencé le thème Institutions sans "
           + "avoir encore assez de réponses pour être placé" + (n > 1 ? "s" : "") + ".",
         none: n => n + " profil" + (n > 1 ? "s" : "") + " sans réponse au thème Institutions "
@@ -823,10 +822,10 @@ export const LOCALES = {
         desc: "Référendum, peuple et élus, Président et Parlement : la lecture populiste, présentée "
           + "comme telle, et le poids donné à l'exécutif.",
         lead: "Ces questions mesurent deux choses à part : qui, du peuple ou des élus, doit décider, sur "
-          + "l'échelle qu'utilisent les experts du CHES pour les partis, et le poids donné à l'exécutif "
+          + "l'échelle qu'utilisent les experts de l'enquête POPPA pour les partis, et le poids donné à l'exécutif "
           + "face au Parlement. Aucune ne déplace votre point sur la boussole principale.",
         leadNative: "Ces questions mesurent deux choses à part : qui, du peuple ou des élus, doit décider, "
-          + "sur l'échelle qu'utilisent les experts du CHES pour les partis, et le poids donné à "
+          + "sur l'échelle qu'utilisent les experts de l'enquête POPPA pour les partis, et le poids donné à "
           + "l'exécutif face au Parlement.",
         salience: "Quelle place les institutions, la façon dont on décide, tiennent-elles dans vos choix politiques ?",
         salienceAfter: "Maintenant que vous avez répondu : quelle place les institutions tiennent-elles "
@@ -886,11 +885,11 @@ export const LOCALES = {
     resultLead: { x: "Vos réponses remplacent l'axe économique de PolitiScales, qui ne posait rien sur la redistribution. Votre point se déplace sur la boussole.",
                   y: "Vos réponses remplacent l'axe sociétal de PolitiScales, question par question tirées des enquêtes publiques. Votre point se déplace sur la boussole.",
                   europe: "Votre position sur l'intégration européenne, parmi les partis que le CHES place sur la même échelle. Elle se lit aussi sur la boussole, dans la lecture « Économie × Europe »." ,
-                  people: "Une lecture que la boussole n'a pas : qui, selon vous, doit décider, le peuple ou ceux qu'il élit, parmi les partis que le CHES place sur la même échelle. Elle se lit aussi sur la boussole, dans la lecture populiste." },
+                  people: "Une lecture que la boussole n'a pas : qui, selon vous, doit décider, le peuple ou ceux qu'il élit, parmi les partis que les experts de l'enquête POPPA placent sur la même échelle. Elle se lit aussi sur la boussole, dans la lecture populiste." },
     resultLeadNative: "Vos réponses placent votre point sur cet axe de la boussole.",
     resultWasPs: v => "était " + v + " avec PolitiScales", resultNativeNote: "mesuré par le questionnaire",
     resultOwnNote: { europe: "positif = pour l'intégration, sur l'échelle eu_position du CHES",
-                     people: "positif = le peuple doit décider, sur l'échelle people_v_elite du CHES" },
+                     people: "positif = le peuple doit décider, sur l'échelle de populisme de l'enquête POPPA" },
     resultNoReading: theme => "Aucune réponse au thème " + theme + " pour l'instant.",
     resultPending: (n, axis, native) => "Encore " + n + " réponse" + (n > 1 ? "s" : "") + " au moins : "
       + "il en faut deux dans chaque groupe de questions pour que le résultat compte. "

@@ -22,18 +22,18 @@ export const VIEWS = [{ key: 'politiskel' }, { key: 'politiscales' }, { key: 'pr
 const SIDE = {
 	protectionism: { of: (c) => c.quiz?.protectionism, ref: 'prot' },
 	europe: { of: (c) => c.eu?.europe, ref: 'eu', score: (c) => c.eu, theme: 'europe' },
-	populist: { of: (c) => c.inst?.people, ref: 'pve', score: (c) => c.inst, theme: 'institutions' }
+	populist: { of: (c) => c.inst?.people, ref: 'pop', score: (c) => c.inst, theme: 'institutions', ysrc: 'populisme : POPPA 2023' }
 };
 
-/* A theme's own reading, as each party carries it (CHES) */
-export const THEME_REF = { europe: 'eu', institutions: 'pve' };
+/* A theme's own reading, as each party carries it (CHES for Europe, POPPA for populism) */
+export const THEME_REF = { europe: 'eu', institutions: 'pop' };
 
 /* Copy for a reading, falling back on the default wording. */
 export const copyOf = (viewKey) => Object.assign({}, L, L.views[viewKey] || {});
 
 /* Provenance is shown, not hidden: a hand estimate and a surveyed position
    should not look alike. */
-export const noteOf = (r) => r.note + (r.src === 'ches' ? ' (CHES 2024)' : ' (estimation)');
+export const noteOf = (r) => r.note + ' (' + (r.src === 'ches' ? 'CHES 2024' : 'estimation') + (r.ysrc ? ' ; ' + r.ysrc : '') + ')';
 
 /* A member as the server sends it, as the compass reads it. */
 export function fromMember(m) {
@@ -105,7 +105,7 @@ export function project(p, viewKey) {
 export function referencesOf(country, viewKey) {
 	const side = SIDE[viewKey];
 	if (!side) return country.parties;
-	return country.parties.filter((r) => r[side.ref] !== undefined).map((r) => ({ ...r, y: r[side.ref] }));
+	return country.parties.filter((r) => r[side.ref] !== undefined).map((r) => ({ ...r, y: r[side.ref], ysrc: side.ysrc }));
 }
 
 export const limitsOf = (refs) => PolitiModel.limitsFor(refs);

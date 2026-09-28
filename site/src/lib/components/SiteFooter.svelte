@@ -16,6 +16,7 @@
 			<ul>
 				<li><a href="https://politiscales.fr" {...ext}>PolitiScales</a> : {S.politiscales}</li>
 				<li><a href="https://www.chesdata.eu/ches-europe/" {...ext}>Chapel Hill Expert Survey 2024</a> : {S.ches}</li>
+				<li><a href="https://doi.org/10.7910/DVN/RMQREQ" {...ext}>POPPA 2023</a> : {S.poppa}</li>
 				<li>
 					<a href="https://www.europeansocialsurvey.org/" {...ext}>ESS</a>,
 					<a href="https://issp.org/" {...ext}>ISSP</a>,
