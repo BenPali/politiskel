@@ -28,5 +28,7 @@ export const scoreOf = (c, key) => ({ economy: c.quiz, society: c.soc, europe: c
    both, and a count that skipped one kind looked wrong. */
 export function progressOf(key, answers) {
 	const screens = screensFor(key);
-	return { done: screens.filter((sc) => answers[screenKey(sc)] !== undefined).length, total: screens.length };
+	/* where "Reprendre" goes: the first screen with no answer (1-based, as ?q= counts) */
+	const open = screens.findIndex((sc) => answers[screenKey(sc)] === undefined);
+	return { done: screens.filter((sc) => answers[screenKey(sc)] !== undefined).length, total: screens.length, next: open < 0 ? null : open + 1 };
 }

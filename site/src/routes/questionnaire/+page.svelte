@@ -53,11 +53,17 @@
 						</div>
 					</div>
 					<div class="ctas">
-						<a class="button {t.done === t.total ? 'ghost' : 'primary'}" href="/questionnaire/{t.key}">
-							{!t.done ? L.quizStart : t.done < t.total ? L.quizResume : L.quizReview}
-						</a>
-						<!-- straight to the result, past the questions: the screen after the last -->
-						{#if t.done}<a class="button {t.done === t.total ? 'primary' : 'skip'}" href="/questionnaire/{t.key}?q={t.total + 1}">{L.seeResult}</a>{/if}
+						<!-- the secondary action outlined on the left, the one to take filled on the right, on every card -->
+						{#if !t.done}
+							<a class="button primary" href="/questionnaire/{t.key}">{L.quizStart}</a>
+						{:else if t.next}
+							<a class="button ghost" href="/questionnaire/{t.key}?q={t.total + 1}">{L.seeResult}</a>
+							<a class="button primary" href="/questionnaire/{t.key}?q={t.next}">{L.quizResume}</a>
+						{:else}
+							<a class="button ghost" href="/questionnaire/{t.key}?q=1">{L.quizReview}</a>
+							<!-- straight to the result, past the questions: the screen after the last -->
+							<a class="button primary" href="/questionnaire/{t.key}?q={t.total + 1}">{L.seeResult}</a>
+						{/if}
 					</div>
 				</article>
 			{/each}

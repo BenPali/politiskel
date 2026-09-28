@@ -233,7 +233,7 @@
 					{:else}
 						<span></span>
 					{/if}
-					<button type="button" class="primary" onclick={() => goStep(1)}>{!anyStarted ? L.quizStart : progress.done < progress.total ? L.quizResume : L.quizReview}</button>
+					<button type="button" class="primary" onclick={() => goStep(progress.next ?? 1)}>{!anyStarted ? L.quizStart : progress.next ? L.quizResume : L.quizReview}</button>
 				{:else if sc}
 					<button type="button" class="ghost" onclick={() => goStep(step - 1)}>{L.quizPrev}</button>
 					<button type="button" class="skip" onclick={() => goStep(step + 1)}>{L.quizSkip}</button>
