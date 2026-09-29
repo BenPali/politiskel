@@ -17,6 +17,7 @@
 	import PartyList from '$lib/components/PartyList.svelte';
 	import BadgeShelf from '$lib/components/BadgeShelf.svelte';
 	import ShareSheet from '$lib/components/ShareSheet.svelte';
+	import SignatureCard from '$lib/components/SignatureCard.svelte';
 	import { badgesOf, sortBadges } from '$lib/badges/badges.js';
 
 	$effect(() => {
@@ -132,6 +133,8 @@
 						<p class="sub">{L.bands.lead}</p>
 						<ReadingBands {c} {q} soc={(c.base || c).soc} eu={(c.base || c).eu} inst={(c.base || c).inst} ecology={(c.base || c).ecology} />
 					</section>
+					<!-- a wrapper that draws nothing, so that the card, when it shows, is spaced like the others -->
+					<div class="sig"><SignatureCard c={base} /></div>
 					<section class="card" aria-label={L.partiesTitle}>
 						<div class="head">
 							<h2>{L.partiesTitle}</h2>
@@ -165,6 +168,7 @@
 	.main { display: flex; flex-direction: column; gap: 24px; min-width: 0; }
 	.head a { font-size: 14px; color: var(--text-2); }
 	.side { display: flex; flex-direction: column; gap: 24px; min-width: 0; }
+	.sig { display: contents; }
 	.card { padding: 24px; }
 	.card + .card { margin-top: 0; }
 	.name { display: flex; align-items: baseline; gap: 12px; margin-bottom: 4px; }

@@ -1090,6 +1090,20 @@ export const LOCALES = {
       + " pour l'instant), mélangées dans un ordre fixe, le même pour tout le monde : une suite "
       + "de questions sur un même sujet laisse deviner ce qu'elle mesure. Les réponses sont les "
       + "mêmes que thème par thème : ce qui est déjà répondu d'un côté l'est de l'autre.",
+    /* a member's signature against the parties: where they stand apart, where they blend in, a tension */
+    signature: {
+      title: "Signature",
+      lead: m => "Face aux " + m + " partis enquêtés par le CHES 2024, tous pays confondus.",
+      standout: "S'écarte le plus des partis",
+      blend: "Se fond le plus parmi les partis",
+      tension: "Une tension",
+      near: (n, m, band) => (n === 0 ? "Aucun parti" : n === 1 ? "1 parti" : n + " partis") + " sur " + m + " à " + band + " points ou moins.",
+      pattern: (a, b) => "Chez les partis, « " + a + " » va plutôt avec « " + b + " ».",
+      combine: (n, m) => n === 0 ? "Aucun des " + m + " partis ne les combine ainsi."
+        : n === 1 ? "1 parti sur " + m + " les combine ainsi." : n + " partis sur " + m + " les combinent ainsi.",
+      middle: "Au milieu",
+      and: "et"
+    },
     /* the badges: a family, each badge's theme on its ribbon, and three names from
        the mildest (60) to the most marked (90); a profile or journey badge has one */
     badges: {
