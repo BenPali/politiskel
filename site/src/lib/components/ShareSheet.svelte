@@ -4,6 +4,7 @@
      do with the image: share it, download it, copy it. The image is made
      here, in the browser. -->
 <script>
+	import { tick } from 'svelte';
 	import { L } from '$lib/i18n/fr.js';
 	import { cardData, snapshotOf, THEMES } from '$lib/share/card.js';
 	import { api, apiError } from '$lib/api.js';
@@ -24,6 +25,23 @@
 	let busy = $state(false);
 	/* the public link: null, 'confirm', or the address once made */
 	let link = $state(null);
+	let linkBox = $state(null);
+	/* a short green line under what was just copied */
+	let copied = $state(null);
+	let copiedTimer = null;
+	function flash(what) {
+		copied = what;
+		clearTimeout(copiedTimer);
+		copiedTimer = setTimeout(() => (copied = null), 2500);
+	}
+	/* the warning and the link open at the foot of the dialog, which may be
+	   below the fold of a short screen: they are brought into view */
+	async function showLink(state) {
+		link = state;
+		await tick();
+		linkBox?.scrollIntoView({ block: 'nearest', behavior: 'smooth' });
+		linkBox?.querySelector('button.primary')?.focus({ preventScroll: true });
+	}
 
 	const data = $derived(open && p ? cardData(p, country) : null);
 	const layout = $derived(LAYOUTS[index]);
@@ -40,6 +58,7 @@
 				/* private browsing */
 			}
 			link = null;
+			copied = null;
 			dialog.showModal();
 			if (!ART) import('$lib/badges/scenes/index.js').then((m) => (ART = m.ART));
 		} else if (!open && dialog.open) dialog.close();
@@ -87,7 +106,7 @@
 			const og = layout.w === 1200 && layout.h === 630 ? layout : LAYOUTS[0];
 			const image = await toBase64(await cardPng(og.draw(data, ART, theme), og.w, og.h));
 			const r = await api('POST', '/api/me/shares', { layout: layout.key, theme, snapshot: snapshotOf(data), image });
-			if (r.ok) link = location.origin + r.data.url;
+			if (r.ok) await showLink(location.origin + r.data.url);
 			else toast(apiError(r), { kind: 'error' });
 		} catch {
 			toast(S.failed, { kind: 'error' });
@@ -98,7 +117,7 @@
 	async function copyLink() {
 		try {
 			await navigator.clipboard.writeText(link);
-			toast(S.linkCopied);
+			flash('link');
 		} catch {
 			/* the address stays selectable in its field */
 		}
@@ -116,7 +135,7 @@
 			}
 			if (kind === 'copy') {
 				await navigator.clipboard.write([new ClipboardItem({ 'image/png': blob })]);
-				toast(S.copied);
+				flash('image');
 			}
 			if (kind === 'download') {
 				const a = document.createElement('a');
@@ -138,7 +157,9 @@
 	{#if data}
 		<div class="head">
 			<h2>{S.title}</h2>
-			<button type="button" class="close" aria-label={S.close} onclick={() => (open = false)}>×</button>
+			<button type="button" class="close" aria-label={S.close} onclick={() => (open = false)}>
+				<svg viewBox="0 0 16 16" width="16" height="16" aria-hidden="true"><path d="M3.5 3.5l9 9M12.5 3.5l-9 9" stroke="currentColor" stroke-width="2" stroke-linecap="round" fill="none"/></svg>
+			</button>
 		</div>
 
 		<div class="stage" onpointerdown={down} onpointerup={up} role="group" aria-roledescription="carousel" aria-label={S.layoutsLabel}>
@@ -167,10 +188,11 @@
 			{#if canShareFiles}<button type="button" class="primary" disabled={busy} onclick={() => act('share')}>{S.share}</button>{/if}
 			<button type="button" class={canShareFiles ? 'ghost' : 'primary'} disabled={busy} onclick={() => act('download')}>{S.download}</button>
 			{#if canCopy}<button type="button" class="ghost" disabled={busy} onclick={() => act('copy')}>{S.copy}</button>{/if}
-			{#if session.me && link === null}<button type="button" class="ghost" disabled={busy} onclick={() => (link = 'confirm')}>{S.link}</button>{/if}
+			{#if session.me && link === null}<button type="button" class="ghost" disabled={busy} onclick={() => showLink('confirm')}>{S.link}</button>{/if}
 		</div>
+		{#if copied === 'image'}<p class="ok" role="status">{S.copied}</p>{/if}
 		{#if link === 'confirm'}
-			<div class="link warn" role="alert">
+			<div class="link warn" role="alert" bind:this={linkBox}>
 				<p>{S.linkWarn}</p>
 				<div class="link-actions">
 					<button type="button" class="ghost" onclick={() => (link = null)}>{S.linkCancel}</button>
@@ -178,12 +200,13 @@
 				</div>
 			</div>
 		{:else if link}
-			<div class="link">
+			<div class="link" bind:this={linkBox}>
 				<label for="share-link">{S.linkReady}</label>
 				<div class="link-row">
 					<input id="share-link" type="text" readonly value={link} onfocus={(e) => e.currentTarget.select()} />
 					<button type="button" class="primary" onclick={copyLink}>{S.linkCopy}</button>
 				</div>
+				{#if copied === 'link'}<p class="ok" role="status">{S.linkCopied}</p>{/if}
 			</div>
 		{/if}
 		<p class="note">{S.lead}</p>
@@ -198,7 +221,12 @@
 	@keyframes rise { from { opacity: 0; transform: translateY(18px) scale(0.98); } }
 	.head { display: flex; justify-content: space-between; align-items: center; margin-bottom: 14px; }
 	h2 { margin: 0; font-size: 20px; }
-	.close { width: 40px; height: 40px; border: none; border-radius: 50%; background: var(--surface-2); font-size: 24px; line-height: 1; color: var(--text-2); }
+	.close { flex: none; display: grid; place-items: center; width: 40px; height: 40px; min-width: 0; min-height: 0; padding: 0;
+		border: none; border-radius: 50%; background: var(--surface-2); color: var(--text-2); }
+	.close:hover { color: var(--text); }
+	.ok { margin: 10px 0 0; text-align: center; font-size: 14px; font-weight: 600; color: #1d7a3e; }
+	.link .ok { text-align: left; }
+	:global([data-mode='sombre']) .ok { color: #7ad69a; }
 	.stage { position: relative; overflow: hidden; border-radius: 12px; background: var(--surface-2); touch-action: pan-y; user-select: none; }
 	.slides { display: flex; transition: transform 420ms cubic-bezier(0.22, 0.8, 0.26, 1); }
 	.slide { flex: 0 0 100%; display: flex; justify-content: center; align-items: center; height: min(52dvh, 460px); padding: 18px; box-sizing: border-box; }
