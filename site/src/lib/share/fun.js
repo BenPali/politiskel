@@ -14,7 +14,7 @@ const MONO = "ui-monospace, Menlo, 'Courier New', monospace";
 /* ---------- copy ---------- */
 export const COPY = {
 	cards: {
-		rpg: ['Carte de personnage', '750 × 1050, carte à collectionner'],
+		rpg: ['Carte de personnage', '750 × 1050, carte de jeu à collectionner'],
 		tabloid: ['Une de tabloïd', '1080 × 1350'],
 		boarding: ["Carte d'embarquement", '1200 × 630'],
 		receipt: ['Ticket de caisse des opinions', '720 × 1400']
@@ -129,19 +129,14 @@ const all = (d) => [...d.axes, ...d.readings];
 const pole = (r) => r.ends[r.v >= 0 ? 1 : 0];
 let uid = 0;
 
-/* ---------- 1. character card, in the spirit of a collectible card ---------- */
-/* metal of the frame by rarity: light, mid, dark */
+/* ---------- 1. character card, laid out like a classic trading card game card ---------- */
+/* the set symbol's metal by rarity: light, mid, dark */
 const METAL = [
 	['#eef1f4', '#9aa2ab', '#4d535a'],
 	['#d6e6ff', '#3f7fe0', '#163a7a'],
 	['#f0dcff', '#9446d8', '#43176b'],
 	['#fff4c2', '#d8a31a', '#6e4a06']
 ];
-/* a filigree curl for a corner, drawn for the top-left and mirrored */
-const curl = (x, y, sx, sy, col, k = 1) =>
-	`<g transform="translate(${x} ${y}) scale(${sx * k} ${sy * k})" fill="none" stroke="${col}" stroke-width="2.6" stroke-linecap="round">` +
-	`<path d="M0 34 C0 12 12 0 34 0"/><path d="M8 40 C6 22 18 10 36 10 C28 14 24 22 28 28 C32 34 40 30 40 24"/>` +
-	`<path d="M40 8 C22 6 10 18 10 36 C14 28 22 24 28 28"/><circle cx="18" cy="18" r="4" fill="${col}" stroke="none"/></g>`;
 /* the rarity mark: a disc, a lozenge, a star, a crown */
 function rarityMark(r, cx, cy, s, fill, edge) {
 	const shape = [
@@ -152,73 +147,89 @@ function rarityMark(r, cx, cy, s, fill, edge) {
 	][r];
 	return `<g fill="${fill}" stroke="${edge}" stroke-width="2">${shape}</g>`;
 }
-const SHIELD = 'M0 0 H84 V46 C84 74 58 90 42 98 C26 90 0 74 0 46 Z';
-const flavourOf = (b) => (DEEDS[b.key] ? cap(DEEDS[b.key]) + '.' : '');
+/* colours: a badge's rim, mixed with white or black */
+const hex = (c) => [1, 3, 5].map((i) => parseInt(c.slice(i, i + 2), 16));
+const mix = (c, to, k) => '#' + hex(c).map((v, i) => Math.round(v + (hex(to)[i] - v) * k).toString(16).padStart(2, '0')).join('');
+const dark = (c) => { const [r, g, b] = hex(c); return 0.299 * r + 0.587 * g + 0.114 * b < 140; };
+/* rules text: what each skill does, in the card game's own phrasing */
+const RULES = [
+	(deed) => 'Quand cette créature entre en jeu, elle ' + deed + '.',
+	(deed) => 'Au début de chaque campagne, cette créature ' + deed + '.',
+	(deed) => 'Une fois par législature, cette créature ' + deed + '.'
+];
+const QUOTES = [
+	'Mes idées ne sont pas extrêmes, c\'est le monde qui est tiède.',
+	'Je ne change pas d\'avis, j\'affine ma position.',
+	'Le débat est ouvert, tant qu\'on finit d\'accord avec moi.',
+	'J\'ai fait le test deux fois, pour être sûr.',
+	'Chaque boussole a son nord. Le mien est le bon.'
+];
+const to10 = (v) => (Number.isFinite(v) ? Math.max(1, Math.min(10, Math.round(((v + 100) / 200) * 9) + 1)) : '?');
 function rpg(d, ART) {
 	const W = 750, H = 1050, P = 'r' + ++uid;
 	const rarity = rarityOf(d), [ml, mm, md] = METAL[rarity];
-	const ink = '#2a2016', ink2 = '#6a563a';
+	const traits = traitBadges(d);
+	const rim = (b) => (ART && b && ART[b.key] ? ART[b.key].rim : '#8a8a85');
+	const frame = rim(traits[0]), bar = mix(frame, '#ffffff', 0.72), edge = mix(frame, '#000000', 0.55);
+	const onFrame = dark(frame) ? '#f4efe4' : '#1a1712';
+	const ink = '#1d1813';
 	const defs =
-		`<linearGradient id="${P}metal" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="${ml}"/><stop offset=".35" stop-color="${mm}"/><stop offset=".7" stop-color="${md}"/><stop offset="1" stop-color="${mm}"/></linearGradient>` +
-		`<linearGradient id="${P}rim" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="${ml}"/><stop offset=".5" stop-color="${mm}"/><stop offset="1" stop-color="${md}"/></linearGradient>` +
-		`<linearGradient id="${P}shine" x1="0" y1="0" x2="1" y2="1"><stop offset=".25" stop-color="#fff" stop-opacity="0"/><stop offset=".42" stop-color="#fff" stop-opacity=".45"/><stop offset=".5" stop-color="#fff" stop-opacity="0"/><stop offset=".62" stop-color="#fff" stop-opacity=".2"/><stop offset=".7" stop-color="#fff" stop-opacity="0"/></linearGradient>` +
-		`<linearGradient id="${P}parch" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#f7ecd2"/><stop offset="1" stop-color="#e6d3ab"/></linearGradient>` +
-		`<radialGradient id="${P}vig" cx=".5" cy=".45" r=".75"><stop offset=".55" stop-color="#000" stop-opacity="0"/><stop offset="1" stop-color="#000" stop-opacity=".55"/></radialGradient>` +
-		`<linearGradient id="${P}light" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#fff" stop-opacity=".35"/><stop offset=".45" stop-color="#fff" stop-opacity="0"/></linearGradient>` +
-		`<clipPath id="${P}art"><path d="M64 148 Q64 136 76 136 H674 Q686 136 686 148 V548 H64 Z"/></clipPath>` +
-		`<filter id="${P}cloth" x="0" y="0" width="1" height="1"><feTurbulence type="fractalNoise" baseFrequency=".006 .018" numOctaves="2" seed="4"/>` +
-		`<feDisplacementMap in="SourceGraphic" scale="12" xChannelSelector="R" yChannelSelector="G"/></filter>` +
-		`<linearGradient id="${P}fold" x1="0" y1="0" x2="1" y2="0">${Array.from({ length: 9 }, (_, i) => `<stop offset="${i / 8}" stop-color="${i % 2 ? '#000' : '#fff'}" stop-opacity="${i % 2 ? 0.16 : 0.1}"/>`).join('')}</linearGradient>` +
-		`<pattern id="${P}grain" width="7" height="7" patternUnits="userSpaceOnUse"><circle cx="2" cy="3" r=".8" fill="#6b4a1e" opacity=".09"/><circle cx="5.5" cy="6" r=".6" fill="#6b4a1e" opacity=".07"/></pattern>`;
+		`<filter id="${P}tex"><feTurbulence type="fractalNoise" baseFrequency=".85" numOctaves="2" seed="7"/><feColorMatrix values="0 0 0 0 0  0 0 0 0 0  0 0 0 0 0  0 0 0 .22 0"/>` +
+		`<feComposite in2="SourceGraphic" operator="in"/><feBlend in="SourceGraphic" mode="multiply"/></filter>` +
+		`<linearGradient id="${P}bar" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="${mix(bar, '#ffffff', 0.35)}"/><stop offset="1" stop-color="${bar}"/></linearGradient>` +
+		`<linearGradient id="${P}box" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#f6efdd"/><stop offset="1" stop-color="#e9dfc6"/></linearGradient>`;
 	let s = svgOpen(W, H, defs);
-	/* frame: metal by rarity, a sheen on it, then the dark bevel */
-	s += `<rect width="${W}" height="${H}" rx="36" fill="url(#${P}metal)"/><rect width="${W}" height="${H}" rx="36" fill="url(#${P}shine)"/>`;
-	s += `<rect x="6" y="6" width="${W - 12}" height="${H - 12}" rx="31" fill="none" stroke="${ml}" stroke-opacity=".7" stroke-width="2"/>`;
-	s += `<rect x="30" y="30" width="${W - 60}" height="${H - 60}" rx="18" fill="#1b1510"/>`;
-	for (const [x, y, sx, sy] of [[16, 16, 1, 1], [W - 16, 16, -1, 1], [16, H - 16, 1, -1], [W - 16, H - 16, -1, -1]])
-		s += curl(x, y, sx, sy, md, 0.9) + `<circle cx="${x + sx * 13}" cy="${y + sy * 13}" r="6" fill="${ml}" stroke="${md}" stroke-width="2"/>`;
-	/* title plate */
-	s += `<rect x="46" y="44" width="${W - 92}" height="78" rx="14" fill="url(#${P}rim)"/><rect x="52" y="50" width="${W - 104}" height="66" rx="10" fill="url(#${P}parch)"/>`;
-	s += T(74, 98, d.alias, fit(d.alias, 44, 520, 0.56), { font: SERIF, w: 700, fill: ink, ls: 0.5 });
-	s += `<circle cx="${W - 88}" cy="83" r="27" fill="url(#${P}rim)"/><circle cx="${W - 88}" cy="83" r="22" fill="#1b1510"/>` + rarityMark(rarity, W - 88, 83, 22, `url(#${P}rim)`, ml);
-	/* illustration: the flag as a banner in the wind, lit from above */
-	s += `<rect x="54" y="128" width="642" height="430" rx="16" fill="url(#${P}rim)"/>`;
-	s += `<g clip-path="url(#${P}art)"><rect x="64" y="136" width="622" height="412" fill="#2a2018"/>`;
-	if (d.flag) s += `<g filter="url(#${P}cloth)"><image href="${d.flag}" x="30" y="110" width="690" height="464" preserveAspectRatio="xMidYMid slice"/></g>`;
-	s += `<rect x="64" y="136" width="622" height="412" fill="url(#${P}fold)"/><rect x="64" y="136" width="622" height="412" fill="url(#${P}light)"/><rect x="64" y="136" width="622" height="412" fill="url(#${P}vig)"/></g>`;
-	for (const [x, y, sx, sy] of [[64, 136, 1, 1], [686, 136, -1, 1]]) s += curl(x, y, sx, sy, ml, 0.75);
-	/* class ribbon over the foot of the picture */
-	const title = titleOf(d);
-	s += `<path d="M70 540 H104 V588 H70 L84 564 Z" fill="${md}"/><path d="M680 540 H646 V588 H680 L666 564 Z" fill="${md}"/>`;
-	s += `<path d="M96 530 H654 V580 H96 Z" fill="url(#${P}rim)"/><path d="M102 535 H648 V575 H102 Z" fill="#1b1510"/>`;
-	s += T(W / 2, 564, title, fit(title, 27, 510, 0.52), { font: SERIF, w: 700, fill: ml, anchor: 'middle', ls: 0.5 });
-	/* characteristics as heraldic shields */
-	s += `<rect x="46" y="598" width="${W - 92}" height="380" rx="14" fill="url(#${P}parch)"/><rect x="46" y="598" width="${W - 92}" height="380" rx="14" fill="url(#${P}grain)"/>`;
-	s += `<rect x="46" y="598" width="${W - 92}" height="380" rx="14" fill="none" stroke="${md}" stroke-width="2"/>`;
-	const stats = all(d).slice(0, 6), gap = (W - 92 - 36 - 6 * 84) / 5;
-	stats.forEach((r, i) => {
-		const x = 64 + i * (84 + gap), y = 616, n = Math.max(1, Math.round((Math.abs(r.v) / 100) * 20));
-		s += `<g transform="translate(${x} ${y})"><path d="${SHIELD}" fill="url(#${P}rim)"/><path d="${SHIELD}" transform="translate(6 6) scale(.857)" fill="#1b1510"/>` +
-			`<path d="M14 14 H70" stroke="${mm}" stroke-width="3" stroke-linecap="round" opacity=".6"/></g>`;
-		s += T(x + 42, y + 58, n, 34, { font: SERIF, w: 700, fill: ml, anchor: 'middle' });
-		const lab = wrap(pole(r), 12).slice(0, 2), ls = Math.min(15, ...lab.map((l) => fit(l, 15, 104, 0.52)));
-		s += lines(lab, x + 42, y + 124, ls, 1.2, { w: 650, fill: ink, anchor: 'middle' });
+	/* black border, then the frame in the profile's colour, lightly textured */
+	s += `<rect width="${W}" height="${H}" rx="34" fill="#0d0d0d"/>`;
+	s += `<rect x="30" y="30" width="${W - 60}" height="${H - 60}" rx="12" fill="${frame}" filter="url(#${P}tex)"/>`;
+	/* title bar: the name, and a cost of pips in the colours of the main traits */
+	const pill = (y, h) => `<rect x="44" y="${y}" width="${W - 88}" height="${h}" rx="${h / 2}" fill="url(#${P}bar)" stroke="${edge}" stroke-width="3"/>`;
+	s += pill(44, 64);
+	const pips = traits.slice(0, 3);
+	s += T(70, 89, d.alias, fit(d.alias, 38, 560 - pips.length * 40, 0.55), { font: SERIF, w: 700, fill: ink });
+	pips.forEach((b, i) => {
+		const cx = W - 78 - (pips.length - 1 - i) * 38, c = rim(b);
+		s += `<circle cx="${cx}" cy="76" r="16" fill="#1a1712" opacity=".35" transform="translate(1.5 2)"/><circle cx="${cx}" cy="76" r="16" fill="${c}" stroke="${mix(c, '#000000', 0.4)}" stroke-width="2"/>` +
+			`<circle cx="${cx - 5}" cy="70" r="5" fill="#fff" opacity=".45"/>` + T(cx, 83, b.level, 19, { font: SERIF, w: 700, fill: dark(c) ? '#fff' : '#1a1712', anchor: 'middle' });
 	});
-	/* skills: the three strongest badges, with a line of flavour */
-	s += `<path d="M70 772 H${W - 70}" stroke="${md}" stroke-width="1.5" opacity=".5"/>`;
-	traitBadges(d).slice(0, 3).forEach((b, i) => {
-		const y = 786 + i * 62;
-		s += badge(ART, b, 68, y, 58);
-		s += T(138, y + 25, b.name, fit(b.name, 21, 420), { font: SERIF, w: 700, fill: ink });
-		s += T(W - 70, y + 25, ['I', 'II', 'III'][b.level - 1], 18, { font: SERIF, w: 700, fill: md, anchor: 'end' });
-		const f = flavourOf(b);
-		s += T(138, y + 48, f, fit(f, 16, 530, 0.5), { font: SERIF, italic: true, fill: ink2 });
+	/* illustration: the flag as it is */
+	s += `<rect x="54" y="116" width="${W - 108}" height="${((W - 108) * 2) / 3}" fill="#0d0d0d"/>`;
+	s += flag(d, 58, 120, W - 116);
+	const artBottom = 116 + ((W - 108) * 2) / 3;
+	/* type bar: the class, and the set symbol in the rarity's metal */
+	s += pill(artBottom + 10, 56);
+	const type = 'Créature politique : ' + titleOf(d);
+	s += T(70, artBottom + 47, type, fit(type, 25, 540, 0.5), { font: SERIF, w: 700, fill: ink });
+	s += rarityMark(rarity, W - 78, artBottom + 38, 22, mm, md);
+	/* text box: the skills as rules, a rule, then flavour */
+	const boxTop = artBottom + 76, boxBottom = H - 92;
+	s += `<rect x="58" y="${boxTop}" width="${W - 116}" height="${boxBottom - boxTop}" fill="url(#${P}box)" stroke="${edge}" stroke-width="2"/>`;
+	let y = boxTop + 38;
+	const size = 20, lh = 1.28;
+	traits.slice(0, 3).forEach((b, i) => {
+		const deed = DEEDS[b.key] || 'agit';
+		const full = b.name + ' : ' + RULES[i](deed);
+		const rows = wrap(full, 60);
+		rows.forEach((row, k) => {
+			if (k === 0 && row.startsWith(b.name))
+				s += `<text x="80" y="${y}" font-family="${SERIF}" font-size="${size}" fill="${ink}"><tspan font-weight="700">${esc(b.name)}</tspan>${esc(row.slice(b.name.length))}</text>`;
+			else s += T(80, y, row, size, { font: SERIF, fill: ink });
+			y += size * lh;
+		});
+		y += 8;
 	});
-	/* foot: rarity, the nearest party, a collector's number */
-	const no = String((hash(d.alias) % 144) + 1).padStart(3, '0') + ' / 144';
-	s += T(60, 1010, COPY.rarity[rarity], 16, { font: SERIF, w: 700, fill: ml });
-	if (d.nearest) s += T(W / 2, 1010, 'Allié : ' + d.nearest.name, fit('Allié : ' + d.nearest.name, 15, 330), { fill: ml, anchor: 'middle', op: 0.9 });
-	s += T(W - 60, 1010, no, 15, { font: SERIF, fill: ml, anchor: 'end' });
+	if (!traits.length) { s += T(80, y, 'Cette créature n\'a pas encore de capacité.', size, { font: SERIF, fill: ink }); y += size * lh + 8; }
+	s += `<path d="M150 ${y - 6} H${W - 150}" stroke="${ink}" stroke-width="1" opacity=".45"/>`;
+	y += 26;
+	const quote = '« ' + QUOTES[hash(d.alias) % QUOTES.length] + ' »';
+	for (const row of wrap(quote.replace('« ', '« ').replace(' »', ' »'), 54)) { s += T(80, y, row, 18, { font: SERIF, italic: true, fill: ink }); y += 18 * lh; }
+	s += T(W - 80, y, d.alias, 17, { font: SERIF, italic: true, fill: ink, anchor: 'end' });
+	/* foot: the collector's number, and power / toughness from X and Y */
+	const no = String((hash(d.alias) % 144) + 1).padStart(3, '0') + '/144';
+	s += T(60, H - 50, no + ' · ' + COPY.rarity[rarity].charAt(0), 16, { font: SANS, w: 700, fill: onFrame });
+	s += T(60, H - 30, 'Politiskel', 15, { font: SERIF, italic: true, fill: onFrame, op: 0.9 });
+	s += `<rect x="${W - 184}" y="${H - 108}" width="128" height="58" rx="10" fill="url(#${P}bar)" stroke="${edge}" stroke-width="3"/>`;
+	s += T(W - 120, H - 66, to10(d.x) + '/' + to10(d.y), 34, { font: SERIF, w: 700, fill: ink, anchor: 'middle' });
 	return s + '</svg>';
 }
 

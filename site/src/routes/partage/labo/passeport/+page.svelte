@@ -54,6 +54,44 @@
 	/* which half of the spread a face is on: odd faces are left pages */
 	const leftSide = $derived(narrow && at % 2 === 1);
 
+	/* The security laminate of the data page: an iridescent film that follows
+	   the pointer (or the phone's tilt, when the browser gives it without
+	   asking), faint at rest and bright while it moves. Frozen when motion
+	   is reduced. */
+	let holo = $state({ mx: 0.35, my: 0.3, ang: 125, e: 0 });
+	let calm;
+	function shine(mx, my) {
+		const ang = Math.round((Math.atan2(my - 0.5, mx - 0.5) * 180) / Math.PI + 180);
+		holo = { mx, my, ang, e: 1 };
+		clearTimeout(calm);
+		calm = setTimeout(() => (holo = { ...holo, e: 0 }), 700);
+	}
+	onMount(() => {
+		if (matchMedia('(prefers-reduced-motion: reduce)').matches) return;
+		const move = (e) => {
+			const book = document.querySelector('.book');
+			if (!book) return;
+			const r = book.getBoundingClientRect();
+			shine(Math.min(1, Math.max(0, (e.clientX - r.left) / r.width)), Math.min(1, Math.max(0, (e.clientY - r.top) / r.height)));
+		};
+		const tilt = (e) => {
+			if (e.gamma === null || e.beta === null) return;
+			shine(Math.min(1, Math.max(0, 0.5 + e.gamma / 60)), Math.min(1, Math.max(0, 0.5 + (e.beta - 40) / 60)));
+		};
+		addEventListener('pointermove', move);
+		addEventListener('deviceorientation', tilt);
+		return () => {
+			removeEventListener('pointermove', move);
+			removeEventListener('deviceorientation', tilt);
+		};
+	});
+	/* the film's motif: the compass and the country code, repeated, as a mask */
+	const MOTIF = 'url("data:image/svg+xml,' + encodeURIComponent(
+		'<svg xmlns="http://www.w3.org/2000/svg" width="46" height="40" viewBox="0 0 46 40">' +
+		'<g fill="none" stroke="#000" stroke-width=".9"><rect x="15" y="4" width="16" height="16" rx="1"/><path d="M23 4 V20 M15 12 H31"/><circle cx="23" cy="12" r="10.5"/></g>' +
+		'<text x="23" y="34" font-family="Arial, sans-serif" font-size="7.5" font-weight="700" text-anchor="middle" letter-spacing="1.5">PSK</text></svg>'
+	) + '")';
+
 	/* the booklet: leaves turned so far, and the one turning now, drawn above the rest */
 	const LEAVES = 4;
 	let turned = $state(0);
@@ -178,7 +216,7 @@
 
 				<!-- leaf 1: data page / visas I -->
 				<div class="leaf" class:turned={1 < turned} class:moving={moving === 1} style="z-index: {z(1)}">
-					<div class="face front data">
+					<div class="face front data" style="--mx: {holo.mx}; --my: {holo.my}; --ang: {holo.ang}deg; --e: {holo.e}; --motif: {MOTIF}">
 						{@render paper('#eef2f0')}
 						<div class="pad">
 							<div class="head"><span>{COPY.republic}</span><span>P · PSK</span></div>
@@ -206,8 +244,13 @@
 							</div>
 							
 							<div class="mrz" aria-hidden="true"><div>{zone[0]}</div><div>{zone[1]}</div></div>
-							{#if d.flag}<img class="watermark" src={d.flag} alt="" />{/if}
+							{#if d.flag}
+								<!-- the ghost image: the photo again, small and iridescent, as on real passports -->
+								<div class="ghost-photo" aria-hidden="true"><img src={d.flag} alt="" /><span></span></div>
+							{/if}
 						</div>
+						<div class="film" aria-hidden="true"></div>
+						<div class="glare" aria-hidden="true"></div>
 					</div>
 					<div class="face back visas">
 						{@render paper('#f6efe2')}
@@ -357,7 +400,25 @@
 	.sign b.official { color: #a3262e; }
 	.mrz { position: absolute; left: 0; right: 0; bottom: 0; padding-bottom: 0.9em !important; font-family: ui-monospace, 'OCR B', 'SF Mono', Menlo, monospace; font-size: 0.6em; letter-spacing: 0.02em; line-height: 1.5; color: #1f2a33;
 		background: rgba(255, 255, 255, 0.55); margin: 0; padding: 0.5em 8% 0; white-space: pre; overflow: hidden; }
-	.watermark { position: absolute; right: 6%; bottom: 20%; width: 34%; opacity: 0.08; filter: grayscale(1); pointer-events: none; transform: rotate(-12deg); }
+	/* the laminate: a film of the motif in rainbow ink, a ghost photo, and a glare that follows the pointer */
+	.data .film, .data .glare { position: absolute; inset: 0; z-index: 2; pointer-events: none; transition: opacity 0.6s ease; }
+	.data .film {
+		background: linear-gradient(var(--ang), #ff5f9e, #ffd35a, #5fffb0, #5fb8ff, #c46bff, #ff5f9e);
+		background-size: 220% 220%; background-position: calc(var(--mx) * 100%) calc(var(--my) * 100%);
+		-webkit-mask: var(--motif) repeat; mask: var(--motif) repeat; -webkit-mask-size: 2.3em 2em; mask-size: 2.3em 2em;
+		mix-blend-mode: color-dodge; opacity: calc(0.1 + var(--e) * 0.24); }
+	.data .glare {
+		background:
+			conic-gradient(from var(--ang) at calc(var(--mx) * 100%) calc(var(--my) * 100%), rgba(255, 90, 160, 0.5), rgba(255, 220, 90, 0.5), rgba(90, 255, 180, 0.5), rgba(90, 170, 255, 0.5), rgba(200, 110, 255, 0.5), rgba(255, 90, 160, 0.5)),
+			radial-gradient(circle at calc(var(--mx) * 100%) calc(var(--my) * 100%), rgba(255, 255, 255, 0.55), rgba(255, 255, 255, 0) 32%);
+		mix-blend-mode: overlay; opacity: calc(0.04 + var(--e) * 0.3);
+		-webkit-mask: radial-gradient(circle at calc(var(--mx) * 100%) calc(var(--my) * 100%), #000, transparent 70%);
+		mask: radial-gradient(circle at calc(var(--mx) * 100%) calc(var(--my) * 100%), #000, transparent 70%); }
+	.ghost-photo { position: absolute; right: 9%; bottom: 17%; width: 22%; aspect-ratio: 3 / 2; pointer-events: none; transform: rotate(-3deg); }
+	.ghost-photo img { width: 100%; height: 100%; object-fit: cover; display: block; filter: grayscale(1) contrast(1.6); mix-blend-mode: multiply; opacity: 0.16; }
+	.ghost-photo span { position: absolute; inset: 0; background: linear-gradient(var(--ang), #ff7ab0, #ffe07a, #7affc4, #7ac4ff, #d08aff);
+		mix-blend-mode: color-dodge; opacity: calc(0.25 + var(--e) * 0.5); transition: opacity 0.6s ease;
+		-webkit-mask: linear-gradient(#000, #000); }
 
 	.stamp { position: absolute; mix-blend-mode: multiply; }
 	.stamp :global(svg) { display: block; width: 100%; height: auto; }
