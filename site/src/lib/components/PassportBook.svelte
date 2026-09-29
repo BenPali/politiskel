@@ -113,6 +113,13 @@
 	const next = () => (narrow ? go(at + 1) : turn(turned + 1));
 	const prev = () => (narrow ? go(at - 1) : turn(turned - 1));
 	const z = (i) => (i === moving ? 20 : i < turned ? i + 1 : LEAVES - i + 1);
+	/* The leaves share one 3D space, where a graphics card sorts by depth and
+	   not by z-index: leaves lying in the same plane then show in the order
+	   of the markup, the back cover over the first page. Each leaf is lifted
+	   by its place in its pile, a pixel a place, the turning one above all;
+	   on a turned leaf the lift is taken before the half turn, hence negative. */
+	const lift = (i) => (i === moving ? 6 : i < turned ? i + 1 : LEAVES - i);
+	const leafTransform = (i) => (i < turned ? `rotateY(-180deg) translateZ(${-lift(i)}px)` : `rotateY(0deg) translateZ(${lift(i)}px)`);
 
 	function key(e) {
 		if (e.key === 'ArrowRight') next();
@@ -186,7 +193,7 @@
 		<!-- svelte-ignore a11y_no_static_element_interactions -->
 		<div class="pp-book" class:pp-narrow={narrow} class:pp-left={leftSide} class:pp-closed={!narrow && turned === 0} class:pp-end={!narrow && turned === LEAVES} onpointerdown={down} onpointerup={up} onkeydown={key} tabindex="0" role="group" aria-label={COPY.title}>
 			<!-- leaf 0: cover / inside cover -->
-			<div class="pp-leaf" class:pp-turned={0 < turned} class:pp-moving={moving === 0} style="z-index: {z(0)}">
+			<div class="pp-leaf" class:pp-turned={0 < turned} class:pp-moving={moving === 0} style="z-index: {z(0)}; transform: {leafTransform(0)}">
 				<div class="pp-face pp-front pp-cover">
 					{@render leather(false)}
 					<div class="pp-cover-in">
@@ -209,7 +216,7 @@
 			</div>
 
 			<!-- leaf 1: data page / visas I -->
-			<div class="pp-leaf" class:pp-turned={1 < turned} class:pp-moving={moving === 1} style="z-index: {z(1)}">
+			<div class="pp-leaf" class:pp-turned={1 < turned} class:pp-moving={moving === 1} style="z-index: {z(1)}; transform: {leafTransform(1)}">
 				<div class="pp-face pp-front pp-data" bind:this={dataFace} style="--mx: {holo.mx}; --my: {holo.my}; --ang: {holo.ang}deg; --e: {holo.e}; --motif: {MOTIF}">
 					{@render paper('#eef2f0')}
 					<div class="pp-pad">
@@ -259,7 +266,7 @@
 			</div>
 
 			<!-- leaf 2: visas II / observations -->
-			<div class="pp-leaf" class:pp-turned={2 < turned} class:pp-moving={moving === 2} style="z-index: {z(2)}">
+			<div class="pp-leaf" class:pp-turned={2 < turned} class:pp-moving={moving === 2} style="z-index: {z(2)}; transform: {leafTransform(2)}">
 				<div class="pp-face pp-front pp-visas">
 					{@render paper('#f6efe2')}
 					<div class="pp-pad">
@@ -289,7 +296,7 @@
 			</div>
 
 			<!-- leaf 3: seal / back cover -->
-			<div class="pp-leaf" class:pp-turned={3 < turned} class:pp-moving={moving === 3} style="z-index: {z(3)}">
+			<div class="pp-leaf" class:pp-turned={3 < turned} class:pp-moving={moving === 3} style="z-index: {z(3)}; transform: {leafTransform(3)}">
 				<div class="pp-face pp-front pp-seal">
 					{@render paper('#f6efe2')}
 					<div class="pp-pad">
@@ -333,7 +340,6 @@
 	.pp-book:focus-visible { outline: 2px solid var(--accent); outline-offset: 6px; border-radius: 6px; }
 	.pp-leaf { position: absolute; left: 50%; top: 0; width: 50%; height: 100%; transform-origin: left center; transform-style: preserve-3d;
 		transition: transform 0.9s cubic-bezier(0.45, 0.05, 0.25, 1); }
-	.pp-leaf.pp-turned { transform: rotateY(-180deg); }
 	.pp-face { position: absolute; inset: 0; backface-visibility: hidden; -webkit-backface-visibility: hidden; overflow: hidden; border-radius: 0 6px 6px 0;
 		box-shadow: 0 1px 2px rgba(0, 0, 0, 0.2), 0 10px 24px rgba(0, 0, 0, 0.18); color: #1f2a33; }
 	.pp-face.pp-back { transform: rotateY(180deg); border-radius: 6px 0 0 6px; }
