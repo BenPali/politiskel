@@ -25,6 +25,19 @@
 	let deleting = $state(false);
 	let display = $state({ palette: 'classique', mode: 'auto', motion: 'full' });
 	onMount(() => (display = readDisplay()));
+
+	/* the public links one made, to open or revoke */
+	let shares = $state(null);
+	onMount(async () => {
+		const r = await api('GET', '/api/me/shares');
+		shares = r.ok ? r.data : [];
+	});
+	async function revoke(token) {
+		const r = await api('DELETE', '/api/me/shares/' + token);
+		if (!r.ok) return toast(apiError(r), { kind: 'error' });
+		shares = shares.filter((x) => x.token !== token);
+		toast(L.share.linkDeleted);
+	}
 	function set(k, v) {
 		display = { ...display, [k]: v };
 		applyDisplay(display);
@@ -194,6 +207,24 @@
 		</section>
 
 		<section>
+			<h2>{L.share.linksTitle}</h2>
+			<p class="section-lead">{L.share.linksLead}</p>
+			{#if shares && shares.length}
+				{#each shares as x (x.token)}
+					<div class="row">
+						<div class="lab"><h3>{(L.share.layouts[x.layout] || [x.layout])[0]}</h3><p>{L.share.linkWhen(new Date(x.created_at * 1000))}</p></div>
+						<div class="ctl links">
+							<a class="button ghost" href="/p/{x.token}" target="_blank" rel="noopener">{L.share.linkOpen}</a>
+							<button type="button" class="ghost" onclick={() => revoke(x.token)}>{L.share.linkDelete}</button>
+						</div>
+					</div>
+				{/each}
+			{:else if shares}
+				<p class="section-lead">{L.share.linksNone}</p>
+			{/if}
+		</section>
+
+		<section>
 			<h2>{L.accountSections.security}</h2>
 			<form class="row stack" onsubmit={changePassword}>
 				<div class="lab"><h3>{L.passwordTitle}</h3><p>{L.passwordHint}</p></div>
@@ -260,6 +291,8 @@
 	/* a line only between two settings, never under a title or after the last */
 	.row + .row, .inset + .row, .confirm + .row { border-top: 1px solid var(--border); }
 	.row.stack { grid-template-columns: minmax(0, 1fr); align-items: start; }
+	.section-lead { margin: 0 0 4px; font-size: 14px; color: var(--text-2); max-width: 70ch; }
+	.links { display: flex; gap: 8px; flex-wrap: wrap; }
 	.lab { min-width: 0; display: block; }
 	.lab h3 { font-family: var(--font-sans); font-size: 15.5px; font-weight: 650; margin: 0; text-transform: none; letter-spacing: 0; color: var(--text); }
 	.lab p { margin: 3px 0 0; font-size: 14px; line-height: 1.45; color: var(--text-2); max-width: 60ch; }

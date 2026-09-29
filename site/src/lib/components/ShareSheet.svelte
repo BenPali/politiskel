@@ -5,7 +5,9 @@
      here, in the browser. -->
 <script>
 	import { L } from '$lib/i18n/fr.js';
-	import { cardData, THEMES } from '$lib/share/card.js';
+	import { cardData, snapshotOf, THEMES } from '$lib/share/card.js';
+	import { api, apiError } from '$lib/api.js';
+	import { session } from '$lib/session.svelte.js';
 	import { SHARE_LAYOUTS as LAYOUTS } from '$lib/share/layouts.js';
 	import { cardPng } from '$lib/share/png.js';
 	import { toast } from '$lib/toast.svelte.js';
@@ -20,6 +22,8 @@
 	let index = $state(0);
 	let theme = $state('clair');
 	let busy = $state(false);
+	/* the public link: null, 'confirm', or the address once made */
+	let link = $state(null);
 
 	const data = $derived(open && p ? cardData(p, country) : null);
 	const layout = $derived(LAYOUTS[index]);
@@ -35,6 +39,7 @@
 			} catch {
 				/* private browsing */
 			}
+			link = null;
 			dialog.showModal();
 			if (!ART) import('$lib/badges/scenes/index.js').then((m) => (ART = m.ART));
 		} else if (!open && dialog.open) dialog.close();
@@ -67,6 +72,38 @@
 	async function png() {
 		return cardPng(layout.draw(data, ART, theme), layout.w, layout.h);
 	}
+	const toBase64 = (blob) => new Promise((ok, ko) => {
+		const r = new FileReader();
+		r.onload = () => ok(String(r.result).split(',')[1]);
+		r.onerror = ko;
+		r.readAsDataURL(blob);
+	});
+	/* The preview a link shows in a chat is a 1200 × 630 image: the card
+	   itself when it has that size, the plain card in its theme otherwise. */
+	async function makeLink() {
+		if (busy || !data) return;
+		busy = true;
+		try {
+			const og = layout.w === 1200 && layout.h === 630 ? layout : LAYOUTS[0];
+			const image = await toBase64(await cardPng(og.draw(data, ART, theme), og.w, og.h));
+			const r = await api('POST', '/api/me/shares', { layout: layout.key, theme, snapshot: snapshotOf(data), image });
+			if (r.ok) link = location.origin + r.data.url;
+			else toast(apiError(r), { kind: 'error' });
+		} catch {
+			toast(S.failed, { kind: 'error' });
+		} finally {
+			busy = false;
+		}
+	}
+	async function copyLink() {
+		try {
+			await navigator.clipboard.writeText(link);
+			toast(S.linkCopied);
+		} catch {
+			/* the address stays selectable in its field */
+		}
+	}
+
 	async function act(kind) {
 		if (busy || !data) return;
 		busy = true;
@@ -130,7 +167,25 @@
 			{#if canShareFiles}<button type="button" class="primary" disabled={busy} onclick={() => act('share')}>{S.share}</button>{/if}
 			<button type="button" class={canShareFiles ? 'ghost' : 'primary'} disabled={busy} onclick={() => act('download')}>{S.download}</button>
 			{#if canCopy}<button type="button" class="ghost" disabled={busy} onclick={() => act('copy')}>{S.copy}</button>{/if}
+			{#if session.me && link === null}<button type="button" class="ghost" disabled={busy} onclick={() => (link = 'confirm')}>{S.link}</button>{/if}
 		</div>
+		{#if link === 'confirm'}
+			<div class="link warn" role="alert">
+				<p>{S.linkWarn}</p>
+				<div class="link-actions">
+					<button type="button" class="ghost" onclick={() => (link = null)}>{S.linkCancel}</button>
+					<button type="button" class="primary" disabled={busy} onclick={makeLink}>{S.linkConfirm}</button>
+				</div>
+			</div>
+		{:else if link}
+			<div class="link">
+				<label for="share-link">{S.linkReady}</label>
+				<div class="link-row">
+					<input id="share-link" type="text" readonly value={link} onfocus={(e) => e.currentTarget.select()} />
+					<button type="button" class="primary" onclick={copyLink}>{S.linkCopy}</button>
+				</div>
+			</div>
+		{/if}
 		<p class="note">{S.lead}</p>
 	{/if}
 </dialog>
@@ -163,6 +218,12 @@
 	.dots.off { opacity: 0.35; margin-bottom: 4px; }
 	.fixed { margin: 0 0 14px; text-align: center; font-size: 13px; color: var(--text-3); }
 	.actions { display: flex; justify-content: center; gap: 10px; flex-wrap: wrap; }
+	.link { margin: 16px 0 0; padding: 14px 16px; border-radius: 12px; background: var(--surface-2); }
+	.link.warn p { margin: 0 0 12px; font-size: 14px; line-height: 1.5; color: var(--text-2); }
+	.link-actions { display: flex; justify-content: flex-end; gap: 10px; flex-wrap: wrap; }
+	.link label { display: block; font-size: 14px; font-weight: 650; margin-bottom: 8px; }
+	.link-row { display: flex; gap: 10px; }
+	.link-row input { flex: 1; min-width: 0; }
 	.note { margin: 14px auto 0; max-width: 56ch; text-align: center; font-size: 13px; color: var(--text-3); line-height: 1.45; }
 	@media (prefers-reduced-motion: reduce) { .slides { transition: none; } .sheet[open] { animation: none; } }
 	@media (max-width: 700px) {

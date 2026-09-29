@@ -16,8 +16,6 @@
 	import ReadingBands from '$lib/components/ReadingBands.svelte';
 	import PartyList from '$lib/components/PartyList.svelte';
 	import BadgeShelf from '$lib/components/BadgeShelf.svelte';
-	import PassportBook from '$lib/components/PassportBook.svelte';
-	import { cardData } from '$lib/share/card.js';
 	import ShareSheet from '$lib/components/ShareSheet.svelte';
 	import { badgesOf, sortBadges } from '$lib/badges/badges.js';
 
@@ -42,7 +40,7 @@
 	const others = $derived(p?.me ? board.members.map((m) => { const k = coords(m); return { id: m.id, alias: m.alias, x: k.x, y: k.y }; }) : null);
 	const badges = $derived(p && base ? sortBadges(badgesOf(p, base, { country, members: others })) : []);
 	let sharing = $state(false);
-	const passport = $derived(p && base && (base.x !== null || Object.keys(p.answers || {}).length) ? cardData(p, country) : null);
+	const passport = $derived(!!p && !!base && (base.x !== null || Object.keys(p.answers || {}).length > 0));
 	const source = $derived(p ? L.profileSource(hasPolitiscales(p), !!(q || c?.soc || c?.quiz)) : '');
 </script>
 
@@ -118,9 +116,12 @@
 						{/if}
 					</section>
 					{#if passport}
-						<section class="card" aria-label="Passeport">
-							<h2>Passeport</h2>
-							<PassportBook data={passport} />
+						<section class="card passport-link" aria-label={L.passport.title}>
+							<div>
+								<h2>{L.passport.title}</h2>
+								<p class="sub">{L.passport.linkLead}</p>
+							</div>
+							<a class="button ghost" href="/boussole/{encodeURIComponent(p.id)}/passeport">{L.passport.open}</a>
 						</section>
 					{/if}
 				</div>
@@ -159,6 +160,8 @@
 	.tabs a:hover { border-color: var(--border-strong); }
 	.tabs a[aria-current='page'] { border-color: var(--accent); background: var(--accent-soft); font-weight: 650; }
 	.sheet { display: grid; grid-template-columns: 480px minmax(0, 1fr); gap: 32px; align-items: start; }
+	.passport-link { display: flex; justify-content: space-between; align-items: center; gap: 16px; flex-wrap: wrap; }
+	.passport-link .sub { margin: 0; }
 	.main { display: flex; flex-direction: column; gap: 24px; min-width: 0; }
 	.head a { font-size: 14px; color: var(--text-2); }
 	.side { display: flex; flex-direction: column; gap: 24px; min-width: 0; }

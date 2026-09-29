@@ -1,0 +1,76 @@
+<!-- A profile someone chose to make public: the card they shared, their
+     passport, and a way to make one's own. The snapshot is read back
+     through fromSnapshot, which checks every field. -->
+<script>
+	import { onMount } from 'svelte';
+	import { page } from '$app/state';
+	import { L } from '$lib/i18n/fr.js';
+	import { api } from '$lib/api.js';
+	import { fromSnapshot } from '$lib/share/card.js';
+	import { SHARE_LAYOUTS } from '$lib/share/layouts.js';
+	import PassportBook from '$lib/components/PassportBook.svelte';
+
+	const S = L.share;
+	let state = $state('loading');
+	let share = $state(null);
+	let ART = $state(null);
+
+	onMount(async () => {
+		const token = page.params.token;
+		if (!/^[A-Za-z0-9_-]{22}$/.test(token)) return (state = 'missing');
+		const r = await api('GET', '/api/shares/' + token);
+		const data = r.ok ? fromSnapshot(r.data.snapshot) : null;
+		if (!data) return (state = 'missing');
+		share = { data, layout: SHARE_LAYOUTS.find((l) => l.key === r.data.layout) || SHARE_LAYOUTS[0], theme: r.data.theme, created: r.data.created_at };
+		state = 'ready';
+		ART = (await import('$lib/badges/scenes/index.js')).ART;
+	});
+</script>
+
+<svelte:head>
+	<title>{share ? S.publicTitle(share.data.alias) : S.publicTitleBare} · Politiskel</title>
+	<meta name="robots" content="noindex" />
+</svelte:head>
+
+{#if state === 'loading'}
+	<p class="status">{L.loadingPage}</p>
+{:else if state === 'missing'}
+	<div class="card missing">
+		<h1>{S.missingTitle}</h1>
+		<p class="lead">{S.missingLead}</p>
+		<a class="button primary" href="/">{S.makeYours}</a>
+	</div>
+{:else}
+	<div class="public">
+		<header>
+			<h1>{S.publicTitle(share.data.alias)}</h1>
+			<p class="lead">{S.publicLead(new Date(share.created * 1000))}</p>
+		</header>
+		<figure class="shared" class:tall={share.layout.h > share.layout.w}>{@html share.layout.draw(share.data, ART, share.theme)}</figure>
+		<section class="card passport" aria-label={L.passport.title}>
+			<h2>{L.passport.title}</h2>
+			<PassportBook data={share.data} {ART} />
+		</section>
+		<div class="card cta">
+			<p>{S.ctaPublic}</p>
+			<a class="button primary" href="/">{S.makeYours}</a>
+		</div>
+	</div>
+{/if}
+
+<style>
+	.status { color: var(--text-3); }
+	h1 { font-family: var(--font-display); font-size: clamp(30px, 5vw, 44px); font-weight: 700; margin: 0 0 6px; letter-spacing: -0.02em; overflow-wrap: anywhere; }
+	.lead { margin: 0; color: var(--text-2); }
+	.public { display: flex; flex-direction: column; gap: 28px; max-width: 960px; margin: 0 auto; }
+	.shared { margin: 0; }
+	.shared :global(svg) { display: block; width: 100%; height: auto; border-radius: 12px; box-shadow: 0 0 0 1px var(--border), var(--shadow-2); }
+	.shared.tall { max-width: 520px; margin: 0 auto; width: 100%; }
+	.card { padding: 24px; }
+	h2 { margin: 0 0 14px; font-size: 20px; }
+	.cta { display: flex; align-items: center; justify-content: space-between; gap: 16px; flex-wrap: wrap; }
+	.cta p { margin: 0; font-size: 16px; }
+	.missing { max-width: 560px; }
+	.missing .lead { margin: 8px 0 18px; }
+	@media (max-width: 700px) { .card { padding: 18px 16px; } }
+</style>
