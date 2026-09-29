@@ -11,7 +11,6 @@
 	import { session } from '$lib/session.svelte.js';
 	import { SHARE_LAYOUTS as LAYOUTS } from '$lib/share/layouts.js';
 	import { cardPng } from '$lib/share/png.js';
-	import { toast } from '$lib/toast.svelte.js';
 
 	/** p: one's own profile; country: the country of reference */
 	let { p, country, open = $bindable(false) } = $props();
@@ -26,8 +25,10 @@
 	/* the public link: null, 'confirm', or the address once made */
 	let link = $state(null);
 	let linkBox = $state(null);
-	/* a short green line under what was just copied */
+	/* a short green line under what was just copied; a red one for what
+	   failed, inside the dialog, since the page's toasts sit below it */
 	let copied = $state(null);
+	let problem = $state(null);
 	let copiedTimer = null;
 	function flash(what) {
 		copied = what;
@@ -59,6 +60,7 @@
 			}
 			link = null;
 			copied = null;
+			problem = null;
 			dialog.showModal();
 			if (!ART) import('$lib/badges/scenes/index.js').then((m) => (ART = m.ART));
 		} else if (!open && dialog.open) dialog.close();
@@ -102,14 +104,16 @@
 	async function makeLink() {
 		if (busy || !data) return;
 		busy = true;
+		problem = null;
 		try {
 			const og = layout.w === 1200 && layout.h === 630 ? layout : LAYOUTS[0];
 			const image = await toBase64(await cardPng(og.draw(data, ART, theme), og.w, og.h));
 			const r = await api('POST', '/api/me/shares', { layout: layout.key, theme, snapshot: snapshotOf(data), image });
 			if (r.ok) await showLink(location.origin + r.data.url);
-			else toast(apiError(r), { kind: 'error' });
+			/* an unexpected refusal keeps its code, so it can be traced */
+			else problem = apiError(r) + (L.apiErrors[r.data?.error] ? '' : ' (' + (r.data?.error || r.status) + ')');
 		} catch {
-			toast(S.failed, { kind: 'error' });
+			problem = S.failed;
 		} finally {
 			busy = false;
 		}
@@ -126,6 +130,7 @@
 	async function act(kind) {
 		if (busy || !data) return;
 		busy = true;
+		problem = null;
 		try {
 			/* Safari wants the clipboard written within the click itself: the
 			   item is given the image as a promise, before anything awaits */
@@ -149,7 +154,7 @@
 			}
 		} catch (e) {
 			/* a share the reader cancels is not a failure */
-			if (e?.name !== 'AbortError') toast(S.failed, { kind: 'error' });
+			if (e?.name !== 'AbortError') problem = S.failed;
 		} finally {
 			busy = false;
 		}
@@ -201,6 +206,7 @@
 					<button type="button" class="ghost" onclick={() => (link = null)}>{S.linkCancel}</button>
 					<button type="button" class="primary" disabled={busy} onclick={makeLink}>{S.linkConfirm}</button>
 				</div>
+				{#if problem}<p class="bad" role="alert">{problem}</p>{/if}
 			</div>
 		{:else if link}
 			<div class="link" bind:this={linkBox}>
@@ -212,6 +218,7 @@
 				{#if copied === 'link'}<p class="ok" role="status">{S.linkCopied}</p>{/if}
 			</div>
 		{/if}
+		{#if problem && link !== 'confirm'}<p class="bad" role="alert">{problem}</p>{/if}
 		<p class="note">{S.lead}</p>
 	{/if}
 </dialog>
@@ -228,7 +235,8 @@
 		border: none; border-radius: 50%; background: var(--surface-2); color: var(--text-2); }
 	.close:hover { color: var(--text); }
 	.ok { margin: 10px 0 0; text-align: center; font-size: 14px; font-weight: 600; color: #1d7a3e; }
-	.link .ok { text-align: left; }
+	.link .ok, .link .bad { text-align: left; }
+	.bad { margin: 10px 0 0; text-align: center; font-size: 14px; font-weight: 600; color: var(--danger, #b3321a); }
 	:global([data-mode='sombre']) .ok { color: #7ad69a; }
 	.stage { position: relative; overflow: hidden; border-radius: 12px; background: var(--surface-2); touch-action: pan-y; user-select: none; }
 	.slides { display: flex; transition: transform 420ms cubic-bezier(0.22, 0.8, 0.26, 1); }
