@@ -126,8 +126,9 @@ pub fn flag(v: &str) -> Result<(), &'static str> {
 }
 
 /// A shared card's layout or theme name, as the site names them.
+/// A layout or theme key as the site names them (`squareFull`, `clair`).
 pub fn share_label(v: &str) -> Result<(), &'static str> {
-    if (1..=32).contains(&v.len()) && v.bytes().all(|b| b.is_ascii_lowercase() || b.is_ascii_digit() || b == b'_' || b == b'-') {
+    if (1..=32).contains(&v.len()) && v.bytes().all(|b| b.is_ascii_alphanumeric() || b == b'_' || b == b'-') {
         Ok(())
     } else {
         Err("share_bad_label")

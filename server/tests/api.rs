@@ -833,8 +833,18 @@ async fn shares_are_bounded() {
     assert_eq!(a.call("POST", "/api/me/shares", Some(ok)).await.0, StatusCode::CREATED);
     let mut label = new_share("Omar");
     label["layout"] = json!("Wide Card");
+    assert_eq!(a.call("POST", "/api/me/shares", Some(label.clone())).await.0, StatusCode::BAD_REQUEST);
+    label["layout"] = json!("<b>");
     assert_eq!(a.call("POST", "/api/me/shares", Some(label)).await.0, StatusCode::BAD_REQUEST);
-    for _ in 0..19 {
+    // every card and theme key the site sends (site/src/lib/share), camelCase included
+    for (layout, theme) in [("wide", "clair"), ("squareFull", "sombre"), ("readings", "corpo"), ("story", "sepia"),
+                            ("tabloid", "pop"), ("boarding", "clair"), ("receipt", "clair")] {
+        let mut s = new_share("Omar");
+        s["layout"] = json!(layout);
+        s["theme"] = json!(theme);
+        assert_eq!(a.call("POST", "/api/me/shares", Some(s)).await.0, StatusCode::CREATED, "{layout}");
+    }
+    for _ in 0..12 {
         assert_eq!(a.call("POST", "/api/me/shares", Some(new_share("Omar"))).await.0, StatusCode::CREATED);
     }
     let (s, b) = a.call("POST", "/api/me/shares", Some(new_share("Omar"))).await;
