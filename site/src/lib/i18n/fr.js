@@ -1159,6 +1159,23 @@ export const LOCALES = {
         explorer: { label: null, rule: "Tous les thèmes", names: ["Explorateur"] },
         diligent: { label: null, rule: "Aucune question sautée", names: ["Consciencieux"] }
       }
+    },
+    /* the profile card to share: layouts, and what each line says */
+    share: {
+      title: "Partager mon profil",
+      lead: "Ton profil en image, dans plusieurs formats. Seuls des résultats y figurent : ta position, tes lectures, tes badges, ton drapeau ; jamais tes réponses.",
+      nearest: name => "Le plus proche : " + name,
+      nearestFit: (fit, d) => "proximité " + fit + ", " + d + " pts",
+      badgesCount: n => n ? n + " badge" + (n > 1 ? "s" : "") : "Pas encore de badge",
+      none: "Pas encore de profil : réponds à un questionnaire ou importe ton résultat PolitiScales.",
+      layouts: {
+        wide: ["Carte", "1200 × 630, l'aperçu d'un lien"],
+        wideBadges: ["Carte badges", "1200 × 630"],
+        square: ["Carré boussole", "1080 × 1080"],
+        squareFull: ["Carré complet", "1080 × 1080"],
+        story: ["Story", "1080 × 1920"],
+        hero: ["Badge vedette", "1080 × 1080"]
+      }
     }
   }
 };
