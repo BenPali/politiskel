@@ -1,9 +1,9 @@
 /* The guided tour for newcomers: a few steps across the site, each on its
-   page, each pointing at one thing. It starts on its own the first time a
-   member is signed in, and again from the account page. Seen — finished or
-   skipped — is kept with the account, so it shows once per person on any
-   browser; this browser keeps it too, for guests and as the first
-   version's record, carried over to the account. */
+   page, each pointing at one thing. It never starts on its own on a page
+   someone opened: only once, right after an account is created, when
+   neither that account nor this browser has seen it; and whenever asked
+   from the account page. Seen (finished or skipped) is kept with the
+   account and in this browser. */
 
 import { L } from '$lib/i18n/fr.js';
 import { api } from '$lib/api.js';
@@ -72,26 +72,28 @@ const tellServer = () => {
 	}
 };
 
-/** whether the tour has yet to be seen: by this account, signed in */
-export function tourPending() {
-	if (!session.me) return read() !== 'done';
-	if (session.me.tour_seen) return false;
-	const who = session.me.username;
-	/* seen here, but the server was not told in time: tell it now */
-	if (seenHere().includes(who)) {
-		session.me.tour_seen = true;
-		tellServer();
+/* An account just created asks for the tour, for this tab only: the page
+   it lands on then offers it, once. */
+const OFFER_KEY = 'politiskel.tour.offer.v1';
+export function offerTourAfterSignup(who) {
+	try {
+		sessionStorage.setItem(OFFER_KEY, who);
+	} catch {
+		/* private browsing: no tour, which is no harm */
+	}
+}
+/** whether to start the tour now: an account created in this tab a moment
+    ago, which has not seen it, in a browser that has never shown it */
+export function tourOffered() {
+	let who = null;
+	try {
+		who = sessionStorage.getItem(OFFER_KEY);
+		sessionStorage.removeItem(OFFER_KEY);
+	} catch {
 		return false;
 	}
-	/* seen in this browser before accounts kept it: the first account signed
-	   in here takes it over, and the browser's record goes — another
-	   account on this browser has not seen it */
-	if (read() === 'done') {
-		forget();
-		markSeen();
-		return false;
-	}
-	return true;
+	if (!who || !session.me || session.me.username !== who || session.me.tour_seen) return false;
+	return read() !== 'done' && seenHere().length === 0;
 }
 function markSeen() {
 	if (!session.me) return write('done');
@@ -101,13 +103,6 @@ function markSeen() {
 		tellServer();
 	}
 }
-const forget = () => {
-	try {
-		localStorage.removeItem(KEY);
-	} catch {
-		/* private browsing */
-	}
-};
 
 export function startTour() {
 	tour.step = 0;

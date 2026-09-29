@@ -2,6 +2,7 @@
      (left by /rejoindre/<code>), and explains otherwise. -->
 <script>
 	import { goto } from '$app/navigation';
+	import { offerTourAfterSignup } from '$lib/tour.svelte.js';
 	import { L } from '$lib/i18n/fr.js';
 	import { toast, dismissErrors } from '$lib/toast.svelte.js';
 	import { passwordMissing } from '$lib/password.js';
@@ -43,6 +44,8 @@
 			if (put.ok) writeGuest(null);
 		}
 		await refresh();
+		/* the tour, offered once to the account just made (as the server named it) */
+		if (session.me) offerTourAfterSignup(session.me.username);
 		/* an invitation brought them here: back to it, to decide on joining */
 		goto(invite ? '/rejoindre/' + encodeURIComponent(invite) : '/boussole');
 	}

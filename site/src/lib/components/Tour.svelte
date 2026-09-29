@@ -8,7 +8,7 @@
 	import { page } from '$app/state';
 	import { L } from '$lib/i18n/fr.js';
 	import { session } from '$lib/session.svelte.js';
-	import { tour, STEPS, nextStep, prevStep, endTour, startTour, tourPending } from '$lib/tour.svelte.js';
+	import { tour, STEPS, nextStep, prevStep, endTour, startTour, tourOffered } from '$lib/tour.svelte.js';
 
 	const step = $derived(tour.active ? STEPS[tour.step] : null);
 	/** the spotlight, in viewport pixels; null: a centred card, no target */
@@ -63,14 +63,13 @@
 		else if (e.key === 'ArrowLeft') prevStep();
 	}
 
-	/* a newcomer's first signed-in page starts it — not while joining a group */
+	/* only an account just created in this tab, on the compass it lands on
+	   (after joining a group, when it came through an invitation) */
 	let offered = false;
 	$effect(() => {
-		if (offered || !session.me || tour.active) return;
-		const p = page.url.pathname;
-		if (p.startsWith('/rejoindre') || p === '/inscription' || p === '/connexion') return;
+		if (offered || !session.me || tour.active || page.url.pathname !== '/boussole') return;
 		offered = true;
-		if (tourPending()) setTimeout(startTour, 800);
+		if (tourOffered()) setTimeout(startTour, 800);
 	});
 
 	/* the card: below the spotlight when there is room, else above; always on screen */
