@@ -130,6 +130,9 @@
 							<a class="button ghost" href="/boussole/{encodeURIComponent(p.id)}/passeport">{L.passport.open}</a>
 						</section>
 					{/if}
+					{#if base && base.x !== null && base.y !== null}
+						<p class="fun-link"><a href="/boussole/{encodeURIComponent(p.id)}/fun">{L.figures.link(p.me)}</a></p>
+					{/if}
 				</div>
 
 				<div class="side">
@@ -180,6 +183,9 @@
 	.sheet { display: grid; grid-template-columns: 480px minmax(0, 1fr); gap: 32px; align-items: start; }
 	.passport-link { display: flex; justify-content: space-between; align-items: center; gap: 16px; flex-wrap: wrap; }
 	.passport-link .sub { margin: 0; }
+	.fun-link { margin: -8px 0 0; padding: 0 4px; font-size: 13.5px; }
+	.fun-link a { display: inline-flex; align-items: center; min-height: 36px; color: var(--text-3); }
+	.fun-link a:hover { color: var(--text); }
 	.main { display: flex; flex-direction: column; gap: 24px; min-width: 0; }
 	.head a { font-size: 14px; color: var(--text-2); }
 	.side { display: flex; flex-direction: column; gap: 24px; min-width: 0; }
