@@ -35,6 +35,24 @@
 	const stampArt = $derived(ART && d ? stamps.map((b, i) => stampSvg(ART, b, i, date)) : []);
 	const rings = guilloche(150, 200, 130, 16, 9, 1);
 	const lines = waves(300, 426, 30, 2);
+	/* the guilloche that runs over the photo's edge */
+	const overLines = waves(120, 80, 7, 4).map((l, i) => l);
+
+	/* on a phone, one page at a time: `at` counts faces, 0 the cover to 7 the back */
+	let narrow = $state(false);
+	let at = $state(0);
+	onMount(() => {
+		const q = matchMedia('(max-width: 699px)');
+		const set = () => {
+			narrow = q.matches;
+			at = narrow ? (turned === 0 ? 0 : turned * 2 - 1) : at;
+		};
+		set();
+		q.addEventListener('change', set);
+		return () => q.removeEventListener('change', set);
+	});
+	/* which half of the spread a face is on: odd faces are left pages */
+	const leftSide = $derived(narrow && at % 2 === 1);
 
 	/* the booklet: leaves turned so far, and the one turning now, drawn above the rest */
 	const LEAVES = 4;
@@ -48,8 +66,14 @@
 		clearTimeout(timer);
 		timer = setTimeout(() => (moving = -1), 900);
 	}
-	const next = () => turn(turned + 1);
-	const prev = () => turn(turned - 1);
+	const FACES = LEAVES * 2;
+	function go(m) {
+		if (m < 0 || m >= FACES) return;
+		at = m;
+		turn(Math.ceil(m / 2));
+	}
+	const next = () => (narrow ? go(at + 1) : turn(turned + 1));
+	const prev = () => (narrow ? go(at - 1) : turn(turned - 1));
 	const z = (i) => (i === moving ? 20 : i < turned ? i + 1 : LEAVES - i + 1);
 
 	function key(e) {
@@ -69,7 +93,7 @@
 		if (Math.abs(dx) < 8 && Math.abs(dy) < 8) {
 			/* a tap: the right half turns forward, the left half back */
 			const r = e.currentTarget.getBoundingClientRect();
-			if (turned === 0 || e.clientX > r.left + r.width / 2) next();
+			if (narrow || turned === 0 || e.clientX > r.left + r.width / 2) next();
 			else prev();
 		}
 	}
@@ -79,14 +103,36 @@
 <svelte:window onkeydown={key} />
 
 {#snippet leather(back)}
+	{@const k = back ? 'b' : 'f'}
 	<svg class="bg" viewBox="0 0 300 426" preserveAspectRatio="none" aria-hidden="true">
 		<defs>
-			<linearGradient id="lth{back ? 'b' : 'f'}" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#3a1418" /><stop offset=".55" stop-color="#5a1d24" /><stop offset="1" stop-color="#2a0e12" /></linearGradient>
-			<filter id="grain{back ? 'b' : 'f'}"><feTurbulence type="fractalNoise" baseFrequency="1.6" numOctaves="3" seed="7" /><feColorMatrix type="matrix" values="0 0 0 0 0  0 0 0 0 0  0 0 0 0 0  0 0 0 .5 0" /><feComposite in2="SourceGraphic" operator="in" /></filter>
+			<linearGradient id="lth{k}" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#4a171c" /><stop offset=".5" stop-color="#561c22" /><stop offset="1" stop-color="#3e1317" /></linearGradient>
+			<!-- the grain: fine noise lit from the top left, pebbled like a hide -->
+			<filter id="grain{k}" x="0" y="0" width="100%" height="100%">
+				<feTurbulence type="fractalNoise" baseFrequency="1.1" numOctaves="3" seed={back ? 5 : 3} result="n" />
+				<feDiffuseLighting in="n" surfaceScale="2.2" lighting-color="#ffffff" result="l"><feDistantLight azimuth="225" elevation="48" /></feDiffuseLighting>
+				<feColorMatrix in="l" type="matrix" values="0.33 0.33 0.33 0 0  0.33 0.33 0.33 0 0  0.33 0.33 0.33 0 0  0 0 0 1 0" />
+			</filter>
+			<!-- the hide's own unevenness, in broad patches -->
+			<filter id="tone{k}" x="0" y="0" width="100%" height="100%">
+				<feTurbulence type="fractalNoise" baseFrequency="0.012" numOctaves="2" seed={back ? 11 : 2} />
+				<feColorMatrix type="matrix" values="0 0 0 0 0.5  0 0 0 0 0.22  0 0 0 0 0.22  0 0 0 -1.4 0.9" />
+			</filter>
+			<!-- worn edges: a lighter rim, eaten by noise -->
+			<filter id="wear{k}" x="-5%" y="-5%" width="110%" height="110%">
+				<feTurbulence type="fractalNoise" baseFrequency="0.08" numOctaves="3" seed="9" result="w" />
+				<feColorMatrix in="w" type="matrix" values="0 0 0 0 0  0 0 0 0 0  0 0 0 0 0  0 0 0 -3 2" result="m" />
+				<feComposite in="SourceGraphic" in2="m" operator="in" />
+			</filter>
 		</defs>
-		<rect width="300" height="426" fill="url(#lth{back ? 'b' : 'f'})" />
-		<rect width="300" height="426" fill="#000" filter="url(#grain{back ? 'b' : 'f'})" opacity=".55" />
-		<rect x="12" y="12" width="276" height="402" rx="6" fill="none" stroke="#c9a24a" stroke-width="1" stroke-dasharray="3 3" opacity=".6" />
+		<rect width="300" height="426" fill="url(#lth{k})" />
+		<rect width="300" height="426" filter="url(#tone{k})" opacity=".22" />
+		<rect width="300" height="426" filter="url(#grain{k})" style="mix-blend-mode: multiply" opacity=".75" />
+		<rect x="1.5" y="1.5" width="297" height="423" rx="5" fill="none" stroke="#b07a72" stroke-width="3" opacity=".45" filter="url(#wear{k})" />
+		<!-- a blind rule and its stitching, pressed into the leather -->
+		<rect x="11" y="11" width="278" height="404" rx="5" fill="none" stroke="#2a0b0e" stroke-width="1.2" opacity=".7" />
+		<rect x="11" y="12" width="278" height="404" rx="5" fill="none" stroke="#c08a80" stroke-width=".6" opacity=".25" />
+		<rect x="17" y="17" width="266" height="392" rx="4" fill="none" stroke="#7a3a38" stroke-width="1.1" stroke-dasharray="4 3" opacity=".8" />
 	</svg>
 {/snippet}
 
@@ -105,19 +151,19 @@
 	{:else}
 		<div class="stage">
 			<!-- svelte-ignore a11y_no_static_element_interactions -->
-			<div class="book" class:closed={turned === 0} class:end={turned === LEAVES} onpointerdown={down} onpointerup={up} role="group" aria-label={COPY.title}>
+			<div class="book" class:narrow class:left={leftSide} class:closed={!narrow && turned === 0} class:end={!narrow && turned === LEAVES} onpointerdown={down} onpointerup={up} role="group" aria-label={COPY.title}>
 				<!-- leaf 0: cover / inside cover -->
 				<div class="leaf" class:turned={0 < turned} class:moving={moving === 0} style="z-index: {z(0)}">
 					<div class="face front cover">
 						{@render leather(false)}
 						<div class="cover-in">
-							<p class="rep">{COPY.republic}</p>
+							<p class="blind union">{COPY.union}</p>
+							<p class="blind rep">{COPY.republic}</p>
 							<div class="emblem">
 								{#if d.flag}<img src={d.flag} alt="" />{/if}
 							</div>
-							<h1>{COPY.title}</h1>
-							<p class="sub">{COPY.passport}</p>
-							<svg class="chip" viewBox="0 0 40 28" aria-hidden="true"><rect x="1" y="1" width="38" height="26" rx="4" fill="none" stroke="#c9a24a" stroke-width="1.6" /><circle cx="20" cy="14" r="6" fill="none" stroke="#c9a24a" stroke-width="1.6" /><path d="M1 14 H14 M26 14 H39" stroke="#c9a24a" stroke-width="1.6" /></svg>
+							<p class="blind sub">{COPY.passport}</p>
+							<svg class="chip" viewBox="0 0 40 28" aria-hidden="true"><g fill="none" stroke-width="1.6"><g stroke="#c89088" opacity=".3" transform="translate(0 .8)"><rect x="1" y="1" width="38" height="26" rx="4" /><circle cx="20" cy="14" r="6" /><path d="M1 14 H14 M26 14 H39" /></g><g stroke="#260a0d" opacity=".8"><rect x="1" y="1" width="38" height="26" rx="4" /><circle cx="20" cy="14" r="6" /><path d="M1 14 H14 M26 14 H39" /></g></g></svg>
 						</div>
 					</div>
 					<div class="face back inside">
@@ -135,15 +181,20 @@
 					<div class="face front data">
 						{@render paper('#eef2f0')}
 						<div class="pad">
-							<div class="head"><span>{COPY.passport}</span><span>{COPY.republic}</span></div>
+							<div class="head"><span>{COPY.republic}</span><span>P · PSK</span></div>
 							<div class="grid">
-								<div class="photo">{#if d.flag}<img src={d.flag} alt="" />{/if}</div>
+								<div class="photo">
+									{#if d.flag}<img src={d.flag} alt="" />{/if}
+									<svg class="over" viewBox="0 0 120 80" preserveAspectRatio="none" aria-hidden="true"><g fill="none" stroke="#6d8aa6" stroke-width=".6" opacity=".55">{#each overLines as l}<path d={l} />{/each}</g></svg>
+									<span class="dry" aria-hidden="true"></span>
+								</div>
+								<div class="sign"><span>{COPY.signature}</span><b>{d.alias}</b></div>
 								<dl>
-									<div class="row3">
+									<div class="row2">
 										<div><dt>{COPY.type}</dt><dd>P</dd></div>
 										<div><dt>{COPY.code}</dt><dd>PSK</dd></div>
-										<div><dt>{COPY.docNo}</dt><dd>{docNumber(d.alias)}</dd></div>
 									</div>
+									<div><dt>{COPY.docNo}</dt><dd>{docNumber(d.alias)}</dd></div>
 									<div><dt>{COPY.surname}</dt><dd class="name">{d.alias}</dd></div>
 									<div><dt>{COPY.nationality}</dt><dd>{nationalityOf(d)}</dd></div>
 									<div><dt>{COPY.position}</dt><dd>{d.placed ? 'X ' + signed(Math.round(d.x)) + ' · Y ' + signed(Math.round(d.y)) : '?'}</dd></div>
@@ -153,7 +204,7 @@
 									<div><dt>{COPY.authority}</dt><dd>{COPY.authorityValue}</dd></div>
 								</dl>
 							</div>
-							<div class="sign"><span>{COPY.signature}</span><b>{d.alias}</b></div>
+							
 							<div class="mrz" aria-hidden="true"><div>{zone[0]}</div><div>{zone[1]}</div></div>
 							{#if d.flag}<img class="watermark" src={d.flag} alt="" />{/if}
 						</div>
@@ -205,7 +256,7 @@
 					<div class="face front seal">
 						{@render paper('#f6efe2')}
 						<div class="pad">
-							<div class="head"><span>{COPY.authority}</span><span>4</span></div>
+							<div class="head"><span>{COPY.authorityPage}</span><span>4</span></div>
 							<div class="seal-art">{@html sealSvg(d)}</div>
 							<p class="small-cap">{COPY.consulate}</p>
 							<p class="consulate">{d.nearest ? d.nearest.name : COPY.consulateNone}</p>
@@ -216,17 +267,16 @@
 					<div class="face back cover">
 						{@render leather(true)}
 						<div class="cover-in end-in">
-							<svg class="chip" viewBox="0 0 40 28" aria-hidden="true"><rect x="1" y="1" width="38" height="26" rx="4" fill="none" stroke="#c9a24a" stroke-width="1.6" /><circle cx="20" cy="14" r="6" fill="none" stroke="#c9a24a" stroke-width="1.6" /></svg>
-							<p class="rep">{COPY.backNote}</p>
+							<p class="blind rep small">{COPY.backNote}</p>
 						</div>
 					</div>
 				</div>
 			</div>
 		</div>
 		<div class="pp-nav">
-			<button type="button" class="button ghost" onclick={prev} disabled={turned === 0} aria-label={COPY.prev}>←</button>
-			<span class="count">{turned} / {LEAVES}</span>
-			<button type="button" class="button ghost" onclick={next} disabled={turned === LEAVES} aria-label={COPY.next}>→</button>
+			<button type="button" class="button ghost" onclick={prev} disabled={narrow ? at === 0 : turned === 0} aria-label={COPY.prev}>←</button>
+			<span class="count">{narrow ? at + 1 + ' / ' + FACES : turned + ' / ' + LEAVES}</span>
+			<button type="button" class="button ghost" onclick={next} disabled={narrow ? at === FACES - 1 : turned === LEAVES} aria-label={COPY.next}>→</button>
 		</div>
 		<p class="hint">{COPY.hint}</p>
 	{/if}
@@ -234,11 +284,18 @@
 
 <style>
 	.lab { margin: 0 0 16px; font-size: 14px; color: var(--text-3); }
-	.stage { --w: min(300px, calc((100vw - 32px) / 2)); display: flex; justify-content: center; padding: 36px 0 20px; perspective: 2200px; overflow-x: clip; }
-	.book { position: relative; width: calc(var(--w) * 2); height: calc(var(--w) * 1.42); font-size: calc(var(--w) * 0.043);
+	.stage { --w: min(300px, calc((100vw - 32px) / 2)); --x: 0px; display: flex; justify-content: center; padding: 36px 0 20px; perspective: 2200px; overflow-x: clip; }
+	.book { position: relative; flex: none; width: calc(var(--w) * 2); height: calc(var(--w) * 1.42); font-size: calc(var(--w) * 0.043);
 		transform-style: preserve-3d; transition: transform 0.8s cubic-bezier(0.3, 0.7, 0.2, 1); touch-action: pan-y; user-select: none; cursor: pointer; }
 	.book.closed { transform: translateX(-25%); }
 	.book.end { transform: translateX(25%); }
+	/* one page on a phone: the book is two pages wide, the stage one, and the book slides to the half on show */
+	@media (max-width: 699px) {
+		.stage { --w: min(340px, calc(100vw - 32px)); justify-content: flex-start; width: var(--w); margin: 0 auto; }
+		.book.narrow { transform: translateX(-50%); }
+		.book.narrow.left { transform: translateX(0); }
+		.face { box-shadow: 0 1px 2px rgba(0, 0, 0, 0.2), 0 6px 14px rgba(0, 0, 0, 0.14); }
+	}
 	.leaf { position: absolute; left: 50%; top: 0; width: 50%; height: 100%; transform-origin: left center; transform-style: preserve-3d;
 		transition: transform 0.9s cubic-bezier(0.45, 0.05, 0.25, 1); }
 	.leaf.turned { transform: rotateY(-180deg); }
@@ -255,18 +312,19 @@
 	.bg { position: absolute; inset: 0; width: 100%; height: 100%; }
 	.pad { position: absolute; inset: 0; padding: 7% 8%; display: flex; flex-direction: column; }
 
-	/* cover */
-	.cover .face, .cover { color: #e9c874; }
-	.cover-in { position: absolute; inset: 0; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 0.8em; text-align: center; padding: 10%; }
-	.rep { margin: 0; font-size: 0.95em; letter-spacing: 0.12em; font-weight: 600; color: #d8b35a; text-shadow: 0 -1px 0 rgba(0, 0, 0, 0.6), 0 1px 0 rgba(255, 220, 140, 0.25); }
-	.emblem { width: 44%; aspect-ratio: 1; border-radius: 50%; overflow: hidden; border: 0.25em solid #c9a24a;
-		box-shadow: inset 0 0 0 0.2em rgba(0, 0, 0, 0.35), 0 0 0 0.12em rgba(0, 0, 0, 0.4); filter: sepia(0.55) saturate(0.8) brightness(0.9); }
-	.emblem img { width: 100%; height: 100%; object-fit: cover; }
-	.cover h1 { margin: 0.4em 0 0; font-size: 2.1em; line-height: 1.05; font-weight: 800; color: #e2bd62;
-		text-shadow: 0 -1px 0 rgba(0, 0, 0, 0.7), 0 1px 0 rgba(255, 230, 160, 0.35); letter-spacing: 0.02em; }
-	.sub { margin: 0; font-size: 1.05em; letter-spacing: 0.3em; color: #c9a24a; }
-	.chip { width: 16%; margin-top: 1em; }
-	.end-in { justify-content: flex-end; padding-bottom: 14%; }
+	/* cover: leather, everything pressed into it, tone on tone */
+	.cover-in { position: absolute; inset: 0; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 0.7em; text-align: center; padding: 12% 10%; }
+	.blind { margin: 0; color: #3c1115; font-weight: 700; letter-spacing: 0.14em; text-transform: uppercase;
+		text-shadow: 0 1px 0 rgba(214, 150, 140, 0.28), 0 -1px 1px rgba(0, 0, 0, 0.55); }
+	.union { font-size: 0.72em; letter-spacing: 0.2em; }
+	.rep { font-size: 1.02em; }
+	.rep.small { font-size: 0.72em; text-transform: none; letter-spacing: 0.08em; }
+	.sub { font-size: 1.5em; letter-spacing: 0.32em; margin-top: 0.3em; }
+	.emblem { width: 52%; aspect-ratio: 3 / 2; margin: 1.1em 0 0.7em; border-radius: 0.2em; overflow: hidden; position: relative;
+		box-shadow: inset 0 2px 3px rgba(0, 0, 0, 0.6), inset 0 -1px 0 rgba(214, 150, 140, 0.25), 0 1px 0 rgba(214, 150, 140, 0.2), 0 -1px 0 rgba(0, 0, 0, 0.4); }
+	.emblem img { width: 100%; height: 100%; object-fit: cover; display: block; filter: grayscale(1) contrast(1.35) brightness(1.05); mix-blend-mode: multiply; opacity: 0.5; }
+	.chip { width: 15%; margin-top: 1.2em; }
+	.end-in { justify-content: flex-end; padding-bottom: 12%; }
 
 	/* inner pages */
 	.head { display: flex; justify-content: space-between; font-size: 0.72em; letter-spacing: 0.1em; color: #5a6a78; border-bottom: 1px solid rgba(90, 106, 120, 0.3); padding-bottom: 0.4em; margin-bottom: 0.9em; }
@@ -275,20 +333,30 @@
 	.prose.small { font-size: 0.82em; }
 	.note { margin: 0.8em 0 0; font-size: 0.72em; color: #5a6a78; line-height: 1.4; }
 
-	.grid { display: grid; grid-template-columns: 34% 1fr; gap: 0.8em; }
-	.photo { aspect-ratio: 3 / 4; overflow: hidden; border-radius: 0.2em; box-shadow: 0 0 0 1px rgba(0, 0, 0, 0.2); }
-	.photo img { width: 100%; height: 100%; object-fit: cover; }
+	.grid { display: grid; grid-template-columns: 44% 1fr; grid-template-rows: auto 1fr; gap: 0.5em 0.8em; align-items: start; }
+	.grid .photo { grid-column: 1; grid-row: 1; }
+	.grid dl { grid-column: 2; grid-row: 1 / 3; }
+	.grid .sign { grid-column: 1; grid-row: 2; margin-top: 2.2em; }
+	/* the flag as the holder's photo: a print with a thin border, the page's guilloche running over its edge, a dry seal biting its corner */
+	.photo { position: relative; aspect-ratio: 3 / 2; margin-top: 0.3em; padding: 0.18em; background: #fbfaf6; border-radius: 0.15em; box-shadow: 0 0 0 1px rgba(40, 60, 80, 0.25); }
+	.photo img { display: block; width: 100%; height: 100%; object-fit: cover; border-radius: 0.08em; filter: saturate(0.85); }
+	.photo .over { position: absolute; left: -12%; top: -10%; width: 124%; height: 120%; pointer-events: none; }
+	.dry { position: absolute; right: -14%; bottom: -26%; width: 44%; aspect-ratio: 1; border-radius: 50%; pointer-events: none;
+		background: repeating-conic-gradient(rgba(255, 255, 255, 0.18) 0 6deg, rgba(0, 0, 0, 0.05) 6deg 12deg);
+		box-shadow: inset 1px 1px 1px rgba(255, 255, 255, 0.7), inset -1px -1px 2px rgba(0, 0, 0, 0.22), 0 0 0 0.35em rgba(0, 0, 0, 0.03);
+		-webkit-mask: radial-gradient(circle, transparent 38%, #000 40%, #000 58%, transparent 60%, transparent 68%, #000 70%);
+		mask: radial-gradient(circle, transparent 38%, #000 40%, #000 58%, transparent 60%, transparent 68%, #000 70%); }
 	dl { margin: 0; display: flex; flex-direction: column; gap: 0.35em; min-width: 0; }
-	.row3 { display: grid; grid-template-columns: auto auto 1fr; gap: 0.6em; }
-	dt { font-size: 0.56em; color: #5a6a78; letter-spacing: 0.05em; }
-	dd { margin: 0; font-size: 0.8em; font-weight: 650; font-family: ui-monospace, 'SF Mono', Menlo, monospace; overflow-wrap: anywhere; line-height: 1.2; }
+	.row2 { display: grid; grid-template-columns: auto 1fr; gap: 1em; }
+	dt { font-size: 0.5em; color: #5a6a78; letter-spacing: 0.05em; }
+	dd { margin: 0; font-size: 0.72em; font-weight: 650; font-family: ui-monospace, 'SF Mono', Menlo, monospace; overflow-wrap: anywhere; line-height: 1.2; }
 	dd.name { font-size: 1.05em; font-family: Geist, system-ui, sans-serif; font-weight: 800; }
 	.sign { margin-top: auto; display: flex; flex-direction: column; gap: 0.1em; padding-bottom: 0.4em; }
 	.sign span { font-size: 0.56em; color: #5a6a78; }
 	.sign b { font-family: 'Brush Script MT', 'Snell Roundhand', 'Segoe Script', cursive; font-size: 1.7em; font-weight: 400; color: #1c3a7a; transform: rotate(-4deg); transform-origin: left; overflow: hidden; white-space: nowrap; text-overflow: ellipsis; }
 	.sign b.official { color: #a3262e; }
-	.mrz { font-family: ui-monospace, 'OCR B', 'SF Mono', Menlo, monospace; font-size: 0.6em; letter-spacing: 0.02em; line-height: 1.5; color: #1f2a33;
-		background: rgba(255, 255, 255, 0.55); margin: 0 -9%; padding: 0.4em 9% 0; white-space: pre; overflow: hidden; }
+	.mrz { position: absolute; left: 0; right: 0; bottom: 0; padding-bottom: 0.9em !important; font-family: ui-monospace, 'OCR B', 'SF Mono', Menlo, monospace; font-size: 0.6em; letter-spacing: 0.02em; line-height: 1.5; color: #1f2a33;
+		background: rgba(255, 255, 255, 0.55); margin: 0; padding: 0.5em 8% 0; white-space: pre; overflow: hidden; }
 	.watermark { position: absolute; right: 6%; bottom: 20%; width: 34%; opacity: 0.08; filter: grayscale(1); pointer-events: none; transform: rotate(-12deg); }
 
 	.stamp { position: absolute; mix-blend-mode: multiply; }

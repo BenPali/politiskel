@@ -1,5 +1,5 @@
-/* Prototype cards meant to be fun to share: an RPG character card, a
-   newspaper front page, a boarding pass and a till receipt of opinions.
+/* Prototype cards meant to be fun to share: a collectible character card,
+   a tabloid front page, a boarding pass and a till receipt of opinions.
    A test bed for /partage/labo, not the final share: each card is an SVG
    string at its final size, like the layouts of card.js, drawn from
    cardData. The French copy lives in COPY until it moves to fr.js. */
@@ -14,19 +14,13 @@ const MONO = "ui-monospace, Menlo, 'Courier New', monospace";
 /* ---------- copy ---------- */
 export const COPY = {
 	cards: {
-		rpg: ['Carte de personnage', '750 × 1050, jeu de rôle'],
-		rpgHolo: ['Carte de personnage, holographique', '750 × 1050'],
-		news: ['Une de journal', '1080 × 1350'],
+		rpg: ['Carte de personnage', '750 × 1050, carte à collectionner'],
 		tabloid: ['Une de tabloïd', '1080 × 1350'],
 		boarding: ["Carte d'embarquement", '1200 × 630'],
 		receipt: ['Ticket de caisse des opinions', '720 × 1400']
 	},
 	rarity: ['Commune', 'Rare', 'Épique', 'Légendaire'],
 	noTitle: 'Citoyen sans étiquette',
-	classLabel: 'Classe',
-	stats: 'Caractéristiques',
-	skills: 'Compétences',
-	skillLevel: ['passive', 'active', 'ultime'],
 	masthead: 'Le Politiskel',
 	tabloidMast: 'POLITI-FLASH',
 	edition: 'Édition spéciale',
@@ -135,62 +129,96 @@ const all = (d) => [...d.axes, ...d.readings];
 const pole = (r) => r.ends[r.v >= 0 ? 1 : 0];
 let uid = 0;
 
-/* ---------- 1. RPG character card ---------- */
-function rpg(d, ART, holo) {
+/* ---------- 1. character card, in the spirit of a collectible card ---------- */
+/* metal of the frame by rarity: light, mid, dark */
+const METAL = [
+	['#eef1f4', '#9aa2ab', '#4d535a'],
+	['#d6e6ff', '#3f7fe0', '#163a7a'],
+	['#f0dcff', '#9446d8', '#43176b'],
+	['#fff4c2', '#d8a31a', '#6e4a06']
+];
+/* a filigree curl for a corner, drawn for the top-left and mirrored */
+const curl = (x, y, sx, sy, col, k = 1) =>
+	`<g transform="translate(${x} ${y}) scale(${sx * k} ${sy * k})" fill="none" stroke="${col}" stroke-width="2.6" stroke-linecap="round">` +
+	`<path d="M0 34 C0 12 12 0 34 0"/><path d="M8 40 C6 22 18 10 36 10 C28 14 24 22 28 28 C32 34 40 30 40 24"/>` +
+	`<path d="M40 8 C22 6 10 18 10 36 C14 28 22 24 28 28"/><circle cx="18" cy="18" r="4" fill="${col}" stroke="none"/></g>`;
+/* the rarity mark: a disc, a lozenge, a star, a crown */
+function rarityMark(r, cx, cy, s, fill, edge) {
+	const shape = [
+		`<circle cx="${cx}" cy="${cy}" r="${s * 0.55}"/>`,
+		`<path d="M${cx} ${cy - s * 0.7} L${cx + s * 0.55} ${cy} L${cx} ${cy + s * 0.7} L${cx - s * 0.55} ${cy} Z"/>`,
+		`<path d="${Array.from({ length: 10 }, (_, i) => { const a = -Math.PI / 2 + (i * Math.PI) / 5, rr = i % 2 ? s * 0.3 : s * 0.72; return (i ? 'L' : 'M') + (cx + rr * Math.cos(a)).toFixed(1) + ' ' + (cy + rr * Math.sin(a)).toFixed(1); }).join(' ')} Z"/>`,
+		`<path d="M${cx - s * 0.65} ${cy + s * 0.45} L${cx - s * 0.7} ${cy - s * 0.35} L${cx - s * 0.32} ${cy} L${cx} ${cy - s * 0.6} L${cx + s * 0.32} ${cy} L${cx + s * 0.7} ${cy - s * 0.35} L${cx + s * 0.65} ${cy + s * 0.45} Z"/>`
+	][r];
+	return `<g fill="${fill}" stroke="${edge}" stroke-width="2">${shape}</g>`;
+}
+const SHIELD = 'M0 0 H84 V46 C84 74 58 90 42 98 C26 90 0 74 0 46 Z';
+const flavourOf = (b) => (DEEDS[b.key] ? cap(DEEDS[b.key]) + '.' : '');
+function rpg(d, ART) {
 	const W = 750, H = 1050, P = 'r' + ++uid;
-	const rarity = rarityOf(d);
-	const pal = holo
-		? { page: '#14121c', ink: '#f4efe6', ink2: '#c9c2d6', frame: '#2a2438', gold: '#e8c872', band: '#3b2f5a' }
-		: { page: '#efe3c4', ink: '#2b2114', ink2: '#5e4b30', frame: '#8a6a3a', gold: '#b8862a', band: '#6b4a1e' };
-	const gem = ['#9aa0a6', '#3b82f6', '#a855f7', '#f59e0b'][rarity];
+	const rarity = rarityOf(d), [ml, mm, md] = METAL[rarity];
+	const ink = '#2a2016', ink2 = '#6a563a';
 	const defs =
-		`<linearGradient id="${P}foil" x1="0" y1="0" x2="1" y2="1">` +
-		['#ff6ad5', '#c774e8', '#ad8cff', '#8795e8', '#94d0ff', '#6affc8', '#fff66a', '#ff9e6a', '#ff6ad5']
-			.map((c, i, a) => `<stop offset="${i / (a.length - 1)}" stop-color="${c}"/>`).join('') + `</linearGradient>` +
-		`<linearGradient id="${P}gold" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#fff2b8"/><stop offset=".5" stop-color="${pal.gold}"/><stop offset="1" stop-color="#7a5418"/></linearGradient>` +
-		`<linearGradient id="${P}shine" x1="0" y1="0" x2="1" y2="0"><stop offset="0" stop-color="#fff" stop-opacity="0"/><stop offset=".5" stop-color="#fff" stop-opacity=".35"/><stop offset="1" stop-color="#fff" stop-opacity="0"/></linearGradient>` +
-		`<clipPath id="${P}portrait"><rect x="95" y="210" width="560" height="373" rx="12"/></clipPath>` +
-		`<pattern id="${P}grain" width="6" height="6" patternUnits="userSpaceOnUse"><circle cx="1" cy="1" r=".7" fill="${holo ? '#fff' : '#6b4a1e'}" opacity=".08"/></pattern>`;
+		`<linearGradient id="${P}metal" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="${ml}"/><stop offset=".35" stop-color="${mm}"/><stop offset=".7" stop-color="${md}"/><stop offset="1" stop-color="${mm}"/></linearGradient>` +
+		`<linearGradient id="${P}rim" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="${ml}"/><stop offset=".5" stop-color="${mm}"/><stop offset="1" stop-color="${md}"/></linearGradient>` +
+		`<linearGradient id="${P}shine" x1="0" y1="0" x2="1" y2="1"><stop offset=".25" stop-color="#fff" stop-opacity="0"/><stop offset=".42" stop-color="#fff" stop-opacity=".45"/><stop offset=".5" stop-color="#fff" stop-opacity="0"/><stop offset=".62" stop-color="#fff" stop-opacity=".2"/><stop offset=".7" stop-color="#fff" stop-opacity="0"/></linearGradient>` +
+		`<linearGradient id="${P}parch" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#f7ecd2"/><stop offset="1" stop-color="#e6d3ab"/></linearGradient>` +
+		`<radialGradient id="${P}vig" cx=".5" cy=".45" r=".75"><stop offset=".55" stop-color="#000" stop-opacity="0"/><stop offset="1" stop-color="#000" stop-opacity=".55"/></radialGradient>` +
+		`<linearGradient id="${P}light" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#fff" stop-opacity=".35"/><stop offset=".45" stop-color="#fff" stop-opacity="0"/></linearGradient>` +
+		`<clipPath id="${P}art"><path d="M64 148 Q64 136 76 136 H674 Q686 136 686 148 V548 H64 Z"/></clipPath>` +
+		`<filter id="${P}cloth" x="0" y="0" width="1" height="1"><feTurbulence type="fractalNoise" baseFrequency=".006 .018" numOctaves="2" seed="4"/>` +
+		`<feDisplacementMap in="SourceGraphic" scale="12" xChannelSelector="R" yChannelSelector="G"/></filter>` +
+		`<linearGradient id="${P}fold" x1="0" y1="0" x2="1" y2="0">${Array.from({ length: 9 }, (_, i) => `<stop offset="${i / 8}" stop-color="${i % 2 ? '#000' : '#fff'}" stop-opacity="${i % 2 ? 0.16 : 0.1}"/>`).join('')}</linearGradient>` +
+		`<pattern id="${P}grain" width="7" height="7" patternUnits="userSpaceOnUse"><circle cx="2" cy="3" r=".8" fill="#6b4a1e" opacity=".09"/><circle cx="5.5" cy="6" r=".6" fill="#6b4a1e" opacity=".07"/></pattern>`;
 	let s = svgOpen(W, H, defs);
-	/* foil border, then the card */
-	s += `<rect width="${W}" height="${H}" rx="38" fill="${holo ? `url(#${P}foil)` : `url(#${P}gold)`}"/>`;
-	if (holo) s += `<rect width="${W}" height="${H}" rx="38" fill="url(#${P}shine)" transform="rotate(-18 375 525)" opacity=".8"/>`;
-	s += `<rect x="22" y="22" width="${W - 44}" height="${H - 44}" rx="26" fill="${pal.page}"/><rect x="22" y="22" width="${W - 44}" height="${H - 44}" rx="26" fill="url(#${P}grain)"/>`;
-	s += `<rect x="36" y="36" width="${W - 72}" height="${H - 72}" rx="20" fill="none" stroke="${pal.frame}" stroke-width="2"/>`;
-	/* name and rarity */
-	s += T(64, 104, d.alias, fit(d.alias, 50, 440), { w: 800, fill: pal.ink, ls: -0.5 });
-	for (let i = 0; i < 4; i++)
-		s += `<path d="M${W - 70 - i * 30} 78 l11 12 l-11 12 l-11 -12 Z" fill="${i <= rarity ? gem : 'none'}" stroke="${gem}" stroke-width="2" opacity="${i <= rarity ? 1 : 0.4}"/>`;
-	s += T(W - 64, 130, COPY.rarity[rarity], 18, { w: 700, fill: gem, anchor: 'end' });
-	/* class banner */
+	/* frame: metal by rarity, a sheen on it, then the dark bevel */
+	s += `<rect width="${W}" height="${H}" rx="36" fill="url(#${P}metal)"/><rect width="${W}" height="${H}" rx="36" fill="url(#${P}shine)"/>`;
+	s += `<rect x="6" y="6" width="${W - 12}" height="${H - 12}" rx="31" fill="none" stroke="${ml}" stroke-opacity=".7" stroke-width="2"/>`;
+	s += `<rect x="30" y="30" width="${W - 60}" height="${H - 60}" rx="18" fill="#1b1510"/>`;
+	for (const [x, y, sx, sy] of [[16, 16, 1, 1], [W - 16, 16, -1, 1], [16, H - 16, 1, -1], [W - 16, H - 16, -1, -1]])
+		s += curl(x, y, sx, sy, md, 0.9) + `<circle cx="${x + sx * 13}" cy="${y + sy * 13}" r="6" fill="${ml}" stroke="${md}" stroke-width="2"/>`;
+	/* title plate */
+	s += `<rect x="46" y="44" width="${W - 92}" height="78" rx="14" fill="url(#${P}rim)"/><rect x="52" y="50" width="${W - 104}" height="66" rx="10" fill="url(#${P}parch)"/>`;
+	s += T(74, 98, d.alias, fit(d.alias, 44, 520, 0.56), { font: SERIF, w: 700, fill: ink, ls: 0.5 });
+	s += `<circle cx="${W - 88}" cy="83" r="27" fill="url(#${P}rim)"/><circle cx="${W - 88}" cy="83" r="22" fill="#1b1510"/>` + rarityMark(rarity, W - 88, 83, 22, `url(#${P}rim)`, ml);
+	/* illustration: the flag as a banner in the wind, lit from above */
+	s += `<rect x="54" y="128" width="642" height="430" rx="16" fill="url(#${P}rim)"/>`;
+	s += `<g clip-path="url(#${P}art)"><rect x="64" y="136" width="622" height="412" fill="#2a2018"/>`;
+	if (d.flag) s += `<g filter="url(#${P}cloth)"><image href="${d.flag}" x="30" y="110" width="690" height="464" preserveAspectRatio="xMidYMid slice"/></g>`;
+	s += `<rect x="64" y="136" width="622" height="412" fill="url(#${P}fold)"/><rect x="64" y="136" width="622" height="412" fill="url(#${P}light)"/><rect x="64" y="136" width="622" height="412" fill="url(#${P}vig)"/></g>`;
+	for (const [x, y, sx, sy] of [[64, 136, 1, 1], [686, 136, -1, 1]]) s += curl(x, y, sx, sy, ml, 0.75);
+	/* class ribbon over the foot of the picture */
 	const title = titleOf(d);
-	s += `<path d="M64 150 H${W - 64} l-14 22 l14 22 H64 l14 -22 Z" fill="${pal.band}"/>`;
-	s += T(W / 2, 180, COPY.classLabel + ' : ' + title, fit(COPY.classLabel + ' : ' + title, 26, W - 180), { w: 700, fill: '#fff3d6', anchor: 'middle' });
-	/* portrait in an ornate frame */
-	s += `<rect x="83" y="198" width="584" height="397" rx="18" fill="url(#${P}gold)"/>`;
-	s += `<g clip-path="url(#${P}portrait)">${flag(d, 95, 210, 560)}<rect x="95" y="210" width="560" height="373" fill="url(#${P}shine)" opacity="${holo ? 0.6 : 0.25}"/></g>`;
-	for (const [cx, cy] of [[83, 198], [667, 198], [83, 595], [667, 595]])
-		s += `<circle cx="${cx}" cy="${cy}" r="14" fill="url(#${P}gold)" stroke="#7a5418" stroke-width="2"/><circle cx="${cx}" cy="${cy}" r="5" fill="${gem}"/>`;
-	/* stats, 1 to 20 */
-	s += T(64, 640, COPY.stats, 20, { w: 800, fill: pal.ink2, ls: 1 });
-	const stats = all(d).slice(0, 6);
+	s += `<path d="M70 540 H104 V588 H70 L84 564 Z" fill="${md}"/><path d="M680 540 H646 V588 H680 L666 564 Z" fill="${md}"/>`;
+	s += `<path d="M96 530 H654 V580 H96 Z" fill="url(#${P}rim)"/><path d="M102 535 H648 V575 H102 Z" fill="#1b1510"/>`;
+	s += T(W / 2, 564, title, fit(title, 27, 510, 0.52), { font: SERIF, w: 700, fill: ml, anchor: 'middle', ls: 0.5 });
+	/* characteristics as heraldic shields */
+	s += `<rect x="46" y="598" width="${W - 92}" height="380" rx="14" fill="url(#${P}parch)"/><rect x="46" y="598" width="${W - 92}" height="380" rx="14" fill="url(#${P}grain)"/>`;
+	s += `<rect x="46" y="598" width="${W - 92}" height="380" rx="14" fill="none" stroke="${md}" stroke-width="2"/>`;
+	const stats = all(d).slice(0, 6), gap = (W - 92 - 36 - 6 * 84) / 5;
 	stats.forEach((r, i) => {
-		const col = i % 2, row = Math.floor(i / 2), x = 64 + col * 318, y = 676 + row * 50;
-		const n = Math.max(1, Math.round((Math.abs(r.v) / 100) * 20));
-		s += T(x, y, pole(r), fit(pole(r), 19, 230), { w: 600, fill: pal.ink });
-		s += `<rect x="${x + 238}" y="${y - 24}" width="56" height="32" rx="7" fill="${pal.band}"/>` + T(x + 266, y - 1, n, 21, { w: 800, fill: '#fff3d6', anchor: 'middle' });
-		s += `<rect x="${x}" y="${y + 9}" width="${220}" height="5" rx="2.5" fill="${pal.frame}" opacity=".3"/><rect x="${x}" y="${y + 9}" width="${220 * n / 20}" height="5" rx="2.5" fill="${pal.gold}"/>`;
+		const x = 64 + i * (84 + gap), y = 616, n = Math.max(1, Math.round((Math.abs(r.v) / 100) * 20));
+		s += `<g transform="translate(${x} ${y})"><path d="${SHIELD}" fill="url(#${P}rim)"/><path d="${SHIELD}" transform="translate(6 6) scale(.857)" fill="#1b1510"/>` +
+			`<path d="M14 14 H70" stroke="${mm}" stroke-width="3" stroke-linecap="round" opacity=".6"/></g>`;
+		s += T(x + 42, y + 58, n, 34, { font: SERIF, w: 700, fill: ml, anchor: 'middle' });
+		const lab = wrap(pole(r), 12).slice(0, 2), ls = Math.min(15, ...lab.map((l) => fit(l, 15, 104, 0.52)));
+		s += lines(lab, x + 42, y + 124, ls, 1.2, { w: 650, fill: ink, anchor: 'middle' });
 	});
-	/* skills: the top badges */
-	s += T(64, 846, COPY.skills, 20, { w: 800, fill: pal.ink2, ls: 1 });
-	d.badges.slice(0, 3).forEach((b, i) => {
-		const x = 64 + i * 212;
-		s += badge(ART, b, x, 858, 96);
-		const nl = wrap(b.name, 14).slice(0, 2), ns = Math.min(17, ...nl.map((l) => fit(l, 17, 106)));
-		s += lines(nl, x + 100, 894, ns, 1.2, { w: 700, fill: pal.ink });
-		s += T(x + 100, 938, (SINGLE.has(b.key) ? '' : 'Niv. ' + b.level + ', ') + COPY.skillLevel[(b.level || 1) - 1], 14, { fill: pal.ink2, italic: true });
+	/* skills: the three strongest badges, with a line of flavour */
+	s += `<path d="M70 772 H${W - 70}" stroke="${md}" stroke-width="1.5" opacity=".5"/>`;
+	traitBadges(d).slice(0, 3).forEach((b, i) => {
+		const y = 786 + i * 62;
+		s += badge(ART, b, 68, y, 58);
+		s += T(138, y + 25, b.name, fit(b.name, 21, 420), { font: SERIF, w: 700, fill: ink });
+		s += T(W - 70, y + 25, ['I', 'II', 'III'][b.level - 1], 18, { font: SERIF, w: 700, fill: md, anchor: 'end' });
+		const f = flavourOf(b);
+		s += T(138, y + 48, f, fit(f, 16, 530, 0.5), { font: SERIF, italic: true, fill: ink2 });
 	});
-	s += T(W / 2, H - 50, 'politiskel · ' + (d.nearest ? 'allié le plus proche : ' + d.nearest.name : d.country), 15, { fill: pal.ink2, anchor: 'middle' });
+	/* foot: rarity, the nearest party, a collector's number */
+	const no = String((hash(d.alias) % 144) + 1).padStart(3, '0') + ' / 144';
+	s += T(60, 1010, COPY.rarity[rarity], 16, { font: SERIF, w: 700, fill: ml });
+	if (d.nearest) s += T(W / 2, 1010, 'Allié : ' + d.nearest.name, fit('Allié : ' + d.nearest.name, 15, 330), { fill: ml, anchor: 'middle', op: 0.9 });
+	s += T(W - 60, 1010, no, 15, { font: SERIF, fill: ml, anchor: 'end' });
 	return s + '</svg>';
 }
 
@@ -342,9 +370,7 @@ function receipt(d, ART) {
 }
 
 export const FUN = [
-	{ key: 'rpg', w: 750, h: 1050, draw: (d, ART) => rpg(d, ART, false) },
-	{ key: 'rpgHolo', w: 750, h: 1050, draw: (d, ART) => rpg(d, ART, true) },
-	{ key: 'news', w: 1080, h: 1350, draw: (d, ART) => news(d, ART, false) },
+	{ key: 'rpg', w: 750, h: 1050, draw: (d, ART) => rpg(d, ART) },
 	{ key: 'tabloid', w: 1080, h: 1350, draw: (d, ART) => news(d, ART, true) },
 	{ key: 'boarding', w: 1200, h: 630, draw: (d, ART, theme) => boarding(d, ART, theme) },
 	{ key: 'receipt', w: 720, h: 1400, draw: (d, ART) => receipt(d, ART) }
