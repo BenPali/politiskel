@@ -229,7 +229,6 @@
 						{#if canShare}
 							<div class="share-cta">
 								<button type="button" class="primary" onclick={() => (sharing = true)}>{L.share.cta}</button>
-								<span>{L.share.ctaLead}</span>
 							</div>
 						{/if}
 					</div>
@@ -280,7 +279,6 @@
 	.result .lead { margin: 0; font-size: var(--fs-lg); color: var(--text-2); max-width: 58ch; }
 	.theme-h { font-family: var(--font-display); font-size: 22px; font-weight: 700; margin: 12px 0 0; }
 	.share-cta { display: flex; align-items: center; gap: 14px; flex-wrap: wrap; margin-top: 6px; }
-	.share-cta span { font-size: 14px; color: var(--text-2); }
 	.result-cards { display: grid; grid-template-columns: repeat(auto-fit, minmax(150px, 1fr)); gap: 10px; }
 	.reading { padding: 14px 16px; border-radius: var(--r-md); background: var(--surface); border: 1px solid var(--border);
 		animation: card-in var(--dur-base) var(--ease-out) both; animation-delay: calc(var(--stagger) * var(--i) + 120ms); }

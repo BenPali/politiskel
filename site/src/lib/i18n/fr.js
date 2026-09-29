@@ -1102,7 +1102,7 @@ export const LOCALES = {
       privateNote: "Visible par vous seul",
       soon: "Pas encore attribué",
       catalogTitle: "Tous les badges",
-      catalogLead: "Chaque badge vient d'un trait de votre profil, calculé à partir de vos réponses aux questionnaires. Il a trois niveaux, avec un nom et une scène qui s'affirment à mesure que le trait est marqué. Les badges de profil et de parcours n'ont qu'un niveau.",
+      catalogLead: "Un badge par trait marqué, à trois niveaux : 60, 75 et 90 sur 100.",
       families: {
         economy: "Économie",
         society: "Société",
@@ -1172,7 +1172,6 @@ export const LOCALES = {
     /* the profile card to share: layouts, and what each line says */
     share: {
       title: "Partager mon profil",
-      lead: "Votre profil en image, dans plusieurs formats. Seuls des résultats y figurent : votre position, vos lectures, vos badges, votre drapeau ; jamais vos réponses.",
       nearest: name => "Le plus proche : " + name,
       nearestFit: (fit, d) => "proximité " + fit + ", " + d + " pts",
       badgesCount: n => n ? n + " badge" + (n > 1 ? "s" : "") : "Pas encore de badge",
@@ -1189,13 +1188,13 @@ export const LOCALES = {
       fixedTheme: "Cette carte garde ses propres couleurs.",
       publicTitle: a => "Le profil politique de " + a,
       publicTitleBare: "Profil partagé",
-      publicLead: d => "Partagé le " + d.toLocaleDateString("fr-FR", { day: "numeric", month: "long", year: "numeric" }) + ". Seuls des résultats y figurent, aucune réponse.",
+      publicLead: d => "Partagé le " + d.toLocaleDateString("fr-FR", { day: "numeric", month: "long", year: "numeric" }) + ".",
       missingTitle: "Ce lien n'existe pas ou plus",
-      missingLead: "La personne qui l'a créé a pu le supprimer. Rien de ce qu'il montrait n'est encore visible.",
+      missingLead: "Il a peut-être été supprimé par la personne qui l'a créé.",
       makeYours: "Faire ma boussole",
       ctaPublic: "Et vous, où vous placez-vous ?",
       link: "Créer un lien",
-      linkWarn: "Ce lien sera public : toute personne qui l'a verra cette carte et votre passeport, avec votre pseudo, votre position, vos lectures, vos badges et votre drapeau. Vos réponses n'y sont pas. Vous pourrez le supprimer à tout moment dans Mon compte.",
+      linkWarn: "Ce lien sera public : toute personne qui l'a verra cette carte et votre passeport, avec votre pseudo, votre position, vos lectures, vos badges et votre drapeau. Vous pourrez le supprimer à tout moment dans Mon compte.",
       linkConfirm: "Créer le lien public",
       linkCancel: "Annuler",
       linkReady: "Votre lien public",
@@ -1203,7 +1202,7 @@ export const LOCALES = {
       linkCopied: "Lien copié",
       linkGuest: "Un lien public demande un compte.",
       linksTitle: "Liens publics",
-      linksLead: "Les profils que vous avez rendus visibles par lien. Supprimer un lien le rend aussitôt inaccessible.",
+      linksLead: "Les profils que vous avez rendus visibles par lien.",
       linksNone: "Aucun lien public.",
       linkOpen: "Ouvrir",
       linkDelete: "Supprimer",
@@ -1231,7 +1230,6 @@ export const LOCALES = {
       theme: "Thème de l'image",
       open: "Partager",
       cta: "Partager mon profil",
-      ctaLead: "Votre profil en image, à envoyer où vous voulez.",
       layoutsLabel: "Dispositions de la carte",
       prev: "Disposition précédente", next: "Disposition suivante", close: "Fermer",
       share: "Partager", download: "Télécharger", copy: "Copier l'image",
@@ -1276,7 +1274,6 @@ export const LOCALES = {
       consulateNone: 'Aucun consulat à proximité',
       sealText: 'RÉPUBLIQUE DE POLITISKEL · PRÉFECTURE DES OPINIONS · ',
       insideLead: 'Au nom de la République de Politiskel, les autorités prient toutes les opinions de laisser passer librement le titulaire du présent passeport, et de lui prêter aide et contradiction en cas de besoin.',
-      insideNote: 'Ce passeport ne contient que des résultats : aucune réponse au questionnaire n\'y figure.',
       level: (n) => 'Niveau ' + n,
       backNote: 'politiskel.benit.ooo'
     }

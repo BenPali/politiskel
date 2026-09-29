@@ -219,7 +219,6 @@
 			</div>
 		{/if}
 		{#if problem && link !== 'confirm'}<p class="bad" role="alert">{problem}</p>{/if}
-		<p class="note">{S.lead}</p>
 	{/if}
 </dialog>
 
@@ -263,7 +262,6 @@
 	.link label { display: block; font-size: 14px; font-weight: 650; margin-bottom: 8px; }
 	.link-row { display: flex; gap: 10px; }
 	.link-row input { flex: 1; min-width: 0; }
-	.note { margin: 14px auto 0; max-width: 56ch; text-align: center; font-size: 13px; color: var(--text-3); line-height: 1.45; }
 	@media (prefers-reduced-motion: reduce) { .slides { transition: none; } .sheet[open] { animation: none; } }
 	@media (max-width: 700px) {
 		.sheet { width: 100vw; max-width: 100vw; margin: auto 0 0; border-radius: 16px 16px 0 0; padding: 16px 16px 20px; max-height: 94dvh; }

@@ -204,7 +204,6 @@
 					<div class="pp-pad">
 						<p class="pp-small-cap">{COPY.republic}</p>
 						<p class="pp-prose">{COPY.insideLead}</p>
-						<p class="pp-note">{COPY.insideNote}</p>
 					</div>
 				</div>
 			</div>
