@@ -104,7 +104,7 @@ const FIGURES_DATA = [
 	},
 	{
 		id: 'cobden', name: 'Richard Cobden', born: 1804, died: 1865, x: 90, y: -45, readings: { pacifism: 85 }, confidence: 'medium', wiki: 'Richard Cobden',
-		basis: 'Economy: he led the Anti-Corn Law League for free trade and opposed the Factory Acts; society is a reasoned guess from his campaigns for schooling and against imperial expansion; pacifism: he addressed the peace congresses and opposed the Crimean War.'
+		basis: 'Economy: he led the Anti-Corn Law League for free trade and opposed legal limits on working hours; society is a reasoned guess from his campaigns for schooling and against imperial expansion; pacifism: he addressed the peace congresses and opposed the Crimean War.'
 	},
 	{
 		id: 'gladstone', name: 'William Ewart Gladstone', born: 1809, died: 1898, x: 55, y: -5, confidence: 'medium', wiki: 'William Ewart Gladstone',
@@ -144,7 +144,7 @@ const FIGURES_DATA = [
 	},
 	{
 		id: 'kropotkin', name: 'Peter Kropotkin', born: 1842, died: 1921, x: -92, y: -78, confidence: 'high', wiki: 'Peter Kropotkin',
-		basis: 'Economy: The Conquest of Bread sets out anarcho-communism, goods shared by the commune; society: Mutual Aid and his prison writings reject authority, church and punishment.'
+		basis: 'Economy: The Conquest of Bread sets out anarcho-communism, goods shared by the commune; society: Mutual Aid, Anarchist Morality and his prison writings reject authority, religious morality and punishment.'
 	},
 	{
 		id: 'goldman', name: 'Emma Goldman', born: 1869, died: 1940, x: -90, y: -95, readings: { pacifism: 85 }, confidence: 'high', wiki: 'Emma Goldman',
@@ -200,7 +200,7 @@ const FIGURES_DATA = [
 	},
 	{
 		id: 'clemenceau', name: 'Georges Clemenceau', born: 1841, died: 1929, x: 5, y: 25, confidence: 'low', wiki: 'Georges Clemenceau',
-		basis: 'Society: Dreyfusard and anticlerical, but he defended colonisation, opposed votes for women and broke strikes as interior minister; economy is a guess for a radical with no programme of his own.'
+		basis: 'Society: Dreyfusard and anticlerical, but he opposed votes for women (1907) and sent troops against strikers as interior minister (1906); economy is a guess for a radical with no programme of his own.'
 	},
 	{
 		id: 'churchill', name: 'Winston Churchill', born: 1874, died: 1965, x: 40, y: 45, readings: { pacifism: -75 }, confidence: 'medium', wiki: 'Winston Churchill',
@@ -308,7 +308,7 @@ const FIGURES_DATA = [
 	},
 	{
 		id: 'sakharov', name: 'Andrei Sakharov', born: 1921, died: 1989, x: -10, y: -65, readings: { pacifism: 80 }, confidence: 'medium', wiki: 'Andrei Sakharov',
-		basis: 'Economy: his 1968 essay predicted a convergence of socialism and capitalism; society: he defended dissidents and free expression; pacifism: he campaigned for a nuclear test ban and received the 1975 Nobel Peace Prize.'
+		basis: 'Economy: his 1968 essay argued for a convergence of socialism and capitalism; society: he defended dissidents and free expression; pacifism: he campaigned for a nuclear test ban and received the 1975 Nobel Peace Prize.'
 	},
 	{
 		id: 'lee-kuan-yew', name: 'Lee Kuan Yew', born: 1923, died: 2015, x: 45, y: 80, confidence: 'medium', wiki: 'Lee Kuan Yew',
@@ -336,7 +336,7 @@ const FIGURES_DATA = [
 	},
 	{
 		id: 'buckley', name: 'William F. Buckley Jr.', born: 1925, died: 2008, x: 70, y: 55, confidence: 'medium', wiki: 'William F. Buckley Jr.',
-		basis: 'Economy: National Review (1955) fused free-market and traditionalist conservatism; society: he opposed the civil rights movement in the 1950s, an editorial he later disowned, and came to favour legalising drugs.'
+		basis: 'Economy: National Review (1955) fused free-market and traditionalist conservatism; society: he defended segregation in the 1957 editorial \'Why the South Must Prevail\' and later said he had been wrong to think Jim Crow could fade without federal intervention, and he came to favour legalising drugs.'
 	},
 	{
 		id: 'carter', name: 'Jimmy Carter', born: 1924, died: 2024, x: -10, y: -15, readings: { pacifism: 50, ecology: 55 }, confidence: 'medium', wiki: 'Jimmy Carter',
@@ -419,7 +419,7 @@ const FIGURES_DATA = [
 		basis: 'Economy: as minister of industry he pursued full state ownership and moral incentives; society: Socialism and Man in Cuba sets an austere ideal of the disciplined new man, which we read on the authoritarian side; pacifism: Guerrilla Warfare argues for armed struggle.'
 	},
 	{
-		id: 'mujica', name: 'José Mujica', born: 1935, died: 2025, x: -65, y: -55, readings: { ecology: 60 }, confidence: 'medium', wiki: 'José Mujica',
+		id: 'mujica', name: 'José Mujica', born: 1935, died: 2025, x: -45, y: -55, readings: { ecology: 60 }, confidence: 'medium', wiki: 'José Mujica',
 		basis: 'Economy: a former Tupamaro who as president kept a mixed economy with social spending; society: under him Uruguay legalised cannabis, same-sex marriage and abortion; ecology: his Rio+20 speech criticised consumerism.'
 	},
 	{
@@ -448,7 +448,7 @@ const FIGURES_DATA = [
 	},
 	{
 		id: 'eisenhower', name: 'Dwight D. Eisenhower', born: 1890, died: 1969, x: 30, y: 30, confidence: 'medium', wiki: 'Dwight D. Eisenhower',
-		basis: 'Economy: he kept the New Deal, built the Interstate highway system and balanced budgets; society: he sent troops to Little Rock in 1957 but was slow to lead on civil rights, and his 1953 order barred gay people from federal jobs.'
+		basis: 'Economy: he kept the New Deal, built the Interstate highway system and kept the budget under tight control (three balanced budgets out of eight); society: he sent troops to Little Rock in 1957 but was slow to lead on civil rights, and his 1953 order barred gay people from federal jobs.'
 	},
 	{
 		id: 'strauss', name: 'Franz Josef Strauss', born: 1915, died: 1988, x: 55, y: 80, confidence: 'medium', wiki: 'Franz Josef Strauss',
@@ -475,8 +475,8 @@ const FIGURES_DATA = [
 		basis: 'Economy: the Catholic Worker movement lived by voluntary poverty and rejected both capitalism and the state; society: orthodox in Catholic morals after her conversion, though she was arrested at rallies; pacifism: she opposed the Second World War and Vietnam.'
 	},
 	{
-		id: 'rothbard', name: 'Murray Rothbard', born: 1926, died: 1995, x: 100, y: -55, readings: { pacifism: 70 }, confidence: 'medium', wiki: 'Murray Rothbard',
-		basis: 'Economy: For a New Liberty and The Ethics of Liberty argue for a stateless market order; society: he opposed drug laws and conscription, though in the 1990s he allied with cultural conservatives; pacifism: he opposed the military budget and American foreign wars.'
+		id: 'rothbard', name: 'Murray Rothbard', born: 1926, died: 1995, x: 100, y: -30, readings: { pacifism: 70 }, confidence: 'medium', wiki: 'Murray Rothbard',
+		basis: 'Economy: For a New Liberty and The Ethics of Liberty argue for a stateless market order; society: he opposed drug laws and conscription, though from 1989 he turned to paleolibertarianism, backed Pat Buchanan in 1992, opposed the civil rights movement and held up David Duke as a model; pacifism: he opposed the military budget and American foreign wars.'
 	}
 ];
 
