@@ -15,6 +15,7 @@
 	import SignedIn from '$lib/components/SignedIn.svelte';
 	import Question from '$lib/components/Question.svelte';
 	import JourneyStrip from '$lib/components/JourneyStrip.svelte';
+	import ShareSheet from '$lib/components/ShareSheet.svelte';
 	import { signed } from '$lib/format.js';
 
 	const theme = $derived(page.params.theme);
@@ -51,6 +52,9 @@
 	const native = $derived(me ? !hasPolitiscales(me) : false);
 	const c = $derived(me ? coords(me) : null);
 	const country = $derived(COUNTRIES.find((x) => x.code === board.country) || COUNTRIES[0]);
+	/* sharing waits for a profile the questionnaire places on both axes itself */
+	const canShare = $derived(!!c && !!c.quiz && c.quiz.x !== null && !!c.soc && c.soc.y !== null);
+	let sharing = $state(false);
 
 	const question = $derived.by(() => {
 		if (!sc) return null;
@@ -222,6 +226,12 @@
 								{#if r.salience}<p class="hint">{r.salience}</p>{/if}
 							{/if}
 						{/each}
+						{#if canShare}
+							<div class="share-cta">
+								<button type="button" class="primary" onclick={() => (sharing = true)}>{L.share.cta}</button>
+								<span>{L.share.ctaLead}</span>
+							</div>
+						{/if}
 					</div>
 				{/if}
 			{/key}
@@ -254,6 +264,7 @@
 			{#if sc}<p class="quiz-keys">{L.quizKeys}</p>{/if}
 		{/if}
 	</div>
+	{#if canShare && me}<ShareSheet p={me} {country} bind:open={sharing} />{/if}
 </SignedIn>
 
 <style>
@@ -268,6 +279,8 @@
 		margin: 8px 0 10px; text-wrap: balance; }
 	.result .lead { margin: 0; font-size: var(--fs-lg); color: var(--text-2); max-width: 58ch; }
 	.theme-h { font-family: var(--font-display); font-size: 22px; font-weight: 700; margin: 12px 0 0; }
+	.share-cta { display: flex; align-items: center; gap: 14px; flex-wrap: wrap; margin-top: 6px; }
+	.share-cta span { font-size: 14px; color: var(--text-2); }
 	.result-cards { display: grid; grid-template-columns: repeat(auto-fit, minmax(150px, 1fr)); gap: 10px; }
 	.reading { padding: 14px 16px; border-radius: var(--r-md); background: var(--surface); border: 1px solid var(--border);
 		animation: card-in var(--dur-base) var(--ease-out) both; animation-delay: calc(var(--stagger) * var(--i) + 120ms); }

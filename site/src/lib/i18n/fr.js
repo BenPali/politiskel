@@ -1175,6 +1175,14 @@ export const LOCALES = {
         story: ["Story", "1080 × 1920"]
       },
       theme: "Thème de l'image",
+      open: "Partager",
+      cta: "Partager mon profil",
+      ctaLead: "Ton profil en image, à envoyer où tu veux.",
+      layoutsLabel: "Dispositions de la carte",
+      prev: "Disposition précédente", next: "Disposition suivante", close: "Fermer",
+      share: "Partager", download: "Télécharger", copy: "Copier l'image",
+      copied: "Image copiée",
+      failed: "L'image n'a pas pu être créée.",
       themes: { clair: "Clair", sombre: "Sombre", corpo: "Corpo", sepia: "Sépia", pop: "Pop" }
     }
   }

@@ -16,6 +16,7 @@
 	import ReadingBands from '$lib/components/ReadingBands.svelte';
 	import PartyList from '$lib/components/PartyList.svelte';
 	import BadgeShelf from '$lib/components/BadgeShelf.svelte';
+	import ShareSheet from '$lib/components/ShareSheet.svelte';
 	import { badgesOf, sortBadges } from '$lib/badges/badges.js';
 
 	$effect(() => {
@@ -38,6 +39,7 @@
 	const base = $derived(p ? coords(p) : null);
 	const others = $derived(p?.me ? board.members.map((m) => { const k = coords(m); return { id: m.id, alias: m.alias, x: k.x, y: k.y }; }) : null);
 	const badges = $derived(p && base ? sortBadges(badgesOf(p, base, { country, members: others })) : []);
+	let sharing = $state(false);
 	const source = $derived(p ? L.profileSource(hasPolitiscales(p), !!(q || c?.soc || c?.quiz)) : '');
 </script>
 
@@ -69,6 +71,9 @@
 						<div class="name">
 							<h1>{p.alias}</h1>
 							{#if p.me}<span class="you">{L.you}</span>{/if}
+							{#if p.me && base && base.x !== null && base.y !== null}
+								<button type="button" class="ghost share" onclick={() => (sharing = true)}>{L.share.open}</button>
+							{/if}
 						</div>
 						<p class="source">{source}</p>
 						{#if concepts.length}
@@ -131,6 +136,7 @@
 				</div>
 			</div>
 		{/key}
+		{#if p?.me}<ShareSheet {p} {country} bind:open={sharing} />{/if}
 	{/if}
 </SignedIn>
 
@@ -151,6 +157,7 @@
 	.card + .card { margin-top: 0; }
 	.name { display: flex; align-items: baseline; gap: 12px; margin-bottom: 4px; }
 	h1 { font-family: var(--font-display); font-size: 40px; font-weight: 700; margin: 0; letter-spacing: -0.02em; line-height: 1.1; overflow-wrap: anywhere; }
+	.share { margin-left: auto; min-height: 40px; }
 	.you { font-size: 13px; font-weight: 650; color: var(--accent-ink); background: var(--accent-soft); padding: 3px 10px; border-radius: var(--r-pill); }
 	.source { margin: 0 0 14px; font-size: 14px; color: var(--text-3); }
 	.concepts { display: flex; flex-wrap: wrap; gap: 6px; list-style: none; margin: 0 0 18px; padding: 0; }
