@@ -749,3 +749,126 @@ async fn groups_go_by_a_uuid_and_their_owner_can_rename_them() {
     let (_, me) = zoe.call("GET", "/api/me", None).await;
     assert_eq!((me["groups"][0]["name"].as_str(), me["groups"][0]["id"].as_str()), (Some("Le jeudi"), Some(gid.as_str())));
 }
+
+/// A share's body: the eight bytes of a PNG signature are all the server checks.
+const PNG_B64: &str = "iVBORw0KGgoAAAANSUhEUg==";
+
+fn new_share(alias: &str) -> Value {
+    json!({ "layout": "wide", "theme": "clair", "image": PNG_B64,
+            "snapshot": { "alias": alias, "x": -40, "y": 12, "badges": [{ "key": "atom", "level": 2 }] } })
+}
+
+/// A GET with no session, returning the raw response.
+async fn raw_get(app: &axum::Router, uri: &str) -> (StatusCode, axum::http::HeaderMap, Vec<u8>) {
+    let res = app.clone().oneshot(Request::get(uri).header(header::HOST, "politiskel.test").body(Body::empty()).unwrap())
+        .await.unwrap();
+    let (status, headers) = (res.status(), res.headers().clone());
+    (status, headers, res.into_body().collect().await.unwrap().to_bytes().to_vec())
+}
+
+#[tokio::test]
+async fn a_share_is_public_by_its_link_only() {
+    let app = server().await;
+    let mut a = Client::new(&app);
+    a.register("Nadia").await;
+    // signed out, no share can be made
+    assert_eq!(Client::new(&app).call("POST", "/api/me/shares", Some(new_share("x"))).await.0, StatusCode::UNAUTHORIZED);
+    let (s, made) = a.call("POST", "/api/me/shares", Some(new_share("Nadia"))).await;
+    assert_eq!(s, StatusCode::CREATED);
+    let token = made["token"].as_str().unwrap().to_string();
+    assert_eq!(token.len(), 22);
+    assert_eq!(made["url"], format!("/p/{token}"));
+
+    let (s, list) = a.call("GET", "/api/me/shares", None).await;
+    assert_eq!(s, StatusCode::OK);
+    assert_eq!(list[0]["token"], token.as_str());
+    assert_eq!(list[0]["layout"], "wide");
+    assert!(list[0].get("snapshot").is_none());
+
+    // anyone with the link reads it, without a session
+    let (s, h, body) = raw_get(&app, &format!("/api/shares/{token}")).await;
+    assert_eq!(s, StatusCode::OK);
+    assert_eq!(h.get(header::CACHE_CONTROL).unwrap(), "no-store");
+    let v: Value = serde_json::from_slice(&body).unwrap();
+    assert_eq!(v["snapshot"]["alias"], "Nadia");
+    assert_eq!(v["theme"], "clair");
+
+    let (s, h, body) = raw_get(&app, &format!("/api/shares/{token}/image")).await;
+    assert_eq!(s, StatusCode::OK);
+    assert_eq!(h.get(header::CONTENT_TYPE).unwrap(), "image/png");
+    assert!(body.starts_with(b"\x89PNG\r\n\x1a\n"));
+
+    // an unknown or malformed token is a 404
+    assert_eq!(raw_get(&app, "/api/shares/AAAAAAAAAAAAAAAAAAAAAA").await.0, StatusCode::NOT_FOUND);
+    assert_eq!(raw_get(&app, "/api/shares/nope").await.0, StatusCode::NOT_FOUND);
+
+    // it is in the export, snapshot included
+    let (_, e) = a.call("GET", "/api/me/export", None).await;
+    assert_eq!(e["shares"][0]["snapshot"]["alias"], "Nadia");
+}
+
+#[tokio::test]
+async fn shares_are_bounded() {
+    let app = server().await;
+    let mut a = Client::new(&app);
+    a.register("Omar").await;
+    let mut bad = new_share("Omar");
+    bad["image"] = json!("R0lGODlhAQABAAAAACw=");
+    let (s, b) = a.call("POST", "/api/me/shares", Some(bad)).await;
+    assert_eq!((s, b["error"].as_str()), (StatusCode::BAD_REQUEST, Some("share_image_not_png")));
+    let mut big = new_share("Omar");
+    big["snapshot"]["pad"] = json!("x".repeat(33 * 1024));
+    let (s, b) = a.call("POST", "/api/me/shares", Some(big)).await;
+    assert_eq!((s, b["error"].as_str()), (StatusCode::BAD_REQUEST, Some("share_snapshot_too_large")));
+    let mut label = new_share("Omar");
+    label["layout"] = json!("Wide Card");
+    assert_eq!(a.call("POST", "/api/me/shares", Some(label)).await.0, StatusCode::BAD_REQUEST);
+    for _ in 0..20 {
+        assert_eq!(a.call("POST", "/api/me/shares", Some(new_share("Omar"))).await.0, StatusCode::CREATED);
+    }
+    let (s, b) = a.call("POST", "/api/me/shares", Some(new_share("Omar"))).await;
+    assert_eq!((s, b["error"].as_str()), (StatusCode::BAD_REQUEST, Some("shares_too_many")));
+}
+
+#[tokio::test]
+async fn only_its_owner_deletes_a_share_and_deleting_the_account_deletes_them() {
+    let app = server().await;
+    let (mut a, mut b) = (Client::new(&app), Client::new(&app));
+    a.register("Paula").await;
+    b.register("Quentin").await;
+    let (_, one) = a.call("POST", "/api/me/shares", Some(new_share("Paula"))).await;
+    let (_, two) = a.call("POST", "/api/me/shares", Some(new_share("Paula"))).await;
+    let (one, two) = (one["token"].as_str().unwrap().to_string(), two["token"].as_str().unwrap().to_string());
+    // another member's share reads as one that does not exist
+    assert_eq!(b.call("DELETE", &format!("/api/me/shares/{one}"), None).await.0, StatusCode::NOT_FOUND);
+    assert_eq!(a.call("DELETE", &format!("/api/me/shares/{one}"), None).await.0, StatusCode::NO_CONTENT);
+    assert_eq!(raw_get(&app, &format!("/api/shares/{one}")).await.0, StatusCode::NOT_FOUND);
+    assert_eq!(a.call("DELETE", &format!("/api/me/shares/{one}"), None).await.0, StatusCode::NOT_FOUND);
+    // the other one goes with the account
+    assert_eq!(raw_get(&app, &format!("/api/shares/{two}")).await.0, StatusCode::OK);
+    a.call("DELETE", "/api/me", Some(json!({ "password": "correct horse battery" }))).await;
+    assert_eq!(raw_get(&app, &format!("/api/shares/{two}")).await.0, StatusCode::NOT_FOUND);
+    assert_eq!(raw_get(&app, &format!("/api/shares/{two}/image")).await.0, StatusCode::NOT_FOUND);
+}
+
+#[tokio::test]
+async fn a_share_page_carries_escaped_preview_tags() {
+    let app = server().await;
+    let mut a = Client::new(&app);
+    a.register("Rose").await;
+    let (_, made) = a.call("POST", "/api/me/shares", Some(new_share("<Rose> \"R\""))).await;
+    let token = made["token"].as_str().unwrap().to_string();
+    let (s, h, body) = raw_get(&app, &format!("/p/{token}")).await;
+    assert_eq!(s, StatusCode::OK);
+    assert!(h.get(header::CONTENT_TYPE).unwrap().to_str().unwrap().starts_with("text/html"));
+    let html = String::from_utf8(body).unwrap();
+    assert!(html.contains("<meta property=\"og:title\" content=\"Profil politique de &lt;Rose&gt; &quot;R&quot;\">"));
+    assert!(!html.contains("<Rose>"));
+    assert!(html.contains(&format!("content=\"https://politiskel.test/api/shares/{token}/image\"")));
+    assert!(html.contains("noindex"));
+    assert!(html.contains("<title>Politiskel</title>"));
+    // an unknown link is the plain page, which says so itself
+    let (s, _, body) = raw_get(&app, "/p/AAAAAAAAAAAAAAAAAAAAAA").await;
+    assert_eq!(s, StatusCode::OK);
+    assert!(!String::from_utf8(body).unwrap().contains("og:title"));
+}

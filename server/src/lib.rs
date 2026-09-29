@@ -16,7 +16,8 @@
 //! `error`, `security` (the middleware on every response), `auth` (sign-up,
 //! sessions, passwords), `account` (one's profile, export, deletion),
 //! `groups`, `directory` (listed groups and requests to join), `logging`
-//! (a line per failed request, and /api/health), `model_check` (how the
+//! (a line per failed request, and /api/health), `shares` (public share
+//! links, the one thing made public on purpose), `model_check` (how the
 //! scoring behaves on the answers of those who agreed, in aggregates, for
 //! admins) and `site` (the built site). `validate` checks every input.
 
@@ -29,6 +30,7 @@ mod groups;
 mod logging;
 mod model_check;
 mod security;
+mod shares;
 mod site;
 mod state;
 
@@ -51,6 +53,7 @@ use crate::security::{same_origin_writes, security_headers};
 use crate::site::site_page;
 use crate::account::{me, put_profile, export, delete_me, set_tour, set_model_check};
 use crate::directory::{directory, ask_to_join, withdraw_request, requests, accept_request, decline_request, set_listed};
+use crate::shares::{create_share, list_shares, delete_share, public_share, share_image, share_page};
 use crate::groups::{create_group, invite_preview, join_group, leave_group, new_invite, remove_member, hand_over_group, delete_group, group_profiles, rename_group};
 
 pub async fn migrate(db: &SqlitePool) -> Result<(), sqlx::migrate::MigrateError> {
@@ -72,6 +75,13 @@ pub fn app(state: AppState) -> Router {
         .route("/api/me/model-check", post(set_model_check))
         .route("/api/admin/model-check", get(crate::model_check::report))
         .route("/api/me/password", post(change_password))
+        // a share carries its image: a larger body than anything else
+        .route("/api/me/shares", post(create_share).get(list_shares)
+            .layer(DefaultBodyLimit::max(1200 * 1024)))
+        .route("/api/me/shares/{token}", axum::routing::delete(delete_share))
+        .route("/api/shares/{token}", get(public_share))
+        .route("/api/shares/{token}/image", get(share_image))
+        .route("/p/{token}", get(share_page))
         .route("/api/me/sessions/others", axum::routing::delete(end_other_sessions))
         .route("/api/groups", post(create_group))
         .route("/api/groups/join", post(join_group))

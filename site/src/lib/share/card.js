@@ -4,7 +4,7 @@
    Only results go in: position, readings, badges, flag, nearest party;
    never an answer. Everything a member typed (the alias) is escaped. */
 import { L } from '$lib/i18n/fr.js';
-import { coords, nearestBase, fitOf } from '$lib/compass/model.js';
+import { COUNTRIES, coords, nearestBase, fitOf } from '$lib/compass/model.js';
 import { politiskelFlag } from '$lib/flag/flag.js';
 import { PolitiModel } from '$lib/model.js';
 import { badgesOf, sortBadges, SINGLE, familyOf } from '$lib/badges/badges.js';
@@ -39,26 +39,59 @@ const READINGS = ['europe', 'ecology', 'people', 'protectionism', 'defence', 'nu
 export function cardData(p, country) {
 	const c = coords(p);
 	const flag = politiskelFlag(c, p);
-	const B = L.badges;
 	const badges = sortBadges(badgesOf(p, c, { country })).filter((b) => !SINGLE.has(b.key) || b.key === 'loyal' || b.key === 'orphan')
-		.map((b) => ({ ...b, name: B.items[b.key].names[SINGLE.has(b.key) ? 0 : b.level - 1], label: B.items[b.key].label || B.families[familyOf(b.key)] }));
-	const placed = c.x !== null && c.y !== null;
-	const near = placed ? nearestBase(c.x, c.y, country) : null;
-	const limits = PolitiModel.limitsFor(country.parties);
+		.map((b) => ({ key: b.key, level: b.level, strength: b.strength }));
 	const q = c.quiz || {}, eu = c.eu || {}, inst = c.inst || {}, eco = c.ecology || {};
-	const value = { europe: eu.europe, defence: eu.defence, russia: eu.russia, world: eu.world, people: inst.people, executive: inst.executive,
+	const values = { europe: eu.europe, defence: eu.defence, russia: eu.russia, world: eu.world, people: inst.people, executive: inst.executive,
 		ecology: eco.ecology, transition: eco.transition, nuclear: eco.nuclear, degrowth: eco.degrowth,
 		protectionism: q.protectionism, labour: q.labour, class: q.class };
-	const readings = READINGS.filter((k) => Number.isFinite(value[k]))
-		.map((k) => ({ k, v: value[k], label: L.bands.label[k], ends: L.bands.ends[k] }))
+	return assemble({ alias: p.alias, x: c.x, y: c.y, flag: flag ? flag.url : null, badges, values }, country);
+}
+
+/* The card's data from results alone: what a profile gives, and what a
+   shared link keeps. Names and labels come from the copy, never from the
+   results, and the nearest party is found again. */
+function assemble(r, country) {
+	const B = L.badges;
+	const placed = r.x !== null && r.y !== null;
+	const near = placed ? nearestBase(r.x, r.y, country) : null;
+	const limits = PolitiModel.limitsFor(country.parties);
+	const readings = READINGS.filter((k) => Number.isFinite(r.values[k]))
+		.map((k) => ({ k, v: r.values[k], label: L.bands.label[k], ends: L.bands.ends[k] }))
 		.sort((a, b) => Math.abs(b.v) - Math.abs(a.v));
 	return {
-		alias: p.alias, x: c.x, y: c.y, placed, flag: flag ? flag.url : null, badges, readings,
-		axes: ['x', 'y'].filter((k) => Number.isFinite(c[k])).map((k) => ({ k, v: c[k], label: L.bands.label[k], ends: L.bands.ends[k] })),
-		country: country.name,
-		parties: country.parties.map((r) => ({ x: r.x, y: r.y, name: r.name })),
+		alias: r.alias, x: r.x, y: r.y, placed, flag: r.flag, values: r.values, readings,
+		badges: r.badges.map((b) => ({ ...b, name: B.items[b.key].names[SINGLE.has(b.key) ? 0 : b.level - 1], label: B.items[b.key].label || B.families[familyOf(b.key)] })),
+		axes: [['x', r.x], ['y', r.y]].filter(([, v]) => Number.isFinite(v)).map(([k, v]) => ({ k, v, label: L.bands.label[k], ends: L.bands.ends[k] })),
+		country: country.name, countryCode: country.code,
+		parties: country.parties.map((q) => ({ x: q.x, y: q.y, name: q.name })),
 		nearest: near ? { name: near.name, d: Math.round(near.d), fit: fitOf(near.d, limits) } : null
 	};
+}
+
+/* What a public link stores: results only, in a shape small enough to check. */
+export const snapshotOf = (d) => ({
+	v: 1, alias: d.alias, country: d.countryCode, x: d.x, y: d.y, flag: d.flag,
+	badges: d.badges.map((b) => ({ key: b.key, level: b.level, strength: b.strength })),
+	values: Object.fromEntries(READINGS.filter((k) => Number.isFinite(d.values[k])).map((k) => [k, d.values[k]]))
+});
+
+/* A stored snapshot read back: it comes from a server anyone can post to
+   through their own account, so every field is checked, and whatever does
+   not fit is dropped rather than drawn. */
+export function fromSnapshot(s) {
+	if (!s || typeof s !== 'object' || s.v !== 1) return null;
+	const country = COUNTRIES.find((c) => c.code === s.country);
+	if (!country) return null;
+	const pos = (v) => (typeof v === 'number' && Number.isFinite(v) ? Math.max(-100, Math.min(100, v)) : null);
+	const alias = typeof s.alias === 'string' ? s.alias.slice(0, 40) : '';
+	const flag = typeof s.flag === 'string' && s.flag.startsWith('data:image/svg+xml') && s.flag.length < 40000 ? s.flag : null;
+	const badges = (Array.isArray(s.badges) ? s.badges : []).slice(0, 60)
+		.filter((b) => b && L.badges.items[b.key] && [1, 2, 3].includes(b.level))
+		.map((b) => ({ key: b.key, level: SINGLE.has(b.key) ? 1 : b.level, strength: typeof b.strength === 'number' && Number.isFinite(b.strength) ? Math.round(Math.max(0, Math.min(100, b.strength))) : null }));
+	const values = {};
+	for (const k of READINGS) { const v = pos(s.values && s.values[k]); if (v !== null) values[k] = v; }
+	return assemble({ alias, x: pos(s.x), y: pos(s.y), flag, badges, values }, country);
 }
 
 /* ---------- pieces ---------- */

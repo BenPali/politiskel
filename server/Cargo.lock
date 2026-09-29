@@ -1008,6 +1008,7 @@ dependencies = [
  "argon2",
  "axum",
  "axum-extra",
+ "base64",
  "http-body-util",
  "rand",
  "serde",

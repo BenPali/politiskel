@@ -117,14 +117,15 @@ pub(crate) async fn export(State(state): State<AppState>, jar: CookieJar) -> Api
         "model_check_consent_at": model_check_at,
         "groups": groups_of(&state, id).await?,
         "profile": profile_of(&state, id).await?,
+        "shares": crate::shares::shares_of(&state, id, true).await?,
     })))
 }
 
 #[derive(Deserialize)]
 pub(crate) struct Confirm { password: String }
 
-/// Deletes the account and, by cascade, its sessions, memberships and
-/// profile; then any group left with no member (art. 17).
+/// Deletes the account and, by cascade, its sessions, memberships, profile
+/// and share links; then any group left with no member (art. 17).
 pub(crate) async fn delete_me(State(state): State<AppState>, jar: CookieJar, Json(body): Json<Confirm>)
     -> ApiResult<(StatusCode, CookieJar)>
 {

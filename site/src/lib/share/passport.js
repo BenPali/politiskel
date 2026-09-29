@@ -1,49 +1,12 @@
-/* The political passport, a prototype: a booklet one leafs through, drawn
+/* The political passport: a booklet one leafs through, drawn
    from the same card data as the share cards. This file holds what the
    pages draw as SVG strings (guilloche, stamps, seal) and the few values
    the pages compute (nationality, machine-readable zone). Nothing a member
    typed goes into an SVG string: the alias is written by the page, as
-   text. The French copy lives in COPY until the prototype is kept, when it
-   moves to fr.js. */
+   text. Its copy is L.passport. */
 import { L } from '$lib/i18n/fr.js';
 
-export const COPY = {
-	title: 'Passeport politique',
-	republic: 'République de Politiskel',
-	open: 'Ouvrir le passeport',
-	prev: 'Page précédente',
-	next: 'Page suivante',
-	hint: 'Clique ou fais glisser pour tourner les pages, ou utilise les flèches du clavier.',
-	union: 'Union des opinions',
-	passport: 'Passeport',
-	type: 'Type / Type',
-	code: 'Code / Code',
-	docNo: 'Passeport n° / Passport No.',
-	surname: '1. Nom / Surname',
-	nationality: '2. Nationalité / Nationality',
-	position: '3. Position / Position',
-	country: '4. Pays de référence / Reference country',
-	issued: '5. Date de délivrance / Date of issue',
-	expires: '6. Date d\'expiration / Date of expiry',
-	expiresValue: 'Jusqu\'au prochain questionnaire',
-	authority: '7. Autorité / Authority',
-	authorityPage: 'Autorité',
-	authorityValue: 'Préfecture des opinions',
-	signature: '8. Signature du titulaire / Holder\'s signature',
-	centre: 'Centre',
-	visas: 'Visas',
-	noStamp: 'Aucun visa pour l\'instant : les badges viennent des questionnaires.',
-	observations: 'Observations',
-	obsLead: 'Le titulaire a été observé aux positions suivantes :',
-	noReading: 'Aucune lecture relevée.',
-	consulate: 'Consulat le plus proche',
-	consulateNone: 'Aucun consulat à proximité',
-	sealText: 'RÉPUBLIQUE DE POLITISKEL · PRÉFECTURE DES OPINIONS · ',
-	insideLead: 'Au nom de la République de Politiskel, les autorités prient toutes les opinions de laisser passer librement le titulaire du présent passeport, et de lui prêter aide et contradiction en cas de besoin.',
-	insideNote: 'Ce passeport ne contient que des résultats : aucune réponse au questionnaire n\'y figure.',
-	level: (n) => 'Niveau ' + n,
-	backNote: 'politiskel.benit.ooo'
-};
+export const COPY = L.passport;
 
 /* ---------- values ---------- */
 

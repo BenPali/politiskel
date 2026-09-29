@@ -125,6 +125,50 @@ pub fn flag(v: &str) -> Result<(), &'static str> {
     Ok(())
 }
 
+/// A shared card's layout or theme name, as the site names them.
+pub fn share_label(v: &str) -> Result<(), &'static str> {
+    if (1..=32).contains(&v.len()) && v.bytes().all(|b| b.is_ascii_lowercase() || b.is_ascii_digit() || b == b'_' || b == b'-') {
+        Ok(())
+    } else {
+        Err("share_bad_label")
+    }
+}
+
+pub const MAX_SNAPSHOT: usize = 32 * 1024;
+pub const MAX_SHARE_IMAGE: usize = 800 * 1024;
+
+/// What a shared card shows, as the site computed it: results, never answers.
+/// It is shown back only through the site, which escapes it; here it is only
+/// bounded.
+pub fn share_snapshot(v: &Value) -> Result<String, &'static str> {
+    if !v.is_object() {
+        return Err("share_snapshot_not_object");
+    }
+    let text = v.to_string();
+    if text.len() > MAX_SNAPSHOT {
+        return Err("share_snapshot_too_large");
+    }
+    Ok(text)
+}
+
+/// The card as a PNG, base64 or a PNG data URL: the decoded bytes, checked.
+pub fn share_image(v: &str) -> Result<Vec<u8>, &'static str> {
+    use base64::Engine;
+    let b64 = v.strip_prefix("data:image/png;base64,").unwrap_or(v);
+    // decoded is three quarters of the text: refuse before decoding
+    if b64.len() > MAX_SHARE_IMAGE / 3 * 4 + 4 {
+        return Err("share_image_too_large");
+    }
+    let bytes = base64::engine::general_purpose::STANDARD.decode(b64).map_err(|_| "share_image_not_png")?;
+    if bytes.len() > MAX_SHARE_IMAGE {
+        return Err("share_image_too_large");
+    }
+    if !bytes.starts_with(b"\x89PNG\r\n\x1a\n") {
+        return Err("share_image_not_png");
+    }
+    Ok(bytes)
+}
+
 /// Questionnaire answers: item or salience keys mapped to an option index or
 /// "dk" ("can't choose").
 pub fn answers(v: &Value) -> Result<(), &'static str> {

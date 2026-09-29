@@ -4,7 +4,8 @@
 //!   http 403 POST /api/groups/{id}/remove 4ms not_owner
 //!
 //! The path is the route's shape: a number or a group's UUID reads {id} and
-//! an invitation code {code}, so no group, member or invitation can be read off the log. No
+//! an invitation code {code} and a share link {token}, so no group, member,
+//! invitation or share can be read off the log. No
 //! address, no name, no body. Left out as noise: the 401 every signed-out
 //! visit gets from /api/me, and a missing file outside the API (robots
 //! probing for /wp-login.php).
@@ -33,6 +34,8 @@ pub(crate) fn route_of(path: &str) -> String {
             "{id}".to_string()
         } else if seg.len() >= 16 && seg.bytes().all(|b| b.is_ascii_hexdigit()) {
             "{code}".to_string()
+        } else if crate::shares::is_share_token(seg) {
+            "{token}".to_string()
         } else {
             seg.to_string()
         }
@@ -89,5 +92,8 @@ mod tests {
         assert_eq!(route_of("/boussole/jean.dupont"), "/boussole/…");
         assert_eq!(route_of("/rejoindre/0123456789abcdef0123456789abcdef"), "/rejoindre/…");
         assert_eq!(route_of("/api/me"), "/api/me");
+        assert_eq!(route_of("/api/shares/AbCdEfGhIjKlMnOpQrSt-_/image"), "/api/shares/{token}/image");
+        assert_eq!(route_of("/api/me/shares/AbCdEfGhIjKlMnOpQrSt-_"), "/api/me/shares/{token}");
+        assert_eq!(route_of("/p/AbCdEfGhIjKlMnOpQrSt-_"), "/p/…");
     }
 }
