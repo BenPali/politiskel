@@ -28,7 +28,8 @@ let nativeAt = 0, englishAt = 0;
 /* the current name, without what the codebook adds in brackets (an
    acronym, a former name, "merger of ..."), bilingual names spaced alike */
 const current = s => {
-  let n = s.split(";")[0];
+  /* pdftotext writes a caron as a breve before its letter (ob˘canů): put it back */
+  let n = s.split(";")[0].replace(/˘(\p{L})/gu, (_, c) => (c + "\u030C").normalize("NFC"));
   while (/\([^()]*\)/.test(n)) n = n.replace(/\s*\([^()]*\)/g, "");
   n = n.replace(/\s*\(.*$/, "");          /* a bracket left open */
   return n.replace(/\s*\/\s*/g, " / ").replace(/\s+/g, " ").trim();
@@ -39,6 +40,12 @@ const FIX = {
   2104: { native: "Křesťanská a demokratická unie – Československá strana lidová",
           english: "Christian and Democratic Union – Czechoslovak People's Party" },
   550: { native: "Junts per Catalunya", english: "Together for Catalonia" },
+  /* the Finns list their former name first; the social democrats' wraps after a ";" */
+  1405: { native: "Perussuomalaiset", english: "Finns Party" },
+  1401: { native: "Suomen Sosialidemokraattinen Puolue", english: "Social Democratic Party of Finland" },
+  1202: { native: "Centro Democrático e Social – Partido Popular", english: "CDS – People's Party" },
+  1250: { native: "Pessoas – Animais – Natureza", english: "People – Animals – Nature" },
+  111: { native: "Démocrate fédéraliste indépendant", english: "Democratic, Federalist, Independent" },
   2314: { native: "Momentum Mozgalom", english: "Momentum Movement" }
 };
 

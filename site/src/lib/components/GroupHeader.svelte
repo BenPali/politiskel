@@ -28,7 +28,8 @@
 	/* a country where the reading on show has no party: back to the default one, and said */
 	function switchCountry() {
 		if (!viewAvailable(board.view, country)) {
-			toast(L.viewUnavailableSwitched(L.views[board.view].name, country.name));
+			const why = board.view === 'protectionism' ? country.protWhy : null;
+			toast(L.viewUnavailableSwitched(L.views[board.view].name, country.name, why), why ? { ms: 9000 } : undefined);
 			board.view = 'politiskel';
 		}
 		savePrefs();
@@ -78,7 +79,7 @@
 				<select bind:value={board.view} onchange={savePrefs}>
 					{#each VIEWS as v (v.key)}
 						{@const off = !viewAvailable(v.key, country)}
-						<option value={v.key} disabled={v.planned || off}>{L.views[v.key].name}{off ? L.viewUnavailable : ''}</option>
+						<option value={v.key} disabled={v.planned || off} title={off && v.key === 'protectionism' && country?.protWhy ? L.viewWhy(country.protWhy) : undefined}>{L.views[v.key].name}{off ? L.viewUnavailable : ''}</option>
 					{/each}
 				</select>
 			</label>

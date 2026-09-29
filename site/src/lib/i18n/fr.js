@@ -355,7 +355,7 @@ export const LOCALES = {
         ], quote: ["« Le gouvernement devrait prendre des mesures pour réduire les différences de revenu. »", "ESS, variable <code>gincdif</code>, questionnaire français officiel"] },
         { id: "partis", title: "Comment les partis sont placés", paras: [
           "Les repères viennent du CHES 2024 : 609 politologues notent 279 partis européens sur les échelles <code>lrecon</code> et <code>galtan</code>, exactement les deux dimensions de cette boussole, ramenées de −100 à +100 : position = (note sur 10 − 5) × 20. La position sur l'Europe vient de son échelle <code>eu_position</code>, notée de 1 à 7 : position = (note − 4) / 3 × 100. Ce ne sont pas des scores PolitiScales ; les distances profil-parti gardent donc une part d'approximation.",
-          "Les 31 pays du CHES 2024 sont repris. Pour la France, l'Allemagne, l'Italie et le Royaume-Uni, chaque repère est décrit à la main, et quelques partis absents du CHES y sont estimés. Pour les 27 autres, un parti est nommé par son sigle actuel, avec son nom d'origine quand la base <em>Party Facts</em> le donne sans ambiguïté, et sa famille selon le CHES : rien n'y est écrit à la main. Leurs tables sont produites par un script du dépôt (<code>tools/import-ches.js</code>) que chacun peut relancer. Dans un pays où la moitié au moins des positions sur le protectionnisme reposent visiblement sur un ou deux experts, cette lecture n'a pas de repère, et la page le dit."
+          "Les 31 pays du CHES 2024 sont repris. Pour la France, l'Allemagne, l'Italie et le Royaume-Uni, chaque repère est décrit à la main, et quelques partis absents du CHES y sont estimés. Pour les 27 autres, un parti est nommé par son sigle actuel, avec son nom complet tel que le donne le livre de codes du CHES 2024, et sa famille selon le CHES : rien n'y est écrit à la main. Leurs tables sont produites par un script du dépôt (<code>tools/import-ches.js</code>) que chacun peut relancer. Dans un pays où la moitié au moins des positions sur le protectionnisme reposent visiblement sur un ou deux experts, cette lecture n'a pas de repère, et la page le dit."
         ] },
         { id: "distance", title: "Une proximité, pas une appartenance", paras: [
           "La distance entre un profil et un parti est mesurée sur les deux axes de la lecture choisie. Les seuils ne sont pas fixés à la main : on mesure l'espacement médian entre un parti et son voisin le plus proche, puis <em>proche</em> vaut jusqu'à cet espacement, <em>modérée</em> jusqu'à une fois et demie. Au-delà, le parti le moins lointain reste nommé, mais la page dit qu'aucun n'est vraiment proche. Le repère le plus proche n'est pas une famille politique : c'est le point le moins éloigné, et il peut être loin."
@@ -761,8 +761,10 @@ export const LOCALES = {
     viewNoteNoX: n => n + " profil" + (n > 1 ? "s" : "") + " sans réponse sur l'axe économique "
       + (n > 1 ? "ne sont" : "n'est") + " pas placé" + (n > 1 ? "s" : "") + ".",
     viewUnavailable: " (pas de repère pour ce pays)",
-    viewUnavailableSwitched: (view, country) => "« " + view + " » : aucun repère pour ce pays (" + country
-      + "). Retour à la lecture Politiskel.",
+    viewUnavailableSwitched: (view, country, why) => "« " + view + " » : aucun repère pour ce pays (" + country
+      + ")" + (why ? " : " + why.replace(/^pour [^,]+, /, "") : ".") + " Retour à la lecture Politiskel.",
+    /* why a reading has no party in a country, when the table says */
+    viewWhy: why => why.charAt(0).toUpperCase() + why.slice(1),
     views: {
       politiskel: { name: "Politiskel : économie × société" },
       politiscales: { name: "PolitiScales d'origine" },
@@ -992,7 +994,7 @@ export const LOCALES = {
         def: "Un revenu versé pour une durée limitée à ceux qui ont perdu leur emploi, financé par des prélèvements sur les salaires." },
       { term: "Prestations sociales", match: /prestations sociales/i,
         def: "Les sommes versées par l'État ou la Sécurité sociale : allocations familiales, aides au logement, RSA, pensions de retraite." },
-      { term: "Cotisations sociales", match: /cotisations/i,
+      { term: "Cotisations sociales", match: /cotisations sociales/i,
         def: "Les prélèvements sur les salaires qui financent la Sécurité sociale : santé, retraites, chômage, famille." },
       { term: "Secteur privé", match: /secteur privé/i,
         def: "Les entreprises qui appartiennent à des particuliers ou à des actionnaires, et non à l'État." },

@@ -23,7 +23,7 @@
       {"name":"Groen","x":-46,"y":-68,"src":"ches","prot":10,"eu":63,"env":90,"pop":-27,"note":"Écologistes"},
       {"name":"Vooruit","x":-18,"y":-38,"src":"ches","prot":5,"eu":70,"env":34,"pop":-20,"note":"Sociaux-démocrates"},
       {"name":"LE","x":7,"y":15,"src":"ches","prot":5,"eu":81,"env":5,"pop":-42,"full":"Les Engagés","note":"Démocrates-chrétiens"},
-      {"name":"DeFl","x":10,"y":-25,"src":"ches","prot":20,"eu":67,"env":20,"pop":-41,"full":"Démocrate fédéraliste independent","note":"Régionalistes"},
+      {"name":"DeFl","x":10,"y":-25,"src":"ches","prot":20,"eu":67,"env":20,"pop":-41,"full":"Démocrate fédéraliste indépendant","note":"Régionalistes"},
       {"name":"CD&V","x":12,"y":36,"src":"ches","prot":5,"eu":90,"env":-16,"pop":-39,"full":"Christen-Democratisch & Vlaams","note":"Démocrates-chrétiens"},
       {"name":"Open Vld","x":40,"y":-40,"src":"ches","prot":-60,"eu":90,"env":-8,"pop":-47,"full":"Open Vlaamse Liberalen en Democraten","note":"Libéraux"},
       {"name":"VB","x":40,"y":78,"src":"ches","prot":40,"eu":-67,"env":-50,"full":"Vlaams Belang","note":"Droite radicale"},
@@ -126,7 +126,7 @@
     protWhy: "pour ce pays, la moitié au moins des positions du CHES 2024 sur le protectionnisme sont des nombres entiers : vraisemblablement un ou deux experts, trop peu pour placer les partis.",
     parties: [
       {"name":"VAS","x":-67,"y":-73,"src":"ches","eu":52,"env":71,"pop":-31,"full":"Vasemmistoliitto","note":"Gauche radicale"},
-      {"name":"SDP","x":-36,"y":-42,"src":"ches","eu":73,"env":32,"pop":-44,"full":"Suomen Sosialidemokraattinen","note":"Sociaux-démocrates"},
+      {"name":"SDP","x":-36,"y":-42,"src":"ches","eu":73,"env":32,"pop":-44,"full":"Suomen Sosialidemokraattinen Puolue","note":"Sociaux-démocrates"},
       {"name":"VIHR","x":-18,"y":-84,"src":"ches","eu":79,"env":87,"pop":-48,"full":"Vihreä Liitto","note":"Écologistes"},
       {"name":"KESK","x":16,"y":29,"src":"ches","eu":27,"env":-13,"pop":-29,"full":"Suomen Keskusta","note":"Agrariens et centre"},
       {"name":"SFP/RKP","x":40,"y":-38,"src":"ches","eu":85,"env":15,"pop":-61,"full":"Ruotsalainen kansanpuolue / Svenska folkpartiet","note":"Régionalistes"},
@@ -134,7 +134,7 @@
       {"name":"AS","x":47,"y":-10,"src":"ches","eu":67,"env":0,"full":"Åländsk Samling","note":"Régionalistes"},
       {"name":"KOK","x":60,"y":5,"src":"ches","eu":76,"env":-3,"pop":-49,"full":"Kansallinen Kokoomus","note":"Conservateurs"},
       {"name":"Liik","x":62,"y":-3,"src":"ches","eu":20,"env":-18,"pop":-25,"full":"Liike Nyt","note":"Libéraux"},
-      {"name":"PS","x":64,"y":78,"src":"ches","eu":-52,"env":-66,"pop":70,"full":"Suomen Puolue","note":"Droite radicale"}
+      {"name":"PS","x":64,"y":78,"src":"ches","eu":-52,"env":-66,"pop":70,"full":"Perussuomalaiset","note":"Droite radicale"}
     ]
   },
   {
@@ -282,11 +282,11 @@
     parties: [
       {"name":"CDU","x":-88,"y":-30,"src":"ches","eu":-67,"env":16,"pop":-3,"full":"Coligação Democrática Unitária","note":"Gauche radicale"},
       {"name":"BE","x":-75,"y":-85,"src":"ches","eu":-12,"env":56,"pop":-26,"full":"Bloco de Esquerda","note":"Gauche radicale"},
-      {"name":"PAN","x":-32,"y":-67,"src":"ches","eu":71,"env":53,"pop":-46,"full":"Pessosas - Animais - Natureza","note":"Écologistes"},
+      {"name":"PAN","x":-32,"y":-67,"src":"ches","eu":71,"env":53,"pop":-46,"full":"Pessoas – Animais – Natureza","note":"Écologistes"},
       {"name":"L","x":-32,"y":-73,"src":"ches","eu":83,"env":50,"full":"Livre","note":"Écologistes"},
       {"name":"PS","x":-16,"y":-44,"src":"ches","eu":100,"env":46,"pop":-62,"full":"Partido Socialista","note":"Sociaux-démocrates"},
       {"name":"PPD/PSD","x":35,"y":35,"src":"ches","eu":100,"env":26,"pop":-68,"full":"Partido Popular Democrático / Partido Social Democrata","note":"Libéraux"},
-      {"name":"CDS-PP","x":47,"y":62,"src":"ches","eu":82,"env":-14,"pop":-52,"full":"Centro Democrático e Social--Partido Poplar","note":"Conservateurs"},
+      {"name":"CDS-PP","x":47,"y":62,"src":"ches","eu":82,"env":-14,"pop":-52,"full":"Centro Democrático e Social – Partido Popular","note":"Conservateurs"},
       {"name":"IL","x":62,"y":-33,"src":"ches","eu":70,"env":-3,"pop":-36,"full":"Iniciativa Liberal","note":"Libéraux"},
       {"name":"Chega","x":62,"y":93,"src":"ches","eu":-24,"env":-33,"pop":67,"note":"Droite radicale"}
     ]
@@ -364,8 +364,8 @@
     parties: [
       {"name":"KSCM","x":-85,"y":60,"src":"ches","prot":79,"eu":-84,"env":-65,"pop":7,"full":"Komunistická strana Cech a Moravy","note":"Gauche radicale"},
       {"name":"SOCDEM","x":-52,"y":-4,"src":"ches","prot":32,"eu":36,"env":-6,"pop":-32,"full":"Česká strana sociálně demokratická","note":"Sociaux-démocrates"},
-      {"name":"ANO2011","x":-24,"y":39,"src":"ches","prot":35,"eu":-31,"env":-51,"pop":51,"full":"Akce nespokojených ob˘canů","note":"Sans famille"},
-      {"name":"SPD","x":-18,"y":89,"src":"ches","prot":79,"eu":-96,"env":-77,"pop":89,"full":"Svoboda a p˘rímá demokracie Tomio Okamura","note":"Droite radicale"},
+      {"name":"ANO2011","x":-24,"y":39,"src":"ches","prot":35,"eu":-31,"env":-51,"pop":51,"full":"Akce nespokojených občanů","note":"Sans famille"},
+      {"name":"SPD","x":-18,"y":89,"src":"ches","prot":79,"eu":-96,"env":-77,"pop":89,"full":"Svoboda a přímá demokracie Tomio Okamura","note":"Droite radicale"},
       {"name":"Pirates","x":-11,"y":-68,"src":"ches","prot":-34,"eu":80,"env":52,"pop":-33,"full":"Ceska piratska strana","note":"Écologistes"},
       {"name":"KDU-CSL","x":7,"y":57,"src":"ches","prot":11,"eu":64,"env":1,"pop":-59,"full":"Křesťanská a demokratická unie – Československá strana lidová","note":"Démocrates-chrétiens"},
       {"name":"STAN","x":17,"y":-19,"src":"ches","prot":-26,"eu":88,"env":24,"pop":-56,"full":"Starostové a nezávislí","note":"Libéraux"},

@@ -65,10 +65,17 @@ function withQuiz(p, c) {
 	c.eu = PolitiQuiz.score(answers, 'europe');
 	c.inst = PolitiQuiz.score(answers, 'institutions');
 	c.ecology = PolitiQuiz.score(answers, 'ecology');
-	/* readings by name, for the flag and the badges */
-	c.readings = { europe: c.eu.europe, pacifism: c.eu.defence === null ? null : -c.eu.defence, populism: c.inst.people, directdemocracy: c.inst.dims.direct,
-		ecology: c.ecology.ecology, transition: c.ecology.transition, nuclear: c.ecology.nuclear, degrowth: c.ecology.degrowth,
-		russia: c.eu.russia, world: c.eu.world, executive: c.inst.executive };
+	/* Readings by name, for the flag and the badges. A theme's own reading
+	   waits for enough answers already; the others do here, as the axes do,
+	   since one answer alone is worth ±100: a single "no" to an army would
+	   draw the dove. Direct democracy is a part of the people reading, and
+	   counts once that reading stands. */
+	const firm = (score, r) => (score && score.n && score.n[r] >= PolitiQuiz.MIN_PER_DIM ? score[r] : null);
+	const defence = firm(c.eu, 'defence');
+	c.readings = { europe: c.eu.europe, pacifism: defence === null ? null : -defence, populism: c.inst.people,
+		directdemocracy: c.inst.people === null ? null : c.inst.dims.direct,
+		ecology: c.ecology.ecology, transition: firm(c.ecology, 'transition'), nuclear: firm(c.ecology, 'nuclear'), degrowth: firm(c.ecology, 'degrowth'),
+		russia: firm(c.eu, 'russia'), world: firm(c.eu, 'world'), executive: firm(c.inst, 'executive') };
 	/* the questionnaire's ecology replaces PolitiScales's in the readout, as an axis does */
 	if (c.ecology.ecology !== null) c.ecol = c.ecology.ecology;
 	const ps = { x: c.x, y: c.y };
