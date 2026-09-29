@@ -59,6 +59,8 @@
 	   asking), faint at rest and bright while it moves. Frozen when motion
 	   is reduced. */
 	let holo = $state({ mx: 0.35, my: 0.3, ang: 125, e: 0 });
+	/* the data page itself: the pointer is read in its own box as shown, after the booklet's turns and slides */
+	let dataFace = $state(null);
 	let calm;
 	function shine(mx, my) {
 		const ang = Math.round((Math.atan2(my - 0.5, mx - 0.5) * 180) / Math.PI + 180);
@@ -69,10 +71,11 @@
 	onMount(() => {
 		if (matchMedia('(prefers-reduced-motion: reduce)').matches) return;
 		const move = (e) => {
-			const book = document.querySelector('.book');
-			if (!book) return;
-			const r = book.getBoundingClientRect();
-			shine(Math.min(1, Math.max(0, (e.clientX - r.left) / r.width)), Math.min(1, Math.max(0, (e.clientY - r.top) / r.height)));
+			if (!dataFace) return;
+			const r = dataFace.getBoundingClientRect();
+			if (!r.width || !r.height) return;
+			/* not clamped: the glare's centre stays under the pointer even past the page's edge */
+			shine((e.clientX - r.left) / r.width, (e.clientY - r.top) / r.height);
 		};
 		const tilt = (e) => {
 			if (e.gamma === null || e.beta === null) return;
@@ -216,7 +219,7 @@
 
 				<!-- leaf 1: data page / visas I -->
 				<div class="leaf" class:turned={1 < turned} class:moving={moving === 1} style="z-index: {z(1)}">
-					<div class="face front data" style="--mx: {holo.mx}; --my: {holo.my}; --ang: {holo.ang}deg; --e: {holo.e}; --motif: {MOTIF}">
+					<div class="face front data" bind:this={dataFace} style="--mx: {holo.mx}; --my: {holo.my}; --ang: {holo.ang}deg; --e: {holo.e}; --motif: {MOTIF}">
 						{@render paper('#eef2f0')}
 						<div class="pad">
 							<div class="head"><span>{COPY.republic}</span><span>P · PSK</span></div>
