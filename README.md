@@ -86,6 +86,14 @@ that what makes an attachment fragile is a tight margin to the runner-up, not
 the weighting. It reads no profile; it exercises the model over its own input
 space. `--country de` and `--profiles N` change what it runs on.
 
+`node tools/score-lab.js` asks how far the "nearest party" reading can be trusted,
+and whether another scorer would hold up better: a magnitude term, a worst-axis
+penalty, an augmented cosine, each against the shipped distance, on synthetic
+profiles drawn from the party positions of every country with the questionnaire's
+own noise. It is a lab: nothing in the site or the server uses it, and it prints
+its numbers instead of keeping them. `--seed`, `--draws`, `--se` (the assumed
+error per questionnaire item) and `--sections` change what it runs.
+
 `node tools/model-check.js` asks the questions synthetic profiles cannot answer,
 on real profiles: whether the "Écolo." readout repeats an axis, how coherently
 the social components are answered, and how many attachments are toss-ups in
