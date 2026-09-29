@@ -882,7 +882,8 @@ export const LOCALES = {
     },
     quizCount: (i, n) => i + " / " + n,
     quizIntroTitle: a => "Compléter le profil de " + a,
-    quizIntroMeta: (n, t) => n + " questions, et deux fois la même sur l'importance "
+    /* n: every screen, as the theme cards and the progress count them */
+    quizIntroMeta: (n, t) => n + " questions, dont deux sur l'importance "
       + (t > 1 ? "de chaque thème" : "du thème") + " · environ " + Math.max(5, Math.round(n / 3.5))
       + " minutes",
     quizHint: "Chaque question est reprise telle quelle d'une grande enquête publique (ESS, ISSP, "

@@ -181,7 +181,7 @@
 								{theme === ALL ? L.allLead(openThemes().length, PolitiQuiz.THEMES.length) : native ? L.themes[theme].leadNative : L.themes[theme].lead}
 							</p>
 							<p class="hint">{L.quizHint}</p>
-							<p class="q-src">{L.quizIntroMeta(screens.filter((s) => s.kind === 'item').length, screens.filter((s) => s.kind === 'salience').length / 2)}</p>
+							<p class="q-src">{L.quizIntroMeta(screens.length, screens.filter((s) => s.kind === 'salience').length / 2)}</p>
 						{:else if question}
 							{#if theme === ALL && sc.kind === 'salience'}<p class="eyebrow">{L.themes[sc.theme].name}</p>{/if}
 							<Question q={question} value={sc.kind === 'salience' && sc.after && mine.answers[question.key] === undefined ? undefined : mine.answers[question.key]} onanswer={answer} />
