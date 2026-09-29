@@ -76,6 +76,10 @@ export const snapshotOf = (d) => ({
 	values: Object.fromEntries(READINGS.filter((k) => Number.isFinite(d.values[k])).map((k) => [k, d.values[k]]))
 });
 
+/* A flag as politiskelFlag makes it: an SVG percent-encoded by
+   encodeURIComponent, so only the characters it can produce. */
+const FLAG_URL = /^data:image\/svg\+xml;charset=utf-8,[A-Za-z0-9\-_.!~*'()%]*$/;
+
 /* A stored snapshot read back: it comes from a server anyone can post to
    through their own account, so every field is checked, and whatever does
    not fit is dropped rather than drawn. */
@@ -85,9 +89,9 @@ export function fromSnapshot(s) {
 	if (!country) return null;
 	const pos = (v) => (typeof v === 'number' && Number.isFinite(v) ? Math.max(-100, Math.min(100, v)) : null);
 	const alias = typeof s.alias === 'string' ? s.alias.slice(0, 40) : '';
-	const flag = typeof s.flag === 'string' && s.flag.startsWith('data:image/svg+xml') && s.flag.length < 40000 ? s.flag : null;
+	const flag = typeof s.flag === 'string' && s.flag.length < 40000 && FLAG_URL.test(s.flag) ? s.flag : null;
 	const badges = (Array.isArray(s.badges) ? s.badges : []).slice(0, 60)
-		.filter((b) => b && L.badges.items[b.key] && [1, 2, 3].includes(b.level))
+		.filter((b) => b && typeof b.key === 'string' && Object.hasOwn(L.badges.items, b.key) && [1, 2, 3].includes(b.level))
 		.map((b) => ({ key: b.key, level: SINGLE.has(b.key) ? 1 : b.level, strength: typeof b.strength === 'number' && Number.isFinite(b.strength) ? Math.round(Math.max(0, Math.min(100, b.strength))) : null }));
 	const values = {};
 	for (const k of READINGS) { const v = pos(s.values && s.values[k]); if (v !== null) values[k] = v; }
@@ -109,7 +113,7 @@ function flagImage(d, x, y, w) {
 	if (!d.flag) return '';
 	const h = w * 2 / 3;
 	return `<rect x="${x - 1}" y="${y - 1}" width="${w + 2}" height="${h + 2}" rx="6" fill="${C.border}"/>` +
-		`<image href="${d.flag}" x="${x}" y="${y}" width="${w}" height="${h}" preserveAspectRatio="none"/>`;
+		`<image href="${esc(d.flag)}" x="${x}" y="${y}" width="${w}" height="${h}" preserveAspectRatio="none"/>`;
 }
 
 function compass(d, x, y, S, o = {}) {

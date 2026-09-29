@@ -773,7 +773,7 @@ async fn a_share_is_public_by_its_link_only() {
     a.register("Nadia").await;
     // signed out, no share can be made
     assert_eq!(Client::new(&app).call("POST", "/api/me/shares", Some(new_share("x"))).await.0, StatusCode::UNAUTHORIZED);
-    let (s, made) = a.call("POST", "/api/me/shares", Some(new_share("Nadia"))).await;
+    let (s, made) = a.call("POST", "/api/me/shares", Some(new_share("Someone else"))).await;
     assert_eq!(s, StatusCode::CREATED);
     let token = made["token"].as_str().unwrap().to_string();
     assert_eq!(token.len(), 22);
@@ -820,10 +820,21 @@ async fn shares_are_bounded() {
     big["snapshot"]["pad"] = json!("x".repeat(33 * 1024));
     let (s, b) = a.call("POST", "/api/me/shares", Some(big)).await;
     assert_eq!((s, b["error"].as_str()), (StatusCode::BAD_REQUEST, Some("share_snapshot_too_large")));
+    // a flag is only the percent-encoded SVG data URL the site makes
+    for flag in [json!("data:image/svg+xml,x\" onerror=\"alert(1)"), json!("javascript:alert(1)"),
+                 json!("data:image/svg+xml;charset=utf-8,%3Csvg%3E\"x"), json!(12)] {
+        let mut f = new_share("Omar");
+        f["snapshot"]["flag"] = flag;
+        let (s, b) = a.call("POST", "/api/me/shares", Some(f)).await;
+        assert_eq!((s, b["error"].as_str()), (StatusCode::BAD_REQUEST, Some("share_snapshot_bad_flag")));
+    }
+    let mut ok = new_share("Omar");
+    ok["snapshot"]["flag"] = json!("data:image/svg+xml;charset=utf-8,%3Csvg%20viewBox%3D'0%200%203%202'%3E%3C%2Fsvg%3E");
+    assert_eq!(a.call("POST", "/api/me/shares", Some(ok)).await.0, StatusCode::CREATED);
     let mut label = new_share("Omar");
     label["layout"] = json!("Wide Card");
     assert_eq!(a.call("POST", "/api/me/shares", Some(label)).await.0, StatusCode::BAD_REQUEST);
-    for _ in 0..20 {
+    for _ in 0..19 {
         assert_eq!(a.call("POST", "/api/me/shares", Some(new_share("Omar"))).await.0, StatusCode::CREATED);
     }
     let (s, b) = a.call("POST", "/api/me/shares", Some(new_share("Omar"))).await;
@@ -855,15 +866,16 @@ async fn only_its_owner_deletes_a_share_and_deleting_the_account_deletes_them() 
 async fn a_share_page_carries_escaped_preview_tags() {
     let app = server().await;
     let mut a = Client::new(&app);
-    a.register("Rose").await;
+    a.register("Ro'se").await;
+    // the page's alias is ignored: a share carries its account's name
     let (_, made) = a.call("POST", "/api/me/shares", Some(new_share("<Rose> \"R\""))).await;
     let token = made["token"].as_str().unwrap().to_string();
     let (s, h, body) = raw_get(&app, &format!("/p/{token}")).await;
     assert_eq!(s, StatusCode::OK);
     assert!(h.get(header::CONTENT_TYPE).unwrap().to_str().unwrap().starts_with("text/html"));
     let html = String::from_utf8(body).unwrap();
-    assert!(html.contains("<meta property=\"og:title\" content=\"Profil politique de &lt;Rose&gt; &quot;R&quot;\">"));
-    assert!(!html.contains("<Rose>"));
+    assert!(html.contains("<meta property=\"og:title\" content=\"Profil politique de Ro&#39;se\">"), "{html}");
+    assert!(!html.contains("<Rose>") && !html.contains("&lt;Rose"));
     assert!(html.contains(&format!("content=\"https://politiskel.test/api/shares/{token}/image\"")));
     assert!(html.contains("noindex"));
     assert!(html.contains("<title>Politiskel</title>"));

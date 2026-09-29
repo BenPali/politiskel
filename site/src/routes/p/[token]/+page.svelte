@@ -19,7 +19,12 @@
 		const token = page.params.token;
 		if (!/^[A-Za-z0-9_-]{22}$/.test(token)) return (state = 'missing');
 		const r = await api('GET', '/api/shares/' + token);
-		const data = r.ok ? fromSnapshot(r.data.snapshot) : null;
+		let data = null;
+		try {
+			data = r.ok ? fromSnapshot(r.data.snapshot) : null;
+		} catch {
+			/* a snapshot the site cannot draw is a link that shows nothing */
+		}
 		if (!data) return (state = 'missing');
 		share = { data, layout: SHARE_LAYOUTS.find((l) => l.key === r.data.layout) || SHARE_LAYOUTS[0], theme: r.data.theme, created: r.data.created_at };
 		state = 'ready';

@@ -51,10 +51,16 @@ pub(crate) struct NewShare {
 pub(crate) async fn create_share(State(state): State<AppState>, jar: CookieJar, Json(body): Json<NewShare>)
     -> ApiResult<(StatusCode, Json<Value>)>
 {
-    let (user, _) = current_user(&state, &jar).await?;
+    let (user, username) = current_user(&state, &jar).await?;
     validate::share_label(&body.layout).map_err(bad)?;
     validate::share_label(&body.theme).map_err(bad)?;
-    let snapshot = validate::share_snapshot(&body.snapshot).map_err(bad)?;
+    // The name on a share is the account's, whatever the page sent: nobody
+    // publishes a card under someone else's name on this domain.
+    let mut body_snapshot = body.snapshot;
+    if let Some(obj) = body_snapshot.as_object_mut() {
+        obj.insert("alias".into(), Value::String(username));
+    }
+    let snapshot = validate::share_snapshot(&body_snapshot).map_err(bad)?;
     let image = validate::share_image(&body.image).map_err(bad)?;
     let (count,): (i64,) = sqlx::query_as("SELECT COUNT(*) FROM shares WHERE user_id = ?")
         .bind(user).fetch_one(&state.db).await?;
@@ -123,7 +129,8 @@ pub(crate) async fn share_image(State(state): State<AppState>, Path(token): Path
     match row {
         Ok(Some((image,))) => (
             [(header::CONTENT_TYPE, "image/png"),
-             (header::CACHE_CONTROL, "public, max-age=3600"),
+             // short, so that a revoked link's image does not linger in caches
+             (header::CACHE_CONTROL, "public, max-age=60"),
              (header::X_CONTENT_TYPE_OPTIONS, "nosniff")],
             image,
         ).into_response(),

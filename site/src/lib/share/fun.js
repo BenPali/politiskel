@@ -59,7 +59,7 @@ function badge(ART, b, x, y, size, rot = 0) {
 }
 function flag(d, x, y, w, extra = '') {
 	const h = (w * 2) / 3;
-	return d.flag ? `<image href="${d.flag}" x="${x}" y="${y}" width="${w}" height="${h}" preserveAspectRatio="none"${extra}/>` :
+	return d.flag ? `<image href="${esc(d.flag)}" x="${x}" y="${y}" width="${w}" height="${h}" preserveAspectRatio="none"${extra}/>` :
 		`<rect x="${x}" y="${y}" width="${w}" height="${h}" fill="#ccc"/>`;
 }
 const svgOpen = (w, h, defs = '') => `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 ${w} ${h}" width="${w}" height="${h}"><defs>${defs}</defs>`;
@@ -76,7 +76,7 @@ function headline(d) {
 	return d.alias + ' alias «\u00a0' + a.name + '\u00a0» ' + DEEDS[(b || a).key];
 }
 function news(d, ART, tabloid) {
-	const W = 1080, H = 1350, P = 'n' + ++uid;
+	const W = 1080, H = 1350, P = 'fn' + ++uid;
 	const pal = tabloid
 		? { paper: '#fbfbf7', ink: '#111', mast: '#d7141a', mastInk: '#fff', rule: '#111', photoTint: 0 }
 		: { paper: '#efe6d2', ink: '#221c14', mast: 'none', mastInk: '#221c14', rule: '#221c14', photoTint: 0.18 };
@@ -133,7 +133,7 @@ function news(d, ART, tabloid) {
 /* ---------- 3. boarding pass ---------- */
 const initials = (s) => s.replace(/[^A-Za-zÀ-ÿ ]/g, ' ').split(/\s+/).filter(Boolean).map((w) => w[0].toUpperCase()).join('').slice(0, 3) || 'XXX';
 function boarding(d, ART, theme) {
-	const W = 1200, H = 630, P = 'b' + ++uid;
+	const W = 1200, H = 630, P = 'fb' + ++uid;
 	const c = theme || { bg: '#f4f4f2', surface: '#ffffff', text: '#1c1c1b', text2: '#4a4a47', text3: '#62625e', accent: '#0f6468', border: '#dfdfdb' };
 	const from = (d.country || 'FR').slice(0, 3).toUpperCase(), to = d.nearest ? initials(d.nearest.name) : '???';
 	const row = d.placed ? Math.round((100 - d.y) / 200 * 39) + 1 : 20, letter = d.placed ? 'ABCDEF'[Math.min(5, Math.floor((d.x + 100) / 200 * 6))] : 'C';
@@ -173,7 +173,7 @@ function boarding(d, ART, theme) {
 
 /* ---------- 4. till receipt of opinions ---------- */
 function receipt(d, ART) {
-	const W = 720, H = 1400, P = 'k' + ++uid;
+	const W = 720, H = 1400, P = 'fk' + ++uid;
 	const ink = '#2a2a2a';
 	let zig = `M0 0 H${W} V${H - 20}`;
 	for (let x = W; x > 0; x -= 20) zig += ` L${x - 10} ${H} L${x - 20} ${H - 20}`;

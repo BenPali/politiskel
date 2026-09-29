@@ -127,15 +127,18 @@
 		if (busy || !data) return;
 		busy = true;
 		try {
+			/* Safari wants the clipboard written within the click itself: the
+			   item is given the image as a promise, before anything awaits */
+			if (kind === 'copy') {
+				await navigator.clipboard.write([new ClipboardItem({ 'image/png': png() })]);
+				flash('image');
+				return;
+			}
 			const blob = await png();
 			if (kind === 'share') {
 				const file = new File([blob], fileName(), { type: 'image/png' });
 				if (navigator.canShare?.({ files: [file] })) await navigator.share({ files: [file] });
 				else kind = 'download';
-			}
-			if (kind === 'copy') {
-				await navigator.clipboard.write([new ClipboardItem({ 'image/png': blob })]);
-				flash('image');
 			}
 			if (kind === 'download') {
 				const a = document.createElement('a');

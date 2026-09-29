@@ -138,11 +138,20 @@ pub const MAX_SNAPSHOT: usize = 32 * 1024;
 pub const MAX_SHARE_IMAGE: usize = 800 * 1024;
 
 /// What a shared card shows, as the site computed it: results, never answers.
-/// It is shown back only through the site, which escapes it; here it is only
-/// bounded.
+/// It is shown back only through the site, which escapes it; here it is
+/// bounded, and its flag, drawn as an image on a public page, is only taken
+/// as the percent-encoded SVG data URL the site makes.
 pub fn share_snapshot(v: &Value) -> Result<String, &'static str> {
-    if !v.is_object() {
-        return Err("share_snapshot_not_object");
+    let obj = v.as_object().ok_or("share_snapshot_not_object")?;
+    match obj.get("flag") {
+        None | Some(Value::Null) => {}
+        Some(Value::String(f)) => {
+            let body = f.strip_prefix("data:image/svg+xml;charset=utf-8,").ok_or("share_snapshot_bad_flag")?;
+            if !body.bytes().all(|c| c.is_ascii_alphanumeric() || b"-_.!~*'()%".contains(&c)) {
+                return Err("share_snapshot_bad_flag");
+            }
+        }
+        Some(_) => return Err("share_snapshot_bad_flag"),
     }
     let text = v.to_string();
     if text.len() > MAX_SNAPSHOT {
