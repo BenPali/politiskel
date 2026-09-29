@@ -5,7 +5,8 @@
      here, in the browser. -->
 <script>
 	import { L } from '$lib/i18n/fr.js';
-	import { cardData, drawCard, LAYOUTS, THEMES } from '$lib/share/card.js';
+	import { cardData, THEMES } from '$lib/share/card.js';
+	import { SHARE_LAYOUTS as LAYOUTS } from '$lib/share/layouts.js';
 	import { cardPng } from '$lib/share/png.js';
 	import { toast } from '$lib/toast.svelte.js';
 
@@ -64,7 +65,7 @@
 
 	const fileName = () => 'politiskel-' + String(p.alias).replace(/[^\p{L}\p{N}_-]+/gu, '-') + '-' + layout.key + '.png';
 	async function png() {
-		return cardPng(drawCard(layout, data, ART, theme), layout.w, layout.h);
+		return cardPng(layout.draw(data, ART, theme), layout.w, layout.h);
 	}
 	async function act(kind) {
 		if (busy || !data) return;
@@ -107,7 +108,7 @@
 			<div class="slides" style="transform: translateX({-index * 100}%)">
 				{#each LAYOUTS as l, i (l.key)}
 					<div class="slide" aria-hidden={i !== index} class:tall={l.h > l.w}>
-						<div class="card-art">{@html drawCard(l, data, ART, theme)}</div>
+						<div class="card-art">{@html l.draw(data, ART, theme)}</div>
 					</div>
 				{/each}
 			</div>
@@ -117,12 +118,13 @@
 
 		<p class="which"><b>{S.layouts[layout.key][0]}</b> <span>{index + 1} / {LAYOUTS.length} · {S.layouts[layout.key][1]}</span></p>
 
-		<div class="dots" role="radiogroup" aria-label={S.theme}>
+		<div class="dots" class:off={!layout.themed} role="radiogroup" aria-label={S.theme} aria-disabled={!layout.themed}>
 			{#each Object.keys(THEMES) as t}
 				<button type="button" role="radio" aria-checked={theme === t} aria-label={S.themes[t]} title={S.themes[t]}
-					style="--bg: {THEMES[t].bg}; --ac: {THEMES[t].accent}" onclick={() => pick(t)}></button>
+					style="--bg: {THEMES[t].bg}; --ac: {THEMES[t].accent}" disabled={!layout.themed} onclick={() => pick(t)}></button>
 			{/each}
 		</div>
+		{#if !layout.themed}<p class="fixed">{S.fixedTheme}</p>{/if}
 
 		<div class="actions">
 			{#if canShareFiles}<button type="button" class="primary" disabled={busy} onclick={() => act('share')}>{S.share}</button>{/if}
@@ -158,6 +160,8 @@
 		background: radial-gradient(circle, var(--ac) 0 32%, var(--bg) 34%); transition: transform var(--dur-fast, 120ms); }
 	.dots button:hover { transform: scale(1.08); }
 	.dots button[aria-checked='true'] { border-color: var(--text); box-shadow: 0 0 0 3px var(--surface), 0 0 0 5px var(--text); }
+	.dots.off { opacity: 0.35; margin-bottom: 4px; }
+	.fixed { margin: 0 0 14px; text-align: center; font-size: 13px; color: var(--text-3); }
 	.actions { display: flex; justify-content: center; gap: 10px; flex-wrap: wrap; }
 	.note { margin: 14px auto 0; max-width: 56ch; text-align: center; font-size: 13px; color: var(--text-3); line-height: 1.45; }
 	@media (prefers-reduced-motion: reduce) { .slides { transition: none; } .sheet[open] { animation: none; } }

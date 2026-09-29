@@ -1172,7 +1172,30 @@ export const LOCALES = {
         wide: ["Carte", "1200 × 630, l'aperçu d'un lien"],
         squareFull: ["Carré complet", "1080 × 1080"],
         readings: ["Lectures", "1080 × 1350, sans boussole"],
-        story: ["Story", "1080 × 1920"]
+        story: ["Story", "1080 × 1920"],
+        tabloid: ["Une de tabloïd", "1080 × 1350"],
+        boarding: ["Carte d'embarquement", "1200 × 630"],
+        receipt: ["Ticket de caisse", "720 × 1400"]
+      },
+      fixedTheme: "Cette carte garde ses propres couleurs.",
+      /* the fun cards: their names, then the words drawn on them */
+      fun: {
+        masthead: 'Le Politiskel',
+        tabloidMast: 'POLITI-FLASH',
+        edition: 'Édition spéciale',
+        price: 'Gratuit, comme les idées',
+        photo: (a) => 'Le drapeau de ' + a + ', photographié hier.',
+        lean: (a, pole) => a + ' penche vers «\u00a0' + pole + '\u00a0»',
+        firmly: 'nettement', clearly: 'clairement', slightly: 'légèrement',
+        ads: 'Petites annonces',
+        nearestNews: (n, d) => 'Le parti le plus proche reste ' + n + ', à ' + d + ' points.',
+        boarding: "Carte d'embarquement",
+        passenger: 'Passager', from: 'Départ', to: 'Destination', seat: 'Siège', gate: 'Porte', flight: 'Vol', cls: 'Classe',
+        boardingNote: 'Embarquement immédiat. Bagages idéologiques en soute.',
+        shop: 'SUPERMARCHÉ POLITISKEL',
+        shopLine: 'Idées fraîches tous les jours',
+        total: 'TOTAL', promo: 'PROMO', thanks: 'Merci de votre vote !', keep: 'Ticket à conserver pour les élections',
+        cashier: 'Caisse 0', item: 'art.'
       },
       theme: "Thème de l'image",
       open: "Partager",
