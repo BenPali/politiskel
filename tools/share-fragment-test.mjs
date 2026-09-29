@@ -178,6 +178,8 @@ bad('nothing but the prefix bytes', b64([]), 'malformed');
 	/* a decoded share goes through the site's own reader, as the page does it */
 	const r = F.decode(F.encode(sample));
 	const d = fromSnapshot({ v: 1, alias: 'Anonyme', flag: null, ...r.share });
+	const zz = F.decode('v1.' + Buffer.from([122, 122, 0, 0, 0x03, 0xe8, 0x03, 0xe8, 0, 0, 0]).toString('base64url'));
+	check('a country the site lacks decodes but is not drawn', zz.ok && fromSnapshot({ v: 1, alias: 'A', flag: null, ...zz.share }) === null);
 	check('the site reads a decoded share', d && d.placed && d.countryCode === 'fr' && d.badges.length === 3 && d.readings.length === 4, JSON.stringify(d && d.badges));
 }
 

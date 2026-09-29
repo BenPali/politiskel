@@ -107,6 +107,12 @@ mes données", is one. Neither is committed. `node tools/verify.js` checks the
 screenshot reading against values read by eye, in
 `politi-results/fixture.json`.
 
+The "lien sans compte" of the share dialog puts a profile's results in the
+fragment of a link (`/v#v1.…`, format in `site/src/lib/share/fragment.js`).
+A browser never sends a fragment to a server, so nothing is stored or logged
+and the link cannot be revoked. `node tools/share-fragment-test.mjs` checks
+the format: round trip, ranges, hostile input, and its tables against the site.
+
 With answers it also checks the questionnaire: whether protectionism and the
 three class readings repeat x, how far the questionnaire moves each axis from
 PolitiScales for the same people, whether each sub-dimension goes with the
