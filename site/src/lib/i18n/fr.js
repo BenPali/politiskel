@@ -204,6 +204,16 @@ export const LOCALES = {
     partiesScope: (country, view) => country + " · " + view,
     nearestLine: (name, fit, d) => "Le plus proche : " + name + ", proximité " + fit + " (" + d + " pts)",
     nearestTie: (name, margin) => ", ou " + name + (margin === 0 ? ", à égalité." : ", à " + margin + (margin > 1 ? " points" : " point") + " près."),
+    /* the nearest party theme by theme, under the overall list */
+    byTheme: {
+      title: "Le plus proche, par domaine",
+      lead: names => names ? "Au total, le plus proche est " + names + ". Sur ces domaines, un autre parti l'est davantage." : "",
+      label: { economy: "Économie", protectionism: "Protectionnisme", society: "Société", europe: "Europe", ecology: "Écologie", institutions: "Peuple et élus" },
+      names: list => list.length > 1 ? list.slice(0, -1).join(", ") + " ou " + list[list.length - 1] : list[0],
+      tie: "à égalité",
+      overallAt: (name, d) => name + " est à " + d + " pts",
+      measured: (n, of) => n + " partis sur " + of + " mesurés"
+    },
     memberUnknown: n => "« " + n + " » n'est pas dans le groupe affiché.",
     brandHome: "Politiskel, accueil", navMain: "Navigation principale", navMenu: "Ouvrir le menu",
     displayPalette: "Palette", displayMode: "Mode",

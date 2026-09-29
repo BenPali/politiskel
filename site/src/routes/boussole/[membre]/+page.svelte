@@ -15,10 +15,12 @@
 	import MemberFlag from '$lib/components/MemberFlag.svelte';
 	import ReadingBands from '$lib/components/ReadingBands.svelte';
 	import PartyList from '$lib/components/PartyList.svelte';
+	import ByTheme from '$lib/components/ByTheme.svelte';
 	import BadgeShelf from '$lib/components/BadgeShelf.svelte';
 	import ShareSheet from '$lib/components/ShareSheet.svelte';
 	import SignatureCard from '$lib/components/SignatureCard.svelte';
 	import { badgesOf, sortBadges } from '$lib/badges/badges.js';
+	import { byTheme, SHOWN } from '$lib/compass/bytheme.js';
 
 	$effect(() => {
 		if (session.ready) ensureBoard();
@@ -40,6 +42,9 @@
 	const base = $derived(p ? coords(p) : null);
 	const others = $derived(p?.me ? board.members.map((m) => { const k = coords(m); return { id: m.id, alias: m.alias, x: k.x, y: k.y }; }) : null);
 	const badges = $derived(p && base ? sortBadges(badgesOf(p, base, { country, members: others })) : []);
+	/* the nearest party theme by theme: the profile itself, on the default reading, whichever one is on show */
+	const themed = $derived(base ? byTheme(base, country) : null);
+	const themedRows = $derived(themed ? themed.themes.filter((t) => SHOWN.has(t.status)) : []);
 	let sharing = $state(false);
 	const passport = $derived(!!p && !!base && (base.x !== null || Object.keys(p.answers || {}).length > 0));
 	const source = $derived(p ? L.profileSource(hasPolitiscales(p), !!(q || c?.soc || c?.quiz)) : '');
@@ -135,6 +140,16 @@
 					</section>
 					<!-- a wrapper that draws nothing, so that the card, when it shows, is spaced like the others -->
 					<div class="sig"><SignatureCard c={base} /></div>
+					{#if themedRows.length}
+						<section class="card" aria-label={L.byTheme.title}>
+							<div class="head">
+								<h2>{L.byTheme.title}</h2>
+								<span>{country.name}</span>
+							</div>
+							{#if themed.overall}<p class="sub">{L.byTheme.lead(L.byTheme.names(themed.overall.names))}</p>{/if}
+							<ByTheme rows={themedRows} />
+						</section>
+					{/if}
 					<section class="card" aria-label={L.partiesTitle}>
 						<div class="head">
 							<h2>{L.partiesTitle}</h2>
