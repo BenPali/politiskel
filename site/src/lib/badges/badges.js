@@ -91,9 +91,9 @@ function middleShare(p) {
 /* Traits that seldom go together: marked on both sides of the social axis,
    or on both sides of the economic one, through different questions. */
 const OPEN = ['liberties', 'feminism', 'pride', 'mosaic', 'globe'];
-const ORDER = ['sheriff', 'temple', 'cocarde', 'border'];
+const ORDER = ['sheriff', 'temple', 'cocarde', 'border', 'oldfrance', 'fortress', 'gauls'];
 const LEFT = ['robin', 'classstruggle', 'picket', 'customs'];
-const RIGHT = ['hand', 'market'];
+const RIGHT = ['hand', 'market', 'taxpayer', 'boss'];
 
 /* ctx: { country, members }: the parties of the country on show, and the
    other members of the group for the one badge that looks at them */

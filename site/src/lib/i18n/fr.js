@@ -1170,12 +1170,12 @@ export const LOCALES = {
       none: "Pas encore de profil : réponds à un questionnaire ou importe ton résultat PolitiScales.",
       layouts: {
         wide: ["Carte", "1200 × 630, l'aperçu d'un lien"],
-        wideBadges: ["Carte badges", "1200 × 630"],
-        square: ["Carré boussole", "1080 × 1080"],
         squareFull: ["Carré complet", "1080 × 1080"],
-        story: ["Story", "1080 × 1920"],
-        hero: ["Badge vedette", "1080 × 1080"]
-      }
+        readings: ["Lectures", "1080 × 1350, sans boussole"],
+        story: ["Story", "1080 × 1920"]
+      },
+      theme: "Thème de l'image",
+      themes: { clair: "Clair", sombre: "Sombre", corpo: "Corpo", sepia: "Sépia", pop: "Pop" }
     }
   }
 };

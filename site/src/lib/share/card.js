@@ -13,10 +13,24 @@ import { signed } from '$lib/format.js';
 
 const esc = (s) => String(s).replace(/[&<>"']/g, (c) => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' })[c]);
 
-const C = {
-	bg: '#f4f4f2', surface: '#ffffff', sunk: '#ececea', border: '#dfdfdb',
-	text: '#1c1c1b', text2: '#4a4a47', text3: '#62625e', accent: '#0f6468', accentSoft: '#d6ecea'
+/* The export's own themes, taken from the site's palettes: a card keeps the
+   theme chosen for it whatever the site is shown in. `left` and `right`
+   fill the two halves of a reading bar; `tints` the four quadrants. */
+export const THEMES = {
+	clair: { bg: '#f4f4f2', surface: '#ffffff', sunk: '#ececea', border: '#dfdfdb', text: '#1c1c1b', text2: '#4a4a47', text3: '#62625e',
+		accent: '#0f6468', left: '#0f6468', right: '#c8733a', onBar: '#ffffff', tints: ['#e9d9d6', '#d9e2ee', '#dcebdd', '#ece5d3'], tintOp: 0.55 },
+	sombre: { bg: '#232427', surface: '#2c2d31', sunk: '#1b1c1f', border: '#404146', text: '#f3f3f1', text2: '#d0d0cc', text3: '#aaaaa6',
+		accent: '#7fd3cf', left: '#4fa9a5', right: '#d98a5a', onBar: '#101113', tints: ['#5a3a3a', '#34435a', '#35503a', '#55503a'], tintOp: 0.5 },
+	corpo: { bg: '#0a0a0c', surface: '#131316', sunk: '#060607', border: '#2a2a31', text: '#ecebe9', text2: '#c2c1c6', text3: '#9a99a1',
+		accent: '#e0202e', left: '#e0202e', right: '#7a7a84', onBar: '#ffffff', tints: ['#2a1214', '#1c1c21', '#16161a', '#22161a'], tintOp: 0.9 },
+	sepia: { bg: '#f2e8d5', surface: '#faf3e4', sunk: '#e4d6bb', border: '#dccdb1', text: '#2b2114', text2: '#56462f', text3: '#6b5a41',
+		accent: '#7d5519', left: '#7d5519', right: '#9a3a20', onBar: '#faf3e4', tints: ['#ead2c0', '#e0dcc8', '#dfe0c0', '#efe0bf'], tintOp: 0.7 },
+	pop: { bg: '#9fe9ee', surface: '#ffffff', sunk: '#d9f3f4', border: '#121212', text: '#121212', text2: '#2c2c2a', text3: '#3f3f3c',
+		accent: '#00666d', left: '#ff5c8a', right: '#00a3ad', onBar: '#ffffff', tints: ['#ffd9e4', '#d9f3f4', '#fff3a6', '#e4dcff'], tintOp: 1 }
 };
+let C = THEMES.clair;
+/* ids inside a card, unique on the page: several cards may be shown at once */
+let P = 'k0', uid = 0;
 const FONT = "Geist, system-ui, sans-serif";
 
 /* the readings a card may show beside the compass, most marked first */
@@ -40,6 +54,7 @@ export function cardData(p, country) {
 		.sort((a, b) => Math.abs(b.v) - Math.abs(a.v));
 	return {
 		alias: p.alias, x: c.x, y: c.y, placed, flag: flag ? flag.url : null, badges, readings,
+		axes: ['x', 'y'].filter((k) => Number.isFinite(c[k])).map((k) => ({ k, v: c[k], label: L.bands.label[k], ends: L.bands.ends[k] })),
 		country: country.name,
 		parties: country.parties.map((r) => ({ x: r.x, y: r.y, name: r.name })),
 		nearest: near ? { name: near.name, d: Math.round(near.d), fit: fitOf(near.d, limits) } : null
@@ -69,9 +84,8 @@ function compass(d, x, y, S, o = {}) {
 	const f = S / 520;
 	let s = `<rect x="${x}" y="${y}" width="${S}" height="${S}" rx="${14 * f}" fill="${C.surface}" stroke="${C.border}" stroke-width="${1.5 * f}"/>`;
 	/* quadrant tints, faint */
-	const tints = ['#e9d9d6', '#d9e2ee', '#dcebdd', '#ece5d3'];
 	[[0, 0], [1, 0], [0, 1], [1, 1]].forEach(([i, j], k) => {
-		s += `<rect x="${x + i * S / 2 + 1}" y="${y + j * S / 2 + 1}" width="${S / 2 - 2}" height="${S / 2 - 2}" rx="${10 * f}" fill="${tints[k]}" opacity=".55"/>`;
+		s += `<rect x="${x + i * S / 2 + 1}" y="${y + j * S / 2 + 1}" width="${S / 2 - 2}" height="${S / 2 - 2}" rx="${10 * f}" fill="${C.tints[k]}" opacity="${C.tintOp}"/>`;
 	});
 	s += `<path d="M${x + S / 2} ${y + 8 * f} V${y + S - 8 * f} M${x + 8 * f} ${y + S / 2} H${x + S - 8 * f}" stroke="${C.text3}" stroke-width="${1.4 * f}" opacity=".6"/>`;
 	const cap = 15 * f;
@@ -83,11 +97,13 @@ function compass(d, x, y, S, o = {}) {
 	if (d.nearest && o.labelNearest !== false) {
 		const r = d.parties.find((q) => q.name === d.nearest.name);
 		if (r) s += `<circle cx="${X(r.x)}" cy="${Y(r.y)}" r="${6.5 * f}" fill="none" stroke="${C.text2}" stroke-width="${1.6 * f}"/>` +
-			text(X(r.x), Y(r.y) - 30 * f, r.name, 15 * f, { fill: C.text, w: 650, anchor: r.x > 60 ? 'end' : r.x < -60 ? 'start' : 'middle' });
+			/* on the side away from the profile, so the name is never read as the profile's */
+			text(X(r.x), Y(r.y) + (d.placed && r.y < d.y ? 34 * f : -24 * f), r.name, 15 * f,
+				{ fill: C.text, w: 650, anchor: r.x > 60 ? 'end' : r.x < -60 ? 'start' : 'middle' });
 	}
 	if (d.placed) {
 		s += `<circle cx="${X(d.x)}" cy="${Y(d.y)}" r="${22 * f}" fill="${C.accent}" opacity=".16"/>` +
-			`<circle cx="${X(d.x)}" cy="${Y(d.y)}" r="${10 * f}" fill="${C.accent}" stroke="#fff" stroke-width="${3 * f}"/>`;
+			`<circle cx="${X(d.x)}" cy="${Y(d.y)}" r="${10 * f}" fill="${C.accent}" stroke="${C.surface}" stroke-width="${3 * f}"/>`;
 	}
 	if (o.caption !== false && d.placed)
 		s += text(x, y + S + 30 * f, 'X ' + signed(Math.round(d.x)) + ' · Y ' + signed(Math.round(d.y)) + ' · ' + d.country, 17 * f, { fill: C.text3 });
@@ -103,8 +119,29 @@ function bars(d, x, y, w, n, size = 1) {
 		s += text(x + w, top + 14 * size, signed(Math.round(r.v)), 19 * size, { w: 650, anchor: 'end' });
 		s += `<rect x="${x}" y="${track - 3 * size}" width="${w}" height="${6 * size}" rx="${3 * size}" fill="${C.sunk}"/>`;
 		s += `<rect x="${x + w / 2 - 1}" y="${track - 7 * size}" width="2" height="${14 * size}" fill="${C.text3}" opacity=".5"/>`;
-		s += `<circle cx="${pos}" cy="${track}" r="${9 * size}" fill="${C.accent}" stroke="#fff" stroke-width="${2.5 * size}"/>`;
+		s += `<circle cx="${pos}" cy="${track}" r="${9 * size}" fill="${C.accent}" stroke="${C.bg}" stroke-width="${2.5 * size}"/>`;
 		s += text(x, track + 26 * size, r.ends[0], 14 * size, { fill: C.text3 }) + text(x + w, track + 26 * size, r.ends[1], 14 * size, { fill: C.text3, anchor: 'end' });
+	});
+	return s;
+}
+
+/* A reading as PolitiScales draws its axes: one bar split in two at the
+   profile's value, each end named with its share. */
+function splitBars(list, x, y, w, rowH) {
+	let s = '';
+	const h = rowH * 0.36, r = h / 2;
+	list.forEach((b, i) => {
+		const top = y + i * rowH, bar = top + rowH * 0.34;
+		const left = Math.round((100 - b.v) / 2), right = 100 - left, cut = x + (w * left) / 100;
+		s += text(x + w / 2, top + rowH * 0.22, b.label, rowH * 0.2, { w: 650, anchor: 'middle', fill: C.text });
+		s += `<clipPath id="${P}bar${i}"><rect x="${x}" y="${bar}" width="${w}" height="${h}" rx="${r}"/></clipPath>` +
+			`<g clip-path="url(#${P}bar${i})"><rect x="${x}" y="${bar}" width="${cut - x}" height="${h}" fill="${C.left}"/>` +
+			`<rect x="${cut}" y="${bar}" width="${x + w - cut}" height="${h}" fill="${C.right}"/></g>`;
+		const inside = rowH * 0.19, mid = bar + h / 2 + inside * 0.36;
+		if (left >= 12) s += text(x + 16, mid, left + ' %', inside, { w: 700, fill: C.onBar });
+		if (right >= 12) s += text(x + w - 16, mid, right + ' %', inside, { w: 700, fill: C.onBar, anchor: 'end' });
+		s += text(x, bar + h + rowH * 0.2, b.ends[0], rowH * 0.16, { fill: C.text2 }) +
+			text(x + w, bar + h + rowH * 0.2, b.ends[1], rowH * 0.16, { fill: C.text2, anchor: 'end' });
 	});
 	return s;
 }
@@ -140,28 +177,6 @@ export const LAYOUTS = [
 			compass(d, 640, 56, 500))
 	},
 	{
-		key: 'wideBadges', w: 1200, h: 630,
-		draw: (d, ART) => {
-			const n = Math.min(5, d.badges.length), size = 196, gap = 30;
-			const x0 = (1200 - (n * size + (n - 1) * gap)) / 2;
-			return frame(1200, 630,
-				flagImage(d, 64, 56, 150) +
-				text(240, 110, d.alias, fitSize(d.alias, 60, 700), { w: 700, ls: -1 }) +
-				text(240, 150, L.share.badgesCount(d.badges.length), 22, { fill: C.text2 }) +
-				d.badges.slice(0, n).map((b, i) => badgeAt(ART, b, x0 + i * (size + gap), 220, size, true, 20)).join('') +
-				brand(1136, 560, 26, 'end'));
-		}
-	},
-	{
-		key: 'square', w: 1080, h: 1080,
-		draw: (d) => frame(1080, 1080,
-			text(80, 132, d.alias, fitSize(d.alias, 76, 640), { w: 700, ls: -1.5 }) +
-			nearestLines(d, 80, 180, 28, 700) +
-			flagImage(d, 830, 72, 170) +
-			compass(d, 200, 250, 680) +
-			brand(80, 1020, 28))
-	},
-	{
 		key: 'squareFull', w: 1080, h: 1080,
 		draw: (d, ART) => frame(1080, 1080,
 			flagImage(d, 72, 64, 180) +
@@ -173,6 +188,19 @@ export const LAYOUTS = [
 			brand(1008, 1040, 22, 'end'))
 	},
 	{
+		key: 'readings', w: 1080, h: 1350,
+		draw: (d) => {
+			const list = [...d.axes, ...d.readings.slice().sort((a, b) => READINGS.indexOf(a.k) - READINGS.indexOf(b.k))].slice(0, 10);
+			const rowH = Math.min(118, 1000 / Math.max(list.length, 1));
+			return frame(1080, 1350,
+				flagImage(d, 72, 64, 180) +
+				text(284, 128, d.alias, fitSize(d.alias, 64, 720), { w: 700, ls: -1 }) +
+				nearestLines(d, 284, 170, 24, 720) +
+				splitBars(list, 72, 250, 936, rowH) +
+				brand(1008, 1296, 24, 'end'));
+		}
+	},
+	{
 		key: 'story', w: 1080, h: 1920,
 		draw: (d, ART) => frame(1080, 1920,
 			flagImage(d, 180, 110, 720) +
@@ -181,19 +209,12 @@ export const LAYOUTS = [
 			compass(d, 190, 820, 700, { caption: false }) +
 			d.badges.slice(0, 3).map((b, i) => badgeAt(ART, b, 150 + i * 280, 1560, 220, true, 24)).join('') +
 			brand(540, 1860, 30, 'middle'))
-	},
-	{
-		key: 'hero', w: 1080, h: 1080,
-		draw: (d, ART) => {
-			const b = d.badges[0];
-			return frame(1080, 1080,
-				(b ? badgeAt(ART, b, 220, 90, 640, false) +
-					text(540, 830, b.name, fitSize(b.name, 76, 960), { w: 700, anchor: 'middle', ls: -1.5 }) +
-					text(540, 882, b.label + (b.strength !== null ? ' · ' + b.strength + ' sur 100' : ''), 28, { fill: C.text2, anchor: 'middle' })
-					: text(540, 540, L.badges.none, 32, { anchor: 'middle', fill: C.text2 })) +
-				flagImage(d, 72, 950, 90) +
-				text(184, 996, d.alias, fitSize(d.alias, 36, 520), { w: 700 }) +
-				brand(1008, 990, 26, 'end'));
-		}
 	}
 ];
+
+/* a layout drawn in a theme */
+export function drawCard(layout, d, ART, theme = 'clair') {
+	C = THEMES[theme] || THEMES.clair;
+	P = 'k' + ++uid;
+	return layout.draw(d, ART);
+}
