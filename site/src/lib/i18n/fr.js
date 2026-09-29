@@ -1208,6 +1208,18 @@ export const LOCALES = {
       linkOpen: "Ouvrir",
       linkDelete: "Supprimer",
       linkDeleted: "Lien supprimé",
+      /* the link that holds the result itself, after a #: no account, nothing stored */
+      bareLink: "Lien sans compte",
+      bareLinkNote: "Rien n'est enregistré : ce lien ne peut pas être supprimé, et toute personne qui l'a voit votre position, vos lectures et vos badges, sans pseudo.",
+      bareLinkReady: "Votre lien sans compte",
+      bareAlias: "Anonyme",
+      bareTitle: "Un profil partagé",
+      bareLead: "Position, lectures et badges, lus dans le lien.",
+      bareBad: {
+        empty: ["Ce lien est vide", "Il ne contient aucun profil. Demandez-en un nouveau à la personne qui vous l'a envoyé."],
+        malformed: ["Ce lien est illisible", "Il est incomplet ou abîmé. Demandez-en un nouveau à la personne qui vous l'a envoyé."],
+        version: ["Ce lien est trop récent", "Cette page ne sait pas encore le lire. Rechargez-la pour obtenir la dernière version."]
+      },
       linkWhen: d => "Créé le " + d.toLocaleDateString("fr-FR", { day: "numeric", month: "long", year: "numeric" }),
       /* the fun cards: their names, then the words drawn on them */
       fun: {
