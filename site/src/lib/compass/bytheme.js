@@ -64,9 +64,7 @@ const rankOn = (theme, value, parties) =>
    within the tie limit of it, since the page names those together. */
 export function overallOf(c, country, limits) {
 	if (!Number.isFinite(c.x) || !Number.isFinite(c.y)) return null;
-	const ranked = country.parties
-		.map((r) => ({ name: r.name, d: Math.round(Math.hypot(r.x - c.x, r.y - c.y)) }))
-		.sort((a, b) => a.d - b.d);
+	const ranked = PolitiModel.rankParties(c, country.parties);
 	if (!ranked.length) return null;
 	const names = ranked.filter((r) => r.d - ranked[0].d <= limits.tie).map((r) => r.name);
 	return { name: ranked[0].name, d: ranked[0].d, names };

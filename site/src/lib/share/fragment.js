@@ -75,7 +75,7 @@ function fromBase64Url(text) {
 const clamp = (v, lo, hi) => Math.max(lo, Math.min(hi, v));
 /* a position or a reading, -100 to 100, to a tenth */
 const pack = (v) => (typeof v === 'number' && Number.isFinite(v) ? Math.round((clamp(v, -100, 100) + 100) * 10) : NONE16);
-const unpack = (n) => (n === NONE16 ? null : n <= 2000 ? (n - 1000) / 10 : undefined);
+const unpack = (n) => (n === NONE16 ? null : n >= 0 && n <= 2000 ? (n - 1000) / 10 : undefined);
 
 /* The address of a profile. `share` has the shape of a stored snapshot
    (country, x, y, values, badges) plus the card's layout and theme; what

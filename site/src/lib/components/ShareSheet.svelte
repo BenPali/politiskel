@@ -50,6 +50,12 @@
 
 	const data = $derived(open && p ? cardData(p, country) : null);
 	const layout = $derived(LAYOUTS[index]);
+	/* the link records the layout and the theme: a new one must be asked for */
+	$effect(() => {
+		layout.key;
+		theme;
+		bareLink = null;
+	});
 	const canShareFiles = typeof navigator !== 'undefined' && !!navigator.canShare;
 	const canCopy = typeof window !== 'undefined' && 'ClipboardItem' in window;
 

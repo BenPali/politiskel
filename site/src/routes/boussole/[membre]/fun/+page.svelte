@@ -52,7 +52,7 @@
 				{#if match.tie}
 					<h2>{F.tieTitle}</h2>
 					<p class="sub">{F.tieLead}</p>
-					<div class="row" class:three={match.tied.length > 2}>
+					<div class="row">
 						{#each match.tied as e (e.figure.id)}
 							<FigureCard entry={e} extra={match.fit === 'far' ? [F.faraway(p.me)] : [F.closer(e.percentile, p.me), F.resemblance(L.fit[match.fit])]} />
 						{/each}
@@ -106,8 +106,7 @@
 	.notice p { margin: 0; font-size: 14.5px; line-height: 1.5; color: var(--text); }
 	.notice .apart { margin-top: 8px; color: var(--text-2); }
 	.sub { margin: -14px 0 0; font-size: 14.5px; color: var(--text-2); }
-	.row { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 16px; }
-	.row.three { grid-template-columns: repeat(3, minmax(0, 1fr)); }
+	.row { display: grid; grid-template-columns: repeat(auto-fit, minmax(min(100%, 220px), 1fr)); gap: 16px; }
 	.second { margin-top: -4px; }
 	.card { padding: 20px 24px; }
 	.empty { display: flex; flex-direction: column; align-items: flex-start; gap: 16px; }
@@ -128,7 +127,7 @@
 	.how p { margin: 4px 0 10px; line-height: 1.55; }
 	.status { color: var(--text-3); }
 	@media (max-width: 700px) {
-		.row, .row.three { grid-template-columns: minmax(0, 1fr); }
+		.row { grid-template-columns: minmax(0, 1fr); }
 		.card { padding: 18px 16px; }
 	}
 </style>

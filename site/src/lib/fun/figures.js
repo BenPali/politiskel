@@ -203,10 +203,6 @@ const FIGURES_DATA = [
 		basis: 'Society: Dreyfusard and anticlerical, but he opposed votes for women (1907) and sent troops against strikers as interior minister (1906); economy is a guess for a radical with no programme of his own.'
 	},
 	{
-		id: 'churchill', name: 'Winston Churchill', born: 1874, died: 1965, x: 40, y: 45, readings: { pacifism: -75 }, confidence: 'medium', wiki: 'Winston Churchill',
-		basis: 'Economy: as a Liberal minister he brought in labour exchanges and national insurance, then sided with employers against strikes; society: an imperialist who fought Indian self-rule; pacifism: he led Britain through the Second World War and had pushed the Gallipoli campaign.'
-	},
-	{
 		id: 'fdr', name: 'Franklin D. Roosevelt', born: 1882, died: 1945, x: -50, y: 5, confidence: 'medium', wiki: 'Franklin D. Roosevelt',
 		basis: 'Economy: the New Deal, the Social Security Act and the Wagner Act; society: he shelved anti-lynching bills to keep Southern Democrats and signed Executive Order 9066, the internment of Japanese Americans.'
 	},

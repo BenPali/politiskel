@@ -84,7 +84,7 @@ export function percentileOf(profile, figure, catalogue = FIGURES) {
 /* The match of a profile: null when it has no place on both axes, otherwise
    every figure ranked, and what may be claimed:
      tie      the top two are within the model's tie limit: no winner, `tied`
-              lists them (three at most)
+              lists them all
      fit      near, moderate or far, of the best figure's adjusted distance
      best / second   with distance, adjusted distance, readings shared, and
               the percentile within the catalogue */
@@ -99,7 +99,7 @@ export function matchProfile(input, catalogue = FIGURES) {
 		})
 		.sort((a, b) => a.score - b.score || (a.figure.id < b.figure.id ? -1 : 1));
 	const best = ranked[0], second = ranked[1] || null;
-	const tied = ranked.filter((r) => r.score - best.score <= limits.tie).slice(0, 3);
+	const tied = ranked.filter((r) => r.score - best.score <= limits.tie);
 	for (const r of tied.concat(second ? [second] : [])) r.percentile = percentileOf(profile, r.figure, catalogue);
 	return {
 		profile, ranked, best, second, limits,

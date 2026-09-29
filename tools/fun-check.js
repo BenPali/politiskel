@@ -55,7 +55,7 @@ const near = (a, b, eps = 1e-9) => Math.abs(a - b) <= eps;
    the borderline cases left out by caution (see the rule in figures.js). */
 const EXCLUDED = [
   "hitler", "himmler", "goebbels", "goering", "mussolini", "stalin", "mao", "pol-pot", "pol pot", "kim il", "kim jong",
-  "lenin", "trotsky", "trotski", "robespierre", "napoleon", "franco", "pinochet", "videla", "leopold", "petain", "pétain",
+  "lenin", "trotsky", "trotski", "robespierre", "napoleon", "churchill", "franco", "pinochet", "videla", "leopold", "petain", "pétain",
   "khomeini", "deng xiaoping", "ceausescu", "ceaușescu", "hoxha", "mengistu", "idi amin", "suharto", "salazar", "kissinger"
 ];
 

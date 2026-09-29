@@ -2,18 +2,23 @@
      apart, the one where they blend in, and, only when they have one, a
      tension (two readings that go together among the parties, combined
      the other way round). Nothing is drawn when there is nothing to say. -->
+<script module>
+	import { COUNTRIES } from '$lib/compass/model.js';
+	import { referenceOf } from '$lib/compass/signature.js';
+
+	/* the parties do not change: computed once, shared by every card */
+	const REF = referenceOf(COUNTRIES);
+</script>
+
 <script>
 	import { L } from '$lib/i18n/fr.js';
 	import { signed } from '$lib/format.js';
-	import { COUNTRIES } from '$lib/compass/model.js';
 	import { PolitiQuiz } from '$lib/model.js';
-	import { referenceOf, readingsOf, signatureOf, BAND } from '$lib/compass/signature.js';
+	import { readingsOf, signatureOf, BAND } from '$lib/compass/signature.js';
 
 	/** c: the profile's own coordinates (coords()), whatever reading is on show */
 	let { c } = $props();
 
-	/* the parties do not change: computed once for every member shown */
-	const REF = referenceOf(COUNTRIES);
 	const S = L.signature;
 	const B = L.bands;
 

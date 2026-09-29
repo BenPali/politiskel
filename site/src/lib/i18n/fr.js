@@ -1384,7 +1384,6 @@ export const LOCALES = {
         'theodore-roosevelt': "Président américain réformateur et protecteur de la nature",
         bryan: "Tribun populiste américain",
         clemenceau: "Président du Conseil, « le Tigre »",
-        churchill: "Premier ministre britannique pendant la guerre",
         fdr: "Président américain du New Deal",
         'eleanor-roosevelt': "Militante, artisane de la Déclaration universelle des droits de l'homme",
         keynes: "Économiste de l'intervention publique",
