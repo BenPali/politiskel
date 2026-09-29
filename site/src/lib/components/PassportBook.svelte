@@ -347,8 +347,10 @@
 	   blended layers (the holographic film): each face is hidden outright
 	   once it faces away, the switch falling halfway through the turn, when
 	   the leaf is seen edge on; opacity too, so that no blended layer
-	   inside it is composited on its own */
-	.pp-leaf > .pp-face { transition: visibility 0s linear 0.45s, opacity 0s linear 0.45s; }
+	   inside it is composited on its own. Edge on is not half the time:
+	   on the leaf's curve, cubic-bezier(0.45, 0.05, 0.25, 1) over 0.9 s,
+	   the angle reaches 90 degrees at 0.38 of it, 0.342 s, either way. */
+	.pp-leaf > .pp-face { transition: visibility 0s linear 0.342s, opacity 0s linear 0.342s; }
 	.pp-leaf.pp-turned > .pp-front, .pp-leaf:not(.pp-turned) > .pp-back { visibility: hidden; opacity: 0; }
 	/* the fold: a shade near the spine, and a light sweep while the page turns */
 	.pp-face::after { content: ''; position: absolute; inset: 0; pointer-events: none; }
