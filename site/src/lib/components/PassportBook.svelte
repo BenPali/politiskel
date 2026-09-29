@@ -343,6 +343,13 @@
 	.pp-face { position: absolute; inset: 0; backface-visibility: hidden; -webkit-backface-visibility: hidden; overflow: hidden; border-radius: 0 6px 6px 0;
 		box-shadow: 0 1px 2px rgba(0, 0, 0, 0.2), 0 10px 24px rgba(0, 0, 0, 0.18); color: #1f2a33; }
 	.pp-face.pp-back { transform: rotateY(180deg); border-radius: 6px 0 0 6px; }
+	/* Firefox leaves a face that turned away visible, mirrored, when it holds
+	   blended layers (the holographic film): each face is hidden outright
+	   once it faces away, the switch falling halfway through the turn, when
+	   the leaf is seen edge on; opacity too, so that no blended layer
+	   inside it is composited on its own */
+	.pp-leaf > .pp-face { transition: visibility 0s linear 0.45s, opacity 0s linear 0.45s; }
+	.pp-leaf.pp-turned > .pp-front, .pp-leaf:not(.pp-turned) > .pp-back { visibility: hidden; opacity: 0; }
 	/* the fold: a shade near the spine, and a light sweep while the page turns */
 	.pp-face::after { content: ''; position: absolute; inset: 0; pointer-events: none; }
 	.pp-face.pp-front::after { background: linear-gradient(90deg, rgba(0, 0, 0, 0.16), rgba(0, 0, 0, 0) 12%); }
@@ -439,7 +446,7 @@
 	.pp-hint { text-align: center; font-size: 13px; color: var(--text-3); margin: 10px 0 0; }
 
 	@media (prefers-reduced-motion: reduce) {
-		.pp-book, .pp-leaf { transition: none; }
+		.pp-book, .pp-leaf, .pp-leaf > .pp-face { transition: none; }
 		.pp-leaf.pp-moving .pp-face::before { animation: none; }
 	}
 </style>

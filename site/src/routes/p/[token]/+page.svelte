@@ -6,11 +6,19 @@
 	import { page } from '$app/state';
 	import { L } from '$lib/i18n/fr.js';
 	import { api } from '$lib/api.js';
+	import { session } from '$lib/session.svelte.js';
+	import { coords, fromMember } from '$lib/compass/model.js';
 	import { fromSnapshot } from '$lib/share/card.js';
 	import { SHARE_LAYOUTS } from '$lib/share/layouts.js';
 	import PassportBook from '$lib/components/PassportBook.svelte';
 
 	const S = L.share;
+	/* the invitation to make one's own is for visitors who have no place yet */
+	const placed = $derived.by(() => {
+		if (!session.me) return false;
+		const c = coords(fromMember({ username: session.me.username, politiscales: session.me.profile.politiscales, answers: session.me.profile.answers }));
+		return c.x !== null && c.y !== null;
+	});
 	let state = $state('loading');
 	let share = $state(null);
 	let ART = $state(null);
@@ -56,10 +64,12 @@
 			<h2>{L.passport.title}</h2>
 			<PassportBook data={share.data} {ART} />
 		</section>
+		{#if session.ready && !placed}
 		<div class="card cta">
 			<p>{S.ctaPublic}</p>
 			<a class="button primary" href="/">{S.makeYours}</a>
 		</div>
+		{/if}
 	</div>
 {/if}
 
