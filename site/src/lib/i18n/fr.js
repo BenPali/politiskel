@@ -168,7 +168,7 @@ export const LOCALES = {
     profilesHint: "Cliquez un profil pour le suivre sur la boussole ; ses repères proches s'entourent.",
     profilesFoot: "Une proximité mesurée sur deux axes, pas une appartenance.",
     openCard: a => "Fiche de " + a,
-    points: d => d + " pts",
+    points: d => d + (d === 1 ? " pt" : " pts"),
     tieShort: (name, margin) => " · ou " + name + (margin === 0 ? ", à égalité" : ", à " + margin + (margin > 1 ? " pts" : " pt") + " près"),
     profileSource: (ps, quiz) => "Profil tiré de : " + (ps && quiz ? "Questionnaire + PolitiScales" : ps ? "PolitiScales" : quiz ? "Questionnaire" : "aucune réponse pour l'instant"),
     flagFigureShort: "Drapeau",
@@ -207,12 +207,13 @@ export const LOCALES = {
     /* the nearest party theme by theme, under the overall list */
     byTheme: {
       title: "Le plus proche, par domaine",
-      lead: names => names ? "Au total, le plus proche est " + names + ". Sur ces domaines, un autre parti l'est davantage." : "",
+      lead: names => names ? "Au total, vous êtes le plus proche de " + names + ". Sur ces domaines, un autre parti est plus proche de vous." : "",
       label: { economy: "Économie", protectionism: "Protectionnisme", society: "Société", europe: "Europe", ecology: "Écologie", institutions: "Peuple et élus" },
       names: list => list.length > 1 ? list.slice(0, -1).join(", ") + " ou " + list[list.length - 1] : list[0],
-      tie: "à égalité",
-      overallAt: (name, d) => name + " est à " + d + " pts",
-      measured: (n, of) => n + " partis sur " + of + " mesurés"
+      tie: "À égalité",
+      overallAt: (name, d) => "contre " + L.points(d) + " pour " + name,
+      measured: (n, of) => "position connue pour " + n + " partis sur " + of,
+      read: "Écart : la distance entre votre position et celle du parti sur ce domaine, en points (échelle de −100 à +100). Plus il est petit, plus le parti est proche de vous. « À égalité » : les écarts sont trop proches pour départager."
     },
     memberUnknown: n => "« " + n + " » n'est pas dans le groupe affiché.",
     brandHome: "Politiskel, accueil", navMain: "Navigation principale", navMenu: "Ouvrir le menu",
@@ -1102,12 +1103,13 @@ export const LOCALES = {
       + "mêmes que thème par thème : ce qui est déjà répondu d'un côté l'est de l'autre.",
     /* a member's signature against the parties: where they stand apart, where they blend in, a tension */
     signature: {
-      title: "Signature",
-      lead: m => "Face aux " + m + " partis enquêtés par le CHES 2024, tous pays confondus.",
-      standout: "S'écarte le plus des partis",
-      blend: "Se fond le plus parmi les partis",
-      tension: "Une tension",
-      near: (n, m, band) => (n === 0 ? "Aucun parti" : n === 1 ? "1 parti" : n + " partis") + " sur " + m + " à " + band + " points ou moins.",
+      title: "Ce qui vous distingue des partis",
+      lead: m => "Votre place sur chaque thème, comparée à celle des " + m + " partis du CHES 2024 (31 pays).",
+      standout: "Votre position la plus rare",
+      blend: "Votre position la plus courante",
+      tension: "Une combinaison rare",
+      near: (n, m, band) => (n === 0 ? "Aucun parti" : n === 1 ? "1 parti" : n + " partis") + " sur " + m + " (" + Math.round(100 * n / m) + " %)" + (n > 1 ? " sont" : " est") + " à " + band + " points ou moins de vous (zone grisée).",
+      read: band => "Chaque échelle va de −100 à +100. Le point est votre position ; la zone grisée couvre " + band + " points de chaque côté. Plus elle contient de partis, plus votre position est courante.",
       pattern: (a, b) => "Chez les partis, « " + a + " » va plutôt avec « " + b + " ».",
       combine: (n, m) => n === 0 ? "Aucun des " + m + " partis ne les combine ainsi."
         : n === 1 ? "1 parti sur " + m + " les combine ainsi." : n + " partis sur " + m + " les combinent ainsi.",

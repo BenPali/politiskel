@@ -14,6 +14,7 @@
 	import { L } from '$lib/i18n/fr.js';
 	import { signed } from '$lib/format.js';
 	import { PolitiQuiz } from '$lib/model.js';
+	import MiniStrip from './MiniStrip.svelte';
 	import { readingsOf, signatureOf, BAND } from '$lib/compass/signature.js';
 
 	/** c: the profile's own coordinates (coords()), whatever reading is on show */
@@ -49,6 +50,7 @@
 						<b>{B.label[r.s.key]}</b>
 						<span class="side">{pole(r.s.key, r.s.value)} ({signed(Math.round(r.s.value))})</span>
 						<span class="count">{S.near(r.s.n, r.s.m, BAND)}</span>
+						<MiniStrip ends={B.ends[r.s.key]} value={r.s.value} around={BAND} />
 					</dd>
 				</div>
 			{/each}
@@ -62,10 +64,13 @@
 						<span class="pair"><b>{pole(t.b, t.vb)}</b> <span class="side">({signed(Math.round(t.vb))})</span></span>
 						<span class="count">{S.pattern(pole(t.a, t.va), across(t.b, t.vb))}</span>
 						<span class="count">{S.combine(t.n, t.m)}</span>
+						<MiniStrip ends={B.ends[t.a]} value={t.va} />
+						<MiniStrip ends={B.ends[t.b]} value={t.vb} />
 					</dd>
 				</div>
 			{/if}
 		</dl>
+		<p class="read">{S.read(BAND)}</p>
 	</section>
 {/if}
 
@@ -81,6 +86,7 @@
 	.pair { display: inline-block; }
 	.side { font-size: 14px; color: var(--text-2); font-variant-numeric: tabular-nums; }
 	.count { flex: 1 1 100%; font-size: 13.5px; color: var(--text-3); }
+	.read { margin: 6px 0 0; padding-top: 12px; border-top: 1px solid var(--border); font-size: 12.5px; line-height: 1.45; color: var(--text-3); }
 	@media (max-width: 700px) {
 		section.card { padding: 18px 16px; }
 		.row { grid-template-columns: minmax(0, 1fr); }
