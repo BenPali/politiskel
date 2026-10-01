@@ -15,12 +15,9 @@
 	import MemberFlag from '$lib/components/MemberFlag.svelte';
 	import ReadingBands from '$lib/components/ReadingBands.svelte';
 	import PartyList from '$lib/components/PartyList.svelte';
-	import ByTheme from '$lib/components/ByTheme.svelte';
 	import BadgeShelf from '$lib/components/BadgeShelf.svelte';
 	import ShareSheet from '$lib/components/ShareSheet.svelte';
-	import SignatureCard from '$lib/components/SignatureCard.svelte';
 	import { badgesOf, sortBadges } from '$lib/badges/badges.js';
-	import { byTheme, SHOWN } from '$lib/compass/bytheme.js';
 
 	$effect(() => {
 		if (session.ready) ensureBoard();
@@ -42,9 +39,6 @@
 	const base = $derived(p ? coords(p) : null);
 	const others = $derived(p?.me ? board.members.map((m) => { const k = coords(m); return { id: m.id, alias: m.alias, x: k.x, y: k.y }; }) : null);
 	const badges = $derived(p && base ? sortBadges(badgesOf(p, base, { country, members: others })) : []);
-	/* the nearest party theme by theme: the profile itself, on the default reading, whichever one is on show */
-	const themed = $derived(base ? byTheme(base, country) : null);
-	const themedRows = $derived(themed ? themed.themes.filter((t) => SHOWN.has(t.status)) : []);
 	let sharing = $state(false);
 	const passport = $derived(!!p && !!base && (base.x !== null || Object.keys(p.answers || {}).length > 0));
 	const source = $derived(p ? L.profileSource(hasPolitiscales(p), !!(q || c?.soc || c?.quiz)) : '');
@@ -130,9 +124,6 @@
 							<a class="button ghost" href="/boussole/{encodeURIComponent(p.id)}/passeport">{L.passport.open}</a>
 						</section>
 					{/if}
-					{#if base && base.x !== null && base.y !== null}
-						<p class="fun-link"><a href="/boussole/{encodeURIComponent(p.id)}/fun">{L.figures.link(p.me)}</a></p>
-					{/if}
 				</div>
 
 				<div class="side">
@@ -141,18 +132,6 @@
 						<p class="sub">{L.bands.lead}</p>
 						<ReadingBands {c} {q} soc={(c.base || c).soc} eu={(c.base || c).eu} inst={(c.base || c).inst} ecology={(c.base || c).ecology} />
 					</section>
-					<!-- a wrapper that draws nothing, so that the card, when it shows, is spaced like the others -->
-					<div class="sig"><SignatureCard c={base} /></div>
-					{#if themedRows.length}
-						<section class="card" aria-label={L.byTheme.title}>
-							<div class="head">
-								<h2>{L.byTheme.title}</h2>
-								<span>{country.name}</span>
-							</div>
-							{#if themed.overall}<p class="sub">{L.byTheme.lead(L.byTheme.names(themed.overall.names))}</p>{/if}
-							<ByTheme rows={themedRows} />
-						</section>
-					{/if}
 					<section class="card" aria-label={L.partiesTitle}>
 						<div class="head">
 							<h2>{L.partiesTitle}</h2>
@@ -183,13 +162,9 @@
 	.sheet { display: grid; grid-template-columns: 480px minmax(0, 1fr); gap: 32px; align-items: start; }
 	.passport-link { display: flex; justify-content: space-between; align-items: center; gap: 16px; flex-wrap: wrap; }
 	.passport-link .sub { margin: 0; }
-	.fun-link { margin: -8px 0 0; padding: 0 4px; font-size: 13.5px; }
-	.fun-link a { display: inline-flex; align-items: center; min-height: 36px; color: var(--text-3); }
-	.fun-link a:hover { color: var(--text); }
 	.main { display: flex; flex-direction: column; gap: 24px; min-width: 0; }
 	.head a { font-size: 14px; color: var(--text-2); }
 	.side { display: flex; flex-direction: column; gap: 24px; min-width: 0; }
-	.sig { display: contents; }
 	.card { padding: 24px; }
 	.card + .card { margin-top: 0; }
 	.name { display: flex; align-items: baseline; gap: 12px; margin-bottom: 4px; }

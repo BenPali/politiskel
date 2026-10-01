@@ -86,14 +86,6 @@ that what makes an attachment fragile is a tight margin to the runner-up, not
 the weighting. It reads no profile; it exercises the model over its own input
 space. `--country de` and `--profiles N` change what it runs on.
 
-`node tools/score-lab.js` asks how far the "nearest party" reading can be trusted,
-and whether another scorer would hold up better: a magnitude term, a worst-axis
-penalty, an augmented cosine, each against the shipped distance, on synthetic
-profiles drawn from the party positions of every country with the questionnaire's
-own noise. It is a lab: nothing in the site or the server uses it, and it prints
-its numbers instead of keeping them. `--seed`, `--draws`, `--se` (the assumed
-error per questionnaire item) and `--sections` change what it runs.
-
 `node tools/model-check.js` asks the questions synthetic profiles cannot answer,
 on real profiles: whether the "Écolo." readout repeats an axis, how coherently
 the social components are answered, and how many attachments are toss-ups in
@@ -106,12 +98,6 @@ which `node tools/extract.js` writes from PolitiScales screenshots dropped in
 mes données", is one. Neither is committed. `node tools/verify.js` checks the
 screenshot reading against values read by eye, in
 `politi-results/fixture.json`.
-
-The "lien sans compte" of the share dialog puts a profile's results in the
-fragment of a link (`/v#v1.…`, format in `site/src/lib/share/fragment.js`).
-A browser never sends a fragment to a server, so nothing is stored or logged
-and the link cannot be revoked. `node tools/share-fragment-test.mjs` checks
-the format: round trip, ranges, hostile input, and its tables against the site.
 
 With answers it also checks the questionnaire: whether protectionism and the
 three class readings repeat x, how far the questionnaire moves each axis from

@@ -11,7 +11,6 @@
 	import { session } from '$lib/session.svelte.js';
 	import { SHARE_LAYOUTS as LAYOUTS } from '$lib/share/layouts.js';
 	import { cardPng } from '$lib/share/png.js';
-	import { encode } from '$lib/share/fragment.js';
 
 	/** p: one's own profile; country: the country of reference */
 	let { p, country, open = $bindable(false) } = $props();
@@ -26,8 +25,6 @@
 	/* the public link: null, 'confirm', or the address once made */
 	let link = $state(null);
 	let linkBox = $state(null);
-	/* the link with no account: the address that holds the result, or null */
-	let bareLink = $state(null);
 	/* a short green line under what was just copied; a red one for what
 	   failed, inside the dialog, since the page's toasts sit below it */
 	let copied = $state(null);
@@ -42,7 +39,6 @@
 	   below the fold of a short screen: they are brought into view */
 	async function showLink(state) {
 		link = state;
-		bareLink = null;
 		await tick();
 		linkBox?.scrollIntoView({ block: 'nearest', behavior: 'smooth' });
 		linkBox?.querySelector('button.primary')?.focus({ preventScroll: true });
@@ -50,12 +46,6 @@
 
 	const data = $derived(open && p ? cardData(p, country) : null);
 	const layout = $derived(LAYOUTS[index]);
-	/* the link records the layout and the theme: a new one must be asked for */
-	$effect(() => {
-		layout.key;
-		theme;
-		bareLink = null;
-	});
 	const canShareFiles = typeof navigator !== 'undefined' && !!navigator.canShare;
 	const canCopy = typeof window !== 'undefined' && 'ClipboardItem' in window;
 
@@ -69,7 +59,6 @@
 				/* private browsing */
 			}
 			link = null;
-			bareLink = null;
 			copied = null;
 			problem = null;
 			dialog.showModal();
@@ -133,29 +122,6 @@
 		try {
 			await navigator.clipboard.writeText(link);
 			flash('link');
-		} catch {
-			/* the address stays selectable in its field */
-		}
-	}
-	/* The result goes into the address itself, after a #, which no server
-	   is ever sent: nothing is stored, and there is nothing to delete. */
-	async function makeBareLink() {
-		problem = null;
-		try {
-			const s = snapshotOf(data);
-			bareLink = location.origin + '/v#' + encode({ ...s, layout: layout.key, theme });
-			link = null;
-			await tick();
-			linkBox?.scrollIntoView({ block: 'nearest', behavior: 'smooth' });
-			linkBox?.querySelector('button.primary')?.focus({ preventScroll: true });
-		} catch {
-			problem = S.failed;
-		}
-	}
-	async function copyBareLink() {
-		try {
-			await navigator.clipboard.writeText(bareLink);
-			flash('bare');
 		} catch {
 			/* the address stays selectable in its field */
 		}
@@ -231,7 +197,6 @@
 			<button type="button" class={canShareFiles ? 'ghost' : 'primary'} disabled={busy} onclick={() => act('download')}>{S.download}</button>
 			{#if canCopy}<button type="button" class="ghost" disabled={busy} onclick={() => act('copy')}>{S.copy}</button>{/if}
 			{#if session.me && link === null}<button type="button" class="ghost" disabled={busy} onclick={() => showLink('confirm')}>{S.link}</button>{/if}
-			{#if !bareLink}<button type="button" class="ghost" disabled={busy} onclick={makeBareLink}>{S.bareLink}</button>{/if}
 		</div>
 		{#if copied === 'image'}<p class="ok" role="status">{S.copied}</p>{/if}
 		{#if link === 'confirm'}
@@ -251,17 +216,6 @@
 					<button type="button" class="primary" onclick={copyLink}>{S.linkCopy}</button>
 				</div>
 				{#if copied === 'link'}<p class="ok" role="status">{S.linkCopied}</p>{/if}
-			</div>
-		{/if}
-		{#if bareLink}
-			<div class="link" bind:this={linkBox}>
-				<label for="share-bare-link">{S.bareLinkReady}</label>
-				<div class="link-row">
-					<input id="share-bare-link" type="text" readonly value={bareLink} onfocus={(e) => e.currentTarget.select()} />
-					<button type="button" class="primary" onclick={copyBareLink}>{S.linkCopy}</button>
-				</div>
-				<p class="note">{S.bareLinkNote}</p>
-				{#if copied === 'bare'}<p class="ok" role="status">{S.linkCopied}</p>{/if}
 			</div>
 		{/if}
 		{#if problem && link !== 'confirm'}<p class="bad" role="alert">{problem}</p>{/if}
@@ -306,7 +260,6 @@
 	.link.warn p { margin: 0 0 12px; font-size: 14px; line-height: 1.5; color: var(--text-2); }
 	.link-actions { display: flex; justify-content: flex-end; gap: 10px; flex-wrap: wrap; }
 	.link label { display: block; font-size: 14px; font-weight: 650; margin-bottom: 8px; }
-	.link .note { margin: 10px 0 0; font-size: 14px; line-height: 1.5; color: var(--text-2); }
 	.link-row { display: flex; gap: 10px; }
 	.link-row input { flex: 1; min-width: 0; }
 	@media (prefers-reduced-motion: reduce) { .slides { transition: none; } .sheet[open] { animation: none; } }
