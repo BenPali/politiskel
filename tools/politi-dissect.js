@@ -303,7 +303,9 @@
   }
 
   const api = { AXES, SIDE, extract, keyConcepts, toPercents, saturated };
+  /* both: Node's tools require it, and the site imports it as a module,
+     which may or may not see `module` depending on where it runs */
   if (typeof module !== "undefined" && module.exports) module.exports = api;
-  else global.PolitiExtract = api;
+  global.PolitiExtract = api;
 
 })(typeof globalThis !== "undefined" ? globalThis : this);

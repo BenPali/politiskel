@@ -8,8 +8,8 @@
    computes.
 
    It returns KEYS, never sentences: `fitOf` gives "near", not "proche", and
-   `methodTag` gives "revolutionary". Wording belongs to the locale table in
-   the page, so a second language changes nothing here.
+   `methodTag` gives "revolutionary". Wording belongs to the site's locale table,
+   site/src/lib/i18n/fr.js, so a second language changes nothing here.
 
    Being requirable is the point: the weighting, the thresholds and the
    proximity claims have all been measured, and a measurement nobody else can
@@ -52,6 +52,9 @@
                 conversion is a rescaling and nothing more.
        "est"  — hand estimate, calibrated against the CHES entries around it.
 
+     `full` is the party's full name in its own language, where `name` is an
+     acronym or a short form, as in the CHES 2024 codebook.
+
      `prot` is CHES `protectionism` (0 = trade liberalisation, 10 = protection
      of domestic producers), converted the same way. It is carried for France,
      Germany and the UK only. For Italy all nine party means are whole
@@ -59,6 +62,35 @@
      consistent with a single rater, so the variable is left out rather than
      drawn as if it were a measure; `protWhy` says so on the page. Hand
      estimates carry no `prot`: there is nothing to estimate it from.
+
+     `env` is the environment against growth: the mean of CHES
+     `environment` and `climate_change` (0 = for the environment and climate
+     policies, 10 = against them; r = 0.86 between the two), turned so that
+     +100 is the environment, then converted as x and y.
+
+     `pop` is populism as the POPPA expert survey rates it (Populism and
+     Political Parties Expert Survey, wave 2023, CC0): the latent score its
+     authors validate (populism_cfa_rescaled, 0 to 10) from five items,
+     people-centrism, anti-elitism, the general will, a Manichean outlook
+     and an indivisible people; converted as x and y. Zaslove, Meijers and
+     Huber, "The state of populism", Party Politics, 2025,
+     doi:10.1177/13540688251361813. It is the
+     populist reading's y. CHES `people_v_elite` was tried first, but it
+     rates direct against representative democracy, not populism: Swiss
+     parties top it, and the RN sat at +40. POPPA rests on 9 experts per
+     French party, 29 German, 18 Italian, 8 British. Parties POPPA does not
+     rate carry no `pop`; Sinistra Italiana and Europa Verde carry the
+     score of the AVS alliance they ran in; Azione that of the Azione–Italia
+     Viva list.
+
+     `eu` is CHES `eu_position` (1 = strongly opposed to European
+     integration, 7 = strongly in favour), set on the same scale:
+     value = (score − 4) / 3 × 100. Every CHES party of the four countries
+     carries it, and its means look like several experts' — two whole numbers
+     in 36, where Italy's protectionism had nine in nine. CHES `eu_russia` is not
+     carried: the French positions rest on two or three experts each, the
+     Italian ones on one at most, and some are implausible (the PD at 9 out
+     of 10 towards Russia).
 
      What does NOT transpose is the meaning of "a party". CHES rates parties, so
      in a multi-party system each reference is one. The United States are not in
@@ -72,32 +104,32 @@
       code: "fr", name: "France", parties: [
         { name: "Lutte ouvrière",     x: -92, y: -30, src: "est",  note: "Trotskisme, anticapitalisme de classe" },
         { name: "NPA / Rév. perm.",   x: -88, y: -70, src: "est",  note: "Anticapitalisme, forte ouverture sociétale" },
-        { name: "La France insoumise",x: -82, y: -64, src: "ches", prot: 48, note: "Rupture écosocialiste, populisme de gauche" },
-        { name: "PCF",                x: -75, y: -29, src: "ches", prot: 56, note: "Étatisme économique, sensibilité souverainiste" },
-        { name: "Les Écologistes",    x: -54, y: -66, src: "ches", prot: 15, note: "Écologie politique, libéralisme culturel" },
-        { name: "Parti socialiste",   x: -33, y: -45, src: "ches", prot: 8, note: "Social-démocratie réformiste" },
-        { name: "La France humaniste",x: -15, y: -22, src: "est",  note: "Villepin, 2025 — gaullisme social : patrimoine et successions taxés, mais déficit sous 3 %, simplification par ordonnances. Postérieur au CHES, placement incertain" },
-        { name: "MoDem",              x:  14, y: -10, src: "ches", prot: -24, note: "Centrisme social, europhilie" },
-        { name: "Rassemblement national", x: 20, y: 67, src: "ches", prot: 70, note: "Étatisme social ciblé, nationalisme" },
-        { name: "Renaissance",        x:  24, y: -18, src: "ches", prot: -24, note: "Libéralisme économique, centre-droit" },
-        { name: "Horizons",           x:  36, y:   6, src: "ches", prot: -28, note: "Droite libérale gestionnaire" },
-        { name: "Debout la France",   x:  38, y:  62, src: "est",  note: "Souverainisme gaulliste" },
-        { name: "Les Républicains",   x:  56, y:  44, src: "ches", prot: -12, note: "Droite conservatrice, ordre et marché" },
-        { name: "Nouvelle Énergie",   x:  62, y:  32, src: "est",  note: "Lisnard — droite libérale et décentralisatrice : choc de dérégulation, retraite par capitalisation, migration hors contrôle des cours européennes" },
-        { name: "Reconquête",         x:  67, y:  82, src: "ches", prot: 37, note: "Libéralisme économique, national-conservatisme" }
+        { name: "La France insoumise",x: -82, y: -64, src: "ches", prot: 48, eu: -33, pop: 55, env: 44, note: "Rupture écosocialiste, populisme de gauche" },
+        { name: "PCF",                x: -75, y: -29, src: "ches", prot: 56, eu: -30, pop: 3, env: 17, full: "Parti communiste français", note: "Étatisme économique, sensibilité souverainiste" },
+        { name: "Les Écologistes",    x: -54, y: -66, src: "ches", prot: 15, eu: 73, pop: -60, env: 72, note: "Écologie politique, libéralisme culturel" },
+        { name: "Parti socialiste",   x: -33, y: -45, src: "ches", prot: 8, eu: 76, pop: -60, env: 34, note: "Social-démocratie réformiste" },
+        { name: "La France humaniste",x: -15, y: -22, src: "est",  note: "Villepin, 2025. Gaullisme social : patrimoine et successions taxés, mais déficit sous 3 %, simplification par ordonnances. Postérieur au CHES, placement incertain" },
+        { name: "MoDem",              x:  14, y: -10, src: "ches", prot: -24, eu: 94, pop: -63, env: -2, full: "Mouvement démocrate", note: "Centrisme social, europhilie" },
+        { name: "Rassemblement national", x: 20, y: 67, src: "ches", prot: 70, eu: -61, pop: 83, env: -55, note: "Étatisme social ciblé, nationalisme" },
+        { name: "Renaissance",        x:  24, y: -18, src: "ches", prot: -24, eu: 76, pop: -39, env: -2, note: "Libéralisme économique, centre-droit" },
+        { name: "Horizons",           x:  36, y:   6, src: "ches", prot: -28, eu: 81, pop: -56, env: -8, note: "Droite libérale gestionnaire" },
+        { name: "Debout la France",   x:  38, y:  62, src: "est",  pop: 67, note: "Souverainisme gaulliste" },
+        { name: "Les Républicains",   x:  56, y:  44, src: "ches", prot: -12, eu: 42, pop: -13, env: -33, note: "Droite conservatrice, ordre et marché" },
+        { name: "Nouvelle Énergie",   x:  62, y:  32, src: "est",  note: "Lisnard, droite libérale et décentralisatrice : choc de dérégulation, retraite par capitalisation, migration hors contrôle des cours européennes" },
+        { name: "Reconquête",         x:  67, y:  82, src: "ches", prot: 37, eu: -79, pop: 96, env: -62, note: "Libéralisme économique, national-conservatisme" }
       ]
     },
     {
       code: "de", name: "Allemagne", parties: [
-        { name: "Die Linke",          x: -73, y: -54, src: "ches", prot: 60, note: "Gauche radicale, redistribution et ouverture sociétale" },
-        { name: "BSW",                x: -44, y:  41, src: "ches", prot: 63, note: "Scission de Die Linke — étatisme économique et conservatisme culturel, le quadrant que l'échiquier français laisse vide" },
-        { name: "Grüne",              x: -33, y: -68, src: "ches", prot: -6, note: "Écologie politique, libéralisme culturel" },
-        { name: "SPD",                x: -31, y: -28, src: "ches", prot: 6, note: "Social-démocratie de gouvernement" },
-        { name: "Freie Wähler",       x:  29, y:  34, src: "ches", prot: 10, note: "Centre-droit localiste, ancré en Bavière" },
-        { name: "CDU",                x:  32, y:  31, src: "ches", prot: -29, note: "Démocratie chrétienne, centre-droit de gouvernement" },
-        { name: "CSU",                x:  35, y:  51, src: "ches", prot: 0, note: "Aile bavaroise de la CDU, nettement plus conservatrice" },
-        { name: "FDP",                x:  52, y: -36, src: "ches", prot: -63, note: "Libéralisme de marché ET libéralisme culturel — sans équivalent français de ce poids" },
-        { name: "AfD",                x:  53, y:  88, src: "ches", prot: 40, note: "Droite radicale nationaliste" }
+        { name: "Die Linke",          x: -73, y: -54, src: "ches", prot: 60, eu: -9, pop: 24, env: 37, note: "Gauche radicale, redistribution et ouverture sociétale" },
+        { name: "BSW",                x: -44, y:  41, src: "ches", prot: 63, eu: -53, env: -48, full: "Bündnis Sahra Wagenknecht", note: "Scission de Die Linke : étatisme économique et conservatisme culturel, le quadrant que l'échiquier français laisse vide" },
+        { name: "Grüne",              x: -33, y: -68, src: "ches", prot: -6, eu: 93, pop: -57, env: 85, full: "Bündnis 90/Die Grünen", note: "Écologie politique, libéralisme culturel" },
+        { name: "SPD",                x: -31, y: -28, src: "ches", prot: 6, eu: 79, pop: -60, env: 33, full: "Sozialdemokratische Partei Deutschlands", note: "Social-démocratie de gouvernement" },
+        { name: "Freie Wähler",       x:  29, y:  34, src: "ches", prot: 10, eu: 0, env: -49, note: "Centre-droit localiste, ancré en Bavière" },
+        { name: "CDU",                x:  32, y:  31, src: "ches", prot: -29, eu: 81, pop: -47, env: -12, full: "Christlich Demokratische Union Deutschlands", note: "Démocratie chrétienne, centre-droit de gouvernement" },
+        { name: "CSU",                x:  35, y:  51, src: "ches", prot: 0, eu: 50, pop: -12, env: -31, full: "Christlich-Soziale Union in Bayern", note: "Aile bavaroise de la CDU, nettement plus conservatrice" },
+        { name: "FDP",                x:  52, y: -36, src: "ches", prot: -63, eu: 61, pop: -81, env: -30, full: "Freie Demokratische Partei", note: "Libéralisme de marché ET libéralisme culturel, sans équivalent français de ce poids" },
+        { name: "AfD",                x:  53, y:  88, src: "ches", prot: 40, eu: -70, pop: 88, env: -84, full: "Alternative für Deutschland", note: "Droite radicale nationaliste" }
       ]
     },
     {
@@ -106,27 +138,27 @@
              + "nombres entiers, là où les autres pays reposent sur cinq à onze experts : "
              + "vraisemblablement un seul expert, trop peu pour placer les partis.",
       parties: [
-        { name: "Sinistra Italiana",  x: -72, y: -66, src: "ches", note: "Gauche radicale, composante de l'alliance AVS" },
-        { name: "Europa Verde",       x: -56, y: -66, src: "ches", note: "Écologistes, composante de l'alliance AVS" },
-        { name: "M5S",                x: -43, y: -35, src: "ches", note: "Mouvement 5 étoiles — populisme devenu social, longtemps hors du clivage" },
-        { name: "Partito Democratico",x: -41, y: -53, src: "ches", note: "Centre-gauche social-démocrate" },
-        { name: "SVP",                x:   0, y:   2, src: "ches", note: "Parti régionaliste sud-tyrolien, au centre des deux axes" },
-        { name: "Azione",             x:   4, y: -31, src: "ches", note: "Centre libéral réformateur" },
-        { name: "Più Europa",         x:   5, y: -73, src: "ches", note: "Centre libéral, fortement europhile" },
-        { name: "Fratelli d'Italia",  x:  28, y:  83, src: "ches", note: "Droite nationale-conservatrice, au gouvernement depuis 2022" },
-        { name: "Lega",               x:  36, y:  77, src: "ches", note: "Droite radicale, régionaliste à l'origine" },
-        { name: "Forza Italia",       x:  48, y:  21, src: "ches", note: "Droite libérale-conservatrice" }
+        { name: "Sinistra Italiana",  x: -72, y: -66, src: "ches", eu: 28, pop: -33, env: 68, note: "Gauche radicale, composante de l'alliance AVS" },
+        { name: "Europa Verde",       x: -56, y: -66, src: "ches", eu: 57, pop: -33, env: 73, note: "Écologistes, composante de l'alliance AVS" },
+        { name: "M5S",                x: -43, y: -35, src: "ches", eu: 2, pop: 76, env: 61, full: "Movimento 5 Stelle", note: "Mouvement 5 étoiles : populisme devenu social, longtemps hors du clivage" },
+        { name: "Partito Democratico",x: -41, y: -53, src: "ches", eu: 93, pop: -46, env: 50, note: "Centre-gauche social-démocrate" },
+        { name: "SVP",                x:   0, y:   2, src: "ches", eu: 52, pop: -42, env: 10, full: "Südtiroler Volkspartei", note: "Parti régionaliste sud-tyrolien, au centre des deux axes" },
+        { name: "Azione",             x:   4, y: -31, src: "ches", eu: 93, pop: -42, env: 17, note: "Centre libéral réformateur" },
+        { name: "Più Europa",         x:   5, y: -73, src: "ches", eu: 98, pop: -71, env: 30, note: "Centre libéral, fortement europhile" },
+        { name: "Fratelli d'Italia",  x:  28, y:  83, src: "ches", eu: -24, pop: 62, env: -30, note: "Droite nationale-conservatrice, au gouvernement depuis 2022" },
+        { name: "Lega",               x:  36, y:  77, src: "ches", eu: -80, pop: 67, env: -54, full: "Lega per Salvini Premier", note: "Droite radicale, régionaliste à l'origine" },
+        { name: "Forza Italia",       x:  48, y:  21, src: "ches", eu: 44, pop: -13, env: -31, note: "Droite libérale-conservatrice" }
       ]
     },
     {
       code: "uk", name: "Royaume-Uni", parties: [
-        { name: "Green Party",        x: -58, y: -71, src: "ches", prot: 0, note: "Écologistes d'Angleterre et du pays de Galles" },
-        { name: "Plaid Cymru",        x: -42, y: -31, src: "ches", prot: -4, note: "Nationalisme gallois de gauche" },
-        { name: "SNP",                x: -38, y: -44, src: "ches", prot: -14, note: "Indépendantisme écossais, social-démocrate" },
-        { name: "Labour",             x: -28, y: -33, src: "ches", prot: -31, note: "Travaillisme de gouvernement, recentré" },
-        { name: "Liberal Democrats",  x: -14, y: -65, src: "ches", prot: -46, note: "Centre libéral, très libéral culturellement" },
-        { name: "Conservative Party", x:  49, y:  43, src: "ches", prot: -16, note: "Conservatisme de marché" },
-        { name: "Reform UK",          x:  68, y:  82, src: "ches", prot: 22, note: "Droite radicale issue du Brexit" }
+        { name: "Green Party",        x: -58, y: -71, src: "ches", prot: 0, eu: 72, pop: -36, env: 93, full: "Green Party of England and Wales", note: "Écologistes d'Angleterre et du pays de Galles" },
+        { name: "Plaid Cymru",        x: -42, y: -31, src: "ches", prot: -4, eu: 73, pop: -9, env: 29, note: "Nationalisme gallois de gauche" },
+        { name: "SNP",                x: -38, y: -44, src: "ches", prot: -14, eu: 79, pop: -1, env: 38, full: "Scottish National Party", note: "Indépendantisme écossais, social-démocrate" },
+        { name: "Labour",             x: -28, y: -33, src: "ches", prot: -31, eu: 14, pop: -25, env: 42, full: "Labour Party", note: "Travaillisme de gouvernement, recentré" },
+        { name: "Liberal Democrats",  x: -14, y: -65, src: "ches", prot: -46, eu: 59, pop: -60, env: 56, note: "Centre libéral, très libéral culturellement" },
+        { name: "Conservative Party", x:  49, y:  43, src: "ches", prot: -16, eu: -75, pop: -8, env: -14, note: "Conservatisme de marché" },
+        { name: "Reform UK",          x:  68, y:  82, src: "ches", prot: 22, eu: -98, pop: 65, env: -67, note: "Droite radicale issue du Brexit" }
       ]
     },
     {
@@ -140,11 +172,11 @@
          + "part. À lire comme un ordre de grandeur, pas comme une mesure.",
       parties: [
         { name: "Green Party",              x: -65, y: -62, src: "est", note: "Écosocialisme, hors des deux grands partis" },
-        { name: "Démocrates progressistes", x: -52, y: -52, src: "est", note: "Sanders, Ocasio-Cortez — assurance maladie publique, Green New Deal" },
+        { name: "Démocrates progressistes", x: -52, y: -52, src: "est", note: "Sanders, Ocasio-Cortez : assurance maladie publique, Green New Deal" },
         { name: "Parti démocrate",          x: -16, y: -30, src: "est", note: "Centre-gauche à l'échelle européenne : le marché y est peu contesté, le libéralisme culturel assumé" },
         { name: "Républicains modérés",     x:  55, y:  30, src: "est", note: "Républicanisme d'avant 2016 : marché, défense, conservatisme social tempéré" },
         { name: "Parti républicain",        x:  62, y:  72, src: "est", note: "Marché, conservatisme social et national" },
-        { name: "Parti libertarien",        x:  88, y: -32, src: "est", note: "Marché sans entrave et libertés individuelles — quadrant que personne n'occupe en Europe à ce niveau" }
+        { name: "Parti libertarien",        x:  88, y: -32, src: "est", note: "Marché sans entrave et libertés individuelles, quadrant que personne n'occupe en Europe à ce niveau" }
       ]
     }
   ];
@@ -271,12 +303,21 @@
     return best;
   }
 
+  /* The other CHES countries, generated by tools/import-ches.js, go after
+     the four written by hand and before the United States. In the browser
+     politi-countries.js is loaded first; in Node it is required. */
+  const more = (typeof global.PolitiCountries !== "undefined" && global.PolitiCountries)
+    || (typeof require === "function" ? require("./politi-countries.js") : []);
+  COUNTRIES.splice(COUNTRIES.findIndex(c => c.code === "us"), 0, ...more);
+
   const countryByCode = code => COUNTRIES.find(c => c.code === code) || null;
 
   const api = { AXES, COUNTRIES, clamp, axisScore, methodTag, coords, spacingOf,
                 limitsFor, fitOf, nearestReference, rankParties, widestEconGap,
                 countryByCode };
+  /* both: Node's tools require it, and the site imports it as a module,
+     which may or may not see `module` depending on where it runs */
   if (typeof module !== "undefined" && module.exports) module.exports = api;
-  else global.PolitiModel = api;
+  global.PolitiModel = api;
 
 })(typeof globalThis !== "undefined" ? globalThis : this);
